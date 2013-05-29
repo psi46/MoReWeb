@@ -1,0 +1,31 @@
+
+	#Page #ContentWrap #Content .ResultData .SubTestResults
+	{
+		overflow:auto;
+	}
+	
+/*
+	Mobile Optimization
+*/
+@media screen and (max-width:680px){
+	#dummy
+	{}
+	
+}
+@media screen and (min-width:680px) and (max-width:900px){
+	#dummy
+	{}
+	
+}
+@media screen and (min-width:900px) and (max-width:1120px){
+	#dummy
+	{}
+	
+	
+}
+@media screen and (min-width:1120px){
+	#dummy
+	{}
+	
+}
+
