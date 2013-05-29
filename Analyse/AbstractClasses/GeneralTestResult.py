@@ -564,8 +564,8 @@ class GeneralTestResult:
 					'###MARGIN_TOP###':str(int(-800./float(DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'])*
 						float(self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight'])/2.)),
 					'###TITLE###':TestResultObject.ResultData['Plot']['Caption'],
-					'###WIDTH###':DisplayOptions['Width'],
-					'###HEIGHT###':1
+					'###WIDTH###':int(DisplayOptions['Width']),
+					'###HEIGHT###':1,
 				}
 			)
 			#PlotHTML = HtmlParser.substituteSubpart(PlotHTML, '###PLOT_IMAGE_'+i+'###', PlotImageHTML)

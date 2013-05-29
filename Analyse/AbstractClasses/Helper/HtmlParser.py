@@ -217,6 +217,7 @@ class HtmlParser:
 	* @see substituteSubpart()
 	'''
 	def substituteMarker(self, content, marker, markContent)  :
+		markContent = str(markContent)
 		return content.replace(marker,markContent);
 	
 
