@@ -27,7 +27,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 						tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*52+j)+1
 						tmpRow = k+1
 					if ChipTestResultObject.Attributes['ChipNo'] < 8:
-						tmpRow += 80
+						#tmpRow += 80
 					# Get the data from the chip sub test result VcalThresholdUntrimmed
 					self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, ChipTestResultObject.ResultData['SubTestResults']['VcalThresholdUntrimmed'].ResultData['Plot']['ROOTObject'].GetBinContent(j+1, k+1))
 		
