@@ -20,8 +20,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
 			for j in range(52): # Columns
 				for k in range(80): # Rows
-					tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*52+j)+1
-					tmpRow = k+1
+					if ChipTestResultObject.Attributes['ChipNo'] < 8:
+						tmpCol = 415-(ChipTestResultObject.Attributes['ChipNo']*52+j)+1
+						tmpRow = 159-k+1
+					else:
+						tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*52+j)+1
+						tmpRow = k+1
 					if ChipTestResultObject.Attributes['ChipNo'] < 8:
 						tmpRow += 80
 					# Get the data from the chip sub test result VcalThresholdUntrimmed
