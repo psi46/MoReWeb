@@ -148,8 +148,8 @@
 	}
 	#Page #ContentWrap #Content .ResultData .Plot .LargeImageContainer .ImageLarge
 	{
-		width:800px;
-		max-height:100%;
+		max-width:90%;
+		max-height:90%;
 	}
 	#Page #ContentWrap #Content .ResultData .Plot .LargeImageContainer .OpenInNewWindowLinkWrap
 	{

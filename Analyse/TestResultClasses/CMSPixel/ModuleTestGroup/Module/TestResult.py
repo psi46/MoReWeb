@@ -114,12 +114,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			
 		]
 			
+		
+		
+	def PopulateResultData(self):
 		self.FileHandle = ROOT.TFile.Open(
 			self.FullTestResultsPath
 			+'/commander_Fulltest.root'
 		)
-		
-	def PopulateResultData(self):
 		self.ResultData['Table'] = {
 			'HEADER':[
 				[
@@ -167,6 +168,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 					i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nPar1Defect']['Value'],
 				]	
 			)
+		
+		self.FileHandle.Close()
 	
 	
 	def CustomWriteToDatabase(self, ParentID):
@@ -235,6 +238,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 					''', Row)
 				return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid
 			
-	def __del__(self):
-		self.CloseSubTestResultFileHandles(1)
 	

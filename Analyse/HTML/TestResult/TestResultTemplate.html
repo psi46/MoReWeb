@@ -177,19 +177,30 @@
 		document.onload = function{
 			var Elements = document.getElementByClassName('ImageLinkBack');
 			var DefaultWidth = 200;
-			var ScreenWidth = 
-			var ScreenHeight = 
+			var ScreenWidth = self.innerWidth;
+			var ScreenHeight = self.innerHeight;
 			for(var i in Elements)
 			{
 				if(Elements.hasOwnProperty(i))
 				{
-					Elements[i]
 					var Width = DefaultWidth * parseInt(Elements[i].getAttribute('data-width'));
 					var Height = DefaultHeight * parseInt(Elements[i].getAttribute('data-height'));
-					'###MARGIN_TOP###':str(int(-800./float(DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'])*
-						float(self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight'])/2.)),
-					
-				
+					var ImageAspectRatio = Width / Height;
+					var ScaledWidth = ScreenWidth*0.9;
+					var ScaledHeight = ScreenHeight*0.9;
+					var ScaleTo = 'Width';
+					if(ScaledWidth / ImageAspectRatio > 0.9 * ScreenHeight)
+					{
+						ScaleTo = 'Height'
+						ScaledWidth = ImageAspectRatio * ScaledHeight;
+					}
+					else
+					{
+						ScaleTo = 'Width'
+						ScaledHeight = ScaledWidth / ImageAspectRatio;
+					}
+					Elements[i].style.marginTop = -1* (ScaledHeight/2)
+					Elements[i].style.marginLeft = -1* (ScaledWidth/2)
 				}
 			}
 		}
