@@ -1,0 +1,7 @@
+Setting device Address = /dev/ttyUSB0
+supplying abo:"/log"
+setDevice
+openDevice
+connectDevice
+return of modbus_connect:0
+subscribed Abo "/jumo"

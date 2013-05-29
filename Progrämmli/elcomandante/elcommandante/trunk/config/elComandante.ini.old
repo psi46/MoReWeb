@@ -1,0 +1,68 @@
+[Modules]
+TB0: M0696
+TB1: M0001
+TB2: M3476
+TB3: M7676
+
+[ModuleType]
+TB0: Roc
+TB1: Roc
+TB2: Full
+TB3: Roc
+
+[TestboardUse]
+TB0: True
+TB1: False
+TB2: False
+TB3: False
+
+[Cycle]
+highTemp: 20
+lowTemp: -10
+nCycles: 5
+
+[IV]
+Start: 0
+Stop: -030
+Step: 10
+Delay: 2
+
+[Keithley]
+KeithleyUse: True
+
+[CoolingBox]
+CoolingBoxUse: True
+
+[Xray]
+XrayUse: False
+
+[Environment Xrf]
+Temperature: 17
+XrayVoltage: 60
+XrayCurrent: 30
+XrayTarget: Mo
+
+[Environment Mo]
+Temperature: <!Environment Xrf|Temperature!>
+XrayVoltage: <!Environment Xrf|XrayVoltage!>
+XrayCurrent: <!Environment Xrf|XrayCurrent!>
+XrayTarget: Mo
+
+[Environment Ag]
+Temperature: <!Environment Xrf|Temperature!>
+XrayVoltage: <!Environment Xrf|XrayVoltage!>
+XrayCurrent: <!Environment Xrf|XrayCurrent!>
+XrayTarget: Ag
+
+[Environment Ba]
+Temperature: <!Environment Xrf|Temperature!>
+XrayVoltage: <!Environment Xrf|XrayVoltage!>
+XrayCurrent: <!Environment Xrf|XrayCurrent!>
+XrayTarget: Ba
+
+[Tests]
+#Test: IV@17,Fulltest@17,IV@17
+Test: IV@17,Pretest@17,Fulltest@16
+#Test: VcalCalibrationStep@Mo,VcalCalibrationStep@Ag,VcalCalibrationStep@Ba,VcalVsThreshold@17
+#,Pretest@-10
+#,Cycle,Pretest@17

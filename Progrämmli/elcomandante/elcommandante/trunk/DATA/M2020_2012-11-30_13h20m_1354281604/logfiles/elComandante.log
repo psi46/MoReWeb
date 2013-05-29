@@ -1,0 +1,56 @@
+#--------LOG from Fri 30 Nov 2012 at 13h:20m:04s ---------
+Set LogFile to <open file '/home/peller/sdvlp/elcommandante/trunk/DATA/logfiles/elComandante.log', mode 'append' at 0x1cf2780>
+Check Subscription of the Clients:
+/keithley is answering
+/jumo is answering
+/psi is answering
+I found the following Testboards with Modules:
+
+	- Testboard 0 at address DPE00JA9 with Module M2020
+try to powercycle Testboard...
+
+I setup the directories:
+	- /home/peller/sdvlp/elcommandante/trunk/DATA/M2020_2012-11-30_13h20m_1354281604//tmp/
+	  with default Parameters from /home/peller/sdvlp/elcommandante/trunk/config/defaults/singleRocTest
+Powercycle Testboard at slot no 0
+Success, Testboard DPE00JA9 is up
+----------------
+I found the following Tests to be executed:
+
+	- Pretest at 17 degrees
+----------------
+I do now the following Test:
+	Pretest at 17 degrees
+	 Stablize CoolingBox Temperature @ 17 degrees
+	--> Jumo is in status 17
+	--> Jumo is in status COOLING
+	--> Jumo is in status COOLING
+	--> Got information to be stable at 1354281645 from packet @ 1354281644
+	--> Temp is stable now. I begin with the Pretest
+
+I setup the directories:
+	- /home/peller/sdvlp/elcommandante/trunk/DATA/M2020_2012-11-30_13h20m_1354281604//1354281645_Pretest@17/
+	  with default Parameters from /home/peller/sdvlp/elcommandante/trunk/config/defaults/singleRocTest
+
+psi46 at Testboard 0 is now started
+----------------
+!!! 	Test in Testboard 0 failed! :( !!!
+
+I setup the directories:
+	- /home/peller/sdvlp/elcommandante/trunk/DATA/M2020_2012-11-30_13h20m_1354281604//tmp/
+	  with default Parameters from /home/peller/sdvlp/elcommandante/trunk/config/defaults/singleRocTest
+Powercycle Testboard at slot no 0
+Success, Testboard DPE00JA9 is up
+----------------
+heating up coolingbox...
+	--> Jumo is in status HEATING
+	--> Jumo is in status HEATING
+	--> Jumo is in status HEATING
+	--> Jumo is in status HEATING
+	--> Got information to be done at 1354281703 from packet @ 1354281703
+	--> Cooling Box is heated up now.
+I am done for now!
+----------------
+ciao!
+#---------------------------------------------------------
+

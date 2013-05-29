@@ -1,0 +1,372 @@
+Setting device Address = /dev/ttyUSB0
+supplying abo:"/log"
+setDevice
+openDevice
+connectDevice
+return of modbus_connect:0
+subscribed Abo "/jumo"
+supplying abo:"/jumo"
+timeout = 2
+SEND AND RECEIVE FUNCTION
+
+14:20:11	supplying abo:"/temperature/jumo"
+supplying abo:"/humidity"
+waiting
+WAITING is a  normal Status!17
+SectionNo = 2
+ Change Status from WAITING to COOLING
+14:20:13	cooling/unstable: -7.93202e+08 16.9797- 17=0.0202789 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:16	cooling/unstable: 3 16.9657- 17=0.0343304 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:17	cooling/unstable: 4 16.9604- 17=0.0395908 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+Start with ProgramNo -1
+start Last program
+14:20:18	cooling/unstable: 5 16.9598- 17=0.0402126 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:18	cooling/unstable: 5 16.9609- 17=0.0390816 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:20	cooling/unstable: 7 16.9664- 17=0.0335655 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:22	cooling/unstable: 9 16.9704- 17=0.0295753 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:23	cooling/unstable: 10 16.965- 17=0.0349808 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:24	cooling/unstable: 11 16.958- 17=0.0419521 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:25	cooling/unstable: 12 16.9601- 17=0.0399055 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:26	cooling/unstable: 13 16.9591- 17=0.0408974 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:27	cooling/unstable: 14 16.9587- 17=0.0412598 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:28	cooling/unstable: 15 16.9572- 17=0.0428028 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:29	cooling/unstable: 16 16.9586- 17=0.0414085 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:30	cooling/unstable: 17 16.9631- 17=0.0369415 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:31	cooling/unstable: 18 16.9658- 17=0.0342293 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:32	cooling/unstable: 19 16.9669- 17=0.0330982 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:33	cooling/unstable: 20 16.9743- 17=0.0257072 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:34	cooling/unstable: 21 16.98- 17=0.0199795 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:35	cooling/unstable: 22 16.9773- 17=0.0226784 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:36	cooling/unstable: 23 16.9751- 17=0.0248508 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:37	cooling/unstable: 24 16.9755- 17=0.0245094 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:38	cooling/unstable: 25 16.9827- 17=0.0173092 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:39	cooling/unstable: 26 16.9923- 17=0.00770569 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:40	cooling/unstable: 27 17.0007- 17=0.000717163 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:41	cooling/unstable: 28 17.0066- 17=0.00658607 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:42	cooling/unstable: 29 17.0135- 17=0.0134773 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:43	cooling/unstable: 30 17.0182- 17=0.0182323 0.5
+COOLING is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:44	cooling/unstable: 31 17.0233- 17=0.0233498 0.5
+ Change Status from COOLING to STABLE
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:47	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:49	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:51	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:54	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:56	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:20:58	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:21:01	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:21:03	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:21:05	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+14:21:07	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 2
+start Heating
+14:21:10	stable
+STABLE is a  normal Status!17
+JumoInterface::setTArgetTemp: 17
+Target Temp: 17	jumoTargetTemp:17
+Set new Temperature in Box to 17
+SectionNo = 3
+ Change Status from STABLE to HEATING
+14:21:11	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:12	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:13	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:14	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:15	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:16	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:17	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:18	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:19	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:20	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:21	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:22	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:23	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:24	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:25	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:26	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:27	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:28	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:29	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:30	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:31	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:32	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:33	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:34	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:35	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:36	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:37	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:38	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:39	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:40	heating
+HEATING is a  normal Status!17
+SectionNo = 3
+14:21:41	heating
+HEATING is a  normal Status!17
+SectionNo = 0
+ Change Status from HEATING to WAITING
+14:21:43	waiting
+WAITING is a  normal Status!17
+SectionNo = 0
+14:21:43	waiting
+WAITING is a  normal Status!17
+SectionNo = 0
+14:21:44	waiting
+WAITING is a  normal Status!17
+SectionNo = 0
+ Change Status from WAITING to HEATING
+kill clientHandler1
+killed Client
+kill clientHandler1
+clean exit
+kill clientHandler1
+client should be killed

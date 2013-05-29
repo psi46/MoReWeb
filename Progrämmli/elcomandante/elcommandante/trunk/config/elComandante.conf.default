@@ -1,0 +1,61 @@
+[Directories]
+baseDir:  ../
+testDefinitions: $configDir$/tests/
+moduleDB: <!Directories|baseDir!>/moduleDB/
+subserverDir: <!Directories|baseDir!>/subserverDATA/
+dataDir:<!Directories|baseDir!>/DATA/
+defaultParameters: $configDir$/defaults/
+jumoDir: <!Directories|baseDir!>/jumoClient/
+keithleyDir: <!Directories|baseDir!>/keithleyClient/
+scriptDir: <!Directories|baseDir!>/analysisClient/scripts/
+
+[TestboardAddress]
+#TB0: DPE00SPH
+TB0: DPE00JA9
+#TB0: DPCDKAPA
+#TB0: DPCDKAPA
+TB1: DPE00T0D
+TB2: DPE00IUD
+TB3: DPE00J4X
+#TB3: DPE00J72
+
+[defaultParameters]
+Roc: defaultParametersRocPSI46v2
+Full: defaultParametersModule
+
+[subsystem]
+Ziel: 127.0.0.1
+Port: 12333
+serverPort: 12334
+coolingBoxSubscription: /jumo
+keithleySubscription: /keithley
+psiSubscription: /psi
+xraySubscription: /xray
+analysisSubscription: /analysis
+
+[jumoClient]
+port: /dev/ttyUSB0
+programName: jumoClient
+
+[keithleyClient]
+#port: /dev/ttyUSB0
+port: /dev/ttyF0
+
+[xrayClient]
+xrayDevice: /dev/ttyF0
+xrayType: id3003
+xrfDevice: /dev/ttyF1
+xrfType: zaber
+xrfTargets: Fe:0,Cu:25320,Mo:50640,Ag:75960,Sn:101280,Ba:126600
+
+
+[Transfer]
+host: cmspixel.pi.infn.it
+port: 23481
+destination: /home/eth/dropbox
+user: eth
+#host: snickers.ethz.ch
+#port: 9922
+#destination: /data/cooling-box/DATA
+#user: bachmair
+checkForTars: True

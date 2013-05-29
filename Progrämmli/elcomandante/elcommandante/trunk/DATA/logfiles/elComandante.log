@@ -1,0 +1,20 @@
+#--------LOG from Thu 24 Jan 2013 at 09h:46m:32s ---------
+Set LogFile to <open file '/home/peller/sdvlp/elcommandante/trunk/DATA/logfiles/elComandante.log', mode 'append' at 0x2581300>
+Subserver is running.
+setup of Agente: psiClient
+	- Testboard 3 at address DPE00J4X with Module M7676
+setup of Agente: keithleyClient
+setup of Agente: analysisClient
+setup of Agente: coolingBoxClient
+Check whether clients are runnning ...
+psiClient: 
+keithleyClient: 
+analysisClient: 
+coolingBoxClient: 
+Starting psiClient ...
+keithleyClient: Starting keithleyClient...
+Starting analysisClient ...
+Starting coolingBoxClient ...
+Check Subscription of the Clients:
+#---------------------------------------------------------
+

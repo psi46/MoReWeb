@@ -1,0 +1,59 @@
+Directory M1215-080320.09:34/T-10b 
+ModuleNr TestNr M1215 T-10b
+Defects 0 0 3 0 0 
+PerfDefects 0 6 0 0 0 
+ROCS with defects > 1% 0 0 0
+Missing histograms 0
+Tested yes on Thu Mar 20 13:04:40 2008
+Trimming yes on Thu Mar 20 12:44:34 2008
+phCalibration yes on Thu Mar 20 12:34:45 2008
+Temp -10.0007 0.0225369 Soll -10
+Thermal cycling yes 2.84364 9.57368
+Test duration 5.3
+dtlScan 13
+SwitchOn 1.55984
+Current 0.277539
+LogErrors 0
+SCurve 173.955266666667 19.97328 
+Threshold   64.6077 1.49255266666667 
+Gain 3.28562533333333 0.10828276 
+Pedestal 296.483533333333 21.53538 
+Parameter1 19.7655688888889 1.435692 
+SCurves good
+Thresholds good
+Gains good
+Peds good
+Par1 good
+TBM1 0
+TBM2 0
+I 150 2.701550 
+I150/I100 1.603343 
+iv datapoints 77 
+Grade A
+ModuleDefects 9
+ModuleFunctDefects 3
+ModulePerfDefects 6
+ModulePHDefects 0
+DEAD 0 0
+MASK - 0
+BUMPS 0 0
+TRIMS 0 0
+ADDRESS 0 0
+NOISE 0 0
+TTHR 0 0
+PHCAL 0 0
+Noise 0 0
+VcalThrWidth 0 0
+RelGainWidth 0 0
+PedSpread 0 0
+MeanParameter1 0 0
+I150V 0 0
+Iratio 0 0
+RATIO 1.79776499656957
+position 21048
+retest GRADE -
+shortTest GRADE A
+fullTest GRADE A
+FINAL DB-GRADE A
+old shortTest GRADE A
+old fullTest GRADE A
