@@ -33,19 +33,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		NoOfEntries = min(IVTuple.GetEntries(), 250)
 		i = 0
 		for Entry in IVTuple:
-			Voltage_List.append(-1.*Entry.Voltage)
-			Current_List.append(self.TestResultEnvironmentObject.GradingParameters['IVCurrentFactor']*Entry.Current)
-			
-			if Entry.Current>-1e-10:
-					continue;
-			if i > 0:
+			if Entry.Voltage <=0:
+				Voltage_List.append(-1.*Entry.Voltage)
+				Current_List.append(self.TestResultEnvironmentObject.GradingParameters['IVCurrentFactor']*Entry.Current)
 				
-				if Voltage_List[i] >= 100. and Voltage_List[i-1] <= 100. :  
-					CurrentAtVoltage100 = Current_List[i-1] + (100. - Voltage_List[i-1])*(Current_List[i] - Current_List[i-1])/(Voltage_List[i] - Voltage_List[i-1]) 
-				
-				if  Voltage_List[i] >= 150. and Voltage_List[i-1] <= 150. :
-					CurrentAtVoltage150 = Current_List[i-1] + (150. - Voltage_List[i-1])*(Current_List[i] - Current_List[i-1])/(Voltage_List[i] - Voltage_List[i-1])
-			i += 1
+				if Entry.Current>-1e-10:
+						continue;
+				if i > 0:
+					
+					if Voltage_List[i] >= 100. and Voltage_List[i-1] <= 100. :  
+						CurrentAtVoltage100 = Current_List[i-1] + (100. - Voltage_List[i-1])*(Current_List[i] - Current_List[i-1])/(Voltage_List[i] - Voltage_List[i-1]) 
+					
+					if  Voltage_List[i] >= 150. and Voltage_List[i-1] <= 150. :
+						CurrentAtVoltage150 = Current_List[i-1] + (150. - Voltage_List[i-1])*(Current_List[i] - Current_List[i-1])/(Voltage_List[i] - Voltage_List[i-1])
+				i += 1
 		
 		IVCurveFile.close()
 		

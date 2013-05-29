@@ -235,5 +235,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 					''', Row)
 				return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid
 			
-
+	def __del__(self):
+		self.CloseSubTestResultFileHandles(1)
 	

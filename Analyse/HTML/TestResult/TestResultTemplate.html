@@ -87,9 +87,9 @@
 													<img class="Image" src="###FILENAME###" alt="Plot" />
 												</a>
 												<div class="LargeImageContainer" id="###IMAGELARGECONTAINERID###">
-													<a href="#d" class="ImageLinkBack" style="margin-top:###MARGIN_TOP###px;">
+													<a href="#d" class="ImageLinkBack" style="margin-top:###MARGIN_TOP###px;" data-width="###WIDTH###" data-height="###HEIGHT###">
 														<h4 class="ImageTitle">###TITLE###</h4>
-														<img class="ImageLarge" src="###FILENAME###"  alt="Plot" />
+														<img class="ImageLarge" src="###FILENAME###"  alt="Plot"/>
 													</a>
 												</div>
 											<!-- ###PLOT_IMAGE### -->
@@ -173,6 +173,30 @@
 					</div>
 				</div>
 			</div>
+		<script type="text/javascript">
+		document.onload = function{
+			var Elements = document.getElementByClassName('ImageLinkBack');
+			var DefaultWidth = 200;
+			var ScreenWidth = 
+			var ScreenHeight = 
+			for(var i in Elements)
+			{
+				if(Elements.hasOwnProperty(i))
+				{
+					Elements.
+					var Width = DefaultWidth * parseInt(Elements[i].getAttribute('data-width'));
+					var Height = DefaultHeight * parseInt(Elements[i].getAttribute('data-height'));
+					'###MARGIN_TOP###':str(int(-800./float(DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'])*
+						float(self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight'])/2.)),
+					
+				
+				}
+			}
+		}
+	
+		
+		
+		</script>
 		<!-- ###TEMPLATE### --> 
 	</body>
 </html>
