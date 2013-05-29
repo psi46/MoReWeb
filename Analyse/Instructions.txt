@@ -1,5 +1,0 @@
-How to run MORE-Web?
-
-1.) Set the pathes to you test results in the Configuration/Pathes.cfg.
-2.) In the console, change to the directory where the Controller.py is located
-3.) type "python Controller.py" in your Console
