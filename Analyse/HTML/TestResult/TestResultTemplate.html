@@ -174,14 +174,16 @@
 				</div>
 			</div>
 		<script type="text/javascript">
-		document.onload = function(e){
-			var Elements = document.getElementByClassName('ImageLinkBack');
-			var DefaultWidth = 200;
-			var ScreenWidth = self.innerWidth;
-			var ScreenHeight = self.innerHeight;
-			for(var i in Elements)
+		var Elements = document.getElementsByClassName('ImageLinkBack');
+		var DefaultWidth = 200;
+		var DefaultHeight= 200;
+		var ScreenWidth = self.innerWidth;
+		var ScreenHeight = self.innerHeight;
+		for(var i in Elements)
+		{
+			if(Elements.hasOwnProperty(i))
 			{
-				if(Elements.hasOwnProperty(i))
+				if(Elements[i].getAttribute)
 				{
 					var Width = DefaultWidth * parseInt(Elements[i].getAttribute('data-width'));
 					var Height = DefaultHeight * parseInt(Elements[i].getAttribute('data-height'));
@@ -189,21 +191,20 @@
 					var ScaledWidth = ScreenWidth*0.9;
 					var ScaledHeight = ScreenHeight*0.9;
 					var ScaleTo = 'Width';
-					if(ScaledWidth / ImageAspectRatio > 0.9 * ScreenHeight)
-					{
-						ScaleTo = 'Height'
+					if(ScaledWidth / ImageAspectRatio > 0.9 * ScreenHeight){
+						ScaleTo = 'Height';
 						ScaledWidth = ImageAspectRatio * ScaledHeight;
 					}
-					else
-					{
-						ScaleTo = 'Width'
+					else{
+						ScaleTo = 'Width';
 						ScaledHeight = ScaledWidth / ImageAspectRatio;
 					}
-					Elements[i].style.marginTop = -1* (ScaledHeight/2)
-					Elements[i].style.marginLeft = -1* (ScaledWidth/2)
+					Elements[i].style.marginTop = -1* (ScaledHeight/2)+"px";
+					Elements[i].style.marginLeft = -1* (ScaledWidth/2)+"px";
 				}
 			}
 		}
+	
 	
 		
 		
