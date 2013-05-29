@@ -1,1 +1,0 @@
-:prog:TB0:start /home/peller/sdvlp/elcommandante/trunk/config/tests/Pretest,/home/peller/sdvlp/elcommandante/trunk/DATA/M2020_2012-11-30_14h27m_1354285628/1354285670_Pretest@17,Pretest

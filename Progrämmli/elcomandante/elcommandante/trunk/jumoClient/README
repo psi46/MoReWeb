@@ -1,7 +1,0 @@
-you need to install modbus
-
-and build libsubsystem 
-
-make bin
-make install
-make lib
