@@ -37,7 +37,7 @@ import ConfigParser
 # see root/core/base/inc/TError.h for information on error levels
 ROOT.gErrorIgnoreLevel = 1001
 
-#ROOT.gROOT.SetBatch(True)
+ROOT.gROOT.SetBatch(True)
 
 Configuration = ConfigParser.ConfigParser()
 Configuration.read([
