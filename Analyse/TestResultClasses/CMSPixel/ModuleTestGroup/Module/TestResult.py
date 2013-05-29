@@ -172,6 +172,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		
 		self.FileHandle.Close()
 	
+		
 	
 	def CustomWriteToDatabase(self, ParentID):
 		if self.ResultData['SubTestResults'].has_key('IVCurve'):

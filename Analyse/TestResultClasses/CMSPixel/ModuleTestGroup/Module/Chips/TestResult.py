@@ -17,7 +17,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 				},
 			})
 		
-		self.FileHandle = self.ParentObject.FileHandle
-		
+	def OpenFileHandle(self):
+		self.FileHandle = self.ParentObject.FileHandle	
 	def PopulateResultData(self):
 		pass

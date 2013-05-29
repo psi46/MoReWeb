@@ -30,6 +30,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("#Delta Threshold [DAC]");
 			self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
 			self.ResultData['Plot']['ROOTObject'].Draw("colz");
+			self.ResultData['Plot']['ROOTObject'].SaveAs(self.GetPlotFileName()+'.cpp')
 
 		if self.SavePlotFile:
 			self.Canvas.SaveAs(self.GetPlotFileName())		
