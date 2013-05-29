@@ -115,12 +115,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		]
 			
 		
-		
-	def PopulateResultData(self):
+	def OpenFileHandle(self):
 		self.FileHandle = ROOT.TFile.Open(
 			self.FullTestResultsPath
 			+'/commander_Fulltest.root'
 		)
+	def PopulateResultData(self):
+		
 		self.ResultData['Table'] = {
 			'HEADER':[
 				[

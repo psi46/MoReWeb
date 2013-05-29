@@ -263,6 +263,7 @@ class GeneralTestResult:
 		@final
 	'''
 	def PopulateAllData(self):
+		self.OpenFileHandle();
 		for i in self.ResultData['SubTestResultDictList']:
 			if i['TestResultObject'].Enabled:
 				self.SetCanvasSize()
@@ -301,6 +302,14 @@ class GeneralTestResult:
 	'''
 	def CustomInit(self):
 		pass
+	
+	'''
+		Opens a file handle just before populating data
+	'''
+	def OpenFileHandle(self):
+		pass
+	
+	
 	'''
 		Create a unique ID for creating root histograms
 	'''
