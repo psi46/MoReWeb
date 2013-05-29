@@ -177,6 +177,7 @@
 		var Elements = document.getElementsByClassName('ImageLinkBack');
 		var DefaultWidth = 200;
 		var DefaultHeight= 200;
+		var Margin = 15;
 		var ScreenWidth = self.innerWidth;
 		var ScreenHeight = self.innerHeight;
 		for(var i in Elements)
@@ -199,8 +200,17 @@
 						ScaleTo = 'Width';
 						ScaledHeight = ScaledWidth / ImageAspectRatio;
 					}
-					Elements[i].style.marginTop = -1* (ScaledHeight/2)+"px";
-					Elements[i].style.marginLeft = -1* (ScaledWidth/2)+"px";
+					Elements[i].style.marginTop = -1* ((ScaledHeight+2*Margin)/2)+"px";
+					Elements[i].style.marginLeft = -1* ((ScaledWidth+2*Margin)/2)+"px";
+					var ImageElement = Elements[i].children[1];
+					if(ScaleTo == 'Width')
+					{
+						ImageElement.style.width = ScaledWidth + 'px';
+					}
+					else
+					{
+						ImageElement.style.height = ScaledHeight + 'px';
+					}
 				}
 			}
 		}
