@@ -120,21 +120,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		over = TestResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(TestResultObject.ResultData['Plot']['ROOTObject'].GetNbinsX()+1)
 			
 		TestResultObject.ResultData['KeyValueDictPairs'] = {
-			'N': {
-				'Value':'{0:1.0f}'.format(Integral), 
-				'Label':'N'
-			},
+			#'N': {
+			#	'Value':'{0:1.0f}'.format(Integral), 
+			#	'Label':'N'
+			#},
 			'mu': {
 				'Value':'{0:1.2f}'.format(Mean), 
 				'Label':'μ'
 			},
-			'sigma':{
-				'Value':'{0:1.2f}'.format(RMS), 
-				'Label':'σ'
-			}
+			#'sigma':{
+			#	'Value':'{0:1.2f}'.format(RMS), 
+			#	'Label':'σ'
+			#}
 		}
 		
-		TestResultObject.ResultData['KeyList'] = ['N','mu','sigma']
+		#TestResultObject.ResultData['KeyList'] = ['N','mu','sigma']
+		TestResultObject.ResultData['KeyList'] = ['mu']
 		if under:
 			TestResultObject.ResultData['KeyValueDictPairs']['under'] = {'Value':'{0:1.2f}'.format(under), 'Label':'<='}
 			TestResultObject.ResultData['KeyList'] += 'under'
