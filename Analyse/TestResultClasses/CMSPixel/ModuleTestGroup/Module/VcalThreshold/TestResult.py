@@ -21,8 +21,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			for j in range(52): # Columns
 				for k in range(80): # Rows
 					if ChipTestResultObject.Attributes['ChipNo'] < 8:
-						tmpCol = 415-(ChipTestResultObject.Attributes['ChipNo']*52+j)+1
-						tmpRow = 159-k+1
+						tmpCol = 8*52-(ChipTestResultObject.Attributes['ChipNo']%8*52+j)
+						tmpRow = 2*80-k
 					else:
 						tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*52+j)+1
 						tmpRow = k+1
