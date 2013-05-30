@@ -14,7 +14,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			if self.Attributes['ModuleType'] == 'a':
 				self.Attributes['StartChip'] = 0
 			elif self.Attributes['ModuleType'] == 'b':
-				self.Attributes['StartChip'] = 8
+				self.Attributes['StartChip'] = 7
 			else:
 				self.Attributes['StartChip'] = 0
 			
