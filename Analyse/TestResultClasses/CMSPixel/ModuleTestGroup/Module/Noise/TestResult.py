@@ -54,6 +54,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		
 			for i in TestResultObject.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
 				ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+				ChipNo = ChipTestResultObject.Attributes['ChipNo']
 				Value = float(ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData['KeyValueDictPairs'][Parameters['DataParameterKey']]['Value'])
 				nValue = float(ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData['KeyValueDictPairs']['N']['Value'])
 				
@@ -65,8 +66,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 				Value = float(Value)
 				Sum += Value
 
-				TestResultObject.ResultData['Plot']['ROOTObject'].SetBinContent(i2+1,Value)
-				TestResultObject.ResultData['Plot']['ROOTObject_h2'].SetBinContent(i2+1,nValue)
+				TestResultObject.ResultData['Plot']['ROOTObject'].SetBinContent(ChipNo,Value)
+				TestResultObject.ResultData['Plot']['ROOTObject_h2'].SetBinContent(ChipNo,nValue)
 				#TestResultObject.ResultData['Plot']['ROOTObject'].SetPoint(i2+1,i2+1,Value)
 				if 1.2*Value > Ymax:
 					Ymax = 1.2*Value
