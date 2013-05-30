@@ -55,6 +55,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			for i in TestResultObject.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
 				ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
 				ChipNo = int(ChipTestResultObject.Attributes['ChipNo'])
+				ChipPosition = ChipNo - TestResultObject.ParentObject.Attributes['StartChip'] + 1
 				Value = float(ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData['KeyValueDictPairs'][Parameters['DataParameterKey']]['Value'])
 				nValue = float(ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData['KeyValueDictPairs']['N']['Value'])
 				
@@ -66,8 +67,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 				Value = float(Value)
 				Sum += Value
 
-				TestResultObject.ResultData['Plot']['ROOTObject'].SetBinContent(ChipNo,Value)
-				TestResultObject.ResultData['Plot']['ROOTObject_h2'].SetBinContent(ChipNo,nValue)
+				TestResultObject.ResultData['Plot']['ROOTObject'].SetBinContent(ChipPosition+1,Value)
+				TestResultObject.ResultData['Plot']['ROOTObject_h2'].SetBinContent(ChipPosition+1,nValue)
 				#TestResultObject.ResultData['Plot']['ROOTObject'].SetPoint(i2+1,i2+1,Value)
 				if 1.2*Value > Ymax:
 					Ymax = 1.2*Value
@@ -94,7 +95,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			lineB.SetLineWidth(2);
 			lineB.SetLineStyle(2)
 			lineB.SetLineColor(ROOT.kRed)
-			TestResultObject.ResultData['Plot']['ROOTObject'].SaveAs(TestResultObject.GetPlotFileName()+'.cpp')
+			#TestResultObject.ResultData['Plot']['ROOTObject'].SaveAs(TestResultObject.GetPlotFileName()+'.cpp')
 		ROOT.gPad.SetLogy(0);
 		
 		TestResultObject.Canvas.SaveAs(TestResultObject.GetPlotFileName())
@@ -139,10 +140,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		TestResultObject.ResultData['KeyList'] = ['mu']
 		if under:
 			TestResultObject.ResultData['KeyValueDictPairs']['under'] = {'Value':'{0:1.2f}'.format(under), 'Label':'<='}
-			TestResultObject.ResultData['KeyList'] += 'under'
+			TestResultObject.ResultData['KeyList'] += ['under']
 		if over:
 			TestResultObject.ResultData['KeyValueDictPairs']['over'] = {'Value':'{0:1.2f}'.format(over), 'Label':'>='}
-			TestResultObject.ResultData['KeyList'] += 'over'
+			TestResultObject.ResultData['KeyList'] += ['over']
 		
 		
 		

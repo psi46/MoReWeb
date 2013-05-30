@@ -3,28 +3,7 @@
 Program	: MORE-Web 
  Author	: Esteban Marin - estebanmarin@gmx.ch
  Version	: 2.1
- Release Date	: 2013-05-14
- License	: GNU General Public License (http://www.gnu.org/licenses/gpl.html)
- 	----------------------------------------------------------------------------
-  Copyright (C) 2013 Esteban Marin
- 	
-	This file is part of MORE-Web.
-
-	MORE-Web is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	MORE-Web is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with MORE-Web. If not, see <http://www.gnu.org/licenses/>.
- 	
- 	See LICENSE.TXT file for more information.
-  ----------------------------------------------------------------------------
+ Release Date	: 2013-05-30
 '''
 from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
 
