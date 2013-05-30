@@ -55,7 +55,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			for i in TestResultObject.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
 				ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
 				ChipNo = ChipTestResultObject.Attributes['ChipNo']
-				ChipPosition = ChipNo - TestResultObject.ParentObject.Attributes['StartChip'] + 1
+				ChipPosition = ChipNo + 1
 				Value = float(ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData['KeyValueDictPairs'][Parameters['DataParameterKey']]['Value'])
 				nValue = float(ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData['KeyValueDictPairs']['N']['Value'])
 				
