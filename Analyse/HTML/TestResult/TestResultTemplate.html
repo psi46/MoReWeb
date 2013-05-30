@@ -207,11 +207,13 @@
 						var ImageElement = Elements[i].children[1];
 						if(ScaleTo == 'Width')
 						{
-							ImageElement.style.width = ScaledWidth + 'px';
+							ImageElement.style.width = parseInt(ScaledWidth) + 'px';
+							ImageElement.style.height = 'inherit';
 						}
 						else
 						{
-							ImageElement.style.height = ScaledHeight + 'px';
+							ImageElement.style.height = parseInt(ScaledHeight) + 'px';
+							ImageElement.style.width = 'inherit';
 						}
 					}
 				}
