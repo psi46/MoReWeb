@@ -63,7 +63,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		
 	
 		if self.ResultData['Plot']['ROOTObject']:
-			self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Noise e^{-}");
+			self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Noise (e^{-})");
 			self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
 			self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
 			self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);

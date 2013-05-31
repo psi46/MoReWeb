@@ -75,7 +75,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		self.ResultData['HiddenData']['PedestalMin'] = self.ResultData['Plot']['ROOTObject_hPedestal'].GetBinCenter(int(xLow-extra)) #pedMin
 		self.ResultData['HiddenData']['PedestalMax'] = self.ResultData['Plot']['ROOTObject_hPedestal'].GetBinCenter(int(xUp+1.5*extra)) #pedMax
 		
-		self.ResultData['Plot']['ROOTObject_hPedestal'].GetXaxis().SetTitle("Pedestal Value");
+		self.ResultData['Plot']['ROOTObject_hPedestal'].GetXaxis().SetTitle("ADC counts");
 		self.ResultData['Plot']['ROOTObject_hPedestal'].GetYaxis().SetTitle("No. of Entries");
 		self.ResultData['Plot']['ROOTObject_hPedestal'].GetXaxis().CenterTitle();
 		self.ResultData['Plot']['ROOTObject_hPedestal'].GetYaxis().SetTitleOffset(1.2);

@@ -30,7 +30,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			self.ResultData['Plot']['ROOTObject'].SetAxisRange(0., 60.);
 			self.ResultData['Plot']['ROOTObject'].SetMinimum(0.5);
 			self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlack);
-			self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("#Delta Threshold DAC");
+			self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold difference");
 			self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
 			self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
 			self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
