@@ -202,7 +202,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			pass
 		else:
 			with self.TestResultEnvironmentObject.LocalDBConnection:
-				self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestDate = :TestDate AND TestType=:TestType',Row)
+				self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType',Row)
 				self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
 					'''INSERT INTO ModuleTestResults 
 					(
