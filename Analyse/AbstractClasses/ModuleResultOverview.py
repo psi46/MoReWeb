@@ -29,7 +29,7 @@ class ModuleResultOverview:
 				'SELECT * FROM ModuleTestResults '+
 				'WHERE 1=1 '+
 				AdditionalWhere+
-				'ORDER BY TestDate DESC,ModuleID ASC,TestType ASC',
+				'ORDER BY ModuleID ASC,TestType ASC',
 				{
 					'ModuleID':ModuleID,
 					'TestDate':TestDate
