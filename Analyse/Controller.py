@@ -40,6 +40,8 @@ TestResultEnvironmentInstance.TestResultsBasePath = TestResultDirectory
 ModuleTestResults = []
 if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
 	for Folder in os.listdir(TestResultDirectory):
+        if os.path.isdir(Folder) == False:
+            continue
 		if not Folder.find('.') == 0:
 			ModuleInformationRaw = Folder.split('_')
 			if len(ModuleInformationRaw) == 5:

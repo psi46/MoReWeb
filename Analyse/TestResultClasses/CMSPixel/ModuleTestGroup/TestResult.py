@@ -27,41 +27,42 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 					'Order':3		
 				}
 			},
-			#{
-			#	'Key':'ModuleFulltest_m10_1',
-			#	'Module':'Module',
-			#	'InitialAttributes':{
-			#		'StorageKey':	'ModuleFulltest_m10_1',
-			#		'TestResultSubDirectory': '001_Fulltest_m10',
-			#		'IncludeIVCurve':False,
-			#		'ModuleID':self.Attributes['ModuleID'],
-			#		'ModuleVersion':self.Attributes['ModuleVersion'],
-			#		'ModuleType':self.Attributes['ModuleType'],
-			#		'TestType':'m10_1',
-			#		'TestTemperature':-10,
-			#	},
-			#	'DisplayOptions':{
-			#		'Order':1		
-			#	}
-			#},
-			#{
-			#	'Key':'ModuleFulltest_m10_2',
-			#	'Module':'Module',
-			#	'InitialAttributes':{
-			#		'StorageKey':	'ModuleFulltest_m10_2',
-			#		'TestResultSubDirectory': '003_Fulltest_m10',
-			#		'IncludeIVCurve':True,
-			#		'IVCurveSubDirectory':	'004_IV_m10',
-			#		'ModuleID':self.Attributes['ModuleID'],
-			#		'ModuleVersion':self.Attributes['ModuleVersion'],
-			#		'ModuleType':self.Attributes['ModuleType'],
-			#		'TestType':'m10_2',
-			#		'TestTemperature':-10,
-			#	},
-			#	'DisplayOptions':{
-			#		'Order':2		
-			#	}
-			#},
+			{
+				'Key':'ModuleFulltest_m10_1',
+				'Module':'Module',
+				'InitialAttributes':{
+					'StorageKey':	'ModuleFulltest_m10_1',
+					'TestResultSubDirectory': '001_Fulltest_m10',
+					'IncludeIVCurve':False,
+					'ModuleID':self.Attributes['ModuleID'],
+					'ModuleVersion':self.Attributes['ModuleVersion'],
+					'ModuleType':self.Attributes['ModuleType'],
+					'TestType':'m10_1',
+					'TestTemperature':-10,
+				},
+				'DisplayOptions':{
+					'Order':1		
+				}
+			},
+			{
+				'Key':'ModuleFulltest_m10_2',
+				'Module':'Module',
+				'InitialAttributes':{
+					'StorageKey':	'ModuleFulltest_m10_2',
+					'TestResultSubDirectory': '003_Fulltest_m10',
+					'IncludeIVCurve':True,
+					'IVCurveSubDirectory':	'004_IV_m10',
+					'ModuleID':self.Attributes['ModuleID'],
+					'ModuleVersion':self.Attributes['ModuleVersion'],
+					'ModuleType':self.Attributes['ModuleType'],
+					'TestType':'m10_2',
+					'TestTemperature':-10,
+					'recalculateCurrentTo': 17
+				},
+				'DisplayOptions':{
+					'Order':2		
+				}
+			},
 			
 			# tempProfile.C
 		]

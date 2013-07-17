@@ -21,6 +21,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		}
 		BadRocs = 0
 		DeadPixels = 0
+		AddressProblems = 0
+		ThresholdDefects = 0
 		MaskDefects = 0
 		DeadBumps = 0
 		NoisyPixels = 0
@@ -33,6 +35,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			if int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Total']['Value']) > 0.01 * 52*80:
 				BadRocs += 1
 			DeadPixels += int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadPixel']['Value'])
+			AddressProblems += int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nAddressProblems']['Value'])
+			ThresholdDefects += int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nThrDefect']['Value'])
 			MaskDefects += int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nMaskDefect']['Value'])
 			DeadBumps += int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadBumps']['Value'])
 			NoisyPixels += int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nNoisy1Pixel']['Value'])
@@ -133,6 +137,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 				'Value':'{0:1.0f}'.format(DeadPixels), 
 				'Label':'Dead Pixels'
 			},
+			'AddressProblems': {
+				'Value':'{0:1.0f}'.format(AddressProblems), 
+				'Label':'Address Problems'
+			},
+			'ThresholdDefects': {
+				'Value':'{0:1.0f}'.format(ThresholdDefects), 
+				'Label':'Threshold Defects'
+			},
+																			
 			'MaskDefects':{
 				'Value':'{0:1.0f}'.format(MaskDefects), 
 				'Label':'Mask Defects'
@@ -163,5 +176,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			},
 		}
 		
-		self.ResultData['KeyList'] = ['Module','Grade','BadRocs', 'DeadPixels', 'MaskDefects', 'DeadBumps', 'NoisyPixels', 'TrimProblems', 'PHGainDefects', 'PHPedestalDefects', 'PHPar1Defects']
+		self.ResultData['KeyList'] = ['Module','Grade','BadRocs', 'DeadPixels','AddressProblems', 'ThresholdDefects', 'MaskDefects', 'DeadBumps', 'NoisyPixels', 'TrimProblems', 'PHGainDefects', 'PHPedestalDefects', 'PHPar1Defects']
 

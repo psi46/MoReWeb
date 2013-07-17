@@ -3,6 +3,7 @@ import ROOT
 import AbstractClasses
 import ROOT
 import array
+import math
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 	def CustomInit(self):
 		self.Name='CMSPixel_ModuleTestGroup_Module_Chips_Chip_IVCurve_TestResult'
@@ -11,7 +12,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		
 	def SetStoragePath(self):
 		pass
-		
+	
+	def recalculateCurrent(self,inputCurrent, inputTemp, outputTemp):
+		outputCurrent = inputCurrent
+		Eef = 1.21
+		kB = 1.38e-23
+		exp = Eef/2/kB*(1/inputTemp-1/outputTemp)
+		outputCurrent = inputCurrent * inputTemp**2/outputTemp**2 *math.exp(exp) 
+		return outputCurrent
+
 	def PopulateResultData(self):
 		ROOT.gPad.SetLogy(1);
 		
@@ -30,6 +39,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		Current_List = array.array('d',[])
 		CurrentAtVoltage100 = 0;
 		CurrentAtVoltage150 = 0;
+		recalculatedCurrentAtVoltage150V = 0;
 		NoOfEntries = min(IVTuple.GetEntries(), 250)
 		i = 0
 		for Entry in IVTuple:
@@ -54,7 +64,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			Variation = CurrentAtVoltage150/CurrentAtVoltage100
 		else:
 			Variation = 0;
-		
+		if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
+			recalculatedCurrentAtVoltage150V = self.recalculateCurrent(CurrentAtVoltage150, self.ParentObject.Attributes['TestTemperature'],self.ParentObject.Attributes['recalculateCurrentTo'])
 		
 		#print Voltage_List
 		
@@ -82,8 +93,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			'Variation': {
 				'Value':'{0:1.2f}'.format(Variation), 
 				'Label':'I(150 V) / I(100 V)'
-			},
+			}										
+											
 		}
+		if self.ParentObject.has_key('recalculateCurrentTo'):
+			self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V'] = {
+					'Value':'{0:1.2f}'.format(recalculatedCurrentAtVoltage150V), 
+					'Label':'I_rec(150 V, 17 degC))',
+					'Unit': 'μA'
+				}
+		
 		self.ResultData['KeyList'] = ['CurrentAtVoltage150','Variation']
 
 		if self.SavePlotFile:
