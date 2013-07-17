@@ -14,9 +14,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 				'Module':'Module',
 				'InitialAttributes':{
 					'StorageKey':	'ModuleFulltest_p17',
-					'TestResultSubDirectory': '005_Fulltest_p17',
+					'TestResultSubDirectory': '000_Fulltest_p17',
 					'IncludeIVCurve':True,
-					'IVCurveSubDirectory':	'006_IV_p17',
+					'IVCurveSubDirectory':	'001_IV_p17',
 					'ModuleID':self.Attributes['ModuleID'],
 					'ModuleVersion':self.Attributes['ModuleVersion'],
 					'ModuleType':self.Attributes['ModuleType'],
@@ -27,35 +27,35 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 					'Order':3		
 				}
 			},
-			{
-				'Key':'ModuleFulltest_m10_1',
-				'Module':'Module',
-				'InitialAttributes':{
-					'StorageKey':	'ModuleFulltest_m10_1',
-					'TestResultSubDirectory': '001_Fulltest_m10',
-					'IncludeIVCurve':False,
-					'ModuleID':self.Attributes['ModuleID'],
-					'ModuleVersion':self.Attributes['ModuleVersion'],
-					'ModuleType':self.Attributes['ModuleType'],
-					'TestType':'m10_1',
-					'TestTemperature':-10,
-				},
-				'DisplayOptions':{
-					'Order':1		
-				}
-			},
+			#{
+			#	'Key':'ModuleFulltest_m10_1',
+			#	'Module':'Module',
+			#	'InitialAttributes':{
+			#		'StorageKey':	'ModuleFulltest_m10_1',
+			#		'TestResultSubDirectory': '001_Fulltest_m10',
+			#		'IncludeIVCurve':False,
+			#		'ModuleID':self.Attributes['ModuleID'],
+			#		'ModuleVersion':self.Attributes['ModuleVersion'],
+			#		'ModuleType':self.Attributes['ModuleType'],
+			#		'TestType':'m10_1',
+			#		'TestTemperature':-10,
+			#	},
+			#	'DisplayOptions':{
+			#		'Order':1		
+			#	}
+			#},
 			{
 				'Key':'ModuleFulltest_m10_2',
 				'Module':'Module',
 				'InitialAttributes':{
-					'StorageKey':	'ModuleFulltest_m10_2',
-					'TestResultSubDirectory': '003_Fulltest_m10',
+					'StorageKey':	'ModuleFulltest_m10',
+					'TestResultSubDirectory': '002_Fulltest_m10',
 					'IncludeIVCurve':True,
-					'IVCurveSubDirectory':	'004_IV_m10',
+					'IVCurveSubDirectory':	'003_IV_m10',
 					'ModuleID':self.Attributes['ModuleID'],
 					'ModuleVersion':self.Attributes['ModuleVersion'],
 					'ModuleType':self.Attributes['ModuleType'],
-					'TestType':'m10_2',
+					'TestType':'m10',
 					'TestTemperature':-10,
 					'recalculateCurrentTo': 17
 				},
