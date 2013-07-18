@@ -14,11 +14,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		pass
 	
 	def recalculateCurrent(self,inputCurrent, inputTemp, outputTemp):
-		outputCurrent = inputCurrent
+ 		inputTemp += 273.15
+ 		outputTemp += 273.15
 		Eef = 1.21
-		kB = 1.38e-23
+		kB = 8.62e-5
 		exp = Eef/2/kB*(1/inputTemp-1/outputTemp)
-		outputCurrent = inputCurrent * inputTemp**2/outputTemp**2 *math.exp(exp) 
+		outputCurrent = inputCurrent * outputTemp**2/inputTemp**2 *math.exp(exp) 
 		return outputCurrent
 
 	def PopulateResultData(self):
@@ -96,15 +97,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 			}										
 											
 		}
-		if self.ParentObject.has_key('recalculateCurrentTo'):
+		self.ResultData['KeyList'] = ['CurrentAtVoltage150','Variation']
+		if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
 			self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V'] = {
 					'Value':'{0:1.2f}'.format(recalculatedCurrentAtVoltage150V), 
 					'Label':'I_rec(150 V, 17 degC))',
 					'Unit': 'μA'
 				}
-		
-		self.ResultData['KeyList'] = ['CurrentAtVoltage150','Variation']
-
+  			self.ResultData['KeyList'].append('recalculatedCurrentAtVoltage150V') 
 		if self.SavePlotFile:
 			self.Canvas.SaveAs(self.GetPlotFileName())		
 		self.ResultData['Plot']['Enabled'] = 1

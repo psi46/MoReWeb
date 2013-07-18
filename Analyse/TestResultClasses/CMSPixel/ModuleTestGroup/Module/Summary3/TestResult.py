@@ -52,4 +52,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 		}
 		
 		self.ResultData['KeyList'] = ['Noise','VcalThrWidth','RelGainWidth','PedestalSpread','Parameter1','CurrentAtVoltage150','CurrentVariation']
+		 
+ 		if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
+ 			self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V'] = {'Value':self.ParentObject.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']['Value'],'Label':'recalculated IV','Unit':'μA',}
+  			self.ResultData['KeyList'].append('recalculatedCurrentAtVoltage150V')	
 
