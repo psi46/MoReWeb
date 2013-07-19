@@ -40,16 +40,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Parameter1',
                 'Unit':'',
             },
-            'CurrentAtVoltage150': {
-                'Value':self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17'].ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'], 
-                'Label':'I(150 V) @ 17°C',
-                'Unit':'μA',
-            },
-            'CurrentVariation': {
-                'Value':self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17'].ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['Variation']['Value'], 
-                'Label':'I(150 V) /I(100 V) @ 17°C',
-            },
         }
+        if self.ParentObject.ParentObject.ResultData['SubTestResults'].has_key('ModuleFulltest_p17_1'):
+            if self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17_1'].ResultData['SubTestResults'].has_key('IVCurve'):
+                IVTestResultData = self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17_1'].ResultData['SubTestResults']['IVCurve']
+                currentAtVoltage150 = IVTestResultData.ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value']
+                currentVariation = IVTestResultData.ResultData['KeyValueDictPairs']['Variation']['Value'], 
+                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150'] = {
+                        'Value': currentAtVoltage150,
+                        'Label':'I(150 V) @ 17°C',
+                        'Unit':'μA',
+                    }
+                self.ResultData['KeyValueDictPairs']['CurrentVariation'] = {
+                        'Value': currentVariation,
+                        'Label':'I(150 V) /I(100 V) @ 17°C',
+                    }
         
         self.ResultData['KeyList'] = ['Noise','VcalThrWidth','RelGainWidth','PedestalSpread','Parameter1','CurrentAtVoltage150','CurrentVariation']
          

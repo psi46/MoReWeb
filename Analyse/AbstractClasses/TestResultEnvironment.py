@@ -168,7 +168,10 @@ class TestResultEnvironment:
                         IVSlope FLOAT,
                         Temperature TEXT,
                         StorageFolder TEXT,
-                        Comments TEXT
+                        Comments TEXT,
+                        nCycles INT,
+                        CycleTempLow FLOAT,
+                        CycleTempHigh FLOAT
                     );
                 ''')
             

@@ -71,9 +71,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if Value > criteriaC[i]:
                     fitsProblemC[i]++
                 '''
-            
-        CurrentAtVoltage150 = float(self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17'].ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'])
-        CurrentVariation = float(self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17'].ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['Variation']['Value'])
+        CurrentAtVoltage150 = 0
+        CurrentVariation = 0
+        if self.ParentObject.ParentObject.ResultData['SubTestResults'].has_key('ModuleFulltest_p17_1'):
+            if self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17_1'].ResultData['SubTestResults'].has_key('IVCurve'):
+                IVTestResult = self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17_1'].ResultData['SubTestResults']['IVCurve']    
+                CurrentAtVoltage150 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'])
+                CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
+            else:
+                print 'Cannot find IVCurve in ModuleFulltest_p17_1'
+        else:
+            print ' Cannot find ModuleFulltest_p17_1'
+                
         
         if self.ParentObject.Attributes['TestType'] == 'p17':
             # Grading

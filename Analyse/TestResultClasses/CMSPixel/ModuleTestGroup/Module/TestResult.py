@@ -196,7 +196,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'IVSlope': IVSlope,
             'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC']['Value'],
             'StorageFolder':os.path.relpath(self.TestResultEnvironmentObject.TestResultsPath, self.TestResultEnvironmentObject.OverviewPath),
-            'Comments': ''
+            'Comments': '',
+            'nCycles': None,
+            'CycleTempLow': None,
+            'CycleTempHigh':None,
         }
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             pass
@@ -219,7 +222,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         IVSlope,
                         Temperature,
                         StorageFolder,
-                        Comments
+                        Comments,
+                        nCycles,
+                        CycleTempLow,
+                        CycleTempHigh
                     )
                     VALUES (
                         :ModuleID,
@@ -235,7 +241,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :IVSlope,
                         :Temperature,
                         :StorageFolder,
-                        :Comments
+                        :Comments,
+                        :nCycles,
+                        :CycleTempLow,
+                        :CycleTempHigh
                     )
                     ''', Row)
                 return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid

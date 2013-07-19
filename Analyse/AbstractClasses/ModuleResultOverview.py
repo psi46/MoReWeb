@@ -57,6 +57,9 @@ class ModuleResultOverview:
                     'IV Slope',
                     'Temperature',
                     'Comments',
+                    'nCycles',
+                    'CycleTempLow',
+                    'CycleTempHigh'
                 ]
             ],
             'BODY':[],
@@ -67,7 +70,12 @@ class ModuleResultOverview:
             Row = list(RowTuple)
             ModuleGroupPath = 'FinalResults/ModuleTestGroup/ModuleFulltest_'+Row[2]
             ResultHTMLFileName = 'TestResult.html'
-        
+#            print 'row',type(Row),Row
+#            print 'row[2]',type(Row[2]), Row[2]
+#            print 'row[12]',type(Row[12]), Row[12]
+#            print 'ModuleGroupPath',type(ModuleGroupPath),ModuleGroupPath
+#            print 'StoragePath',type(self.StoragePath),self.StoragePath
+            
             Link = os.path.relpath(
                 self.TestResultEnvironmentObject.OverviewPath+'/'+Row[12]+'/'+ModuleGroupPath+'/'+ResultHTMLFileName,
                 self.StoragePath
