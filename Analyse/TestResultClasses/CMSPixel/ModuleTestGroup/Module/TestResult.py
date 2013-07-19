@@ -181,7 +181,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             CurrentAtVoltage150 = 0
             IVSlope = 0
-            
+        initalCurrent = 0
         Row = {
             'ModuleID' : self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
@@ -196,6 +196,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'IVSlope': IVSlope,
             'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC']['Value'],
             'StorageFolder':os.path.relpath(self.TestResultEnvironmentObject.TestResultsPath, self.TestResultEnvironmentObject.OverviewPath),
+            'initalCurrent': initalCurrent,
             'Comments': '',
             'nCycles': None,
             'CycleTempLow': None,
@@ -222,6 +223,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         IVSlope,
                         Temperature,
                         StorageFolder,
+                        initalCurrent,
                         Comments,
                         nCycles,
                         CycleTempLow,
@@ -241,6 +243,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :IVSlope,
                         :Temperature,
                         :StorageFolder,
+                        :initalCurrent,
                         :Comments,
                         :nCycles,
                         :CycleTempLow,

@@ -6,6 +6,7 @@ import AbstractClasses.Helper.environment
 #as BetterConfigParser
 import AbstractClasses.Helper.testchain
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+  
     def CustomInit(self):
         self.Name='CMSPixel_ModuleTestGroup_TestResult'
         self.NameSingle='ModuleTestGroup'
@@ -160,44 +161,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         test = testchain.next()
         while test:
             if 'Fulltest' in test.testname:
-                print  '%03d'%index, test.testname, test.environment
-                lastTest = test.testname
-                environment = test.environment
-                key = 'Module%s_%s'%(test.testname,test.environment.name)
-                nKeys = 1
-                for item in tests:
-                    if item['Key'].startswith(key):
-                        nKeys +=1
-                key+='_%s'%(nKeys)        
-                directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
-                tests.append( {
-                    'Key': key,
-                    'Module':'Module',
-                    'InitialAttributes':{
-                        'StorageKey':    key,
-                        'TestResultSubDirectory': directory,
-                        'IncludeIVCurve':False,
-                        'ModuleID':self.Attributes['ModuleID'],
-                        'ModuleVersion':self.Attributes['ModuleVersion'],
-                        'ModuleType':self.Attributes['ModuleType'],
-                        'TestType':test.environment.name,
-                        'TestTemperature':test.environment.temperature,
-                    },
-                    'DisplayOptions':{
-                        'Order':len(tests)+1        
-                    }
-                   })
-                test = test.next()
-                index += 1
-                if test and 'IV' in test.testname and test.environment.name == environment.name:
-                    print '\tFound corresponding', test.testname, test.environment
-                    tests[-1]['InitialAttributes']['IncludeIVCurve'] =True
-                    tests[-1]['InitialAttributes']['IVCurveSubDirectory'] = '%03d_%s_%s'%(index,test.testname,test.environment.name)
-                    test = test.next()
-                    index += 1
+                tests,test,index = self.appendFulltest(tests,test,index)
+            elif 'Cycle' in test.testname:
+                tests,test,index = self.appendTemperatureCycle(tests, test, index)
             else:
                 index += 1
                 test = test.next()
+                
         print '\n'
         for item in tests:
             for key in item:
@@ -212,6 +182,65 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #            pass
         
         return tests
+    
+    def appendTemperatureCycle(self,tests,test,index):
+         print  '%03d'%index, test.testname, test.environment
+         tests.append(
+                      {
+                    'Key':'TemperatureCycle',
+                    'Module':'TemperatureCycle',
+                    'InitialAttributes':{
+                        'StorageKey':    'ModuleFulltest_TemperatureCycle',
+                        'TestResultSubDirectory': 'configfiles',
+                        'ModuleID':self.Attributes['ModuleID'],
+                        'ModuleVersion':self.Attributes['ModuleVersion'],
+                        'ModuleType':self.Attributes['ModuleType'],
+                        'TestType':'TemperatureCycle',
+                    },
+                    'DisplayOptions':{
+                        'Order':len(tests)+1        
+                    }
+                })
+         return tests,test,index
+     
+    def appendFulltest(self,tests,test,index):
+        print  '%03d'%index, test.testname, test.environment
+        environment = test.environment
+        key = 'Module%s_%s'%(test.testname,test.environment.name)
+        nKeys = 1
+        for item in tests:
+            if item['Key'].startswith(key):
+                nKeys +=1
+        key+='_%s'%(nKeys)        
+        directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
+        tests.append( {
+            'Key': key,
+            'Module':'Module',
+            'InitialAttributes':{
+                'StorageKey':    key,
+                'TestResultSubDirectory': directory,
+                'IncludeIVCurve':False,
+                'ModuleID':self.Attributes['ModuleID'],
+                'ModuleVersion':self.Attributes['ModuleVersion'],
+                'ModuleType':self.Attributes['ModuleType'],
+                'TestType': '%s_%s'%(test.environment.name,nKeys),
+                'TestTemperature':test.environment.temperature,
+            },
+            'DisplayOptions':{
+                'Order':len(tests)+1        
+            }
+           })
+        if test.environment.temperature != 17:
+            tests[-1]['InitialAttributes']['recalculateCurrentTo'] = 17
+        test = test.next()
+        index += 1
+        if test and 'IV' in test.testname and test.environment.name == environment.name:
+            print '\tFound corresponding', test.testname, test.environment
+            tests[-1]['InitialAttributes']['IncludeIVCurve'] =True
+            tests[-1]['InitialAttributes']['IVCurveSubDirectory'] = '%03d_%s_%s'%(index,test.testname,test.environment.name)
+            test = test.next()
+            index += 1
+        return tests,test,index
          
     def PopulateResultData(self):
         ModuleResultOverviewObject = AbstractClasses.ModuleResultOverview.ModuleResultOverview(self.TestResultEnvironmentObject)

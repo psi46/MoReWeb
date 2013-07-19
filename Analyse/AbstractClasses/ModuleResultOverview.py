@@ -56,6 +56,7 @@ class ModuleResultOverview:
                     'I(150V)',
                     'IV Slope',
                     'Temperature',
+                    'initalCurrent',
                     'Comments',
                     'nCycles',
                     'CycleTempLow',
@@ -67,6 +68,7 @@ class ModuleResultOverview:
         }
         
         for RowTuple in Rows:
+#            print RowTuple
             Row = list(RowTuple)
             ModuleGroupPath = 'FinalResults/ModuleTestGroup/ModuleFulltest_'+Row[2]
             ResultHTMLFileName = 'TestResult.html'
