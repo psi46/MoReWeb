@@ -149,6 +149,7 @@ class TestResultEnvironment:
                 CreateDBStructure = True
             
             self.LocalDBConnection = sqlite3.connect(self.SQLiteDBPath)
+            self.LocalDBConnection.row_factory = sqlite3.Row
             self.LocalDBConnectionCursor =  self.LocalDBConnection.cursor()
             self.LocalDBConnection.text_factory = str
             
@@ -168,7 +169,8 @@ class TestResultEnvironment:
                         IVSlope FLOAT,
                         Temperature TEXT,
                         StorageFolder TEXT,
-                        initalCurrent FLOAT,
+                        RelativeModuleFulltestStoragePath TEXT,
+                        initialCurrent FLOAT,
                         Comments TEXT,
                         nCycles INT,
                         CycleTempLow FLOAT,
@@ -180,6 +182,19 @@ class TestResultEnvironment:
     def GetUniqueID(self, Prefix = ''):
         self.LastUniqueIDCounter += 1
         return Prefix + '_'+str(self.LastUniqueIDCounter) 
+    
+    def FetchOneAssoc(cursor) :
+        data = cursor.fetchone()
+        if data == None :
+            return None
+        desc = cursor.description
+    
+        dict = {}
+    
+        for (name, value) in zip(desc, data) :
+            dict[name[0]] = value
+    
+        return dict
     
     def __del__(self):
         if self.Configuration['Database']['UseGlobal']:

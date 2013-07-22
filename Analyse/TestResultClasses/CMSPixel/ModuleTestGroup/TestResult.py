@@ -2,6 +2,7 @@ import AbstractClasses
 import ROOT
 import os
 import AbstractClasses.Helper.BetterConfigParser 
+import AbstractClasses.Helper.HtmlParser
 import AbstractClasses.Helper.environment
 #as BetterConfigParser
 import AbstractClasses.Helper.testchain
@@ -55,7 +56,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Key':'ModuleFulltest_m10_2',
                     'Module':'Module',
                     'InitialAttributes':{
-                        'StorageKey':    'ModuleFulltest_m10',
+                        'StorageKey':    'ModuleFulltest_m10_2',
                         'TestResultSubDirectory': '002_Fulltest_m10',
                         'IncludeIVCurve':True,
                         'IVCurveSubDirectory':    '003_IV_m10',
@@ -90,17 +91,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 },
                 {
-                    'Key':'ModuleFulltest_p17',
+                    'Key':'ModuleFulltest_p17_1',
                     'Module':'Module',
                     'InitialAttributes':{
-                        'StorageKey':    'ModuleFulltest_p17',
+                                         #Storage Key is needed to identify the 
+                        'StorageKey':    'ModuleFulltest_p17_1',
                         'TestResultSubDirectory': '000_Fulltest_p17',
                         'IncludeIVCurve':True,
                         'IVCurveSubDirectory':    '001_IV_p17',
                         'ModuleID':self.Attributes['ModuleID'],
                         'ModuleVersion':self.Attributes['ModuleVersion'],
                         'ModuleType':self.Attributes['ModuleType'],
-                        'TestType':'p17',
+                        'TestType':'p17_1',
                         'TestTemperature':17,
                     },
                     'DisplayOptions':{
@@ -108,17 +110,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 },
                 {
-                    'Key':'ModuleFulltest_m10_2',
+                    'Key':'ModuleFulltest_m10_1',
                     'Module':'Module',
                     'InitialAttributes':{
-                        'StorageKey':    'ModuleFulltest_m10',
+                        'StorageKey':    'ModuleFulltest_m10_1',
                         'TestResultSubDirectory': '002_Fulltest_m10',
                         'IncludeIVCurve':True,
                         'IVCurveSubDirectory':    '003_IV_m10',
                         'ModuleID':self.Attributes['ModuleID'],
                         'ModuleVersion':self.Attributes['ModuleVersion'],
                         'ModuleType':self.Attributes['ModuleType'],
-                        'TestType':'m10',
+                        'TestType':'m10_1',
                         'TestTemperature':-10,
                         'recalculateCurrentTo': 17
                     },
@@ -243,6 +245,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return tests,test,index
          
     def PopulateResultData(self):
+        
         ModuleResultOverviewObject = AbstractClasses.ModuleResultOverview.ModuleResultOverview(self.TestResultEnvironmentObject)
         ModuleResultOverviewObject.StoragePath = self.StoragePath
-        self.ResultData['Table'] = ModuleResultOverviewObject.TableData(self.Attributes['ModuleID'],self.Attributes['TestDate'])
+        self.ResultData['Table'] = ModuleResultOverviewObject.TableData(self.Attributes['ModuleID'],self.Attributes['TestDate'],ShrinkedList = False)
+        
+    def PostWriteToDatabase(self):
+        self.PopulateResultData();

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import AbstractClasses
 import ROOT
 import os
@@ -123,42 +124,48 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.FileHandle.read(fileName)
         
     def PopulateResultData(self):
-        self.Attributes['nCycles'] = self.FileHandle.get('Cycle','nCycles')
-        self.Attributes['CycleTempHigh'] = self.FileHandle.get('Cycle','highTemp')
-        self.Attributes['CycleTempLow'] = self.FileHandle.get('Cycle','lowTemp')
-        
-        self.ResultData['Table'] = {
-            'HEADER':[
-                [
-                    'Test Name',
-                    'nCycles',
-                    'CycleTempLow',
-                    'CycleTempHigh',
-                ]
-            ],
-            'BODY':[],
-            'FOOTER':[],
-        }
-        LinkHTMLTemplate = self.TestResultEnvironmentObject.HtmlParser.getSubpart(
-            self.TestResultEnvironmentObject.OverviewHTMLTemplate,
-            '###LINK###'
-        )
+        self.ResultData['KeyValueDictPairs']['nCycles'] = {'Value': self.FileHandle.get('Cycle','nCycles'), 'Unit': '#',}
+        self.ResultData['KeyValueDictPairs']['CycleTempHigh'] ={
+                                                                'Value': self.FileHandle.get('Cycle','highTemp'),
+                                                                'Unit': '℃',
+                                                                }
+        self.ResultData['KeyValueDictPairs']['CycleTempLow'] = {
+                                                                'Value': self.FileHandle.get('Cycle','lowTemp'),
+                                                                'Unit': '℃',
+                                                                }
+        self.ResultData['KeyList'] = ['nCycles','CycleTempLow','CycleTempHigh']
+#        self.ResultData['Table'] = {
+#            'HEADER':[
+#                [
+#                    'Test Name',
+#                    'nCycles',
+#                    'CycleTempLow',
+#                    'CycleTempHigh',
+#                ]
+#            ],
+#            'BODY':[],
+#            'FOOTER':[],
+#        }
+#        LinkHTMLTemplate = self.TestResultEnvironmentObject.HtmlParser.getSubpart(
+#            self.TestResultEnvironmentObject.OverviewHTMLTemplate,
+#            '###LINK###'
+#        )
         #for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']:
-        self.ResultData['Table']['BODY'].append(
-            [
-                self.TestResultEnvironmentObject.HtmlParser.substituteMarkerArray(
-                    LinkHTMLTemplate,
-                    {
-                        '###LABEL###':'TemperatureCycle',
-                        #i['TestResultObject'].StoragePath, self.StoragePath)+'/TestResult.html'
-                        '###URL###':os.path.relpath(self.StoragePath, self.StoragePath)+'/TestResult.html'
-                    }
-                ),
-                self.Attributes['nCycles'],
-                self.Attributes['CycleTempLow'],
-                self.Attributes['CycleTempHigh'],
-            ]   
-        )
+#        self.ResultData['Table']['BODY'].append(
+#            [
+#                self.TestResultEnvironmentObject.HtmlParser.substituteMarkerArray(
+#                    LinkHTMLTemplate,
+#                    {
+#                        '###LABEL###':'TemperatureCycle',
+#                        #i['TestResultObject'].StoragePath, self.StoragePath)+'/TestResult.html'
+#                        '###URL###':os.path.relpath(self.StoragePath, self.StoragePath)+'/TestResult.html'
+#                    }
+#                ),
+#                self.Attributes['nCycles'],
+#                self.Attributes['CycleTempLow'],
+#                self.Attributes['CycleTempHigh'],
+#            ]   
+#        )
         del self.FileHandle
 #        self.FileHandle.Close()
     
@@ -170,20 +177,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ModuleID' : self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
-            'Grade': None,
-            'PixelDefects': None,
-            'ROCsMoreThanOnePercent': None,
-            'Noise': None,
-            'Trimming': None,
-            'PHCalibration': None,
-            'CurrentAtVoltage150': None,
-            'IVSlope': None,
-            'Temperature': None,
+#            'Grade': None,
+#            'PixelDefects': None,
+#            'ROCsMoreThanOnePercent': None,
+#            'Noise': None,
+#            'Trimming': None,
+#            'PHCalibration': None,
+#            'CurrentAtVoltage150': None,
+#            'IVSlope': None,
+#            'Temperature': None,
             'StorageFolder':os.path.relpath(self.TestResultEnvironmentObject.TestResultsPath, self.TestResultEnvironmentObject.OverviewPath),
-            'Comments': '',
-            'nCycles': self.Attributes['nCycles'],
-            'CycleTempLow': self.Attributes['CycleTempLow'],
-            'CycleTempHigh':self.Attributes['CycleTempHigh'],
+            'RelativeModuleFulltestStoragePath': os.path.relpath(self.StoragePath, self.TestResultEnvironmentObject.TestResultsPath),
+#            'Comments': '',
+            'nCycles': self.ResultData['KeyValueDictPairs']['nCycles']['Value'],
+            'CycleTempLow': self.ResultData['KeyValueDictPairs']['CycleTempLow']['Value'],
+            'CycleTempHigh':self.ResultData['KeyValueDictPairs']['CycleTempHigh']['Value'],
         }
         
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
@@ -200,17 +208,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         ModuleID,
                         TestDate,
                         TestType,
-                        Grade,
-                        PixelDefects,
-                        ROCsMoreThanOnePercent,
-                        Noise,
-                        Trimming,
-                        PHCalibration,
-                        CurrentAtVoltage150,
-                        IVSlope,
-                        Temperature,
                         StorageFolder,
-                        Comments,
+                        RelativeModuleFulltestStoragePath,
                         nCycles,
                         CycleTempLow,
                         CycleTempHigh
@@ -219,17 +218,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :ModuleID,
                         :TestDate,
                         :TestType,
-                        :Grade,
-                        :PixelDefects,
-                        :ROCsMoreThanOnePercent,
-                        :Noise,
-                        :Trimming,
-                        :PHCalibration,
-                        :CurrentAtVoltage150,
-                        :IVSlope,
-                        :Temperature,
                         :StorageFolder,
-                        :Comments,
+                        :RelativeModuleFulltestStoragePath,
                         :nCycles,
                         :CycleTempLow,
                         :CycleTempHigh

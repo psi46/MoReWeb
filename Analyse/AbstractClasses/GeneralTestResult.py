@@ -80,8 +80,8 @@ class GeneralTestResult:
             # 'KeyValueDictPairs':{
             #       'MyKey':{
             #           'Value':25,
-            #           Unit: 'kg',
-            #           Label: 'My Key'
+            #           'Unit': 'kg',
+            #           'Label': 'My Key'
             #       }
             #   }
             'KeyValueDictPairs':{},
@@ -569,6 +569,11 @@ class GeneralTestResult:
         for i in TestResultObject.ResultData['KeyList']:
             if not TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Unit'):
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['Unit'] = ''
+            if TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Sigma'):
+                TestResultObject.ResultData['KeyValueDictPairs'][i]['SigmaOutput'] = ' +/- %s'%TestResultObject.ResultData['KeyValueDictPairs'][i]['Sigma']
+            else:
+                TestResultObject.ResultData['KeyValueDictPairs'][i]['SigmaOutput'] = ''
+            
             if not TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Label'):
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['Label'] = i
 
@@ -580,7 +585,7 @@ class GeneralTestResult:
                         TestResultObject.ResultData['KeyValueDictPairs'][i]['Label']
                         ),
                     '###VALUE###':HtmlParser.MaskHTML(
-                        TestResultObject.ResultData['KeyValueDictPairs'][i]['Value']
+                        str(TestResultObject.ResultData['KeyValueDictPairs'][i]['Value']) + TestResultObject.ResultData['KeyValueDictPairs'][i]['SigmaOutput']
                         ),
                     '###UNIT###':HtmlParser.MaskHTML(
                         TestResultObject.ResultData['KeyValueDictPairs'][i]['Unit']
@@ -736,7 +741,12 @@ class GeneralTestResult:
         for i in self.ResultData['SubTestResults']:
             self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
         
+        self.PostWriteToDatabase()
+        
     def CustomWriteToDatabase(self, ParentID):
+        pass
+    
+    def PostWriteToDatabase(self):
         pass
         
     def __del__(self):
