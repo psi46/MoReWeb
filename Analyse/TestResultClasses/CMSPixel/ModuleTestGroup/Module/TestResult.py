@@ -178,7 +178,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     
     def CustomWriteToDatabase(self, ParentID):
         if self.ResultData['SubTestResults'].has_key('IVCurve'):
-            CurrentAtVoltage150 = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'])
+#             self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']
+            if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key('recalculatedCurrentAtVoltage150V'):
+                CurrentAtVoltage150 = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']['Value'])
+            else:
+                CurrentAtVoltage150 = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'])
             IVSlope = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['Variation']['Value'])
         else:
             CurrentAtVoltage150 = 0
