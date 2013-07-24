@@ -156,9 +156,12 @@ class ModuleResultOverview:
                 Identificator+='_%s'%RowTuple['TestType']
                 if RowTuple['TestType'] == 'TemperatureCycle':
                     continue
-            if not FinalModuleRowsDict.has_key(Identificator) :
+            Identificator+='_%s'%RowTuple['TestDate']
+            print Identificator
+            if not FinalModuleRowsDict.has_key(Identificator):
                 FinalModuleRowsDict[Identificator] = {}
                 ModuleIDList.append(Identificator)    
+                print 'added'
     
                 RowDict = FinalModuleRowsDict[Identificator]
                 for Key in TableColumnList:

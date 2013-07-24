@@ -132,6 +132,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ]
    
     def extractTests(self):
+        print 'Extract Tests from config file'
         absPath = self.TestResultEnvironmentObject.TestResultsPath+'/configfiles'
         testList = []
         if not os.path.isdir(absPath):
@@ -143,10 +144,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print 'read configParser'
             self.initParser.read(fileName)
             tests = self.initParser.get('Tests','Test')
+            print tests
             testList = self.analyseTestList(tests)
             print tests
         else:
             print "file %s doesn't exist"%fileName
+        print 'done with extraction'
         return testList
         pass
     
@@ -203,6 +206,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':len(tests)+1        
                     }
                 })
+         test = test.next()
+         index += 1
          return tests,test,index
      
     def appendFulltest(self,tests,test,index):

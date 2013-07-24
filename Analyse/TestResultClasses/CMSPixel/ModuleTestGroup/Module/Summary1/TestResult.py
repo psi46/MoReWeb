@@ -73,18 +73,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 '''
         CurrentAtVoltage150 = 0
         CurrentVariation = 0
-        if self.ParentObject.ParentObject.ResultData['SubTestResults'].has_key('ModuleFulltest_p17_1'):
-            if self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17_1'].ResultData['SubTestResults'].has_key('IVCurve'):
-                IVTestResult = self.ParentObject.ParentObject.ResultData['SubTestResults']['ModuleFulltest_p17_1'].ResultData['SubTestResults']['IVCurve']    
-                CurrentAtVoltage150 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'])
-                CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
-            else:
-                print 'Cannot find IVCurve in ModuleFulltest_p17_1'
+        if self.ParentObject.ResultData['SubTestResults'].has_key('IVCurve'):
+            print 'found IV Curve'
+            IVTestResult = self.ParentObject.ResultData['SubTestResults']['IVCurve']    
+            CurrentAtVoltage150 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'])
+            CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
+            print 'got current at 150 and variation: %s, %s'%(CurrentAtVoltage150,CurrentVariation)
         else:
-            print ' Cannot find ModuleFulltest_p17_1'
+            print 'Cannot find IVCurve in %s'%self.ParentObject.Attributes['TestType']
                 
-        
-        if self.ParentObject.Attributes['TestType'] == 'p17':
+        #TODO
+        if self.ParentObject.Attributes['TestType']  == 'p17_1':
             # Grading
             if Grade == 1 and BadRocs > 1:
                 Grade = 2
