@@ -177,6 +177,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ModuleID' : self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
+            'QualificationType': self.ParentObject.Attributes['QualificationType'],
 #            'Grade': None,
 #            'PixelDefects': None,
 #            'ROCsMoreThanOnePercent': None,
@@ -200,7 +201,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
                 print 'Delete from DB'
-                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType',Row)
+                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType',Row)
                 print 'Insert into DB'
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
                     '''INSERT INTO ModuleTestResults 
@@ -208,6 +209,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         ModuleID,
                         TestDate,
                         TestType,
+                        QualificationType,
                         StorageFolder,
                         RelativeModuleFulltestStoragePath,
                         nCycles,
@@ -218,6 +220,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :ModuleID,
                         :TestDate,
                         :TestType,
+                        :QualificationType,
                         :StorageFolder,
                         :RelativeModuleFulltestStoragePath,
                         :nCycles,

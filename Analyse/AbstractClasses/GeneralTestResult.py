@@ -9,6 +9,7 @@ import os, ROOT
 import gzip
 import sys
 import datetime
+import json
 class GeneralTestResult:
     
     
@@ -352,7 +353,7 @@ class GeneralTestResult:
     '''
     def GenerateDataFiles(self):
         self.GenerateDataFileHTML()
-        
+        self.GenerateDataFileJSON()
     
     '''
         Generate HTML file
@@ -721,8 +722,9 @@ class GeneralTestResult:
         @final
     '''
     def GenerateDataFileJSON(self):
-        pass
-    
+        f = open(self.StoragePath+'/KeyValueDictPairs.json', 'w')
+        f.write(json.dumps(self.ResultData['KeyValueDictPairs'], sort_keys=True,indent=4, separators=(',', ': ')))
+        f.close()
     '''
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in ASCII format
         @final
@@ -739,7 +741,14 @@ class GeneralTestResult:
         ID = self.CustomWriteToDatabase(ParentID)
         
         for i in self.ResultData['SubTestResults']:
-            self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
+            try: 
+                self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
+            except Exception as inst:
+                    print 'Error in subtest (write to database)', self.ResultData['SubTestResults'][i].ModulePath,self.ResultData['SubTestResults'][i].StoragePath
+                    print inst
+                    print inst.args
+                    print sys.exc_info()[0]
+                    print "\n\n------\n"
         
         self.PostWriteToDatabase()
         

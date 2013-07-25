@@ -159,6 +159,7 @@ class TestResultEnvironment:
                         ModuleID TEXT,
                         TestDate INT,
                         TestType TEXT,
+                        QualificationType TEXT,
                         Grade TEXT,
                         PixelDefects TEXT,
                         ROCsMoreThanOnePercent INT, 

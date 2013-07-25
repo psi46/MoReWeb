@@ -53,6 +53,12 @@ class ModuleResultOverview:
                 'InShrinkedList': True
              },
              {
+                'Label':'Qualification Type',
+                'DBColumnName':'QualificationType',
+                'InShrinkedList': True,
+                'InFullList': False
+             },
+             {
                 'Label':'Test Type',
                 'DBColumnName':'TestType',
                 'InShrinkedList': True
@@ -156,7 +162,9 @@ class ModuleResultOverview:
                 Identificator+='_%s'%RowTuple['TestType']
                 if RowTuple['TestType'] == 'TemperatureCycle':
                     continue
-            Identificator+='_%s'%RowTuple['TestDate']
+            else:
+                Identificator+='_%s'%RowTuple['QualificationType']
+#            Identificator+='_%s'%RowTuple['TestDate']
             print Identificator
             if not FinalModuleRowsDict.has_key(Identificator):
                 FinalModuleRowsDict[Identificator] = {}

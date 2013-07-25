@@ -51,7 +51,7 @@ if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                 ModuleInformation = {
                     'ModuleID': ModuleInformationRaw[0],
                     'TestDate': ModuleInformationRaw[4],
-                    'TestType': ModuleInformationRaw[1]
+                    'QualificationType': ModuleInformationRaw[1]
                 }
                 
                 
@@ -74,6 +74,7 @@ if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                         'ModuleVersion':ModuleVersion,
                         'ModuleType':'a',
                         'TestType':TestType,
+                        'QualificationType': ModuleInformation['QualificationType']
                     }    
                 )
                 # add apache webserver configuration for compressed svg images  

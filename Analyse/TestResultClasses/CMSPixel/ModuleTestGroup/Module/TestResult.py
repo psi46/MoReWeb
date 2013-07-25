@@ -192,6 +192,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ModuleID' : self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
+            'QualificationType': self.ParentObject.Attributes['QualificationType'],
             'Grade':  self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Grade']['Value'],
             'PixelDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadPixels']['Value'],
             'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['BadRocs']['Value'],
@@ -213,13 +214,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
-                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType',Row)
+                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType',Row)
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
                     '''INSERT INTO ModuleTestResults 
                     (
                         ModuleID,
                         TestDate,
                         TestType,
+                        QualificationType,
                         Grade,
                         PixelDefects,
                         ROCsMoreThanOnePercent,
@@ -241,6 +243,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :ModuleID,
                         :TestDate,
                         :TestType,
+                        :QualificationType,
                         :Grade,
                         :PixelDefects,
                         :ROCsMoreThanOnePercent,
