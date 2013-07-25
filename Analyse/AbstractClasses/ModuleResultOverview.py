@@ -29,7 +29,7 @@ class ModuleResultOverview:
                 'SELECT * FROM ModuleTestResults '+
                 'WHERE 1=1 '+
                 AdditionalWhere+
-                'ORDER BY ModuleID ASC,TestType ASC ',
+                'ORDER BY ModuleID ASC,TestType ASC,TestDate ASC ',
                 {
                     'ModuleID':ModuleID,
                     'TestDate':TestDate
@@ -165,19 +165,19 @@ class ModuleResultOverview:
             else:
                 Identificator+='_%s'%RowTuple['QualificationType']
 #            Identificator+='_%s'%RowTuple['TestDate']
-            print Identificator
+#            print Identificator
             if not FinalModuleRowsDict.has_key(Identificator):
                 FinalModuleRowsDict[Identificator] = {}
                 ModuleIDList.append(Identificator)    
-                print 'added'
+#                print 'added'
     
                 RowDict = FinalModuleRowsDict[Identificator]
                 for Key in TableColumnList:
                     RowDict[Key] = RowTuple[Key]
                     
-                ModuleGroupPath =  'FinalResults/ModuleTestGroup/'
+                ModuleGroupPath =  'FinalResults/QualificationGroup/'
                 if not ShrinkedList:
-                    print RowTuple['RelativeModuleFulltestStoragePath']
+#                    print RowTuple['RelativeModuleFulltestStoragePath']
                     ModuleGroupPath = RowTuple['RelativeModuleFulltestStoragePath']
                 if not ModuleGroupPath:
                     print 'Problem with',RowTuple

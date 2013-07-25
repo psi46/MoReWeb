@@ -7,7 +7,7 @@ Program    : MORE-Web
 '''
 from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
 
-import TestResultClasses.CMSPixel.ModuleTestGroup.TestResult
+import TestResultClasses.CMSPixel.QualificationGroup.TestResult
 import os, time
 import ROOT
 import ConfigParser
@@ -62,10 +62,10 @@ if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                     os.makedirs(FinalResultsPath)
                 
                 
-                ModuleTestResult = TestResultClasses.CMSPixel.ModuleTestGroup.TestResult.TestResult(
+                ModuleTestResult = TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
                     TestResultEnvironmentInstance, 
                     None, 
-                    'TestResultClasses.CMSPixel.ModuleTestGroup', 
+                    'TestResultClasses.CMSPixel.QualificationGroup', 
                     FinalResultsPath,
                     {
                         'TestDate':ModuleInformation['TestDate'],
