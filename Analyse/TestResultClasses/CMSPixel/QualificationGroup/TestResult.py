@@ -169,6 +169,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 tests,test,index = self.appendFulltest(tests,test,index)
             elif 'Cycle' in test.testname:
                 tests,test,index = self.appendTemperatureCycle(tests, test, index)
+            elif 'XraySpectrum' in test.testname:
+                tests,test,index = self.appendXraySpectrum(tests,test,index)
             else:
                 index += 1
                 test = test.next()
@@ -249,7 +251,82 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             test = test.next()
             index += 1
         return tests,test,index
-         
+    
+    def appendXraySpectrum(self,tests,test,index):
+        print 'ADDING XraySpectrumMethod'
+        environment = test.environment
+        key = 'XraySpectrumMethod'
+        nKeys = 1
+        for item in tests:
+            if item['Key'].startswith(key):
+                nKeys +=1
+        key+='_%s'%(nKeys)        
+        directory =  "."
+        tests.append( {
+            'Key': key,
+            'Module':'XrayCalibrationSpectrum',
+            'InitialAttributes':{
+                'StorageKey':    key,
+                'TestResultSubDirectory': directory,
+                'IncludeIVCurve':False,
+                'ModuleID':self.Attributes['ModuleID'],
+                'ModuleVersion':self.Attributes['ModuleVersion'],
+                'ModuleType':self.Attributes['ModuleType'],
+                'TestType': 'XraySpectrum',
+                'TestTemperature':test.environment.temperature,
+            },
+            'DisplayOptions':{
+                'Order':len(tests)+1        
+            }
+           })
+        while test and 'XraySpectrum' in test.testname:
+            tests,test,index = self.appendFluorescenceTarget(tests,test,index)
+        
+        print'\n'
+        for i in  tests[-1]['InitialAttributes']['SubTestResultDictList']:
+            print i
+            print '\n'
+        return tests,test,index
+
+    def appendFluorescenceTarget(self,tests,test,index):
+        environment = test.environment
+        print 'ADDING FluorescenceTarget @ %s'%environment.name
+        key = 'Module%s_%s'%(test.testname,test.environment.name)
+        nKeys = 1
+        for item in tests:
+            if item['Key'].startswith(key):
+                nKeys +=1
+        key+='_%s'%(nKeys)        
+        directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
+        print 'XRAY Spectrum @ %s in dir %s:"%s"'%(environment,directory,key)
+        TargetEnergy= index
+        if not tests[-1].has_key('InitialAttributes'):
+            tests[-1]['InitialAttributes'] = {}
+        if not tests[-1]['InitialAttributes'].has_key('SubTestResultDictList'):
+            tests[-1]['InitialAttributes']['SubTestResultDictList']=[]
+        tests[-1]['InitialAttributes']['SubTestResultDictList'].append({
+               'Key': key,
+               'Module':'FluorescenceSpectrum',
+               'InitialAttributes':{
+                         'StorageKey':    key,
+                        'TestResultSubDirectory': directory,
+                        'IncludeIVCurve':False,
+                        'ModuleID':self.Attributes['ModuleID'],
+                        'ModuleVersion':self.Attributes['ModuleVersion'],
+                        'ModuleType':self.Attributes['ModuleType'],
+                        'TestType': '%s_%s'%(test.environment.name,nKeys),
+                        'TestTemperature':test.environment.temperature,
+                        'Target': environment.name,
+                        'TargetEnergy': TargetEnergy
+                },
+                'DisplayOptions':{
+                        'Order':len(tests[-1]['InitialAttributes']['SubTestResultDictList'])+1        
+                }
+           })
+        test = test.next()
+        index +=1
+        return tests,test,index 
+    
     def PopulateResultData(self):
         
         ModuleResultOverviewObject = AbstractClasses.ModuleResultOverview.ModuleResultOverview(self.TestResultEnvironmentObject)
