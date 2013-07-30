@@ -1,4 +1,11 @@
-	
+/*
+
+Program	: MORE-Web 
+ Author	: Esteban Marin - estebanmarin@gmx.ch
+ Version	: 2.1
+ Release Date	: 2013-05-30
+
+*/	
 	#Page #ContentWrap #Content .ResultData
 	{
 		float:left;
@@ -26,6 +33,10 @@
 	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4
 	{
 		width:860px;
+	}
+	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4
+	{
+		width:1080px;
 	}
 	#Page #ContentWrap #Content .ResultData .Title
 	{
@@ -80,6 +91,14 @@
 	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4 .ResultData .Plot .Image
 	{
 		width:858px;
+	}
+	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4 .ResultData .Plot
+	{
+		width:1080px;
+	}
+	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4 .ResultData .Plot .Image
+	{
+		width:1078px;
 	}
 	#Page #ContentWrap #Content .ResultData .Plot .ImageLink:hover .Image
 	{
