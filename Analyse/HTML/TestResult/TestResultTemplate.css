@@ -67,6 +67,8 @@ Program	: MORE-Web
 		width:198px;	
 		border:1px solid #ffffff;
 		max-width:100%;
+		cursor: -webkit-zoom-in; 
+		cursor: -moz-zoom-in;
 	}
 	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width2 .ResultData .Plot
 	{
@@ -145,6 +147,8 @@ Program	: MORE-Web
 	#Page #ContentWrap #Content .ResultData .Plot .LargeImageContainer .ImageLinkBack
 	{
 		display:block;
+		cursor: -webkit-zoom-out; 
+		cursor: -moz-zoom-out;
 	}
 	#Page #ContentWrap #Content .ResultData .Plot .LargeImageContainer[id]:target .ImageLinkBack
 	{
