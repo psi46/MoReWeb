@@ -7,6 +7,7 @@
 import AbstractClasses
 import ROOT
 import ConfigParser
+import os
 import array
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
@@ -161,6 +162,83 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #            m_outFile->SetWritable(false);
 #            }
 #    '''
-#            
-#
-#
+
+
+    def CustomWriteToDatabase(self, ParentID):
+        Row = {
+            'ModuleID' : self.Attributes['ModuleID'],
+            'TestDate': self.Attributes['TestDate'],
+            'TestType': self.Attributes['TestType'],
+            'QualificationType': self.ParentObject.Attributes['QualificationType'],
+            'Grade':  None,
+            'PixelDefects': None,
+            'ROCsMoreThanOnePercent': None,
+            'Noise': None,
+            'Trimming': None,
+            'PHCalibration': None,
+            'CurrentAtVoltage150': None,
+            'IVSlope': None,
+            'Temperature': None,
+            'StorageFolder':os.path.relpath(self.TestResultEnvironmentObject.TestResultsPath, self.TestResultEnvironmentObject.OverviewPath),
+            'RelativeModuleFulltestStoragePath':os.path.relpath(self.StoragePath, self.TestResultEnvironmentObject.TestResultsPath),
+            'initialCurrent': None,
+            'Comments': '',
+            'nCycles': None,
+            'CycleTempLow': None,
+            'CycleTempHigh':None,
+        }
+        if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
+            pass
+        else:
+            with self.TestResultEnvironmentObject.LocalDBConnection:
+                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',Row)
+                print 'insert into DB - Xray'
+                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
+                    '''INSERT INTO ModuleTestResults 
+                    (
+                        ModuleID,
+                        TestDate,
+                        TestType,
+                        QualificationType,
+                        Grade,
+                        PixelDefects,
+                        ROCsMoreThanOnePercent,
+                        Noise,
+                        Trimming,
+                        PHCalibration,
+                        CurrentAtVoltage150,
+                        IVSlope,
+                        Temperature,
+                        StorageFolder,
+                        RelativeModuleFulltestStoragePath,
+                        initialCurrent,
+                        Comments,
+                        nCycles,
+                        CycleTempLow,
+                        CycleTempHigh
+                    )
+                    VALUES (
+                        :ModuleID,
+                        :TestDate,
+                        :TestType,
+                        :QualificationType,
+                        :Grade,
+                        :PixelDefects,
+                        :ROCsMoreThanOnePercent,
+                        :Noise,
+                        :Trimming,
+                        :PHCalibration,
+                        :CurrentAtVoltage150,
+                        :IVSlope,
+                        :Temperature,
+                        :StorageFolder,
+                        :RelativeModuleFulltestStoragePath,
+                        :initialCurrent,
+                        :Comments,
+                        :nCycles,
+                        :CycleTempLow,
+                        :CycleTempHigh
+                    )
+                    ''', Row)
+                return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid
+            
