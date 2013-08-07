@@ -276,7 +276,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'TestTemperature':test.environment.temperature,
             },
             'DisplayOptions':{
-                'Order':len(tests)+1        
+                'Order':len(tests)+1,
+                #'Width':1
             }
            })
         while test and 'XraySpectrum' in test.testname:
@@ -287,6 +288,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print i
             print '\n'
         return tests,test,index
+
+    # Hard coded initial guess for signal position based on element name
+    def GetEnergy(self,elementName):
+        if "Fe" in elementName:
+            return 6391.02
+        elif "Ni" in elementName:
+            return 7461.03
+        elif "Cu" in elementName:
+            return 8027.84
+        elif "Br" in elementName:
+            return 11877.75
+        elif "Mo" in elementName:
+            return 17374.29
+        elif "Ag" in elementName:
+            return 21990.30
+        elif "Sn" in elementName:
+            return 25044.04
+        elif "Ba" in elementName:
+            return 31816.615
+        else:
+            return 0
 
     def appendFluorescenceTarget(self,tests,test,index):
         environment = test.environment
@@ -299,7 +321,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         key+='_%s'%(nKeys)        
         directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
         print 'XRAY Spectrum @ %s in dir %s:"%s"'%(environment,directory,key)
-        TargetEnergy= index
+        TargetEnergy= self.GetEnergy(environment.name)
+        TargetNElectrons = TargetEnergy / 3.6
         if not tests[-1].has_key('InitialAttributes'):
             tests[-1]['InitialAttributes'] = {}
         if not tests[-1]['InitialAttributes'].has_key('SubTestResultDictList'):
@@ -317,7 +340,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'TestType': '%s_%s'%(test.environment.name,nKeys),
                         'TestTemperature':test.environment.temperature,
                         'Target': environment.name,
-                        'TargetEnergy': TargetEnergy
+                        'TargetEnergy': TargetEnergy,
+                        'TargetNElectrons': TargetNElectrons
                 },
                 'DisplayOptions':{
                         'Order':len(tests[-1]['InitialAttributes']['SubTestResultDictList'])+1        
