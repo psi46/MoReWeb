@@ -549,7 +549,7 @@ class GeneralTestResult:
                 PlotImageHTML,
                 {
                     '###FILENAME###':HtmlParser.MaskHTML(RecursionRelativePath+os.path.basename(TestResultObject.ResultData['Plot']['ImageFile'])),
-                    '###IMAGELARGECONTAINERID###':HtmlParser.MaskHTML(TestResultObject.Name),
+                    '###IMAGELARGECONTAINERID###':HtmlParser.MaskHTML(TestResultObject.Name+'_'+TestResultObject.Key),
                     '###MARGIN_TOP###':str(int(-800./float(DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'])*
                         float(self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight'])/2.)),
                     '###TITLE###':TestResultObject.ResultData['Plot']['Caption'],
