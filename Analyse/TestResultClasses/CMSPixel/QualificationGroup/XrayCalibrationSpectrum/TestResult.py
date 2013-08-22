@@ -21,7 +21,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
         print self.ResultData['SubTestResultDictList']
         self.Attributes['TestedObjectType'] = 'XrayCalibrationSpectrum'
-        #self.DisplayOptions = {'DisplayOptions':{'Order':1, 'Width':1,'GroupWithNext':False},}
+        self.DisplayOptions = {'DisplayOptions':{'Order':1, 'Width':3,'GroupWithNext':False},}
         #self.DisplayOptions['Width'] = 5
 #        print self.Attributes
 #        for e in self.Attributes['SubTestResultDictList']:

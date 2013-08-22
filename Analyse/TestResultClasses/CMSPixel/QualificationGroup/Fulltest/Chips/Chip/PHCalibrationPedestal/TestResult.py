@@ -29,6 +29,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #nP_entries
         IntegralPedestal_Entries = self.ResultData['Plot']['ROOTObject_hPedestal'].GetEntries()
         
+        # Calculation of area where are XX% of the events inside... 
+        # starting from pred. mean bin.
         if IntegralPedestal > 0:
             
             # -- restricted RMS

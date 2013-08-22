@@ -6,9 +6,10 @@ Program    : MORE-Web
  Release Date    : 2013-05-30
 '''
 from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
+import AbstractClasses.Helper.hasher as hasher
 
 import TestResultClasses.CMSPixel.QualificationGroup.TestResult
-import os, time
+import os, time,shutil
 import ROOT
 import ConfigParser
 
@@ -27,6 +28,12 @@ Configuration.read([
 
 TestResultDirectory = Configuration.get('Paths', 'TestResultDirectory')
 OverviewPath = Configuration.get('Paths', 'OverviewPath')
+if Configuration.has_option('Paths',''):
+    FinalResultDirectory = Configuration.get('Paths','FinalResultsPath')
+else:
+    FinalResultDirectory = ''
+if FinalResultDirectory!= '' and not os.path.exists(FinalResultDirectory):
+    os.makedirs(FinalResultDirectory)
 SQLiteDBPath = OverviewPath + '/ModuleResultDB.sqlite'
 
 ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
@@ -38,6 +45,8 @@ TestResultEnvironmentInstance.SQLiteDBPath = SQLiteDBPath
 TestResultEnvironmentInstance.OverviewPath = OverviewPath
 TestResultEnvironmentInstance.OpenDBConnection()
 TestResultEnvironmentInstance.TestResultsBasePath = TestResultDirectory
+
+hasher.create_hash_file_directory('checksum.md5','.')
 
 ModuleTestResults = []
 if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
@@ -57,9 +66,22 @@ if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                 
                 TestResultEnvironmentInstance.TestResultsPath = TestResultDirectory+'/'+Folder
                 
-                FinalResultsPath = TestResultDirectory+'/'+Folder+'/FinalResults'
+                if FinalResultDirectory=='':
+                    FinalResultsPath = TestResultDirectory+'/'+Folder+'/FinalResults'
+                else:
+                    FinalResultsPath = FinalResultDirectory+'/'+Folder
+                
                 if not os.path.exists(FinalResultsPath):
                     os.makedirs(FinalResultsPath)
+
+                md5FileName= FinalResultsPath+'/'+ 'checksum.md5'
+
+                if os.path.exists(md5FileName):
+                    print 'md5 sum exists %s'%md5FileName
+                    bSameFiles = hasher.compare_two_files('checksum.md5',md5FileName)
+                    if bSameFiles:
+                        print 'do not analyse folder '+ Folder
+                        continue
                 
                 
                 ModuleTestResult = TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
@@ -96,6 +118,8 @@ AddEncoding x-gzip .svgz
                 print '    Generating Final Output'
                 ModuleTestResult.GenerateFinalOutput()
                 ModuleTestResults.append(ModuleTestResult)
+                print 'copyfile checksum'
+                shutil.copyfile('checksum.md5',md5FileName)
     
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
