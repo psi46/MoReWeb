@@ -190,17 +190,35 @@ class TestResultEnvironment:
             return None
         desc = cursor.description
     
-        dict = {}
+        retDict = {}
     
         for (name, value) in zip(desc, data) :
-            dict[name[0]] = value
+            retDict[name[0]] = value
     
-        return dict
+        return retDict
     
     def __del__(self):
         if self.Configuration['Database']['UseGlobal']:
             pass
         else:
             self.LocalDBConnection.close()
+    
+    def existInDB(self,moduleID,QualificationType):
+        print 'check wheather module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
+        AdditionalWhere =""
+        AdditionalWhere += ' AND ModuleID=:ModuleID '
+        AdditionalWhere += ' AND QualificationType=:QualificationType '
         
+        self.LocalDBConnectionCursor.execute(
+            'SELECT * FROM ModuleTestResults '+
+            'WHERE 1=1 '+
+            AdditionalWhere+
+            'ORDER BY ModuleID ASC,TestType ASC, TestDate ASC ',
+            {
+                'ModuleID':moduleID,
+                'QualificationType':QualificationType
+            }
+        )
+        Rows = self.LocalDBConnectionCursor.fetchall()
+        return len(Rows)>0
     

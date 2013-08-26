@@ -79,7 +79,8 @@ if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                 if os.path.exists(md5FileName):
                     print 'md5 sum exists %s'%md5FileName
                     bSameFiles = hasher.compare_two_files('checksum.md5',md5FileName)
-                    if bSameFiles:
+                    bExistInDB = TestResultEnvironmentInstance.existInDB(ModuleInformation['ModuleID'],ModuleInformation['QualificationType'])
+                    if bSameFiles and bExistInDB:
                         print 'do not analyse folder '+ Folder
                         continue
                 
