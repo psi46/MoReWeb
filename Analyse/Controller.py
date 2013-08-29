@@ -7,10 +7,11 @@ Program    : MORE-Web
 '''
 from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
 import AbstractClasses.Helper.hasher as hasher
-
+import argparse
 import TestResultClasses.CMSPixel.QualificationGroup.TestResult
 import os, time,shutil
 import ROOT
+import time
 import ConfigParser
 
 # Suppress "info"-level notices from TCanvas that it has saved a .png
@@ -25,6 +26,13 @@ Configuration.read([
     'Configuration/SystemConfiguration.cfg', 
     'Configuration/Paths.cfg',
     'Configuration/ModuleInformation.cfg'])
+
+#arg parse to analyse a single Fulltest
+parser = argparse.ArgumentParser(description='MORE web Controller: an analysis software for CMS pixel modules and ROCs')
+parser.add_argument('-FT','--singleFulltest',dest='singleFulltest',
+                     help='option which can be used to analyse a single Fulltest',
+                     default='')
+args = parser.parse_args()
 
 TestResultDirectory = Configuration.get('Paths', 'TestResultDirectory')
 OverviewPath = Configuration.get('Paths', 'OverviewPath')
@@ -49,7 +57,54 @@ TestResultEnvironmentInstance.TestResultsBasePath = TestResultDirectory
 hasher.create_hash_file_directory('checksum.md5','.')
 
 ModuleTestResults = []
-if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
+if not args.singleFulltest=='':
+    print 'analysing a single Fulltest at destination: "%s"'%args.singleFulltest 
+    TestResultEnvironmentInstance.TestResultsPath  = args.singleFulltest
+    TestResultEnvironmentInstance.FinalResultsPath = args.singleFulltest
+    ModuleID = args.singleFulltest.split('/')[-1]
+    TestDate = '%s'%int(time.time())
+    TestType = 'singleFulltest'
+    ModuleInformation = {
+        'ModuleID': ModuleID,
+        'TestDate': TestDate,
+        'QualificationType': 'SingleFulltest',
+    }
+    FinalResultsPath = args.singleFulltest+'/FinalResults'
+    ModuleTestResult = TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
+                    TestResultEnvironmentInstance, 
+                    None, 
+                    'TestResultClasses.CMSPixel.QualificationGroup', 
+                    FinalResultsPath,
+                    {
+                        'TestDate':ModuleInformation['TestDate'],
+                        'TestedObjectID':ModuleInformation['ModuleID'],
+                        'ModuleID':ModuleInformation['ModuleID'],
+                        'ModuleVersion':ModuleVersion,
+                        'ModuleType':'a',
+                        'TestType':TestType,
+                        'QualificationType': ModuleInformation['QualificationType']
+                    }    
+                )
+                # add apache webserver configuration for compressed svg images  
+    f = open(FinalResultsPath + '/.htaccess', 'w')
+    f.write('''
+AddType image/svg+xml svg
+AddType image/svg+xml svgz
+AddEncoding x-gzip .svgz
+    ''')
+    f.close()
+    
+    print 'Working on: ',ModuleInformation
+    print ' -- '
+    
+    print '    Populating Data'
+    ModuleTestResult.PopulateAllData()
+    ModuleTestResult.WriteToDatabase() # needed before final output
+    
+    print '    Generating Final Output'
+    ModuleTestResult.GenerateFinalOutput()
+    pass  
+elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
     for Folder in os.listdir(TestResultDirectory):
         absPath = TestResultDirectory+'/'+Folder
         if not os.path.isdir(absPath):
@@ -63,13 +118,15 @@ if int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                     'QualificationType': ModuleInformationRaw[1]
                 }
                 
-                
-                TestResultEnvironmentInstance.TestResultsPath = TestResultDirectory+'/'+Folder
-                
                 if FinalResultDirectory=='':
                     FinalResultsPath = TestResultDirectory+'/'+Folder+'/FinalResults'
                 else:
                     FinalResultsPath = FinalResultDirectory+'/'+Folder
+                                    
+                TestResultEnvironmentInstance.TestResultsPath = TestResultDirectory+'/'+Folder
+                TestResultEnvironmentInstance.FinalResultsPath = FinalResultsPath 
+                #TestResultEnvironmentInstance.FinalResultsPath = TestResultDirectory+'/'+Folder
+                
                 
                 if not os.path.exists(FinalResultsPath):
                     os.makedirs(FinalResultsPath)
