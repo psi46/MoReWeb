@@ -32,6 +32,8 @@ parser = argparse.ArgumentParser(description='MORE web Controller: an analysis s
 parser.add_argument('-FT','--singleFulltest',dest='singleFulltest',
                      help='option which can be used to analyse a single Fulltest',
                      default='')
+parser.add_argument('-M','--ModuleVersion',dest='ModuleVersion',
+                    help='option to choose which module version is analysed [singleROC =3, Module ={1,2}]',default='')
 args = parser.parse_args()
 
 TestResultDirectory = Configuration.get('Paths', 'TestResultDirectory')
@@ -43,8 +45,10 @@ else:
 if FinalResultDirectory!= '' and not os.path.exists(FinalResultDirectory):
     os.makedirs(FinalResultDirectory)
 SQLiteDBPath = OverviewPath + '/ModuleResultDB.sqlite'
-
-ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
+if not args.ModuleVersion == '':
+     ModuleVersion = int(args.ModuleVersion)
+else:
+     ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
 TestType = Configuration.get('TestType','TestType')
 
 
