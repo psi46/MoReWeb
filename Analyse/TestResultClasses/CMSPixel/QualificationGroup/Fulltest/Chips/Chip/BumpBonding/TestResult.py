@@ -15,6 +15,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         
         ROOT.gPad.SetLogy(1);
+        isDigitalROC = False
         
         # TH1D
         try:
@@ -23,11 +24,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
         if not self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}Distribution".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
-        
+            isDigitalROC = True
         
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
+            if not isDigitalROC:
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0*self.ResultData['Plot']['ROOTObject'].GetMaximum());
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold difference");  
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
