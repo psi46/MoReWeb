@@ -20,6 +20,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
         elif self.Attributes['ModuleVersion'] == 2:
             self.Attributes['StartChip'] = 0
+        elif self.Attributes['ModuleVersion'] == 3:
+            self.Attributes['NumberOfChips'] = 1
+            self.Attributes['StartChip'] = 0
         
         
         
@@ -118,10 +121,35 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
         
     def OpenFileHandle(self):
-        self.FileHandle = ROOT.TFile.Open(
-            self.FullTestResultsPath
-            +'/commander_Fulltest.root'
-        )
+        fileHandlePath = self.FullTestResultsPath+'/commander_Fulltest.root'
+        self.FileHandle = ROOT.TFile.Open(fileHandlePath)
+        if not self.FileHandle:
+            print 'problem to find %s'%fileHandlePath
+            files = [f for f in os.listdir(self.FullTestResultsPath) if f.endswith('.root')]
+            i = 0
+            if len(files)>1:
+                print '\nPossible Candidates for ROOT files are:'
+                for f in files:
+                    print '\t[%3d]\t%s'%(i,f)
+                    i += 1
+                i = len(files)
+                while i<0 or i>= len(files):
+                    try:
+                        rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]'%(len(files)-1))
+                        i =  int(rawInput)
+                    except:
+                        print '%s is not an integer, please enter a valid integer'%rawInput
+                fileHandlePath = self.FullTestResultsPath+'/'+files[i]
+                print "open '%s'"%fileHandlePath
+                self.FileHandle = ROOT.TFile.Open(fileHandlePath)
+            elif len(files) == 1:
+                i = 0
+                fileHandlePath = self.FullTestResultsPath+'/'+files[i]
+                print "open '%s'"%fileHandlePath
+                self.FileHandle = ROOT.TFile.Open(fileHandlePath)
+            else:
+                print 'There exist no ROOT file in "%s"'%self.FullTestResultsPath
+            
     def PopulateResultData(self):
         
         self.ResultData['Table'] = {

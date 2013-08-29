@@ -15,6 +15,29 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = self.Attributes['QualificationType'] + " " + self.Attributes['ModuleID']
         if self.Attributes['TestType'] == 'automatic':
             self.ResultData['SubTestResultDictList'] = self.extractTests()
+        elif self.Attributes['TestType'] == 'singleFulltest':
+            print 'add singleFulltest subTestResults'
+            self.ResultData['SubTestResultDictList'] = [
+                {
+                    'Key':'singleFulltest',
+                    'Module':'Fulltest',
+                    'InitialAttributes':{
+                        'StorageKey':    'Fulltest_p17_1',
+                        'TestResultSubDirectory': '.',
+                        'IncludeIVCurve':False,
+                        'IVCurveSubDirectory':    '',
+                        'ModuleID':self.Attributes['ModuleID'],
+                        'ModuleVersion':self.Attributes['ModuleVersion'],
+                        'ModuleType':self.Attributes['ModuleType'],
+                        'TestType':'p17',
+                        'TestTemperature':17,
+                        'ChipNo':0,
+                    },
+                    'DisplayOptions':{
+                        'Order':1        
+                    }
+                },
+                                                        ]
 #        elif self.Attributes['TestType'] == 'FullQualification':
 #            self.ResultData['SubTestResultDictList'] = [
 #                {

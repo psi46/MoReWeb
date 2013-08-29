@@ -14,6 +14,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name='CMSPixel_ModuleTestGroup_Module_XRayCalibration_FluorescenceTarget_TestResult'
         self.NameSingle='FluorescenceTarget'
         self.Attributes['TestedObjectType'] = 'CMSPixel_ModuleTestGroup_Module_ROC'
+        self.verbose = False
+        if not self.verbose:
+            self.fitOption +='Q'
 
     def SetSoragePath(self):
         pass
@@ -152,7 +155,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #Limit on turn on speed between 0.1 and 10. This value should be positive and shouldn't be much more below 0.1 otherwise it will affect the rest of the fit
         myfit.SetParLimits(9,0.01,10)
 
-        histo.Fit(myfit)
+        histo.Fit(myfit,self.fitOption)
         if self.Attributes.has_key('TargetEnergy'):
             targetEnergy= self.Attributes['TargetEnergy']
         else:
@@ -224,7 +227,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #Make sure we actually fit a 'signal like' peak, nothing too broad or narrow
         fit.SetParLimits(2,signalSigma-5,signalSigma+5)
 
-        histo.Fit(fit)
+        histo.Fit(fit,self.fitOption)
         return fit
 
 #'''
@@ -275,8 +278,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         myfit.SetParameter(4,gaus2)
         #Make sure signal peak is reasonably narrow
         myfit.SetParLimits(4,signalSigma-5,signalSigma+5)
-
-        histo.Fit(myfit,"R")
+        
+        histo.Fit(myfit,"R"+self.fitOption)
         return myfit
 
     def PopulateResultData(self):

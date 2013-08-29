@@ -21,8 +21,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
         print self.ResultData['SubTestResultDictList']
         self.Attributes['TestedObjectType'] = 'XrayCalibrationSpectrum'
-        self.DisplayOptions = {'DisplayOptions':{'Order':1, 'Width':3,'GroupWithNext':False},}
-        #self.DisplayOptions['Width'] = 5
+        
+#        self.DisplayOptions = {'Order':1, 'Width':3,'GroupWithNext':False,}
+        self.DisplayOptions['Width'] = 3
+        self.DisplayOptions['GroupWithNext'] = True
+        self.verbose = False
 #        print self.Attributes
 #        for e in self.Attributes['SubTestResultDictList']:
 #            print e
@@ -33,6 +36,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         pass
 
     def PopulateResultData(self):
+        fitOption =""
+        if not self.verbose:
+            fitOption += 'Q'
         PeakCenters = array.array('d',[])
         PeakErrors = array.array('d',[])
         NumElectrons = array.array('d',[])
@@ -69,18 +75,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'].SetMarkerColor(4)
         self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.6)
         #self.ResultData['Plot']['ROOTObject'].SetMarkerStyle(21)
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1","","SAME",sortedPeakCenters[0],sortedPeakCenters[ len(sortedPeakCenters) -1])
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1",fitOption,"SAME",sortedPeakCenters[0],sortedPeakCenters[ len(sortedPeakCenters) -1])
         chi2Total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1","","SAME",sortedPeakCenters[1],sortedPeakCenters[ len(sortedPeakCenters) -1])
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1",fitOption,"SAME",sortedPeakCenters[1],sortedPeakCenters[ len(sortedPeakCenters) -1])
         chi2Right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1","","SAME",sortedPeakCenters[0],sortedPeakCenters[ len(sortedPeakCenters) -2])
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1",fitOption,"SAME",sortedPeakCenters[0],sortedPeakCenters[ len(sortedPeakCenters) -2])
         chi2Left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         if ((chi2Right < chi2Total) or (chi2Left < chi2Total)):
             if chi2Right < chi2Left:
-                self.ResultData['Plot']['ROOTObject'].Fit("pol1","","SAME",sortedPeakCenters[1],sortedPeakCenters[ len(sortedPeakCenters) -1])
+                self.ResultData['Plot']['ROOTObject'].Fit("pol1",fitOption,"SAME",sortedPeakCenters[1],sortedPeakCenters[ len(sortedPeakCenters) -1])
                 print "Excluding Leftmost Point because chi2Total=",chi2Total," and chi2Right=",chi2Right
             else:
-                self.ResultData['Plot']['ROOTObject'].Fit("pol1","","SAME",sortedPeakCenters[0],sortedPeakCenters[ len(sortedPeakCenters) -2])
+                self.ResultData['Plot']['ROOTObject'].Fit("pol1",fitOption,"SAME",sortedPeakCenters[0],sortedPeakCenters[ len(sortedPeakCenters) -2])
                 print "Excluding Rightmost Point because chi2Total=",chi2Total," and chi2Left=",chi2Left
         fit = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1")
         self.ResultData['KeyValueDictPairs'] = {

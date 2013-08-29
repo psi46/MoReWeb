@@ -14,14 +14,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         ROOT.gStyle.SetOptStat(0);
         ROOT.gPad.SetLogy(0);
-        
+        isDigitalROC = False
         # TH2D
-        self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
-        
-        
+        try:
+            self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        except:
+            pass
+        if not self.ResultData['Plot']['ROOTObject']:
+            self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+            isDigitalROC = True
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(self.TestResultEnvironmentObject.GradingParameters['minThrDiff'], self.TestResultEnvironmentObject.GradingParameters['maxThrDiff']);
+            if not isDigitalROC:
+                self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(self.TestResultEnvironmentObject.GradingParameters['minThrDiff'], self.TestResultEnvironmentObject.GradingParameters['maxThrDiff']);
+            else:
+                self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0,255)
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
