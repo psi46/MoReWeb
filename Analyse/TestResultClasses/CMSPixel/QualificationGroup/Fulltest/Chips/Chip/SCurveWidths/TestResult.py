@@ -21,9 +21,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) # hw
         self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) #Noise in unbonded pixel (not displayed) # hd
         self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", 52, 0., 52., 80, 0., 80.) # ht
-        
-        self.ResultData['Plot']['ROOTObject_h2'] =ROOT.TH2D(self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ))
-        
+        isDigitalROC = False
+        if self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo'])):
+#            print 'SCurve Analog module'
+            self.ResultData['Plot']['ROOTObject_h2'] = ROOT.TH2D(
+                                                             self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
+                                                             )
+        else:
+#            print 'SCurve Digital module'
+            isDigitalROC = True
+            self.ResultData['Plot']['ROOTObject_h2'] = ROOT.TH2D(
+                                                             self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
+                                                             )
         
         Directory = self.FullTestResultsPath
         SCurveFileName = "{Directory}/SCurve_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
@@ -36,8 +45,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Line = SCurveFile.readline()
             Line = SCurveFile.readline()
             
-            for i in range(52): #Columns
-                for j in range(80): #Rows
+            for column in range(52): #Columns
+                for row in range(80): #Rows
                     Line = SCurveFile.readline()
                     if Line:
                         LineArray = Line.strip().split()
@@ -47,8 +56,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         
                         self.ResultData['Plot']['ROOTObject'].Fill(Sign)
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardADC2ElectronConversionFactor']
-                        self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(i+1, j+1, Threshold)
-                        if self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(i+1, j+1) >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:
+                        self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
+                        if not isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:
+                            self.ResultData['Plot']['ROOTObject_hd'].Fill(Sign)
+                        elif isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) <= self.TestResultEnvironmentObject.GradingParameters['BumpBondThr']:
                             self.ResultData['Plot']['ROOTObject_hd'].Fill(Sign)
             
             

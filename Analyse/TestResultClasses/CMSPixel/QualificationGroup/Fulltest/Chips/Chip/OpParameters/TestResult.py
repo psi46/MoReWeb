@@ -22,8 +22,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             DacParametersFileName =  "{Directory}/dacParameters{i}_C{ChipNo}.dat".format(Directory=Directory,i=i, ChipNo=self.ParentObject.Attributes['ChipNo']);
             if os.path.exists(DacParametersFileName):
                 if not vcalTrim:
-                    vcalTrim = int(i)
-                
+                    try:
+                        vcalTrim = int(i)
+                    except:
+                        vcalTrim  = -1
                 DacParametersFile = open(DacParametersFileName, "r");
                 self.ResultData['HiddenData']['DacParameters']['File'+i] = DacParametersFile
                     

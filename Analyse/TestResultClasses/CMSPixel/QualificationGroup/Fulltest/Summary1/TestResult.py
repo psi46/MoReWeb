@@ -48,6 +48,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # Grading
         
         for i in ['Noise', 'VcalThresholdWidth', 'RelativeGainWidth', 'PedestalSpread', 'Parameter1']:
+            if not self.ParentObject.ResultData['SubTestResults'].has_key(i):
+                continue
             TestResultObject = self.ParentObject.ResultData['SubTestResults'][i]
             for j in range(self.ParentObject.Attributes['NumberOfChips']-self.ParentObject.Attributes['StartChip']):
             

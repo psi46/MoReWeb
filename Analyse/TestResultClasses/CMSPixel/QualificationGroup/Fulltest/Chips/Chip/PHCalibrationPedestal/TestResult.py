@@ -96,16 +96,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject_rPedestal'].Draw("same")
         
         Line = ROOT.TLine()
-        Line.DrawLine(
+        line1 = Line.DrawLine(
             self.ResultData['Plot']['ROOTObject_rPedestal'].GetBinCenter(xLow), 0, 
             self.ResultData['Plot']['ROOTObject_rPedestal'].GetBinCenter(xLow), 
-            0.6*self.ResultData['Plot']['ROOTObject_rPedestal'].GetMaximum()
+            0.8*self.ResultData['Plot']['ROOTObject_rPedestal'].GetMaximum()
         )
-        Line.DrawLine(
+        line1.SetLineColor(ROOT.kBlue)
+        line1.SetLineWidth(3)
+        line1.SetLineStyle(2)
+        line2 = Line.DrawLine(
             self.ResultData['Plot']['ROOTObject_rPedestal'].GetBinCenter(xUp), 0, 
             self.ResultData['Plot']['ROOTObject_rPedestal'].GetBinCenter(xUp), 
-            0.6*self.ResultData['Plot']['ROOTObject_rPedestal'].GetMaximum()
+            0.8*self.ResultData['Plot']['ROOTObject_rPedestal'].GetMaximum()
         )
+        line2.SetLineColor(ROOT.kBlue)
+        line2.SetLineWidth(3)
+        line2.SetLineStyle(2)
         
         if self.SavePlotFile:
             self.Canvas.SaveAs(self.GetPlotFileName())      

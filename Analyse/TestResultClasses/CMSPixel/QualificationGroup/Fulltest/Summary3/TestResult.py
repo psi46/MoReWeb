@@ -12,31 +12,55 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         pass
         
     def PopulateResultData(self):
-        
+        try:
+            noise = self.ParentObject.ResultData['SubTestResults']['Noise'].ResultData['KeyValueDictPairs']['mu']['Value']
+        except:
+            noise  = -9999
+            print "Summary3: cannot find ResultData['SubTestResults']['Noise'].ResultData['KeyValueDictPairs']['mu']['Value']"  
+        try:
+            vcalthrwidth = self.ParentObject.ResultData['SubTestResults']['VcalThresholdWidth'].ResultData['KeyValueDictPairs']['mu']['Value']
+        except: 
+            vcalthrwidth  = -9999
+            print "Summary3: cannot find .ResultData['SubTestResults']['VcalThresholdWidth'].ResultData['KeyValueDictPairs']['mu']['Value']"
+        try:
+            relGainWidth = self.ParentObject.ResultData['SubTestResults']['RelativeGainWidth'].ResultData['KeyValueDictPairs']['mu']['Value']
+        except:
+            relGainWidth = -9999
+            print "Summary3: cannot find ResultData['SubTestResults']['RelativeGainWidth'].ResultData['KeyValueDictPairs']['mu']['Value']"
+        try:
+            pedestalSpread = self.ParentObject.ResultData['SubTestResults']['PedestalSpread'].ResultData['KeyValueDictPairs']['mu']['Value']
+        except:
+            pedestalSpread = -9999
+            print "Summary3: cannot find ResultData['SubTestResults']['PedestalSpread'].ResultData['KeyValueDictPairs']['mu']['Value']"
+        try:
+            parameter1 = self.ParentObject.ResultData['SubTestResults']['Parameter1'].ResultData['KeyValueDictPairs']['mu']['Value']
+        except:
+            parameter1 = -9999 
+            print "Summary3: cannot find ResultData['SubTestResults']['PedestalSpread'].ResultData['KeyValueDictPairs']['mu']['Value']"
         
         self.ResultData['KeyValueDictPairs'] = {
             'Noise': {
-                'Value':self.ParentObject.ResultData['SubTestResults']['Noise'].ResultData['KeyValueDictPairs']['mu']['Value'], 
+                'Value':noise, 
                 'Label':'Noise',
                 'Unit':'e',
             },
             'VcalThrWidth': {
-                'Value':self.ParentObject.ResultData['SubTestResults']['VcalThresholdWidth'].ResultData['KeyValueDictPairs']['mu']['Value'], 
+                'Value':vcalthrwidth,
                 'Label':'Vcal Thr. Width',
                 'Unit':'e',
             },
             'RelGainWidth': {
-                'Value':self.ParentObject.ResultData['SubTestResults']['RelativeGainWidth'].ResultData['KeyValueDictPairs']['mu']['Value'], 
+                'Value':relGainWidth, 
                 'Label':'Rel. Gain Width',
                 'Unit':'%',
             },
             'PedestalSpread': {
-                'Value':self.ParentObject.ResultData['SubTestResults']['PedestalSpread'].ResultData['KeyValueDictPairs']['mu']['Value'], 
+                'Value':pedestalSpread, 
                 'Label':'Pedestal Spread',
                 'Unit':'e',
             },
             'Parameter1': {
-                'Value':self.ParentObject.ResultData['SubTestResults']['Parameter1'].ResultData['KeyValueDictPairs']['mu']['Value'], 
+                'Value':parameter1, 
                 'Label':'Parameter1',
                 'Unit':'',
             },

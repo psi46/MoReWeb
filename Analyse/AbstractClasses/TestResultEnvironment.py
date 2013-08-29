@@ -58,6 +58,7 @@ class TestResultEnvironment:
         # check
         'minThrDiff':-5,
         'maxThrDiff':5,
+        'BumpBondThr': 150,
         'StandardADC2ElectronConversionFactor':65,
         'IVCurrentFactor':-1e6,
         'TrimBitDifference':2.,

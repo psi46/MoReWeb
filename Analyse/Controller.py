@@ -45,10 +45,11 @@ else:
 if FinalResultDirectory!= '' and not os.path.exists(FinalResultDirectory):
     os.makedirs(FinalResultDirectory)
 SQLiteDBPath = OverviewPath + '/ModuleResultDB.sqlite'
+ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
 if not args.ModuleVersion == '':
      ModuleVersion = int(args.ModuleVersion)
-else:
-     ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
+print ModuleVersion
+     
 TestType = Configuration.get('TestType','TestType')
 
 

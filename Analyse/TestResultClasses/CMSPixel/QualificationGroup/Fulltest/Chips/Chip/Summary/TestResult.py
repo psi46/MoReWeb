@@ -44,19 +44,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         VcalThresholdMapHistogram =  self.ParentObject.ParentObject.FileHandle.Get("VcalThresholdMap_C{ChipNo};8".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
         
         #reset file pointers
-        self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].FileHandle.seek(0)
-        for i in range(2):
-            self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].FileHandle.readline() #Omit first three lines
+        if self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].FileHandle:
+            self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].FileHandle.seek(0)
+            for i in range(2):
+                self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].FileHandle.readline() #Omit first three lines
         
-        
-        self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].FileHandle.seek(0)
-        for i in range(4):
-            self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].FileHandle.readline() #Omit first three lines
+        if self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].FileHandle:
+            self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].FileHandle.seek(0)
+            for i in range(4):
+                self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].FileHandle.readline() #Omit first three lines
         
         if self.ParentObject.Attributes['ModuleVersion'] == 1:
-            self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].FileHandle.seek(0)
-            for i in range(3):
-                self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].FileHandle.readline() #Omit first three lines
+            if self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan']:
+                self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].FileHandle.seek(0)
+                for i in range(3):
+                    self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].FileHandle.readline() #Omit first three lines
             
         for i in range(52): #Column
             for j in range(80): #Row
@@ -143,17 +145,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
                 # -- Threshold
                 if pixel_alive:
-        
-                    if ROOT.TMath.Abs(VcalThresholdMapHistogram.GetBinContent(i+1, j+1) - self.ParentObject.ResultData['SubTestResults']['OpParameters'].ResultData['HiddenData']['vcalTrim']) > self.TestResultEnvironmentObject.GradingParameters['tthrTol']:
-                        if px_counted:
-                            nDoubleCounts+=1
-                        px_counted = 1
-                
-                        if px_perf_counted:
-                            nDoublePerfCounts+=1
-                        px_perf_counted = 1
-                
-                        nThrDefect+=1
+                    if self.ParentObject.ResultData['SubTestResults']['OpParameters'].ResultData['HiddenData'].has_key('vcalTrim'):
+                        if ROOT.TMath.Abs(VcalThresholdMapHistogram.GetBinContent(i+1, j+1) - self.ParentObject.ResultData['SubTestResults']['OpParameters'].ResultData['HiddenData']['vcalTrim']) > self.TestResultEnvironmentObject.GradingParameters['tthrTol']:
+                            if px_counted:
+                                nDoubleCounts+=1
+                            px_counted = 1
+                    
+                            if px_perf_counted:
+                                nDoublePerfCounts+=1
+                            px_perf_counted = 1
+                    
+                            nThrDefect+=1
                                 
         
                 # -- Noise
