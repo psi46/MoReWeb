@@ -209,17 +209,18 @@ class TestResultEnvironment:
         AdditionalWhere =""
         AdditionalWhere += ' AND ModuleID=:ModuleID '
         AdditionalWhere += ' AND QualificationType=:QualificationType '
-        
-        self.LocalDBConnectionCursor.execute(
-            'SELECT * FROM ModuleTestResults '+
-            'WHERE 1=1 '+
-            AdditionalWhere+
-            'ORDER BY ModuleID ASC,TestType ASC, TestDate ASC ',
-            {
-                'ModuleID':moduleID,
-                'QualificationType':QualificationType
-            }
-        )
-        Rows = self.LocalDBConnectionCursor.fetchall()
-        return len(Rows)>0
+        if self.LocalDBConnectionCursor:
+            self.LocalDBConnectionCursor.execute(
+                'SELECT * FROM ModuleTestResults '+
+                'WHERE 1=1 '+
+                AdditionalWhere+
+                'ORDER BY ModuleID ASC,TestType ASC, TestDate ASC ',
+                {
+                    'ModuleID':moduleID,
+                    'QualificationType':QualificationType
+                }
+            )
+            Rows = self.LocalDBConnectionCursor.fetchall()
+            return len(Rows)>0
+        return False
     

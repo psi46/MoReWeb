@@ -135,7 +135,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 i = len(files)
                 while i<0 or i>= len(files):
                     try:
-                        rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]'%(len(files)-1))
+                        rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]\t'%(len(files)-1))
                         i =  int(rawInput)
                     except:
                         print '%s is not an integer, please enter a valid integer'%rawInput
@@ -145,7 +145,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             elif len(files) == 1:
                 i = 0
                 fileHandlePath = self.FullTestResultsPath+'/'+files[i]
-                print "open '%s'"%fileHandlePath
+                print "only one other ROOT file exists. Open '%s'"%fileHandlePath
                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
             else:
                 print 'There exist no ROOT file in "%s"'%self.FullTestResultsPath

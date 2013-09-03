@@ -8,6 +8,23 @@ Program    : MORE-Web
 from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
 import AbstractClasses.Helper.hasher as hasher
 import argparse
+
+
+#arg parse to analyse a single Fulltest
+parser = argparse.ArgumentParser(description='MORE web Controller: an analysis software for CMS pixel modules and ROCs')
+parser.add_argument('-FT','--singleFulltest',dest='singleFulltestPath',metavar='PATH',
+                     help='option which can be used to analyse a single Fulltest, as the second argument needs the path where the single fulltest data are stored',
+                     default='')
+parser.add_argument('-M','--ModuleVersion',dest='ModuleVersion',metavar='VERSION',
+                    help='option to choose which module version is analysed [singleROC =3, Module ={1,2}]',default='')
+parser.add_argument('-noDB','--noDBupload',dest='DBUpload',action='store_false',
+                    help='deactivates upload to DB within this analysis session')
+parser.add_argument('-withDB','--withDBupload',dest='DBUpload',action='store_true',
+                    help='activates upload to DB within this analysis session [default]')
+parser.set_defaults(DBUpload=True)
+args = parser.parse_args()
+
+
 import TestResultClasses.CMSPixel.QualificationGroup.TestResult
 import os, time,shutil
 import ROOT
@@ -19,7 +36,6 @@ import ConfigParser
 ROOT.gErrorIgnoreLevel = 1001
 
 ROOT.gROOT.SetBatch(True)
-
 Configuration = ConfigParser.ConfigParser()
 Configuration.read([
     'Configuration/GradingParameters.cfg', 
@@ -27,14 +43,6 @@ Configuration.read([
     'Configuration/Paths.cfg',
     'Configuration/ModuleInformation.cfg'])
 
-#arg parse to analyse a single Fulltest
-parser = argparse.ArgumentParser(description='MORE web Controller: an analysis software for CMS pixel modules and ROCs')
-parser.add_argument('-FT','--singleFulltest',dest='singleFulltest',
-                     help='option which can be used to analyse a single Fulltest',
-                     default='')
-parser.add_argument('-M','--ModuleVersion',dest='ModuleVersion',
-                    help='option to choose which module version is analysed [singleROC =3, Module ={1,2}]',default='')
-args = parser.parse_args()
 
 TestResultDirectory = Configuration.get('Paths', 'TestResultDirectory')
 OverviewPath = Configuration.get('Paths', 'OverviewPath')
@@ -47,7 +55,7 @@ if FinalResultDirectory!= '' and not os.path.exists(FinalResultDirectory):
 SQLiteDBPath = OverviewPath + '/ModuleResultDB.sqlite'
 ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
 if not args.ModuleVersion == '':
-     ModuleVersion = int(args.ModuleVersion)
+    ModuleVersion = int(args.ModuleVersion)
 print ModuleVersion
      
 TestType = Configuration.get('TestType','TestType')
@@ -62,11 +70,11 @@ TestResultEnvironmentInstance.TestResultsBasePath = TestResultDirectory
 hasher.create_hash_file_directory('checksum.md5','.')
 
 ModuleTestResults = []
-if not args.singleFulltest=='':
-    print 'analysing a single Fulltest at destination: "%s"'%args.singleFulltest 
-    TestResultEnvironmentInstance.TestResultsPath  = args.singleFulltest
-    TestResultEnvironmentInstance.FinalResultsPath = args.singleFulltest
-    ModuleID = args.singleFulltest.split('/')[-1]
+if not args.singleFulltestPath=='':
+    print 'analysing a single Fulltest at destination: "%s"'%args.singleFulltestPath 
+    TestResultEnvironmentInstance.TestResultsPath  = args.singleFulltestPath
+    TestResultEnvironmentInstance.FinalResultsPath = args.singleFulltestPath
+    ModuleID = args.singleFulltestPath.split('/')[-1]
     TestDate = '%s'%int(time.time())
     TestType = 'singleFulltest'
     ModuleInformation = {
@@ -74,7 +82,7 @@ if not args.singleFulltest=='':
         'TestDate': TestDate,
         'QualificationType': 'SingleFulltest',
     }
-    FinalResultsPath = args.singleFulltest+'/FinalResults'
+    FinalResultsPath = args.singleFulltestPath+'/FinalResults'
     ModuleTestResult = TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
                     TestResultEnvironmentInstance, 
                     None, 
@@ -104,7 +112,8 @@ AddEncoding x-gzip .svgz
     
     print '    Populating Data'
     ModuleTestResult.PopulateAllData()
-    ModuleTestResult.WriteToDatabase() # needed before final output
+    if args.DBUpload:
+        ModuleTestResult.WriteToDatabase() # needed before final output
     
     print '    Generating Final Output'
     ModuleTestResult.GenerateFinalOutput()
@@ -141,7 +150,10 @@ elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                 if os.path.exists(md5FileName):
                     print 'md5 sum exists %s'%md5FileName
                     bSameFiles = hasher.compare_two_files('checksum.md5',md5FileName)
-                    bExistInDB = TestResultEnvironmentInstance.existInDB(ModuleInformation['ModuleID'],ModuleInformation['QualificationType'])
+                    if Configuration.get('SystemConfiguration','UseGlobalDatabase') == 0:
+                        bExistInDB = TestResultEnvironmentInstance.existInDB(ModuleInformation['ModuleID'],ModuleInformation['QualificationType'])
+                    else:
+                        bExistInDB = false
                     if bSameFiles and bExistInDB:
                         print 'do not analyse folder '+ Folder
                         continue
