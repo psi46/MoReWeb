@@ -1,29 +1,42 @@
 import ROOT
 import AbstractClasses
-import ROOT
+from sets import Set
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_Summary_TestResult'
         self.NameSingle='Summary'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        self.chipNo = self.ParentObject.Attributes['ChipNo']
         
     def SetStoragePath(self):
         pass
         
     def PopulateResultData(self):
         nDeadPixel = 0
+        DeadPixelList = Set()
         nIneffPixel = 0
+        IneffPixelList = Set()
         nMaskDefect = 0
+        MaskDefectList = Set()
         nNoisy1Pixel = 0
+        Noisy1PixelList = Set()
         nDeadBumps = 0
+        DeadBumpList = Set()
         nDeadTrimbits = 0
+        DeadTrimbitsList = Set()
         nAddressProblems = 0
+        AddressProblemList = Set()
     
         nNoisy2Pixel = 0
+        Noisy2PixelList = Set()
         nThrDefect = 0
+        ThrDefectList = Set()
         nGainDefect = 0
+        GainDefectList = Set()
         nPedDefect = 0
+        PedDefectList = Set()
         nPar1Defect = 0
+        Par1DefectList = Set()
     
         nRootFileProblems = 0
     
@@ -60,8 +73,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 for i in range(3):
                     self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].FileHandle.readline() #Omit first three lines
             
-        for i in range(52): #Column
-            for j in range(80): #Row
+        for column in range(52): #Column
+            for row in range(80): #Row
+            	i = column
+            	j = row
                 
                 pixel_alive   = 1
                 px_funct_counted = 0
@@ -74,20 +89,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 PixelMapCurrentValue = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['Plot']['ROOTObject'].GetBinContent(i+1, j+1)
                 
                 # -- Pixel alive
-                if  PixelMapCurrentValue == 0:
+                if PixelMapCurrentValue == 0:
                     
                     pixel_alive = 0
                     nDeadPixel += 1
+                    DeadPixelList.add((self.chipNo,column,row))
+                    
                 elif PixelMapCurrentValue  > self.TestResultEnvironmentObject.GradingParameters['PixelMapMaxValue']:
                     nNoisy1Pixel += 1
+                    Noisy1PixelList.add((self.chipNo,column,row))
                     px_counted = 1 
                     px_funct_counted = 1
                 elif PixelMapCurrentValue  < self.TestResultEnvironmentObject.GradingParameters['PixelMapMinValue']:
-                    nMaskDefect += 1  
+                    nMaskDefect += 1
+                    MaskDefectList.add((self.chipNo,column,row))  
                     px_counted = 1
                     px_funct_counted = 1
                 else:
                     nIneffPixel += 1
+                    IneffPixelList.add((self.chipNo,column,row))
                     px_counted = 1
                     px_funct_counted = 1
         
@@ -106,6 +126,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         px_funct_counted = 1
                 
                         nDeadBumps += 1
+                        DeadBumpList.add((self.chipNo,column,row))
 
         
                 # -- Trim bits 1 - 4
@@ -127,6 +148,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             trim_counted = 1
                 
                             nDeadTrimbits+=1
+                            DeadTrimbitsList.add((self.chipNo,column,row))
 
                 # -- Address decoding
                 if pixel_alive:
@@ -141,6 +163,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         px_funct_counted = 1
                 
                         nAddressProblems+=1
+                        AddressProblemList.add((self.chipNo,column,row))
                 
         
                 # -- Threshold
@@ -156,6 +179,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             px_perf_counted = 1
                     
                             nThrDefect+=1
+                            ThrDefectList.add((self.chipNo,column,row))
                                 
         
                 # -- Noise
@@ -173,6 +197,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             px_perf_counted = 1
                     
                             nNoisy2Pixel+=1
+                            Noisy2PixelList.add((self.chipNo,column,row))
                     except (ValueError, TypeError, IndexError):
                         pass
         
@@ -218,6 +243,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         ph_counted = 1
                 
                         nPedDefect+=1
+                        PedDefectList.add((self.chipNo,column,row))
         
         
                 # -- Par1
@@ -240,11 +266,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             ph_counted = 1
                     
                             nPar1Defect+=1
+                            Par1DefectList.add((self.chipNo,column,row))
                     except (ValueError, TypeError, IndexError):
                         pass    
         
         Total = nDeadPixel + nMaskDefect + nDeadTrimbits + nAddressProblems
+        totalList = DeadPixelList.union(MaskDefectList).union(DeadTrimbitsList).union(AddressProblemList)
         
+        if False and (len(totalList) >0 or Total >0) :
+            print '\nChip %d'%self.chipNo
+            print '%d = %d + %d + %d + %d'%(Total,nDeadPixel , nMaskDefect , nDeadTrimbits , nAddressProblems)
+            
+            print totalList
+            print '%d = %d + %d + %d + %d'%(len(totalList),len(DeadPixelList) , len(MaskDefectList) , len(DeadTrimbitsList) , len(AddressProblemList))
+            if len(totalList) != Total:
+                raw_input('Please check List, something is wrong')
+#         raw_input('check both')
         # -- Compute the final verdict on this chip  //?? FIXME (below is pure randomness)
         finalVerdict = 0
         if nDeadTrimbits > 0:
@@ -260,6 +297,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if nNoisy2Pixel > 0:
             finalVerdict += 1000
         if nThrDefect > 0:
+#             print 'ThrDefects: %s'%nThrDefect
+#             print len(ThrDefectList), ThrDefectList
             finalVerdict += 10000
         if nGainDefect > 0:
             finalVerdict += 100000

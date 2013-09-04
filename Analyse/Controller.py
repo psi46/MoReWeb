@@ -153,7 +153,7 @@ elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                     if Configuration.get('SystemConfiguration','UseGlobalDatabase') == 0:
                         bExistInDB = TestResultEnvironmentInstance.existInDB(ModuleInformation['ModuleID'],ModuleInformation['QualificationType'])
                     else:
-                        bExistInDB = false
+                        bExistInDB = False
                     if bSameFiles and bExistInDB:
                         print 'do not analyse folder '+ Folder
                         continue

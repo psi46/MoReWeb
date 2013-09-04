@@ -15,6 +15,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='FluorescenceTarget'
         self.Attributes['TestedObjectType'] = 'CMSPixel_ModuleTestGroup_Module_ROC'
         self.verbose = False
+        self.fitOption =''
         if not self.verbose:
             self.fitOption +='Q'
 
