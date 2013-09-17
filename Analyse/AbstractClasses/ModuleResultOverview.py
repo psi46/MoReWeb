@@ -178,7 +178,7 @@ class ModuleResultOverview:
                 ModuleGroupPath =  ''
                 if not ShrinkedList:
 #                    print RowTuple['RelativeModuleFulltestStoragePath']
-                    ModuleGroupPath = '/../'+RowTuple['RelativeModuleFulltestStoragePath']
+                    ModuleGroupPath = '/../../'+RowTuple['RelativeModuleFulltestStoragePath']
                 if not ModuleGroupPath:
                     print 'Problem with',RowTuple
                     

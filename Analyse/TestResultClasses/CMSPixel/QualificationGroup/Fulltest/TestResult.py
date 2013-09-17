@@ -119,6 +119,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             {
                 'Key':'SummaryROCs',
                 'DisplayOptions':{
+                        'Width':4,
                 }
             },
         ]

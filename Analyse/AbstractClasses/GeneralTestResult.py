@@ -616,7 +616,7 @@ class GeneralTestResult:
         
         #Table
         TableHTML = ''
-        if RecursionLevel == 0:
+        if RecursionLevel == 0 or True:
             TableHTMLTemplate = HtmlParser.getSubpart(HTMLTemplate, '###TABLE###')
             TableHTML = HtmlParser.GenerateTableHTML(TableHTMLTemplate, TestResultObject.ResultData['Table'], {
                     '###ADDITIONALCSSCLASS###':'',
