@@ -177,12 +177,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Sigma': round(myfit.GetParError(3),2),
             },
             'TargetEnergy': {
-                'Value': targetEnergy,
+                'Value': round(targetEnergy,2),
                 'Label':'Energy of target %s'%target,
                 'Unit': 'eV',
             },
             'TargetNElectrons': {
-                'Value': targetNElectrons,
+                'Value': round(targetNElectrons,2),
                 'Label':'Energy of target %s'%target,
                 'Unit': 'nElectrons',
             },
@@ -296,8 +296,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold difference");
 #            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle('Pulseheight / Vcal')
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle('number of entries #')
             self.ResultData['Plot']['ROOTObject'].Draw();
 
         if self.SavePlotFile:

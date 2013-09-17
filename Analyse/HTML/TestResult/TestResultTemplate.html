@@ -54,6 +54,97 @@
 							<div class="ResultData ###RESULTDATAADDITIONALCSSCLASSES###">
 								<div class="TestDate">###TESTDATE###</div>
 								<div class="Title">###TITLE###</div>
+								<div class="###MAINTESTRESULTADDITIONALCLASSES###">
+									<!-- ###PLOT### -->
+										<div class="Plot">
+											<div class="ImageWrap">
+												<!-- ###PLOT_IMAGE### -->
+													<a href="####IMAGELARGECONTAINERID###" class="ImageLink" onclick="RefreshSizes('###IMAGELARGECONTAINERID###');">
+														<img class="Image" src="###FILENAME###" alt="Plot" />
+													</a>
+													<div class="LargeImageContainer" id="###IMAGELARGECONTAINERID###">
+														<a href="#d" class="ImageLinkBack" style="margin-top:###MARGIN_TOP###px;" data-width="###WIDTH###" data-height="###HEIGHT###">
+															<h4 class="ImageTitle">###TITLE###</h4>
+															<img class="ImageLarge" src="###FILENAME###"  alt="Plot"/>
+														</a>
+													</div>
+												<!-- ###PLOT_IMAGE### -->
+											</div>
+											
+										</div>
+									<!-- ###PLOT### -->
+									<div class="KeyValueDictPairs">
+										<table>
+											<tbody>
+												<!-- ###KEYVALUEDICTPAIRS_ROW### -->
+													<tr>
+														<td class="Key">###KEY###</td>
+														<td class="Label">###LABEL###</td>
+														<td class="Value">###VALUE###</td>
+														<td class="Unit">###UNIT###</td>
+													</tr>
+												<!-- ###KEYVALUEDICTPAIRS_ROW### -->
+											</tbody>
+										</table>
+									</div>
+									<div class="TableContainer">
+										<!-- ###TABLE### -->
+											<table class="Table ###ADDITIONALCSSCLASS###" id="###ID###">
+												<!-- ###HEADER### -->
+													<thead>
+														<!-- ###ROW### -->
+															<tr>
+																<!-- ###CELL### -->
+																	<th>
+																		<!-- ###CONTENT### -->
+																			<!-- ###LINK### -->
+																				<a href="###URL###">###LABEL###</a>
+																			<!-- ###LINK### -->
+																		<!-- ###CONTENT### -->	
+																	</th>
+																<!-- ###CELL### -->
+															</tr>
+														<!-- ###ROW### -->
+													</thead>
+												<!-- ###HEADER### -->
+												<!-- ###BODY### -->
+													<tbody>
+														<!-- ###ROW### -->
+															<tr>
+																<!-- ###CELL### -->
+																	<td>
+																		<!-- ###CONTENT### -->
+																			<!-- ###LINK### -->
+																				<a href="###URL###">###LABEL###</a>
+																			<!-- ###LINK### -->
+																		<!-- ###CONTENT### -->
+																	</td>
+																<!-- ###CELL### -->
+															</tr>
+														<!-- ###ROW### -->
+													</tbody>
+												<!-- ###BODY### -->
+												<!-- ###FOOTER### -->
+													<tfoot>
+														<!-- ###ROW### -->
+															<tr>
+																<!-- ###CELL### -->
+																	<td>
+																		<!-- ###CONTENT### -->
+																			<!-- ###LINK### -->
+																				<a href="###URL###">###LABEL###</a>
+																			<!-- ###LINK### -->
+																		<!-- ###CONTENT### -->	
+																	</td>
+																<!-- ###CELL### -->
+															</tr>
+														<!-- ###ROW### -->
+													</tfoot>
+												<!-- ###FOOTER### -->
+											</table>
+										<!-- ###TABLE### -->
+									</div>
+								</div>
 								<div class="SubTestResults">
 									<!-- ###SUBTESTRESULTGROUP_START### -->
 									<div class="Group ###SUBTESTRESULTGROUP_ADDITIONALCSSCLASSES###">
@@ -78,95 +169,6 @@
 										</select>
 										<!-- </ul> -->
 									<!-- ###SUBTESTRESULTLIST### -->
-								</div>
-								<!-- ###PLOT### -->
-									<div class="Plot">
-										<div class="ImageWrap">
-											<!-- ###PLOT_IMAGE### -->
-												<a href="####IMAGELARGECONTAINERID###" class="ImageLink" onclick="RefreshSizes('###IMAGELARGECONTAINERID###');">
-													<img class="Image" src="###FILENAME###" alt="Plot" />
-												</a>
-												<div class="LargeImageContainer" id="###IMAGELARGECONTAINERID###">
-													<a href="#d" class="ImageLinkBack" style="margin-top:###MARGIN_TOP###px;" data-width="###WIDTH###" data-height="###HEIGHT###">
-														<h4 class="ImageTitle">###TITLE###</h4>
-														<img class="ImageLarge" src="###FILENAME###"  alt="Plot"/>
-													</a>
-												</div>
-											<!-- ###PLOT_IMAGE### -->
-										</div>
-										
-									</div>
-								<!-- ###PLOT### -->
-								<div class="KeyValueDictPairs">
-									<table>
-										<tbody>
-											<!-- ###KEYVALUEDICTPAIRS_ROW### -->
-												<tr>
-													<td class="Key">###KEY###</td>
-													<td class="Label">###LABEL###</td>
-													<td class="Value">###VALUE###</td>
-													<td class="Unit">###UNIT###</td>
-												</tr>
-											<!-- ###KEYVALUEDICTPAIRS_ROW### -->
-										</tbody>
-									</table>
-								</div>
-								<div class="TableContainer">
-									<!-- ###TABLE### -->
-										<table class="Table ###ADDITIONALCSSCLASS###" id="###ID###">
-											<!-- ###HEADER### -->
-												<thead>
-													<!-- ###ROW### -->
-														<tr>
-															<!-- ###CELL### -->
-																<th>
-																	<!-- ###CONTENT### -->
-																		<!-- ###LINK### -->
-																			<a href="###URL###">###LABEL###</a>
-																		<!-- ###LINK### -->
-																	<!-- ###CONTENT### -->	
-																</th>
-															<!-- ###CELL### -->
-														</tr>
-													<!-- ###ROW### -->
-												</thead>
-											<!-- ###HEADER### -->
-											<!-- ###BODY### -->
-												<tbody>
-													<!-- ###ROW### -->
-														<tr>
-															<!-- ###CELL### -->
-																<td>
-																	<!-- ###CONTENT### -->
-																		<!-- ###LINK### -->
-																			<a href="###URL###">###LABEL###</a>
-																		<!-- ###LINK### -->
-																	<!-- ###CONTENT### -->
-																</td>
-															<!-- ###CELL### -->
-														</tr>
-													<!-- ###ROW### -->
-												</tbody>
-											<!-- ###BODY### -->
-											<!-- ###FOOTER### -->
-												<tfoot>
-													<!-- ###ROW### -->
-														<tr>
-															<!-- ###CELL### -->
-																<td>
-																	<!-- ###CONTENT### -->
-																		<!-- ###LINK### -->
-																			<a href="###URL###">###LABEL###</a>
-																		<!-- ###LINK### -->
-																	<!-- ###CONTENT### -->	
-																</td>
-															<!-- ###CELL### -->
-														</tr>
-													<!-- ###ROW### -->
-												</tfoot>
-											<!-- ###FOOTER### -->
-										</table>
-									<!-- ###TABLE### -->
 								</div>
 							</div>
 						<!-- ###RESULTDATA### -->

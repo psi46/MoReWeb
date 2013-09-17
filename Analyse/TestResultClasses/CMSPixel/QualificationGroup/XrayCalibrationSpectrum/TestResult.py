@@ -23,7 +23,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'XrayCalibrationSpectrum'
         
 #        self.DisplayOptions = {'Order':1, 'Width':3,'GroupWithNext':False,}
+        
         self.DisplayOptions['Width'] = 3
+        self.DisplayOptions['Order'] = 1
         self.DisplayOptions['GroupWithNext'] = True
         self.verbose = False
 #        print self.Attributes
@@ -186,7 +188,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'IVSlope': None,
             'Temperature': None,
             'StorageFolder':os.path.relpath(self.TestResultEnvironmentObject.TestResultsPath, self.TestResultEnvironmentObject.OverviewPath),
-            'RelativeModuleFulltestStoragePath':os.path.relpath(self.StoragePath, self.TestResultEnvironmentObject.TestResultsPath),
+            'RelativeModuleFulltestStoragePath':os.path.relpath(self.StoragePath, self.TestResultEnvironmentObject.TestResultsPath ),
+            'RelativeModuleFulltestFinalResultPath':os.path.relpath(self.ParentObject.StoragePath, self.TestResultEnvironmentObject.OverviewPath),
             'initialCurrent': None,
             'Comments': '',
             'nCycles': None,
@@ -217,6 +220,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Temperature,
                         StorageFolder,
                         RelativeModuleFulltestStoragePath,
+                        RelativeModuleFulltestFinalResultPath,
                         initialCurrent,
                         Comments,
                         nCycles,
@@ -239,6 +243,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :Temperature,
                         :StorageFolder,
                         :RelativeModuleFulltestStoragePath,
+                        :RelativeModuleFulltestFinalResultPath,
                         :initialCurrent,
                         :Comments,
                         :nCycles,

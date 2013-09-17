@@ -53,6 +53,7 @@ class GeneralTestResult:
         self.SavePlotFile = True
         self.GzipSVG = TestResultEnvironmentObject.Configuration['GzipSVG']
         self.DefaultImageFormat = TestResultEnvironmentObject.Configuration['DefaultImageFormat'].strip().lower()
+        self.OverviewHTMLLink = TestResultEnvironmentObject.Configuration['OverviewHTMLLink']
         
         # Path for current test to folder with root-files
         self.FullTestResultsPath = ''
@@ -253,8 +254,14 @@ class GeneralTestResult:
                     print 'Error in subtest', i['TestResultObject'].ModulePath,i['TestResultObject'].StoragePath
                     print inst
                     print inst.args
+                    self.TestResultEnvironmentObject.ErrorList.append(
+                                                                      {'ModulePath':i['TestResultObject'].ModulePath,
+                                                                       'ErrorCode': inst,
+                                                                       'StoragePath':i['TestResultObject'].StoragePath}
+                                                                      )
                     print sys.exc_info()[0]
                     print "\n\n------\n"
+                    #todo Felix: handel exceptions
                 
         self.SetCanvasSize()
         self.PopulateResultData()
@@ -416,12 +423,14 @@ class GeneralTestResult:
                 tmpTestResultObject = tmpTestResultObject.ParentObject
             
             i+=1
-        
-        
+        if not self.OverviewHTMLLink:
+            OverviewHTMLLink = os.path.relpath(self.TestResultEnvironmentObject.OverviewPath+'/Overview.html',self.StoragePath)        
+        else:
+            OverviewHTMLLink = self.OverviewHTMLLink
         ClickPathEntries.append(HtmlParser.substituteMarkerArray(
                 ClickPathEntryTemplate,
                 {
-                    '###URL###':HtmlParser.MaskHTML(os.path.relpath(self.TestResultEnvironmentObject.OverviewPath+'/Overview.html',self.StoragePath)),
+                    '###URL###':HtmlParser.MaskHTML(OverviewHTMLLink),
                     '###LABEL###':'Overview'
                 }
             ))
@@ -488,11 +497,19 @@ class GeneralTestResult:
             
             MyObjectTestDate = 'Test Date: '+datetime.datetime.fromtimestamp(float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%m")
         
+        MainTestResultAdditionalClasses = ''
+        
+        if RecursionLevel == 0:
+            MainTestResultAdditionalClasses += 'MainTestResult Group'
+            if self.DisplayOptions['Width'] > 1: 
+                MainTestResultAdditionalClasses += ' Width'+str(self.DisplayOptions['Width'])
+        
         ResultDataHTML = HtmlParser.substituteMarkerArray(
             ResultDataHTML, 
             {
                 '###TITLE###':HtmlParser.MaskHTML(TestResultObject.Title),
                 '###TESTDATE###':MyObjectTestDate,
+                '###MAINTESTRESULTADDITIONALCLASSES###':MainTestResultAdditionalClasses,
             }
         )
         # Plot

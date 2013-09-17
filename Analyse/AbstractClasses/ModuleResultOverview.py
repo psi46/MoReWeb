@@ -175,17 +175,18 @@ class ModuleResultOverview:
                 for Key in TableColumnList:
                     RowDict[Key] = RowTuple[Key]
                     
-                ModuleGroupPath =  'FinalResults/QualificationGroup/'
+                ModuleGroupPath =  ''
                 if not ShrinkedList:
 #                    print RowTuple['RelativeModuleFulltestStoragePath']
-                    ModuleGroupPath = RowTuple['RelativeModuleFulltestStoragePath']
+                    ModuleGroupPath = '/../'+RowTuple['RelativeModuleFulltestStoragePath']
                 if not ModuleGroupPath:
                     print 'Problem with',RowTuple
                     
                 ResultHTMLFileName = 'TestResult.html'
    
                 Link = os.path.relpath(
-                    self.TestResultEnvironmentObject.OverviewPath+'/'+RowTuple['StorageFolder']+'/'+ModuleGroupPath+'/'+ResultHTMLFileName,
+                                       #
+                    self.TestResultEnvironmentObject.OverviewPath+'/'+RowTuple['RelativeModuleFulltestFinalResultPath']+ModuleGroupPath+'/'+ResultHTMLFileName,
                     self.StoragePath
                 )
                 

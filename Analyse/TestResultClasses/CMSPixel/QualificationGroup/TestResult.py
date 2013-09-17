@@ -300,7 +300,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'DisplayOptions':{
                 'Order':len(tests)+1,
-                #'Width':1
+                'Width':2
             }
            })
         while test and 'XraySpectrum' in test.testname:

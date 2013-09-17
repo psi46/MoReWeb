@@ -8,7 +8,11 @@ Program    : MORE-Web
 from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
 import AbstractClasses.Helper.hasher as hasher
 import argparse
-
+from AbstractClasses import Helper
+import AbstractClasses.Helper.ROOTConfiguration as ROOTConfiguration
+import TestResultClasses.CMSPixel.QualificationGroup.TestResult
+import os, time,shutil, errno, sys
+import ConfigParser
 
 #arg parse to analyse a single Fulltest
 parser = argparse.ArgumentParser(description='MORE web Controller: an analysis software for CMS pixel modules and ROCs')
@@ -21,21 +25,15 @@ parser.add_argument('-noDB','--noDBupload',dest='DBUpload',action='store_false',
                     help='deactivates upload to DB within this analysis session')
 parser.add_argument('-withDB','--withDBupload',dest='DBUpload',action='store_true',
                     help='activates upload to DB within this analysis session [default]')
+parser.add_argument('-rev','--analysis-revision',dest='revision',metavar='REV',default = -1,
+                    help='setting analysis revision number by hand to create an extra directory, alternative: Configuration/SystemConfiguration.cfg --> AnalysisRevision')
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
 
-
-import TestResultClasses.CMSPixel.QualificationGroup.TestResult
-import os, time,shutil
 import ROOT
-import time
-import ConfigParser
 
-# Suppress "info"-level notices from TCanvas that it has saved a .png
-# see root/core/base/inc/TError.h for information on error levels
-ROOT.gErrorIgnoreLevel = 1001
 
-ROOT.gROOT.SetBatch(True)
+ROOTConfiguration.initialise_ROOT()
 Configuration = ConfigParser.ConfigParser()
 Configuration.read([
     'Configuration/GradingParameters.cfg', 
@@ -43,11 +41,19 @@ Configuration.read([
     'Configuration/Paths.cfg',
     'Configuration/ModuleInformation.cfg'])
 
+if args.revision != -1:
+    revisionNumber = int(args.revision)
+elif Configuration.has_option('SystemConfiguration', 'AnalysisRevision'):
+    revisionNumber = Configuration.getint('SystemConfiguration', 'AnalysisRevision')
+else:
+    revisionNumber  = 0
+print 'MORE web analysis script, Revision number %s'%revisionNumber
+RevisionString = "-R%03d"%revisionNumber
 
 TestResultDirectory = Configuration.get('Paths', 'TestResultDirectory')
 OverviewPath = Configuration.get('Paths', 'OverviewPath')
-if Configuration.has_option('Paths',''):
-    FinalResultDirectory = Configuration.get('Paths','FinalResultsPath')
+if Configuration.has_option('Paths','FinalResultsPath'):
+    FinalResultDirectory = Configuration.get('Paths','FinalResultsPath')+'/R%03d'%revisionNumber
 else:
     FinalResultDirectory = ''
 if FinalResultDirectory!= '' and not os.path.exists(FinalResultDirectory):
@@ -60,16 +66,21 @@ print ModuleVersion
      
 TestType = Configuration.get('TestType','TestType')
 
-
 TestResultEnvironmentInstance = TestResultEnvironment.TestResultEnvironment(Configuration)
 TestResultEnvironmentInstance.SQLiteDBPath = SQLiteDBPath
 TestResultEnvironmentInstance.OverviewPath = OverviewPath
 TestResultEnvironmentInstance.OpenDBConnection()
 TestResultEnvironmentInstance.TestResultsBasePath = TestResultDirectory
 
+if Configuration.has_option('Paths','AbsoluteOverviewPage'):
+    TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'] = Configuration.get('Paths','AbsoluteOverviewPage')
+    raw_input('AbsoluteOverviewPage %s'%TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'])
+
 hasher.create_hash_file_directory('checksum.md5','.')
 
 ModuleTestResults = []
+
+
 if not args.singleFulltestPath=='':
     print 'analysing a single Fulltest at destination: "%s"'%args.singleFulltestPath 
     TestResultEnvironmentInstance.TestResultsPath  = args.singleFulltestPath
@@ -82,7 +93,7 @@ if not args.singleFulltestPath=='':
         'TestDate': TestDate,
         'QualificationType': 'SingleFulltest',
     }
-    FinalResultsPath = args.singleFulltestPath+'/FinalResults'
+    FinalResultsPath = args.singleFulltestPath+'/FinalResults'+RevisionString
     ModuleTestResult = TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
                     TestResultEnvironmentInstance, 
                     None, 
@@ -133,11 +144,13 @@ elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                 }
                 
                 if FinalResultDirectory=='':
-                    FinalResultsPath = TestResultDirectory+'/'+Folder+'/FinalResults'
+                    FinalResultsPath = TestResultDirectory+'/'+Folder+'/FinalResults'+RevisionString
                 else:
                     FinalResultsPath = FinalResultDirectory+'/'+Folder
-                                    
                 TestResultEnvironmentInstance.TestResultsPath = TestResultDirectory+'/'+Folder
+#                 raw_input(FinalResultsPath)
+                
+               
                 TestResultEnvironmentInstance.FinalResultsPath = FinalResultsPath 
                 #TestResultEnvironmentInstance.FinalResultsPath = TestResultDirectory+'/'+Folder
                 
@@ -174,6 +187,7 @@ elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
                         'QualificationType': ModuleInformation['QualificationType']
                     }    
                 )
+                    
                 # add apache webserver configuration for compressed svg images  
                 f = open(FinalResultsPath + '/.htaccess', 'w')
                 f.write('''
@@ -198,3 +212,6 @@ AddEncoding x-gzip .svgz
     
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
+TestResultEnvironmentInstance.ErrorList.append( {'test1':'bla'})
+print TestResultEnvironmentInstance.ErrorList
+sys.exit(len(TestResultEnvironmentInstance.ErrorList))

@@ -23,6 +23,7 @@ class TestResultEnvironment:
         'ParameterFile':'',
         'GzipSVG':True,
         'DefaultImageFormat':'svg',
+        'AbsoluteOverviewPage': None,
     }
     
     GradingParameters = {
@@ -96,6 +97,9 @@ class TestResultEnvironment:
     OverviewPath = ''
     
     LastUniqueIDCounter = 0;
+    
+    #Error Handling
+    ErrorList = []
     
     def __init__(self, Configuration = None):
         if Configuration:
@@ -172,6 +176,7 @@ class TestResultEnvironment:
                         Temperature TEXT,
                         StorageFolder TEXT,
                         RelativeModuleFulltestStoragePath TEXT,
+                        RelativeModuleFulltestFinalResultPath TEXT,
                         initialCurrent FLOAT,
                         Comments TEXT,
                         nCycles INT,

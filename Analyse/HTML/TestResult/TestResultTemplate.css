@@ -13,7 +13,7 @@ Program	: MORE-Web
 		width:100%;
 		margin-bottom:20px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group
+	#Page #ContentWrap #Content .ResultData .Group
 	{
 		float:left;
 		width:200px;
@@ -22,19 +22,19 @@ Program	: MORE-Web
 		padding-right:10px;
 		
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width2
+	#Page #ContentWrap #Content .ResultData .Group.Width2
 	{
 		width:420px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width3
+	#Page #ContentWrap #Content .ResultData .Group.Width3
 	{
 		width:640px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4
+	#Page #ContentWrap #Content .ResultData .Group.Width4
 	{
 		width:860px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4
+	#Page #ContentWrap #Content .ResultData .Group.Width5
 	{
 		width:1080px;
 	}
@@ -49,6 +49,12 @@ Program	: MORE-Web
 		font-size:16px;
 		float:right;
 		margin-bottom:10px;
+	}
+	#Page #ContentWrap #Content .ResultData .MainTestResult
+	{
+		float:none;
+		clear:both;
+		width:100%;
 	}
 	#Page #ContentWrap #Content .SubTestResults .ResultData .Title
 	{
@@ -70,35 +76,35 @@ Program	: MORE-Web
 		cursor: -webkit-zoom-in; 
 		cursor: -moz-zoom-in;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width2 .ResultData .Plot
+	#Page #ContentWrap #Content .ResultData .Group.Width2 .Plot
 	{
 		width:420px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width2 .ResultData .Plot .Image
+	#Page #ContentWrap #Content .ResultData .Group.Width2 .Plot .Image
 	{
 		width:418px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width3 .ResultData .Plot
+	#Page #ContentWrap #Content .ResultData .Group.Width3 .Plot
 	{
 		width:640px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width3 .ResultData .Plot .Image
+	#Page #ContentWrap #Content .ResultData .Group.Width3 .Plot .Image
 	{
 		width:638px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4 .ResultData .Plot
+	#Page #ContentWrap #Content .ResultData .Group.Width4 .Plot
 	{
 		width:860px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4 .ResultData .Plot .Image
+	#Page #ContentWrap #Content .ResultData .Group.Width4 .Plot .Image
 	{
 		width:858px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4 .ResultData .Plot
+	#Page #ContentWrap #Content .ResultData .Group.Width5 .Plot
 	{
 		width:1080px;
 	}
-	#Page #ContentWrap #Content .ResultData .SubTestResults .Group.Width4 .ResultData .Plot .Image
+	#Page #ContentWrap #Content .ResultData .Group.Width5 .Plot .Image
 	{
 		width:1078px;
 	}

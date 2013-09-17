@@ -116,7 +116,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Order':7,
                 }
             },
-            
+            {
+                'Key':'SummaryROCs',
+                'DisplayOptions':{
+                }
+            },
         ]
             
         
@@ -151,55 +155,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print 'There exist no ROOT file in "%s"'%self.FullTestResultsPath
             
     def PopulateResultData(self):
-        
-        self.ResultData['Table'] = {
-            'HEADER':[
-                [
-                    'ROC',
-                    'Total',
-                    'Dead',
-                    'Mask',
-                    'Bumps',
-                    'Trim(Bits)',
-                    'Address',
-                    'Noise',
-                    'Thresh',
-                    'Gain',
-                    'Ped',
-                    'Par1',
-                ]
-            ],
-            'BODY':[],
-            'FOOTER':[],
-        }
-        LinkHTMLTemplate = self.TestResultEnvironmentObject.HtmlParser.getSubpart(
-            self.TestResultEnvironmentObject.OverviewHTMLTemplate,
-            '###LINK###'
-        )
-        for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']:
-            self.ResultData['Table']['BODY'].append(
-                [
-                    self.TestResultEnvironmentObject.HtmlParser.substituteMarkerArray(
-                        LinkHTMLTemplate,
-                        {
-                            '###LABEL###':'Chip '+str(i['TestResultObject'].Attributes['ChipNo']),
-                            '###URL###':os.path.relpath(i['TestResultObject'].StoragePath, self.StoragePath)+'/TestResult.html'
-                        }
-                    ),
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Total']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadPixel']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nMaskDefect']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadBumps']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadTrimbits']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nAddressProblems']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nNoisy1Pixel']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nThrDefect']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nGainDefect']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nPedDefect']['Value'],
-                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nPar1Defect']['Value'],
-                ]   
-            )
-        
         self.FileHandle.Close()
     
         
@@ -232,6 +187,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC']['Value'],
             'StorageFolder':os.path.relpath(self.TestResultEnvironmentObject.TestResultsPath, self.TestResultEnvironmentObject.OverviewPath),
             'RelativeModuleFulltestStoragePath':os.path.relpath(self.StoragePath, self.TestResultEnvironmentObject.TestResultsPath),
+            'RelativeModuleFulltestFinalResultPath':os.path.relpath(self.ParentObject.StoragePath, self.TestResultEnvironmentObject.OverviewPath),
             'initialCurrent': initialCurrent,
             'Comments': '',
             'nCycles': None,
@@ -261,6 +217,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Temperature,
                         StorageFolder,
                         RelativeModuleFulltestStoragePath,
+                        RelativeModuleFulltestFinalResultPath,
                         initialCurrent,
                         Comments,
                         nCycles,
@@ -283,6 +240,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :Temperature,
                         :StorageFolder,
                         :RelativeModuleFulltestStoragePath,
+                        :RelativeModuleFulltestFinalResultPath,
                         :initialCurrent,
                         :Comments,
                         :nCycles,

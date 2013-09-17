@@ -189,6 +189,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #            'Temperature': None,
             'StorageFolder':os.path.relpath(self.TestResultEnvironmentObject.TestResultsPath, self.TestResultEnvironmentObject.OverviewPath),
             'RelativeModuleFulltestStoragePath': os.path.relpath(self.StoragePath, self.TestResultEnvironmentObject.TestResultsPath),
+            'RelativeModuleFulltestFinalResultPath': os.path.relpath(self.ParentObject.StoragePath, self.TestResultEnvironmentObject.OverviewPath),
 #            'Comments': '',
             'nCycles': self.ResultData['KeyValueDictPairs']['nCycles']['Value'],
             'CycleTempLow': self.ResultData['KeyValueDictPairs']['CycleTempLow']['Value'],
@@ -212,6 +213,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         QualificationType,
                         StorageFolder,
                         RelativeModuleFulltestStoragePath,
+                        RelativeModuleFulltestFinalResultPath,
                         nCycles,
                         CycleTempLow,
                         CycleTempHigh
@@ -223,6 +225,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :QualificationType,
                         :StorageFolder,
                         :RelativeModuleFulltestStoragePath,
+                        :RelativeModuleFulltestFinalResultPath,
                         :nCycles,
                         :CycleTempLow,
                         :CycleTempHigh
