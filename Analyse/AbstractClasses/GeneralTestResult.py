@@ -617,7 +617,7 @@ class GeneralTestResult:
             GroupWithNext = False
             i2 = 0
             for i in TestResultObject.GetSortedSubTestResultDictList():
-                if i['DisplayOptions']['Show']:
+                if i['TestResultObject'].DisplayOptions['Show']:
                 
                     GroupCSSClass = '' 
                     if i2%5 == 0:
@@ -629,8 +629,8 @@ class GeneralTestResult:
                     if i2%2 == 0:
                         GroupCSSClass += ' WidthNthChild2n'
                     
-                    if i['DisplayOptions']['Width'] > 1:
-                        GroupCSSClass += ' Width'+str(i['DisplayOptions']['Width'])
+                    if i['TestResultObject'].DisplayOptions['Width'] > 1:
+                        GroupCSSClass += ' Width'+str(i['TestResultObject'].DisplayOptions['Width'])
                     
                     if not GroupWithNext:
                         SubTestResultListHTML +=  HtmlParser.substituteMarker(
@@ -639,15 +639,15 @@ class GeneralTestResult:
                             HtmlParser.MaskHTML(GroupCSSClass)
                         )
                         # only increase the width counter for a group start
-                        i2 += i['DisplayOptions']['Width']
+                        i2 += i['TestResultObject'].DisplayOptions['Width']
                         
                     
                         
                         
-                    SubTestResultListHTML += self.GenerateResultDataHTML(i['TestResultObject'], RecursionLevel + 1, i['DisplayOptions'])
+                    SubTestResultListHTML += self.GenerateResultDataHTML(i['TestResultObject'], RecursionLevel + 1, i['TestResultObject'].DisplayOptions)
                     
                     
-                    if not i['DisplayOptions']['GroupWithNext']:
+                    if not i['TestResultObject'].DisplayOptions['GroupWithNext']:
                         # if the last element was in a group but the current not, close the group
                         SubTestResultListHTML += HtmlParser.getSubpart(HTMLTemplate, '###SUBTESTRESULTGROUP_END###')
         
