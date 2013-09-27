@@ -1,6 +1,7 @@
 import hashlib
 import os
 
+verbose = False
 def get_python_file_list(rootdir):
     fileList =[]
     for root, subFolders, files in os.walk(rootdir):
@@ -43,6 +44,6 @@ def create_hash_file_directory(filename,directory):
 def compare_two_files(filename1,filename2):
     hash1 = md5(filename1)
     hash2 = md5(filename2)
-    #print filename1 + ': ' + hash1
-    #print filename2 + ': ' + hash2
+    if verbose: print filename1 + ': ' + hash1
+    if verbose: print filename2 + ': ' + hash2
     return hash1 ==hash2

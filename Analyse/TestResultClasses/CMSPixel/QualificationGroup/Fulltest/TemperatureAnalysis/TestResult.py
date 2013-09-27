@@ -13,7 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         pass
         
     def PopulateResultData(self):
-        Directory = self.ParentObject.FullTestResultsPath
+        Directory = self.ParentObject.RawTestSessionDataPath
         temperatureFile =  "{Directory}/temperature.log".format(Directory=Directory);
         meanTemp = 0
         sigmaTemp = 0

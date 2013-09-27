@@ -34,7 +34,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                              self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
                                                              )
         
-        Directory = self.FullTestResultsPath
+        Directory = self.RawTestSessionDataPath
         SCurveFileName = "{Directory}/SCurve_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         SCurveFile = open(SCurveFileName, "r")
         

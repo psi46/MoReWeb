@@ -276,7 +276,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return tests,test,index
     
     def appendXraySpectrum(self,tests,test,index):
-        print 'ADDING XraySpectrumMethod'
         environment = test.environment
         key = 'XraySpectrumMethod'
         nKeys = 1
@@ -306,10 +305,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         while test and 'XraySpectrum' in test.testname:
             tests,test,index = self.appendFluorescenceTarget(tests,test,index)
         
-        print'\n'
-        for i in  tests[-1]['InitialAttributes']['SubTestResultDictList']:
-            print i
-            print '\n'
+        targetList = [i['InitialAttributes']['Target'] for i in tests[-1]['InitialAttributes']['SubTestResultDictList'] ]
+        print 'XraySpectrumMethod with Targets %s'%targetList
+        
         return tests,test,index
 
     # Hard coded initial guess for signal position based on element name
@@ -335,7 +333,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def appendFluorescenceTarget(self,tests,test,index):
         environment = test.environment
-        print 'ADDING FluorescenceTarget @ %s'%environment.name
         key = 'Module%s_%s'%(test.testname,test.environment.name)
         nKeys = 1
         for item in tests:
@@ -343,7 +340,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 nKeys +=1
         key+='_%s'%(nKeys)        
         directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
-        print 'XRAY Spectrum @ %s in dir %s:"%s"'%(environment,directory,key)
         TargetEnergy= self.GetEnergy(environment.name)
         TargetNElectrons = TargetEnergy / 3.6
         if not tests[-1].has_key('InitialAttributes'):

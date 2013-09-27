@@ -14,12 +14,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_ModuleTestGroup_Module_XRayCalibrationSpectrum_TestResult'
         self.NameSingle='XrayCalibrationSpectrum'
-        print self.NameSingle+": "+str(self.Attributes['SubTestResultDictList'])
+        self.verbose = False
+        if self.verbose: print self.NameSingle+": "+str(self.Attributes['SubTestResultDictList'])
         for e in self.Attributes['SubTestResultDictList']:
-            print 'adding'+str(e)
+            if self.verbose: print 'adding'+str(e)
             self.ResultData['SubTestResultDictList'].append(e)
             pass
-        print self.ResultData['SubTestResultDictList']
+        if self.verbose: print self.ResultData['SubTestResultDictList']
         self.Attributes['TestedObjectType'] = 'XrayCalibrationSpectrum'
         
 #        self.DisplayOptions = {'Order':1, 'Width':3,'GroupWithNext':False,}
@@ -27,7 +28,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.DisplayOptions['Width'] = 3
         self.DisplayOptions['Order'] = 1
         self.DisplayOptions['GroupWithNext'] = True
-        self.verbose = False
 #        print self.Attributes
 #        for e in self.Attributes['SubTestResultDictList']:
 #            print e
@@ -44,11 +44,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         PeakCenters = array.array('d',[])
         PeakErrors = array.array('d',[])
         NumElectrons = array.array('d',[])
-        print 'sub test resiults'
-        print type(self.ResultData['KeyValueDictPairs'])
+        if self.verbose: print 'sub test resiults'
+        if self.verbose: print type(self.ResultData['KeyValueDictPairs'])
         for e in self.ResultData['SubTestResults']:
             keyValuePairs = self.ResultData['SubTestResults'][e].ResultData['KeyValueDictPairs']
-            print e,keyValuePairs['Center']['Value'],keyValuePairs['TargetNElectrons']['Value']
+            if self.verbose: print e,keyValuePairs['Center']['Value'],keyValuePairs['TargetNElectrons']['Value']
             PeakCenters.append(keyValuePairs['Center']['Value'])
             PeakErrors.append(keyValuePairs['Center']['Sigma'])
             NumElectrons.append(keyValuePairs['TargetNElectrons']['Value'])

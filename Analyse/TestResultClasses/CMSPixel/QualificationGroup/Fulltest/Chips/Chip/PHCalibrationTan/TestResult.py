@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
-import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     
     def CustomInit(self):
@@ -19,9 +18,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         #hPar1
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", 350, -1., 6.)  # par1
-        Directory = self.FullTestResultsPath
+        Directory = self.RawTestSessionDataPath
+        
         PHCalibrationFitTanFileName = "{Directory}/phCalibrationFitTan_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
-        PHCalibrationFitTanFile = open(PHCalibrationFitTanFileName, "r")
+        try:
+            PHCalibrationFitTanFile = open(PHCalibrationFitTanFileName, "r")
+        except IOError:
+            raise  IOError("cannot open %s"%PHCalibrationFitTanFileName)
         self.FileHandle = PHCalibrationFitTanFile #needed in summary
         
         #SCurveFile.seek(2*200) # omit the first 400 bytes

@@ -30,7 +30,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Parameters = [] # Parameters of Vcal vs. Pulse Height Fit
         
         
-        Directory = self.FullTestResultsPath
+        Directory = self.RawTestSessionDataPath
         # originally: phCalibrationFit_C
         PHCalibrationFitFileName = "{Directory}/phCalibrationFit_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         PHCalibrationFitFile = open(PHCalibrationFitFileName, "r")

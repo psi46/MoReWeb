@@ -65,7 +65,8 @@ class TestResultEnvironment:
         'TrimBitDifference':2.,
         'PixelMapMaxValue':10,
         'PixelMapMinValue':0,
-        
+        'PixelMapMaskDefectUpperThreshold': 0,
+        'BumpBondingProblemsNSigma': 5
     }
     
     

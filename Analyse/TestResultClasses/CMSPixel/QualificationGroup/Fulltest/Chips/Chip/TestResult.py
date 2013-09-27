@@ -64,11 +64,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':9,
                     }
                 },
-                {'Key':'AddressLevels',
-                    'DisplayOptions':{
-                        'Order':10,
-                    }
-                },
                 {'Key':'PHCalibrationGain',
                     'DisplayOptions':{
                         'Order':11,
@@ -105,6 +100,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                  
                 
             ]
+        
+        if not self.ParentObject.ParentObject.Attributes['isDigital']:
+                self.ResultData['SubTestResultDictList'].append(
+                                                            {'Key':'AddressLevels',
+                                                                'DisplayOptions':{
+                                                                    'Order':10,
+                                                                }
+                                                            }
+                                                            )
             
                 
     def PopulateResultData(self):

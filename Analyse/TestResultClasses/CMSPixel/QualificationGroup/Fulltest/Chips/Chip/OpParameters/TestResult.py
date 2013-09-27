@@ -16,7 +16,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         pass
         
     def PopulateResultData(self):
-        Directory = self.FullTestResultsPath
+        Directory = self.RawTestSessionDataPath
         vcalTrim = 0
         for i in ['60', '50', '']:
             DacParametersFileName =  "{Directory}/dacParameters{i}_C{ChipNo}.dat".format(Directory=Directory,i=i, ChipNo=self.ParentObject.Attributes['ChipNo']);

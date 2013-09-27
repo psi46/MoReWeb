@@ -119,7 +119,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
     def OpenFileHandle(self):
         self.FileHandle = ConfigParser.ConfigParser()
-        fileName = self.FullTestResultsPath+'/elComandante.ini'
+        fileName = self.RawTestSessionDataPath+'/elComandante.ini'
 #        print 'open ConfigFile "%s"'%fileName 
         self.FileHandle.read(fileName)
         

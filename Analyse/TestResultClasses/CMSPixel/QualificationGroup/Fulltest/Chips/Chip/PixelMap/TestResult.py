@@ -13,7 +13,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0);
         # TH2D
-        self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("PixelMap_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        fileHandle = self.ParentObject.ParentObject.FileHandle
+        
+        self.ResultData['Plot']['ROOTObject'] =  fileHandle.Get("PixelMap_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
     
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");

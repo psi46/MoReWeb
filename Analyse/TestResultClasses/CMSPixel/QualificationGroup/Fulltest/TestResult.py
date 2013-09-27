@@ -2,10 +2,26 @@ import AbstractClasses
 import ROOT
 import os
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+    def ReadModuleVersion(self):
+        if self.verbose:
+            print 'Read configParameters'
+        fileName = '%s/configParameters.dat'%self.RawTestSessionDataPath
+        f = open(fileName)
+        for line in  f.readlines():
+            if line.strip().startswith('rocType'):
+                version = line.split(' ')[-1]
+            elif line.strip().startswith('nRocs'):
+                nRocs = int(line.split(' ')[-1])
+                if self.verbose: print '\tnRocs: %s'%nRocs
+            elif line.strip().startswith('halfModule'):
+                halfModule = int(line.split(' ')[-1])
+                if self.verbose: print '\thalfModule: %s'%halfModule
+        return (version,nRocs,halfModule)
+                    
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_TestResult'
         self.NameSingle='Fulltest'
-        
+        self.verbose = False
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Attributes['NumberOfChips'] = 16
@@ -23,9 +39,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         elif self.Attributes['ModuleVersion'] == 3:
             self.Attributes['NumberOfChips'] = 1
             self.Attributes['StartChip'] = 0
-        
-        
-        
+        ROCtype, nRocs,halfModule = self.ReadModuleVersion()
+        self.Attributes['NumberOfChips'] = nRocs
+        if halfModule:
+            self.Attributes['StartChip'] = 8
+        self.Attributes['isDigital'] = (ROCtype.find('dig') != -1)
+        if self.verbose:
+            print 'Analysing Fulltest with the following Attributes:'
+            for name,value in self.Attributes.items():
+                print "\t%25s:  %s"%(name,value)
         
         self.ResultData['SubTestResultDictList'] = [
             {
@@ -38,12 +60,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'ModuleVersion':self.Attributes['ModuleVersion'],   
                 },
             },
-            {
-                'Key':'AddressLevelOverview',
-                'DisplayOptions':{
-                    'Order':2,
-                }
-            },
+            
             {
                 'Key':'BumpBondingMap',
                 'DisplayOptions':{
@@ -60,6 +77,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             },
         ]
+        if not self.Attributes['isDigital']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key':'AddressLevelOverview',
+                'DisplayOptions':{
+                    'Order':2,
+                }
+            })
+            pass
         
         if self.Attributes['IncludeIVCurve']:
             self.ResultData['SubTestResultDictList'] += [
@@ -126,11 +151,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
         
     def OpenFileHandle(self):
-        fileHandlePath = self.FullTestResultsPath+'/commander_Fulltest.root'
+        fileHandlePath = self.RawTestSessionDataPath+'/commander_Fulltest.root'
         self.FileHandle = ROOT.TFile.Open(fileHandlePath)
         if not self.FileHandle:
             print 'problem to find %s'%fileHandlePath
-            files = [f for f in os.listdir(self.FullTestResultsPath) if f.endswith('.root')]
+            files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.root')]
             i = 0
             if len(files)>1:
                 print '\nPossible Candidates for ROOT files are:'
@@ -144,16 +169,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         i =  int(rawInput)
                     except:
                         print '%s is not an integer, please enter a valid integer'%rawInput
-                fileHandlePath = self.FullTestResultsPath+'/'+files[i]
+                fileHandlePath = self.RawTestSessionDataPath+'/'+files[i]
                 print "open '%s'"%fileHandlePath
                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
             elif len(files) == 1:
                 i = 0
-                fileHandlePath = self.FullTestResultsPath+'/'+files[i]
+                fileHandlePath = self.RawTestSessionDataPath+'/'+files[i]
                 print "only one other ROOT file exists. Open '%s'"%fileHandlePath
                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
             else:
-                print 'There exist no ROOT file in "%s"'%self.FullTestResultsPath
+                print 'There exist no ROOT file in "%s"'%self.RawTestSessionDataPath
             
     def PopulateResultData(self):
         self.FileHandle.Close()

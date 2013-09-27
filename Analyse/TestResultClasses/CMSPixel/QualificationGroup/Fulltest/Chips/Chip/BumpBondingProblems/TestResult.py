@@ -14,7 +14,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         ROOT.gStyle.SetOptStat(0);
         ROOT.gPad.SetLogy(0);
-        isDigitalROC = False
+        isDigitalROC =  self.ParentObject.ParentObject.ParentObject.Attributes['isDigital'] 
         # TH2D
         try:
             self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
@@ -22,7 +22,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
         if not self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
-            isDigitalROC = True
+            if not isDigitalROC:
+                print "ERROR Cannot find vcals_xtal_CXXX but is analog Module..."
+        elif isDigitalROC:
+                print "ERROR: FOound vcals_xtal_CXXX but is digital Module..."
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
             if not isDigitalROC:
@@ -34,6 +37,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
+            
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("#Delta Threshold [DAC]");
             self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw("colz");

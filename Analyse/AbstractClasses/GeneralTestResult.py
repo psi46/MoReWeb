@@ -53,10 +53,12 @@ class GeneralTestResult:
         self.SavePlotFile = True
         self.GzipSVG = TestResultEnvironmentObject.Configuration['GzipSVG']
         self.DefaultImageFormat = TestResultEnvironmentObject.Configuration['DefaultImageFormat'].strip().lower()
-        self.OverviewHTMLLink = TestResultEnvironmentObject.Configuration['OverviewHTMLLink']
-        
+        if  TestResultEnvironmentObject.Configuration.has_key('OverviewHTMLLink'):
+            self.OverviewHTMLLink = TestResultEnvironmentObject.Configuration['OverviewHTMLLink']
+        else:
+            self.OverviewHTMLLink = None
         # Path for current test to folder with root-files
-        self.FullTestResultsPath = ''
+        self.RawTestSessionDataPath = ''
         
         # Path for current test result files (html, svg, etc)
         self.StoragePath = ''
@@ -136,11 +138,11 @@ class GeneralTestResult:
         
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
         self.Canvas = self.TestResultEnvironmentObject.Canvas
-        self.FullTestResultsPath = self.TestResultEnvironmentObject.TestResultsPath
+        self.RawTestSessionDataPath = self.TestResultEnvironmentObject.TestResultsPath
         
         if ParentObject:
             self.ParentObject = ParentObject
-            self.FullTestResultsPath = self.ParentObject.FullTestResultsPath
+            self.RawTestSessionDataPath = self.ParentObject.RawTestSessionDataPath
         
         if InitialAttributes:
             self.Attributes.update(InitialAttributes)
@@ -150,7 +152,7 @@ class GeneralTestResult:
         
         
         if self.Attributes['TestResultSubDirectory']:
-            self.FullTestResultsPath += '/'+self.Attributes['TestResultSubDirectory']
+            self.RawTestSessionDataPath += '/'+self.Attributes['TestResultSubDirectory']
         
         
         self.CustomInit();

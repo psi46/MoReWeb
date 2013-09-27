@@ -23,9 +23,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         pass
 
     def OpenFileHandle(self):
-        print self.FullTestResultsPath
-        fileHandleName =  self.FullTestResultsPath + '/commander_XraySpectrum.root'
-        print "Open File Handle: %s"%fileHandleName
+        if self.verbose: print self.RawTestSessionDataPath
+        fileHandleName =  self.RawTestSessionDataPath + '/commander_XraySpectrum.root'
+        if self.verbose: print "Open File Handle: %s"%fileHandleName
         self.FileHandle = ROOT.TFile.Open(fileHandleName)
 
     # Hard coded initial guess for signal position based on element name
@@ -189,8 +189,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         }
         self.ResultData['KeyList'] = ['Center','TargetEnergy','TargetNElectrons']
-        print self.ResultData
-        print self.ResultData['KeyValueDictPairs']
+        if self.verbose: print self.ResultData
+        if self.verbose: print self.ResultData['KeyValueDictPairs']
 
         return myfit
 
@@ -330,7 +330,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #		Parameters = [] # Parameters of Vcal vs. Pulse Height Fit
 #
 #
-#		Directory = self.FullTestResultsPath
+#		Directory = self.RawTestSessionDataPath
 #		# originally: phCalibrationFit_C
 #		PHCalibrationFitFileName = "{Directory}/phCalibrationFit_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
 #		PHCalibrationFitFile = open(PHCalibrationFitFileName, "r")

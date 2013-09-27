@@ -180,6 +180,7 @@ class ModuleResultOverview:
 #                    print RowTuple['RelativeModuleFulltestStoragePath']
                     ModuleGroupPath = '/../../'+RowTuple['RelativeModuleFulltestStoragePath']
                 if not ModuleGroupPath:
+                    print 'cannot find ModuleGroupPath: "%s"'%ModuleGroupPath
                     print 'Problem with',RowTuple
                     
                 ResultHTMLFileName = 'TestResult.html'
