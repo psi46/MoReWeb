@@ -7,8 +7,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='BumpBondingMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         

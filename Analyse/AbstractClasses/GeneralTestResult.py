@@ -18,7 +18,7 @@ class GeneralTestResult:
         @param ParentObject Reference to the Parent Object
         @param InitialModulePath Starting point of modules
     '''
-    def __init__(self, TestResultEnvironmentObject, ParentObject = None, InitialModulePath = None, InitialStoragePath = None, InitialAttributes = None, Key = None, DisplayOptions = None):
+    def __init__(self, TestResultEnvironmentObject, ParentObject = None, InitialModulePath = None, InitialFinalResultsStoragePath = None, InitialAttributes = None, Key = None, DisplayOptions = None):
         
         # Name of the Test Result, only a-zA-Z0-9_
         self.Name = ''
@@ -61,7 +61,7 @@ class GeneralTestResult:
         self.RawTestSessionDataPath = ''
         
         # Path for current test result files (html, svg, etc)
-        self.StoragePath = ''
+        self.FinalResultsStoragePath = ''
         
         
         # File handle (might be used by sub results)
@@ -138,7 +138,7 @@ class GeneralTestResult:
         
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
         self.Canvas = self.TestResultEnvironmentObject.Canvas
-        self.RawTestSessionDataPath = self.TestResultEnvironmentObject.TestResultsPath
+        self.RawTestSessionDataPath = self.TestResultEnvironmentObject.ModuleDataDirectory
         
         if ParentObject:
             self.ParentObject = ParentObject
@@ -166,31 +166,31 @@ class GeneralTestResult:
         if InitialModulePath:
             self.ModulePath = InitialModulePath
         
-        if InitialStoragePath:
-            self.StoragePath = InitialStoragePath
+        if InitialFinalResultsStoragePath:
+            self.FinalResultsStoragePath = InitialFinalResultsStoragePath
             
-        self.RelativeStoragePath = ''
+        self.RelativeFinalResultsStoragePath = ''
         
         
         if self.ParentObject:
-            self.StoragePath = self.ParentObject.StoragePath
-            self.RelativeStoragePath = self.ParentObject.RelativeStoragePath
+            self.FinalResultsStoragePath = self.ParentObject.FinalResultsStoragePath
+            self.RelativeFinalResultsStoragePath = self.ParentObject.RelativeFinalResultsStoragePath
             self.ModulePath = self.ParentObject.ModulePath + '.' + self.ModulePath
             
         
         if self.Attributes['StorageKey']:
-            self.StoragePath += '/'+self.Attributes['StorageKey']
-            self.RelativeStoragePath += '/'+self.Attributes['StorageKey']
+            self.FinalResultsStoragePath += '/'+self.Attributes['StorageKey']
+            self.RelativeFinalResultsStoragePath += '/'+self.Attributes['StorageKey']
         else:
-            self.StoragePath += '/'+self.NameSingle
-            self.RelativeStoragePath += '/'+self.NameSingle
-        self.SetStoragePath()
+            self.FinalResultsStoragePath += '/'+self.NameSingle
+            self.RelativeFinalResultsStoragePath += '/'+self.NameSingle
+        self.SetFinalResultsStoragePath()
         
         
         
         
-        if not os.path.exists(self.StoragePath):
-            os.makedirs(self.StoragePath)
+        if not os.path.exists(self.FinalResultsStoragePath):
+            os.makedirs(self.FinalResultsStoragePath)
         
         # Load all sub test results in correct order
         i2 = len(self.ResultData['SubTestResultDictList'])
@@ -253,13 +253,13 @@ class GeneralTestResult:
                 try:
                     i['TestResultObject'].PopulateAllData()
                 except Exception as inst:
-                    print 'Error in subtest', i['TestResultObject'].ModulePath,i['TestResultObject'].StoragePath
+                    print 'Error in subtest', i['TestResultObject'].ModulePath,i['TestResultObject'].FinalResultsStoragePath
                     print inst
                     print inst.args
                     self.TestResultEnvironmentObject.ErrorList.append(
                                                                       {'ModulePath':i['TestResultObject'].ModulePath,
                                                                        'ErrorCode': inst,
-                                                                       'StoragePath':i['TestResultObject'].StoragePath}
+                                                                       'FinalResultsStoragePath':i['TestResultObject'].FinalResultsStoragePath}
                                                                       )
                     print sys.exc_info()[0]
                     print "\n\n------\n"
@@ -308,7 +308,7 @@ class GeneralTestResult:
     '''
         Sets the storage path
     '''
-    def SetStoragePath(self):
+    def SetFinalResultsStoragePath(self):
         pass
     
     '''
@@ -328,7 +328,7 @@ class GeneralTestResult:
     '''
     def GetPlotFileName(self):
         Suffix = self.ResultData['Plot']['Format']
-        return self.StoragePath+'/'+self.NameSingle+'.'+Suffix
+        return self.FinalResultsStoragePath+'/'+self.NameSingle+'.'+Suffix
     
     '''
         Get the sub test result list in the display order
@@ -426,7 +426,7 @@ class GeneralTestResult:
             
             i+=1
         if not self.OverviewHTMLLink:
-            OverviewHTMLLink = os.path.relpath(self.TestResultEnvironmentObject.OverviewPath+'/Overview.html',self.StoragePath)        
+            OverviewHTMLLink = os.path.relpath(self.TestResultEnvironmentObject.GlobalOverviewPath+'/Overview.html',self.FinalResultsStoragePath)        
         else:
             OverviewHTMLLink = self.OverviewHTMLLink
         ClickPathEntries.append(HtmlParser.substituteMarkerArray(
@@ -459,7 +459,7 @@ class GeneralTestResult:
             }
         )
         
-        f = open(self.StoragePath+'/'+HTMLFileName, 'w')
+        f = open(self.FinalResultsStoragePath+'/'+HTMLFileName, 'w')
         f.write(FinalHTML)
         f.close()
         
@@ -487,7 +487,7 @@ class GeneralTestResult:
         
         RecursionRelativePath = ''
         if RecursionLevel > 0:
-            PathParts = TestResultObject.StoragePath.split('/')
+            PathParts = TestResultObject.FinalResultsStoragePath.split('/')
             #print PathParts
             RecursionRelativePath = PathParts[-1]+'/'
         
@@ -691,7 +691,7 @@ class GeneralTestResult:
                     SubTestResultOverviewLinkHTML,
                     {
                         '###URL###':HtmlParser.MaskHTML(
-                            os.path.basename(TestResultObject.StoragePath)+'/'+HTMLFileName
+                            os.path.basename(TestResultObject.FinalResultsStoragePath)+'/'+HTMLFileName
                             ),
                     }
                 )
@@ -705,8 +705,8 @@ class GeneralTestResult:
                         SubTestResultListItemHTMLTemplate,
                         {
                             '###URL###':HtmlParser.MaskHTML(
-                                os.path.basename(TestResultObject.StoragePath)+'/'+
-                                os.path.basename(i['TestResultObject'].StoragePath)+'/'+HTMLFileName
+                                os.path.basename(TestResultObject.FinalResultsStoragePath)+'/'+
+                                os.path.basename(i['TestResultObject'].FinalResultsStoragePath)+'/'+HTMLFileName
                                 ),
                             '###LABEL###':HtmlParser.MaskHTML(
                                 i['TestResultObject'].Title
@@ -741,7 +741,7 @@ class GeneralTestResult:
         @final
     '''
     def GenerateDataFileJSON(self):
-        f = open(self.StoragePath+'/KeyValueDictPairs.json', 'w')
+        f = open(self.FinalResultsStoragePath+'/KeyValueDictPairs.json', 'w')
         f.write(json.dumps(self.ResultData['KeyValueDictPairs'], sort_keys=True,indent=4, separators=(',', ': ')))
         f.close()
     '''
@@ -763,7 +763,7 @@ class GeneralTestResult:
             try: 
                 self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
             except Exception as inst:
-                    print 'Error in subtest (write to database)', self.ResultData['SubTestResults'][i].ModulePath,self.ResultData['SubTestResults'][i].StoragePath
+                    print 'Error in subtest (write to database)', self.ResultData['SubTestResults'][i].ModulePath,self.ResultData['SubTestResults'][i].FinalResultsStoragePath
                     print inst
                     print inst.args
                     print sys.exc_info()[0]

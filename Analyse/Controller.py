@@ -53,25 +53,26 @@ else:
 print 'MORE web analysis script, Revision number %s'%revisionNumber
 RevisionString = "-R%03d"%revisionNumber
 
-TestResultDirectory = Configuration.get('Paths', 'TestResultDirectory')
-OverviewPath = Configuration.get('Paths', 'OverviewPath')
-if Configuration.has_option('Paths','FinalResultsPath'):
-    FinalResultDirectory = Configuration.get('Paths','FinalResultsPath')+'/REV%03d'%revisionNumber
+GlobalDataDirectory = Configuration.get('Paths', 'GlobalDataDirectory')
+GlobalOverviewPath = Configuration.get('Paths', 'GlobalOverviewPath')
+if Configuration.has_option('Paths','GlobalFinalResultsPath'):
+    GlobalFinalResultsPath = Configuration.get('Paths','GlobalFinalResultsPath')+'/REV%03d'%revisionNumber
 else:
-    FinalResultDirectory = ''
-print 'FinalResultDirectory: "%s"'%FinalResultDirectory
-if FinalResultDirectory!= '' and not os.path.exists(FinalResultDirectory):
-    os.makedirs(FinalResultDirectory)
-SQLiteDBPath = OverviewPath + '/ModuleResultDB.sqlite'
+    GlobalFinalResultsPath = ''
+print 'GlobalFinalResultsPath: "%s"'%GlobalFinalResultsPath
+if GlobalFinalResultsPath!= '' and not os.path.exists(GlobalFinalResultsPath):
+    os.makedirs(GlobalFinalResultsPath)
+    
+SQLiteDBPath = GlobalOverviewPath + '/ModuleResultDB.sqlite'
 ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
      
 TestType = Configuration.get('TestType','TestType')
 
 TestResultEnvironmentInstance = TestResultEnvironment.TestResultEnvironment(Configuration)
 TestResultEnvironmentInstance.SQLiteDBPath = SQLiteDBPath
-TestResultEnvironmentInstance.OverviewPath = OverviewPath
+TestResultEnvironmentInstance.GlobalOverviewPath = GlobalOverviewPath
 TestResultEnvironmentInstance.OpenDBConnection()
-TestResultEnvironmentInstance.TestResultsBasePath = TestResultDirectory
+TestResultEnvironmentInstance.GlobalDataDirectory = GlobalDataDirectory
 
 if Configuration.has_option('Paths','AbsoluteOverviewPage'):
     TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'] = Configuration.get('Paths','AbsoluteOverviewPage')
@@ -89,17 +90,17 @@ def extractModuleInformation(ModuleInformationRaw):
                     'QualificationType': ModuleInformationRaw[1]
                 }
 
-def GetFinalResultPath(Folder):
-    if FinalResultDirectory=='':
-        path = TestResultDirectory+'/'+Folder+'/FinalResults'+RevisionString
+def GetFinalModuleResultsPath(ModuleFolder):
+    if GlobalFinalResultsPath=='':
+        FinalModuleResultsPath = GlobalDataDirectory+'/'+ModuleFolder+'/FinalResults'+RevisionString
     else:
-        path = FinalResultDirectory+'/'+Folder
-    if not os.path.exists(path):
-        os.makedirs(path)
-    return path
+        FinalModuleResultsPath = GlobalFinalResultsPath+'/'+ModuleFolder
+    if not os.path.exists(FinalModuleResultsPath):
+        os.makedirs(FinalModuleResultsPath)
+    return FinalModuleResultsPath
    
-def NeedsToBeAnalyzed(FinalResultsPath,ModuleInformation):   
-    md5FileName= FinalResultsPath+'/'+ 'checksum.md5'
+def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):   
+    md5FileName= FinalModuleResultsPath+'/'+ 'checksum.md5'
     if os.path.exists(md5FileName):
         if verbose: print 'md5 sum exists %s'%md5FileName
         bSameFiles = hasher.compare_two_files('checksum.md5',md5FileName)
@@ -111,21 +112,21 @@ def NeedsToBeAnalyzed(FinalResultsPath,ModuleInformation):
             bExistInDB = False
         if verbose: print 'same file: %s / exists in DB: %s'%(bSameFiles,bExistInDB)
         if bSameFiles and bExistInDB:
-            print 'do not analyse folder '+ FinalResultsPath +'\n'
+            print 'do not analyse folder '+ FinalModuleResultsPath +'\n'
             return False
     return True
 
-def CopyMD5File(FinalResultsPath):
+def CopyMD5File(FinalModuleResultsPath):
     print 'copyfile checksum'
-    md5FileName= FinalResultsPath+'/'+ 'checksum.md5'
+    md5FileName= FinalModuleResultsPath+'/'+ 'checksum.md5'
     shutil.copyfile('checksum.md5',md5FileName)
 
-def GetModuleTestResult(TestResultEnvironment,FinalResultsPath,ModuleInformation):
+def GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInformation):
     return TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
         TestResultEnvironmentInstance, 
         None, 
         'TestResultClasses.CMSPixel.QualificationGroup', 
-        FinalResultsPath,
+        FinalModuleResultsPath,
         {
             'TestDate':ModuleInformation['TestDate'],
             'TestedObjectID':ModuleInformation['ModuleID'],
@@ -148,21 +149,20 @@ def CreateApacheWebserverConfiguration(FinalResultsPath):
     ''')
     f.close()    
     
-def AnalyseTestData(ModuleInformationRaw,Folder):
+def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
     global FinalResultDirectory
     #,ModuleInformation
     ModuleInformation = extractModuleInformation(ModuleInformationRaw) 
-    FinalResultsPath = GetFinalResultPath(Folder)
-    TestResultEnvironmentInstance.TestResultsPath = TestResultDirectory+'/'+Folder
+    FinalModuleResultsPath = GetFinalModuleResultsPath(ModuleFolder)
+    TestResultEnvironmentInstance.ModuleDataDirectory = GlobalDataDirectory+'/'+ModuleFolder
    
-    TestResultEnvironmentInstance.FinalResultsPath = FinalResultsPath 
-    #TestResultEnvironmentInstance.FinalResultsPath = TestResultDirectory+'/'+Folder
+    TestResultEnvironmentInstance.FinalModuleResultsPath = FinalModuleResultsPath 
     if not NeedsToBeAnalyzed(FinalResultsPath,ModuleInformation):
         return
     
-    ModuleTestResult = GetModuleTestResult(TestResultEnvironment,FinalResultsPath,ModuleInformation)
+    ModuleTestResult = GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInformation)
     
-    CreateApacheWebserverConfiguration(FinalResultsPath)
+    CreateApacheWebserverConfiguration(FinalModuleResultsPath)
     
     print 'Working on: ',ModuleInformation
     print ' -- '
@@ -179,9 +179,9 @@ def AnalyseTestData(ModuleInformationRaw,Folder):
     pass
 
 
-def AnalyseAllTestDataInDirectory(TestResultDirectory):
-    for Folder in os.listdir(TestResultDirectory):
-        absPath = TestResultDirectory+'/'+Folder
+def AnalyseAllTestDataInDirectory(GlobalDataDirectory):
+    for Folder in os.listdir(GlobalDataDirectory):
+        absPath = GlobalDataDirectory+'/'+Folder
         if not os.path.isdir(absPath):
             continue
         ModuleInformationRaw = Folder.split('_')
@@ -190,8 +190,8 @@ def AnalyseAllTestDataInDirectory(TestResultDirectory):
             
 def AnalyseSingleFullTest(singleFulltestPath):
     print 'analysing a single Fulltest at destination: "%s"'%args.singleFulltestPath 
-    TestResultEnvironmentInstance.TestResultsPath  = args.singleFulltestPath
-    TestResultEnvironmentInstance.FinalResultsPath = args.singleFulltestPath
+    TestResultEnvironmentInstance.ModuleDataDirectory  = args.singleFulltestPath
+    TestResultEnvironmentInstance.FinalModuleResultsPath = args.singleFulltestPath
     ModuleID = args.singleFulltestPath.split('/')[-1]
     TestDate = '%s'%int(time.time())
     TestType = 'singleFulltest'
@@ -219,7 +219,7 @@ def AnalyseSingleFullTest(singleFulltestPath):
 if not args.singleFulltestPath=='':
     AnalyseSingleFullTest(args.singleFulltestPath)
 elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
-    AnalyseAllTestDataInDirectory(TestResultDirectory)
+    AnalyseAllTestDataInDirectory(GlobalDataDirectory)
     
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()

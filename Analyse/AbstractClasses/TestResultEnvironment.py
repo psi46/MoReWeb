@@ -79,10 +79,10 @@ class TestResultEnvironment:
     LocalDBConnectionCursor = None
     
     # Path to the test results
-    TestResultsPath = '';
+    ModuleDataDirectory = '';
     
     # path to folder with all test results
-    TestResultsBasePath = ''
+    GlobalDataDirectory = ''
     
     TestResultHTMLTemplate = ''
     
@@ -95,7 +95,7 @@ class TestResultEnvironment:
     SQLiteDBPath = ''
     
     # Path to the Overview
-    OverviewPath = ''
+    GlobalOverviewPath = ''
     
     LastUniqueIDCounter = 0;
     
@@ -175,9 +175,8 @@ class TestResultEnvironment:
                         CurrentAtVoltage150 FLOAT,
                         IVSlope FLOAT,
                         Temperature TEXT,
-                        StorageFolder TEXT,
-                        RelativeModuleFulltestStoragePath TEXT,
-                        RelativeModuleFulltestFinalResultPath TEXT,
+                        RelativeModuleFinalResultsPath TEXT,
+                        FulltestSubfolder TEXT,
                         initialCurrent FLOAT,
                         Comments TEXT,
                         nCycles INT,

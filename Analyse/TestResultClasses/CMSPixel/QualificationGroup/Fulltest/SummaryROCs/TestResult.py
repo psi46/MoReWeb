@@ -10,8 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = 'Summary ROCs'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         self.ResultData['Table'] = {
@@ -45,7 +44,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                        LinkHTMLTemplate,
                        {
                            '###LABEL###':'Chip '+str(i['TestResultObject'].Attributes['ChipNo']),
-                           '###URL###':os.path.relpath(i['TestResultObject'].StoragePath, self.ParentObject.StoragePath)+'/TestResult.html'
+                           '###URL###':os.path.relpath(i['TestResultObject'].FinalResultsStoragePath, self.ParentObject.FinalResultsStoragePath)+'/TestResult.html'
                        }
                    ),
                    i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Total']['Value'],

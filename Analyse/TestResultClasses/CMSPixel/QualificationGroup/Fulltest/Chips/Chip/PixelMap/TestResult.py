@@ -7,8 +7,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='PixelMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0);

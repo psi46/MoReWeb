@@ -12,8 +12,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['DacParameters'] = {}
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         Directory = self.RawTestSessionDataPath

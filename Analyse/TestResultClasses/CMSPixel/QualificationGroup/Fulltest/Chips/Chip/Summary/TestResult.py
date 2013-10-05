@@ -21,8 +21,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Par1DefectList = Set()
         self.isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
         
-    def SetStoragePath(self):
-        pass
+
     
     def IsDeadPixel(self, column, row,PixelMapCurrentValue):
         if PixelMapCurrentValue == 0:

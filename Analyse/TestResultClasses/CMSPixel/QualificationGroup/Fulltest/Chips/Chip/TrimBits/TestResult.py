@@ -7,8 +7,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='TrimBits'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         

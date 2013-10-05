@@ -157,8 +157,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #                    LinkHTMLTemplate,
 #                    {
 #                        '###LABEL###':'TemperatureCycle',
-#                        #i['TestResultObject'].StoragePath, self.StoragePath)+'/TestResult.html'
-#                        '###URL###':os.path.relpath(self.StoragePath, self.StoragePath)+'/TestResult.html'
+#                        #i['TestResultObject'].FinalResultsStoragePath, self.FinalResultsStoragePath)+'/TestResult.html'
+#                        '###URL###':os.path.relpath(self.FinalResultsStoragePath, self.FinalResultsStoragePath)+'/TestResult.html'
 #                    }
 #                ),
 #                self.Attributes['nCycles'],
@@ -187,10 +187,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #            'CurrentAtVoltage150': None,
 #            'IVSlope': None,
 #            'Temperature': None,
-            'StorageFolder':os.path.relpath(self.TestResultEnvironmentObject.TestResultsPath, self.TestResultEnvironmentObject.OverviewPath),
-            'RelativeModuleFulltestStoragePath': os.path.relpath(self.StoragePath, self.TestResultEnvironmentObject.TestResultsPath),
-            'RelativeModuleFulltestFinalResultPath': os.path.relpath(self.ParentObject.StoragePath, self.TestResultEnvironmentObject.OverviewPath),
-#            'Comments': '',
+            'RelativeModuleFinalResultsPath':os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath, self.TestResultEnvironmentObject.GlobalOverviewPath),
+            'FulltestSubfolder':os.path.relpath(self.FinalResultsStoragePath, self.TestResultEnvironmentObject.FinalModuleResultsPath),
+            'Comments': '',
             'nCycles': self.ResultData['KeyValueDictPairs']['nCycles']['Value'],
             'CycleTempLow': self.ResultData['KeyValueDictPairs']['CycleTempLow']['Value'],
             'CycleTempHigh':self.ResultData['KeyValueDictPairs']['CycleTempHigh']['Value'],
@@ -211,9 +210,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         TestDate,
                         TestType,
                         QualificationType,
-                        StorageFolder,
-                        RelativeModuleFulltestStoragePath,
-                        RelativeModuleFulltestFinalResultPath,
+                        RelativeModuleFinalResultsPath,
+                        FulltestSubfolder,
                         nCycles,
                         CycleTempLow,
                         CycleTempHigh
@@ -223,9 +221,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         :TestDate,
                         :TestType,
                         :QualificationType,
-                        :StorageFolder,
-                        :RelativeModuleFulltestStoragePath,
-                        :RelativeModuleFulltestFinalResultPath,
+                        :RelativeModuleFinalResultsPath,
+                        :FulltestSubfolder,
                         :nCycles,
                         :CycleTempLow,
                         :CycleTempHigh

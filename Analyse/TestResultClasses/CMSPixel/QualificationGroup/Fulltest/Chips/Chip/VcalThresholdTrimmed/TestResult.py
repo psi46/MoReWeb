@@ -8,8 +8,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='VcalThresholdTrimmed'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         

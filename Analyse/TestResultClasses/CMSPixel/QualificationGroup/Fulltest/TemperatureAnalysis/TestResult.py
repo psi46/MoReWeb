@@ -9,8 +9,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #        self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = 'Temperature Analysis'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         Directory = self.ParentObject.RawTestSessionDataPath

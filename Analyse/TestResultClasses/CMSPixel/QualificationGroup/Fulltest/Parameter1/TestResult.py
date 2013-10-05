@@ -6,8 +6,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='Parameter1'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         

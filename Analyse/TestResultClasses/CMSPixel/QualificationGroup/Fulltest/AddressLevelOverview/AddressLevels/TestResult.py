@@ -8,8 +8,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         ChipNo = self.Attributes['ChipNo']

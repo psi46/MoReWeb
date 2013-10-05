@@ -1,8 +1,8 @@
 [Paths]
-#TestResultDirectory = /Users/peller/Validation
-TestResultDirectory = /Users/bachmair/DATA/moduleTest
-#OverviewPath = /data/cooling-box/ResultsPSI
-OverviewPath = /Users/bachmair/DATA/Overview
-#OverviewPath = /Users/peller/Validation
-#TestResultDirectory = /Users/esteban/Documents/ETH/Fächer/06 Semesterarbeit/Testdaten/2013-03-15
-#OverviewPath = /Users/esteban/Documents/ETH/Fächer/06 Semesterarbeit/Testdaten/0_Overview
+#GlobalDataDirectory = /Users/peller/Validation
+GlobalDataDirectory = /Users/bachmair/DATA/moduleTest
+#GlobalOverviewPath = /data/cooling-box/ResultsPSI
+GlobalOverviewPath = /Users/bachmair/DATA/Overview
+#GlobalOverviewPath = /Users/peller/Validation
+#GlobalDataDirectory = /Users/esteban/Documents/ETH/Fächer/06 Semesterarbeit/Testdaten/2013-03-15
+#GlobalOverviewPath = /Users/esteban/Documents/ETH/Fächer/06 Semesterarbeit/Testdaten/0_Overview

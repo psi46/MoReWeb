@@ -10,8 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='IVCurve'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         
-    def SetStoragePath(self):
-        pass
+
     
     def recalculateCurrent(self,inputCurrent, inputTemp, outputTemp):
         inputTemp += 273.15
@@ -25,7 +24,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(1);
         
-        Directory = self.TestResultEnvironmentObject.TestResultsPath+'/'+self.ParentObject.Attributes['IVCurveSubDirectory']
+        Directory = self.TestResultEnvironmentObject.ModuleDataDirectory+'/'+self.ParentObject.Attributes['IVCurveSubDirectory']
         
         IVCurveFileName =  "{Directory}/ivCurve.log".format(Directory=Directory);
         IVCurveFile = open(IVCurveFileName, "r");

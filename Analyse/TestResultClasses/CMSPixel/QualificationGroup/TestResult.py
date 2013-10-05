@@ -156,7 +156,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
    
     def extractTests(self):
         print 'Extract Tests from config file'
-        absPath = self.TestResultEnvironmentObject.TestResultsPath+'/configfiles'
+        absPath = self.TestResultEnvironmentObject.ModuleDataDirectory+'/configfiles'
         testList = []
         if not os.path.isdir(absPath):
             print 'dir: %s does not exist'%absPath
@@ -373,7 +373,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         
         ModuleResultOverviewObject = AbstractClasses.ModuleResultOverview.ModuleResultOverview(self.TestResultEnvironmentObject)
-        ModuleResultOverviewObject.StoragePath = self.StoragePath
+        ModuleResultOverviewObject.FinalResultsStoragePath = self.FinalResultsStoragePath
         self.ResultData['Table'] = ModuleResultOverviewObject.TableData(self.Attributes['ModuleID'],self.Attributes['TestDate'],ShrinkedList = False)
         
     def PostWriteToDatabase(self):

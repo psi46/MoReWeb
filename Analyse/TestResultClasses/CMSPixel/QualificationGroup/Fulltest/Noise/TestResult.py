@@ -8,8 +8,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='Noise'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0);

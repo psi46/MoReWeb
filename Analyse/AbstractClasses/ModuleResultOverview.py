@@ -10,7 +10,7 @@ import os
 class ModuleResultOverview:
     def __init__(self, TestResultEnvironmentObject):
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
-        self.StoragePath = self.TestResultEnvironmentObject.OverviewPath
+        self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
         
     def TableData(self, ModuleID = None, TestDate = None, ShrinkedList = True):
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
@@ -175,21 +175,22 @@ class ModuleResultOverview:
                 for Key in TableColumnList:
                     RowDict[Key] = RowTuple[Key]
                     
-                ModuleGroupPath =  ''
-                if not ShrinkedList:
-#                    print RowTuple['RelativeModuleFulltestStoragePath']
-                    ModuleGroupPath = '/../../'+RowTuple['RelativeModuleFulltestStoragePath']
-                if not ModuleGroupPath:
-                    print 'cannot find ModuleGroupPath: "%s"'%ModuleGroupPath
-                    print 'Problem with',RowTuple
-                    
                 ResultHTMLFileName = 'TestResult.html'
-   
-                Link = os.path.relpath(
-                                       #
-                    self.TestResultEnvironmentObject.OverviewPath+'/'+RowTuple['RelativeModuleFulltestFinalResultPath']+ModuleGroupPath+'/'+ResultHTMLFileName,
-                    self.StoragePath
-                )
+                QualificationGroupSubfolder = 'QualificationGroup'
+                
+                
+                if ShrinkedList:
+                	CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
+                	Link = RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
+			
+                else:
+                	Link = os.path.relpath(
+				self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/'+ResultHTMLFileName,
+				self.TestResultEnvironmentObject.GlobalOverviewPath
+			)
+			
+                    
+                
                 
                 #Link the module ID
                 
@@ -292,7 +293,7 @@ class ModuleResultOverview:
         HTMLFileName = 'Overview.html'
         FinalHTML = self.GenerateOverviewHTML()
         
-        f = open(self.StoragePath+'/'+HTMLFileName, 'w')
+        f = open(self.GlobalOverviewPath+'/'+HTMLFileName, 'w')
         f.write(FinalHTML)
         f.close()
     

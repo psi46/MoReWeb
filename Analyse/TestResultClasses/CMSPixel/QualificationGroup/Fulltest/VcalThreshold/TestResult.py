@@ -7,8 +7,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='VcalThreshold'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = 'Vcal Threshold'
-    def SetStoragePath(self):
-        pass
+
         
     def PopulateResultData(self):
         
