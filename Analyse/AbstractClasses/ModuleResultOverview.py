@@ -12,7 +12,7 @@ class ModuleResultOverview:
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
         self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
         
-    def TableData(self, ModuleID = None, TestDate = None, ShrinkedList = True):
+    def TableData(self, ModuleID = None, TestDate = None, GlobalOverviewList = True):
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
         
         
@@ -45,53 +45,53 @@ class ModuleResultOverview:
             {
                 'Label':'Module ID',
                 'DBColumnName':'ModuleID',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label':'Test Date',
                 'DBColumnName':'TestDate',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label':'Qualification Type',
                 'DBColumnName':'QualificationType',
-                'InShrinkedList': True,
+                'InGlobalOverviewList': True,
                 'InFullList': False
              },
              {
                 'Label':'Test Type',
                 'DBColumnName':'TestType',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label':'Grade',
                 'DBColumnName':'Grade',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label': 'Pixel Defects',
                 'DBColumnName':'PixelDefects',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label':'ROCs > 1%',
                 'DBColumnName':'ROCsMoreThanOnePercent',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label':'Noise',
                 'DBColumnName':'Noise',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label':'Trimming',
                 'DBColumnName':'Trimming',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label':'PHCalibration',
                 'DBColumnName':'PHCalibration',
-                'InShrinkedList': True
+                'InGlobalOverviewList': True
              },
              {
                 'Label':'I(150V)',
@@ -112,24 +112,24 @@ class ModuleResultOverview:
              {
                 'Label':'Comments',
                 'DBColumnName':'Comments',
-                'InShrinkedList': True,
+                'InGlobalOverviewList': True,
              },
              {
                 'Label':'no of Cycles',
                 'DBColumnName':'nCycles',
-                'InShrinkedList': True,
+                'InGlobalOverviewList': True,
                 'InFullList': False
              },
              {
                 'Label':'CycleTempLow',
                 'DBColumnName':'CycleTempLow',
-                'InShrinkedList': True,
+                'InGlobalOverviewList': True,
                 'InFullList': False,
              },    
              {
                 'Label':'CycleTempHigh',
                 'DBColumnName':'CycleTempHigh',
-                'InShrinkedList': True,
+                'InGlobalOverviewList': True,
                 'InFullList': False,
              },               
                         
@@ -145,11 +145,11 @@ class ModuleResultOverview:
     
     
         for ColumnDict in TableColumns:
-            if ((not ShrinkedList and ColumnDict.has_key('InFullList')  and ColumnDict['InFullList'] == True)
+            if ((not GlobalOverviewList and ColumnDict.has_key('InFullList')  and ColumnDict['InFullList'] == True)
                 or
-                (not ShrinkedList and not ColumnDict.has_key('InFullList'))
+                (not GlobalOverviewList and not ColumnDict.has_key('InFullList'))
                 or 
-                (ShrinkedList and ColumnDict.has_key('InShrinkedList') and ColumnDict['InShrinkedList'] == True)):
+                (GlobalOverviewList and ColumnDict.has_key('InGlobalOverviewList') and ColumnDict['InGlobalOverviewList'] == True)):
                 TableData['HEADER'][0].append(ColumnDict['Label'])
                 TableColumnList.append(ColumnDict['DBColumnName'])
         
@@ -158,7 +158,7 @@ class ModuleResultOverview:
             
         for RowTuple in Rows:
             Identificator = RowTuple['ModuleID']
-            if not ShrinkedList:
+            if not GlobalOverviewList:
                 Identificator+='_%s'%RowTuple['TestType']
                 if RowTuple['TestType'] == 'TemperatureCycle':
                     continue
@@ -179,7 +179,7 @@ class ModuleResultOverview:
                 QualificationGroupSubfolder = 'QualificationGroup'
                 
                 
-                if ShrinkedList:
+                if GlobalOverviewList:
                 	CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
                 	Link = RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
 			
