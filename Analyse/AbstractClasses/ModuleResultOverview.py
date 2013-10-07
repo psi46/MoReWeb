@@ -180,14 +180,13 @@ class ModuleResultOverview:
                 
                 
                 if GlobalOverviewList:
-                	CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
-                	Link = RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
-			
-                else:
                 	Link = os.path.relpath(
 				self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/'+ResultHTMLFileName,
 				self.TestResultEnvironmentObject.GlobalOverviewPath
 			)
+                else:
+			CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
+                	Link = RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
 			
                     
                 
