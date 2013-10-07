@@ -8,9 +8,10 @@ Program    : MORE-Web
 from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
 import AbstractClasses.Helper.hasher as hasher
 import argparse
-from AbstractClasses import Helper
+# from AbstractClasses import Helper
 import TestResultClasses.CMSPixel.QualificationGroup.TestResult
-import os, time,shutil, errno, sys
+import os, time,shutil, sys
+# import errno
 import ConfigParser
 
 #arg parse to analyse a single Fulltest
@@ -32,7 +33,6 @@ parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
 verbose = args.verbose
 
-import ROOT
 import AbstractClasses.Helper.ROOTConfiguration as ROOTConfiguration
 
 
@@ -101,6 +101,7 @@ def GetFinalModuleResultsPath(ModuleFolder):
    
 def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):   
     md5FileName= FinalModuleResultsPath+'/'+ 'checksum.md5'
+    retVal = True
     if os.path.exists(md5FileName):
         if verbose: print 'md5 sum exists %s'%md5FileName
         bSameFiles = hasher.compare_two_files('checksum.md5',md5FileName)
@@ -113,8 +114,8 @@ def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):
         if verbose: print 'same file: %s / exists in DB: %s'%(bSameFiles,bExistInDB)
         if bSameFiles and bExistInDB:
             print 'do not analyse folder '+ FinalModuleResultsPath +'\n'
-            return False
-    return True
+            retVal = False
+    return retVal
 
 def CopyMD5File(FinalModuleResultsPath):
     print 'copyfile checksum'
@@ -157,7 +158,8 @@ def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
     TestResultEnvironmentInstance.ModuleDataDirectory = GlobalDataDirectory+'/'+ModuleFolder
    
     TestResultEnvironmentInstance.FinalModuleResultsPath = FinalModuleResultsPath 
-    if not NeedsToBeAnalyzed(FinalResultsPath,ModuleInformation):
+
+    if not NeedsToBeAnalyzed(TestResultEnvironmentInstance.FinalModuleResultsPath ,ModuleInformation):
         return
     
     ModuleTestResult = GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInformation)
@@ -174,7 +176,7 @@ def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
     print '    Generating Final Output'
     ModuleTestResult.GenerateFinalOutput()
     ModuleTestResults.append(ModuleTestResult)
-    CopyMD5File(FinalResultsPath)
+    CopyMD5File(TestResultEnvironmentInstance.FinalModuleResultsPath)
     print 'DONE' 
     pass
 
