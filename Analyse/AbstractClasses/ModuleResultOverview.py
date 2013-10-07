@@ -186,7 +186,8 @@ class ModuleResultOverview:
 			)
                 else:
 			CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
-                	Link = RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
+			# change directory one level up since we are in QualificationGroup folder and FulltestSubfolder is relative to ModuleFinalResultsPath...
+                	Link = '../'+RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
 			
                     
                 
