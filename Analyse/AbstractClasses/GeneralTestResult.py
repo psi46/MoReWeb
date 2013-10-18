@@ -589,11 +589,13 @@ class GeneralTestResult:
         for i in TestResultObject.ResultData['KeyList']:
             if not TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Unit'):
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['Unit'] = ''
+            html_value = HtmlParser.MaskHTML(str(TestResultObject.ResultData['KeyValueDictPairs'][i]['Value']))
             if TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Sigma'):
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['SigmaOutput'] = ' +/- %s'%TestResultObject.ResultData['KeyValueDictPairs'][i]['Sigma']
+                html_value += ' &plusmn; ' + HtmlParser.MaskHTML(str(TestResultObject.ResultData['KeyValueDictPairs'][i]['Sigma']))
             else:
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['SigmaOutput'] = ''
-            
+
             if not TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Label'):
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['Label'] = i
 
@@ -604,9 +606,7 @@ class GeneralTestResult:
                     '###LABEL###':HtmlParser.MaskHTML(
                         TestResultObject.ResultData['KeyValueDictPairs'][i]['Label']
                         ),
-                    '###VALUE###':HtmlParser.MaskHTML(
-                        str(TestResultObject.ResultData['KeyValueDictPairs'][i]['Value']) + TestResultObject.ResultData['KeyValueDictPairs'][i]['SigmaOutput']
-                        ),
+                    '###VALUE###': html_value,
                     '###UNIT###':HtmlParser.MaskHTML(
                         TestResultObject.ResultData['KeyValueDictPairs'][i]['Unit']
                         ),
