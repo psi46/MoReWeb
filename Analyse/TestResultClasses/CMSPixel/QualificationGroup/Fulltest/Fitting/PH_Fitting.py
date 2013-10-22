@@ -88,7 +88,6 @@ class PH_Fitting():
     def AddToHistos(self,histos):
         if len(histos)!=2:
             raise Exception
-        print 'add to histos'
         self.histoChi.Add(histos[0])
         for i in range(len(histos[1])):
             self.histoFits[i].Add(histos[1][i])
@@ -110,11 +109,11 @@ class PH_Fitting():
 #         res = pool.map(functools.partial(self.FitPHCurve,dirName=dir), range(nRocs))
 #         print res
 #         
-        print'\nusing process'
         threads = []
+        #result = Queue()
         result = Queue()
         for chip in range (0,nRocs):
-#             p = Process(target=self.FitPHCurve, args=(dir,chip,result))
+        #p = Process(target=self.FitPHCurve, args=(dir,chip,result))
             self.FitPHCurve(dir, chip, result)
             p = chip
             threads.append(p)
@@ -176,9 +175,9 @@ class PH_Fitting():
             return
         
         if self.fitMode ==3:
-            outputFileName = '%s//phCalibrationFitTan_C%i_PY.dat'%(dirName, chip)
+            outputFileName = '%s//phCalibrationFitTan_C%i.dat'%(dirName, chip)
         else:
-            outputFileName = "%s/phCalibrationFit_C%i_PY.dat"%( dirName, chip)
+            outputFileName = "%s/phCalibrationFit_C%i.dat"%( dirName, chip)
         if os.path.isfile(outputFileName) and not self.refit:
             print 'file "%s" already exists --> no fiting'%outputFileName
             retVal =[-2]*4
@@ -235,7 +234,7 @@ class PH_Fitting():
                 
     def FillOutputFile(self,outputFile,fitResult,column,row):
         for i in fitResult[:-1]: 
-            outputFile.write('%s,\t'%i)
+            outputFile.write('%s\t'%i)
         outputFile.write('Pix %2d %2d\n'%(column,row))
         pass  
                   
@@ -267,7 +266,7 @@ class PH_Fitting():
         xErr = [8.94,8.89,8.55,8.55,9.16,8.68,8.90,7.85,7.29,4.37];
         i = 0
         for ph in calibration:
-            if ph >= 0:#todo anpassen fuer analoge
+            if ph >= -9999:#todo anpassen fuer analoge
                 n+=1
                 x.append(ph)
                 y.append(self.vcalLow[i])
@@ -305,7 +304,10 @@ class PH_Fitting():
 #         for (int i = 0; i < nFitParams; i++) {histoFit[i]->Fill(phFitClone.GetParameter(i))}
 
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
-        retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF())
+        try:
+            retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF())
+        except:
+            retVal.append(0)
         if self.verbose:
             print retVal
         return retVal
@@ -371,7 +373,11 @@ class PH_Fitting():
             slope = 0.5;
         
         phFitClone.SetParameter(2, slope)
-        phFitClone.SetParameter(3, y[upperPoint] - slope * x[upperPoint])
+        try:
+            phFitClone.SetParameter(3, y[upperPoint] - slope * x[upperPoint])
+        except:
+            #data is missing, or N/A
+            return [0]*(self.nFitParams+1) 
         
         phFitClone.FixParameter(0, 0.)
         phFitClone.FixParameter(1, 0.)
@@ -385,7 +391,6 @@ class PH_Fitting():
         
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
         retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF())
-        print retVal
         return retVal
 
 

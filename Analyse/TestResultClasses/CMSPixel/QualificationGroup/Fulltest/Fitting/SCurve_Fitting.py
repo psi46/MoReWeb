@@ -30,10 +30,9 @@ class SCurve_Fitting():
         print "Fitting SCurves %s"%dir
         maxChi2 = [-1]*4
         results = []
-        for chip in range (0,nRocs):
 #             p = Process(target=self.FitPHCurve, args=(dir,chip,result))
+        for chip in range(0,nRocs):
             results.append(self.FitSCurve(dir, chip))
-        print results
             #
         for chi2,histos in results :
             if chi2[0] ==-1:
@@ -67,7 +66,7 @@ class SCurve_Fitting():
         return inputFile
     
     def getOutputFile(self,dirName,chip):
-        outputFileName = '%s//SCurve_C%i_PY.dat'%(dirName, chip)
+        outputFileName = '%s//SCurve_C%i.dat'%(dirName, chip)
         if os.path.isfile(outputFileName) and not self.refit:
             print 'file "%s" already exists --> no fiting'%outputFileName
             retVal =[-2]*4

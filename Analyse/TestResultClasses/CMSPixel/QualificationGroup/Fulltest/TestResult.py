@@ -7,6 +7,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print 'Read configParameters'
         fileName = '%s/configParameters.dat'%self.RawTestSessionDataPath
         f = open(fileName)
+        version = 'none'
         for line in  f.readlines():
             if line.strip().startswith('rocType'):
                 version = line.split(' ')[-1]
@@ -50,6 +51,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print "\t%25s:  %s"%(name,value)
         
         self.ResultData['SubTestResultDictList'] = [
+            {
+                'Key':'Fitting',
+                'DisplayOptions':{
+                    'GroupWithNext':False,
+                    'Order':100,
+                },
+                'InitialAttributes':{
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                    'NumberOfChips': self.Attributes['NumberOfChips'],   
+                },
+            },
             {
                 'Key':'Chips',
                 'DisplayOptions':{
