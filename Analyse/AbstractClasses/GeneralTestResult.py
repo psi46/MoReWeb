@@ -10,6 +10,8 @@ import gzip
 import sys
 import datetime
 import json
+import traceback
+
 class GeneralTestResult:
     
     
@@ -253,16 +255,23 @@ class GeneralTestResult:
                 try:
                     i['TestResultObject'].PopulateAllData()
                 except Exception as inst:
-                    print 'Error in subtest', i['TestResultObject'].ModulePath,i['TestResultObject'].FinalResultsStoragePath
-                    print inst
-                    print inst.args
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    # Start red color
+                    sys.stdout.write("\x1b[31m")
+                    sys.stdout.flush()
+                    # Print error message
+                    print '\x1b[31mException while processing', i['TestResultObject'].FinalResultsStoragePath
+                    # Print traceback
+                    traceback.print_exception(exc_type, exc_obj, exc_tb)
+                    # Stop red color
+                    sys.stdout.write("\x1b[0m")
+                    sys.stdout.flush()
+
                     self.TestResultEnvironmentObject.ErrorList.append(
                                                                       {'ModulePath':i['TestResultObject'].ModulePath,
                                                                        'ErrorCode': inst,
                                                                        'FinalResultsStoragePath':i['TestResultObject'].FinalResultsStoragePath}
                                                                       )
-                    print sys.exc_info()[0]
-                    print "\n\n------\n"
                     #todo Felix: handel exceptions
                 
         self.SetCanvasSize()
