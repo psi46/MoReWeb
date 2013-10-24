@@ -120,9 +120,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def OpenFileHandle(self):
         self.FileHandle = ConfigParser.ConfigParser()
         fileName = self.RawTestSessionDataPath+'/elComandante.ini'
+        if not os.path.isfile(fileName):
+            fileName = self.RawTestSessionDataPath+'/Tests.ini'
 #        print 'open ConfigFile "%s"'%fileName 
         self.FileHandle.read(fileName)
-        
+
     def PopulateResultData(self):
         self.ResultData['KeyValueDictPairs']['nCycles'] = {'Value': self.FileHandle.get('Cycle','nCycles'), 'Unit': '#',}
         self.ResultData['KeyValueDictPairs']['CycleTempHigh'] ={

@@ -13,6 +13,8 @@ import TestResultClasses.CMSPixel.QualificationGroup.TestResult
 import os, time,shutil, sys
 # import errno
 import ConfigParser
+import line_profiler
+import cProfile
 
 #arg parse to analyse a single Fulltest
 parser = argparse.ArgumentParser(description='MORE web Controller: an analysis software for CMS pixel modules and ROCs')
@@ -219,9 +221,9 @@ def AnalyseSingleFullTest(singleFulltestPath):
     pass  
 
 if not args.singleFulltestPath=='':
-    AnalyseSingleFullTest(args.singleFulltestPath)
+    cProfile.run("AnalyseSingleFullTest(args.singleFulltestPath)")
 elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
-    AnalyseAllTestDataInDirectory(GlobalDataDirectory)
+    cProfile.run("AnalyseAllTestDataInDirectory(GlobalDataDirectory)")
     
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()

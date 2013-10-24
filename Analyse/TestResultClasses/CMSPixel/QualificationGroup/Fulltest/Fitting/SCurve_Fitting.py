@@ -193,4 +193,4 @@ class SCurve_Fitting():
     
 if __name__=='__main__':
     fitter = SCurve_Fitting()
-    fitter.FitAllSCurve(".",16)
+    fitter.FitAllSCurve('/Users/peller/pixel/TestModuleData/storage/test/',16)

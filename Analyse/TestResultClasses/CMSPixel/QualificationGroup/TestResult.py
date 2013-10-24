@@ -163,13 +163,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
         self.initParser = AbstractClasses.Helper.BetterConfigParser.BetterConfigParser()
         fileName = absPath+'/elComandante.ini'
+        fileName2 = absPath+'/Tests.ini'
         if os.path.isfile(fileName):
-#            print 'read configParser'
             self.initParser.read(fileName)
             tests = self.initParser.get('Tests','Test')
-#            print tests
             testList = self.analyseTestList(tests)
-#            print tests
+        elif os.path.isfile(fileName2):
+            self.initParser.read(fileName2)
+            tests = self.initParser.get('Tests','Test')
+            testList = self.analyseTestList(tests)
         else:
             print "file %s doesn't exist"%fileName
 #        print 'done with extraction'
