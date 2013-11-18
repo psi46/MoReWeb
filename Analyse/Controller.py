@@ -19,6 +19,9 @@ parser = argparse.ArgumentParser(description='MORE web Controller: an analysis s
 parser.add_argument('-FT','--singleFulltest',dest='singleFulltestPath',metavar='PATH',
                      help='option which can be used to analyse a single Fulltest, as the second argument needs the path where the single fulltest data are stored',
                      default='')
+parser.add_argument('-FQ','--singleQualification',dest='singleQualificationPath',metavar='PATH',
+                    help='option which activates an analysis of a single Qualification',
+                    default='')
 # parser.add_argument('-M','--ModuleVersion',dest='ModuleVersion',metavar='VERSION',
 #                     help='option to choose which module version is analysed [singleROC =3, Module ={1,2}]',default='')
 parser.add_argument('-noDB','--noDBupload',dest='DBUpload',action='store_false',
@@ -29,6 +32,8 @@ parser.add_argument('-withDB','--withDBupload',dest='DBUpload',action='store_tru
                     help='activates upload to DB within this analysis session [default]')
 parser.add_argument('-rev','--analysis-revision',dest='revision',metavar='REV',default = -1,
                     help='setting analysis revision number by hand to create an extra directory, alternative: Configuration/SystemConfiguration.cfg --> AnalysisRevision')
+parser.add_argument('-norev','--no-revisionnumber',dest='norev',action='store_true',default=False,
+                    help='deactivates the revsion sting with in the path')
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
 verbose = args.verbose
@@ -50,13 +55,24 @@ elif Configuration.has_option('SystemConfiguration', 'AnalysisRevision'):
     revisionNumber = Configuration.getint('SystemConfiguration', 'AnalysisRevision')
 else:
     revisionNumber  = 0
-print 'MORE web analysis script, Revision number %s'%revisionNumber
-RevisionString = "-R%03d"%revisionNumber
+outputstring = 'MORE web analysis script, Revision number %s'%revisionNumber
+if args.norev:
+    outputstring += ', Revision number is not included in folder names'
+print outputstring
+if args.norev:
+    RevisionString = ""
+else:
+    RevisionString = "-R%03d"%revisionNumber
 
+if verbose:
+    print 'RevisionString "%s"'%RevisionString
 GlobalDataDirectory = Configuration.get('Paths', 'GlobalDataDirectory')
 GlobalOverviewPath = Configuration.get('Paths', 'GlobalOverviewPath')
 if Configuration.has_option('Paths','GlobalFinalResultsPath'):
-    GlobalFinalResultsPath = Configuration.get('Paths','GlobalFinalResultsPath')+'/REV%03d'%revisionNumber
+    if args.norev:
+        GlobalFinalResultsPath = Configuration.get('Paths','GlobalFinalResultsPath')
+    else:
+        GlobalFinalResultsPath = Configuration.get('Paths','GlobalFinalResultsPath')+'/REV%03d'%revisionNumber
 else:
     GlobalFinalResultsPath = ''
 print 'GlobalFinalResultsPath: "%s"'%GlobalFinalResultsPath
@@ -91,15 +107,27 @@ def extractModuleInformation(ModuleInformationRaw):
                 }
 
 def GetFinalModuleResultsPath(ModuleFolder):
+    if len(ModuleFolder.rstrip('/').split('/'))!=1:
+        folder = ModuleFolder.rstrip('/')
+        folders = folder.rsplit('/',1)
+        ModuleFolder = folders[-1]
+        ModuleFolderPath = folders[0]
+    
     if GlobalFinalResultsPath=='':
-        FinalModuleResultsPath = GlobalDataDirectory+'/'+ModuleFolder+'/FinalResults'+RevisionString
+        if args.singleQualificationPath == '':
+            ModuleFolderPath = GlobalDataDirectory
+            
+        FinalModuleResultsPath = ModuleFolderPath+'/'+ModuleFolder+'/FinalResults'+RevisionString
     else:
-        FinalModuleResultsPath = GlobalFinalResultsPath+'/'+ModuleFolder
+        if RevisionString == '':
+            FinalModuleResultsPath = GlobalFinalResultsPath+'/'+ModuleFolder
+        else:
+            FinalModuleResultsPath = GlobalFinalResultsPath+'/'+RevisionString[1:]+'/'+ModuleFolder
     if not os.path.exists(FinalModuleResultsPath):
         os.makedirs(FinalModuleResultsPath)
     return FinalModuleResultsPath
    
-def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):   
+def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):
     md5FileName= FinalModuleResultsPath+'/'+ 'checksum.md5'
     retVal = True
     if os.path.exists(md5FileName):
@@ -152,10 +180,18 @@ def CreateApacheWebserverConfiguration(FinalResultsPath):
     
 def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
     global FinalResultDirectory
+    print ModuleInformationRaw, ModuleFolder
     #,ModuleInformation
     ModuleInformation = extractModuleInformation(ModuleInformationRaw) 
-    FinalModuleResultsPath = GetFinalModuleResultsPath(ModuleFolder)
-    TestResultEnvironmentInstance.ModuleDataDirectory = GlobalDataDirectory+'/'+ModuleFolder
+    
+    if not args.singleQualificationPath == '':
+        print 'singleQualification'
+        TestResultEnvironmentInstance.ModuleDataDirectory = ModuleFolder
+        FinalModuleResultsPath = GetFinalModuleResultsPath(ModuleFolder)
+    
+    else: 
+        FinalModuleResultsPath = GetFinalModuleResultsPath(ModuleFolder)
+        TestResultEnvironmentInstance.ModuleDataDirectory = GlobalDataDirectory+'/'+ModuleFolder
    
     TestResultEnvironmentInstance.FinalModuleResultsPath = FinalModuleResultsPath 
 
@@ -180,6 +216,27 @@ def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
     print 'DONE' 
     pass
 
+
+def AnalyseSingleQualification(Folder):
+    print 'AnalyseSingleQualification "%s"'%Folder
+    if not os.path.isdir(Folder):
+        print '"%s" is not a directory ---> ABORT'%Folder
+        TestResultEnvironmentInstance.ErrorList.append(
+                       {'ModulePath':Folder,
+                        'ErrorCode': -999,
+                        'FinalResultsStoragePath':'unkown'
+                        }
+       )
+        print TestResultEnvironmentInstance
+        print 'ERROR'
+        return 
+    Folder.rstrip('/')
+    ModuleInformationRaw = Folder.rstrip('/').split('/')[-1]
+    print ModuleInformationRaw
+    ModuleInformationRaw = ModuleInformationRaw.split('_')
+    print ModuleInformationRaw
+    if len(ModuleInformationRaw) == 5:
+        AnalyseTestData(ModuleInformationRaw, Folder)
 
 def AnalyseAllTestDataInDirectory(GlobalDataDirectory):
     for Folder in os.listdir(GlobalDataDirectory):
@@ -220,6 +277,8 @@ def AnalyseSingleFullTest(singleFulltestPath):
 
 if not args.singleFulltestPath=='':
     AnalyseSingleFullTest(args.singleFulltestPath)
+elif not args.singleQualificationPath=='':
+    AnalyseSingleQualification(args.singleQualificationPath)
 elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
     AnalyseAllTestDataInDirectory(GlobalDataDirectory)
     

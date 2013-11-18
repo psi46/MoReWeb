@@ -8,10 +8,10 @@ import time
 class SCurve_Fitting():
     nCols = 52
     nRows = 80    
-    def __init__(self):
+    def __init__(self,refit=True):
         ROOT.gStyle
         self.verbose = False
-        self.refit = True
+        self.refit = refit
         self.DrawHistos = False
         self.nReadouts = 50
         self.chiLimit = 2.

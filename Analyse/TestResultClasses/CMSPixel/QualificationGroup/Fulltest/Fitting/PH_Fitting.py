@@ -14,11 +14,11 @@ class PH_Fitting():
     vcalSteps = 5
     rangeConversion = 7
     
-    def __init__(self,fitMode):
+    def __init__(self,fitMode,refit=True):
         ROOT.gStyle
         self.verbose = False
         self.fitMode = fitMode
-        self.refit = True
+        self.refit = refit
         self.DrawHistos = False
         self.vcal = [50,100,150,200,250,30,50,70,90,200];
         self.vcalLow = self.vcal

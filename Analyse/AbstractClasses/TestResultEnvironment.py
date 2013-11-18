@@ -112,6 +112,12 @@ class TestResultEnvironment:
                 'Password':Configuration.get('SystemConfiguration', 'DatabasePassword'),
                 'DatabaseName':Configuration.get('SystemConfiguration', 'DatabaseName'),
             }
+            refit = True
+            if Configuration.has_option('Fitting','refit'):
+                refit = Configuration.getboolean('Fitting','refit')
+            self.Configuration['Fitting'] = {
+                'refit': refit
+            }
             self.Configuration['GzipSVG'] = int(Configuration.get('SystemConfiguration', 'GzipSVG'))
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
             for i in self.GradingParameters:
