@@ -174,7 +174,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #         print ' BumpBondingProblems_RMS: %s'%BumpBondingProblems_RMS
 #         print ' BumpBondingProblems_nSigma: %s'%BumpBondingProblems_nSigma
 #         if self.isDigitalROC:
-#             raw_input('Check')
         
         TrimBitHistograms = []
         for k in range(5):
@@ -237,7 +236,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print '\ttrim:  %4d'%len(self.DeadTrimbitsList)
             print '\taddr:  %4d'%len(self.AddressProblemList)
 #                 = %d + %d + %d + %d'%(len(totalList),len(self.DeadPixelList) , len(self.MaskDefectList) , len(self.DeadTrimbitsList) , len(self.AddressProblemList))
-#         raw_input('check both')
         # -- Compute the final verdict on this chip  //?? FIXME (below is pure randomness)
         finalVerdict = 0
         if len(self.DeadTrimbitsList) > 0:

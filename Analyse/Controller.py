@@ -92,7 +92,8 @@ TestResultEnvironmentInstance.GlobalDataDirectory = GlobalDataDirectory
 
 if Configuration.has_option('Paths','AbsoluteOverviewPage'):
     TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'] = Configuration.get('Paths','AbsoluteOverviewPage')
-    raw_input('AbsoluteOverviewPage %s'%TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'])
+    if verbose:
+        raw_input('AbsoluteOverviewPage %s. Please press enter.'%TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'])
 
 hasher.create_hash_file_directory('checksum.md5','.')
 

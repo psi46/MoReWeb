@@ -126,7 +126,6 @@ class SCurve_Fitting():
         graph.Fit(self.scurveFit, "Q", "", 0.0, 0.3);
 #         if row ==0 and col == 0:
 #             graph.Draw('APL')
-#             raw_input()
         chi2 = self.scurveFit.GetChisquare() / self.scurveFit.GetNDF();
         
         notConverged = ("FAILED    " in ROOT.gMinuit.fCstatu) or (ROOT.gMinuit.fEDM > 1.e-4)    #//if fEDM very small, convergence failed only due to limited machine accuracy

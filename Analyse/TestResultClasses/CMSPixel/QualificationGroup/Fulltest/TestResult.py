@@ -177,6 +177,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 i = len(files)
                 while i<0 or i>= len(files):
                     try:
+                        #TODO: How to continue when it happens in automatic processing...
                         rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]\t'%(len(files)-1))
                         i =  int(rawInput)
                     except:
