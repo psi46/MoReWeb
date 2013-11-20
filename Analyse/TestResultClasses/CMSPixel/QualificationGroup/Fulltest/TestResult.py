@@ -226,14 +226,53 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC']['Value'],
             'RelativeModuleFinalResultsPath':os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath, self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder':os.path.relpath(self.FinalResultsStoragePath, self.TestResultEnvironmentObject.FinalModuleResultsPath),
+# needed for PixelDB
+            'AbsModuleFulltestStoragePath':self.TestResultEnvironmentObject.FinalModuleResultsPath,
+            'AbsFulltestSubfolder':self.FinalResultsStoragePath,
+            'InputTarFile': os.environ.get('TARFILE',None),
+            'MacroVersion': os.environ.get('MACROVERSION',None),
+#
+
             'initialCurrent': initialCurrent,
             'Comments': '',
             'nCycles': None,
             'CycleTempLow': None,
             'CycleTempHigh':None,
+#
+# added by Tommaso
+#
+            'nMaskDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['MaskDefects']['Value'],
+            'nDeadPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadPixels']['Value'],
+            'nBumpDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadBumps']['Value'],
+            'nTrimDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['TrimProblems']['Value'],
+            'nNoisyPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'],
+            'nGainDefPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
+            'nPedDefPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPedestalDefects']['Value'],
+            'nPar1DefPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPar1Defects']['Value']
         }
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
-            pass
+            from PixelDB import *
+#modified by Tommaso
+            #
+            # try and speak directly with PixelDB
+            #
+            
+            pdb = PixelDBInterface(operator="tommaso",center="pisa")
+            pdb.connectToDB()
+	    OPERATOR=os.environ['PIXEL_OPERATOR']
+	    CENTER=os.environ['PIXEL_CENTER']
+            s = Session(CENTER, OPERATOR)
+            pdb.insertSession(s)
+            print "--------------------"
+            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath,s.SESSION_ID,Row
+            print "--------------------"
+            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID,Row)
+
+
+            if (pp is None):
+                print "INSERTION FAILED!"
+		sys.exit(31)
+
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',Row)
