@@ -226,7 +226,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 
         totalList = self.DeadPixelList.union(self.MaskDefectList).union(self.DeadTrimbitsList).union(self.AddressProblemList)
         
-        if True and (len(totalList) >0) :
+        if True or (len(totalList) > 0) :
             print '\nChip %d'%self.chipNo
             
 #             print totalList
@@ -260,7 +260,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             finalVerdict += 100000
         if len(self.Par1DefectList) > 0:
             finalVerdict += 100000
-            
+        gradeA = self.TestResultEnvironmentObject.GradingParameters['defectsB']
+        gradeB = self.TestResultEnvironmentObject.GradingParameters['defectsC']
+        totalDefects = len(totalList)
+        if totalDefects < gradeA:
+            pixelDefectsGrade = 1
+        elif totalDefects < gradeB:
+            pixelDefectsGrade = 2
+        else:
+            pixelDefectsGrade = 3
+        print '\tGrade: %s'%pixelDefectsGrade
         self.ResultData['KeyValueDictPairs'] = {
             'Total': {
                 'Value':'{0:1.0f}'.format(len(totalList)), 
@@ -310,6 +319,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value':'{0:1.0f}'.format(len(self.Par1DefectList)), 
                 'Label':'PH Parameter1 Defects'
             },
+            'PixelDefectsGrade':{
+                'Value': '%d'%pixelDefectsGrade,
+                'Label': 'Pixel Defects Grade ROC'
+            }
         }
-        self.ResultData['KeyList'] = ['Total','nDeadPixel','nNoisy1Pixel','nMaskDefect','nDeadBumps','nDeadTrimbits','nAddressProblems','nNoisy2Pixel','nThrDefect','nGainDefect','nPedDefect','nPar1Defect']
+        self.ResultData['KeyList'] = ['Total','nDeadPixel','nNoisy1Pixel','nMaskDefect','nDeadBumps','nDeadTrimbits'
+                                      ,'nAddressProblems','nNoisy2Pixel','nThrDefect','nGainDefect','nPedDefect','nPar1Defect','PixelDefectsGrade']
     

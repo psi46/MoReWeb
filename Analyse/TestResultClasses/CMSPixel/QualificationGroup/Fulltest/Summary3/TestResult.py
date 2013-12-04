@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
-import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Summary3_TestResult'
@@ -9,6 +8,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = 'Summary 3'
 
+  
         
     def PopulateResultData(self):
         try:
@@ -37,6 +37,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             parameter1 = -9999 
             print "Summary3: cannot find ResultData['SubTestResults']['PedestalSpread'].ResultData['KeyValueDictPairs']['mu']['Value']"
         
+        nNoiseA = self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeAROCs']['Value']
+        nNoiseB = self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeBROCs']['Value']
+        nNoiseC = self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeCROCs']['Value']
+        nVcalA =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeAROCs']['Value']
+        nVcalB =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeBROCs']['Value']
+        nVcalC =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeCROCs']['Value']
+        nGainA =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeAROCs']['Value']
+        nGainB =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeBROCs']['Value']
+        nGainC =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeCROCs']['Value']
+        nPedA =   self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeAROCs']['Value']
+        nPedB =   self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeBROCs']['Value']
+        nPedC =   self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeCROCs']['Value']
+        nPar1A =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeAROCs']['Value']
+        nPar1B =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeBROCs']['Value']
+        nPar1C =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeCROCs']['Value']
         self.ResultData['KeyValueDictPairs'] = {
             'Noise': {
                 'Value':noise, 
@@ -63,8 +78,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Parameter1',
                 'Unit':'',
             },
+            'NoiseROCs': {
+                'Value':'%d/%d/%d'%(nNoiseA,nNoiseB,nNoiseC), 
+                'Label':'Noise grades',
+            },
+            'VcalThrWidthROCs': {
+                'Value':'%d/%d/%d'%(nVcalA,nVcalB,nVcalC),
+                'Label':'Vcal Thr. W. grades',
+            },
+            'RelGainWidthROCs': {
+                'Value':'%d/%d/%d'%(nGainA,nGainB,nGainC),
+                'Label':'Rel. Gain W. grades',
+            },
+            'PedestalSpreadROCs': {
+                'Value':'%d/%d/%d'%(nPedA,nPedB,nPedC), 
+                'Label':'Ped. Spread grades',
+            },
+            'Parameter1ROCs': {
+                'Value':'%d/%d/%d'%(nPar1A,nPar1B,nPar1C),  
+                'Label':'Par1 grades',
+            },
         }
-        self.ResultData['KeyList'] = ['Noise','VcalThrWidth','RelGainWidth','PedestalSpread','Parameter1']
+        self.ResultData['KeyList'] = ['Noise','NoiseROCs','VcalThrWidth','VcalThrWidthROCs','RelGainWidth','RelGainWidthROCs','PedestalSpread','PedestalSpreadROCs','Parameter1','Parameter1ROCs']
         if self.ParentObject.ResultData['SubTestResults'].has_key('IVCurve'):
             self.ResultData['KeyList'].append('CurrentAtVoltage150')
             result = self.ParentObject.ResultData['SubTestResults']['IVCurve'].ResultData

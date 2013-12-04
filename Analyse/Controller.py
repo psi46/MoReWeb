@@ -286,6 +286,9 @@ elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
 # TestResultEnvironmentInstance.ErrorList.append( {'test1':'bla'})
-# print TestResultEnvironmentInstance.ErrorList
+print '\nErrorList:'
+for i in TestResultEnvironmentInstance.ErrorList:
+    print i
+    print '\t - %s: %s'%(i['ModulePath'],i['ErrorCode'])
 sys.exit(len(TestResultEnvironmentInstance.ErrorList))
 

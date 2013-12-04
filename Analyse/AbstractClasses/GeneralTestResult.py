@@ -5,12 +5,14 @@ Program : MORE-Web
  Release Date   : 2013-05-30
 '''
 
-import os, ROOT
+import os
+import ROOT
 import gzip
 import sys
 import datetime
 import json
 import traceback
+import warnings
 
 class GeneralTestResult:
     
@@ -275,7 +277,26 @@ class GeneralTestResult:
                     #todo Felix: handel exceptions
                 
         self.SetCanvasSize()
-        self.PopulateResultData()
+        try:
+            self.PopulateResultData()
+        except Exception as inst:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    # Start red color
+                    sys.stdout.write("\x1b[31m")
+                    sys.stdout.flush()
+                    print '\x1b[31mException while processing', self.FinalResultsStoragePath
+                    # Print traceback
+                    traceback.print_exception(exc_type, exc_obj, exc_tb)
+                    # Stop red color
+                    sys.stdout.write("\x1b[0m")
+                    sys.stdout.flush()
+
+                    self.TestResultEnvironmentObject.ErrorList.append(
+                                                                      {'ModulePath':self.ModulePath,
+                                                                       'ErrorCode': inst,
+                                                                       'FinalResultsStoragePath':self.FinalResultsStoragePath}
+#                                                                        'FinalResultsStoragePath':i['TestResultObject'].FinalResultsStoragePath}
+                                                                      )
     
     '''
         Manually close all file handles of the sub tests
@@ -596,6 +617,9 @@ class GeneralTestResult:
         KeyValueDictPairsRows = ''
         
         for i in TestResultObject.ResultData['KeyList']:
+            if not TestResultObject.ResultData['KeyValueDictPairs'].has_key(i):
+                warnings.warn('Cannot find Key: %s'%i)
+                continue
             if not TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Unit'):
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['Unit'] = ''
             html_value = HtmlParser.MaskHTML(str(TestResultObject.ResultData['KeyValueDictPairs'][i]['Value']))

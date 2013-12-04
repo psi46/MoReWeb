@@ -14,7 +14,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = self.Attributes['QualificationType'] + " " + self.Attributes['ModuleID']
         if self.Attributes['TestType'] == 'automatic':
-            self.ResultData['SubTestResultDictList'] = self.extractTests()
+            self.ResultData['SubTestResultDictList'] = self.analyseTestIniFile()
         elif self.Attributes['TestType'] == 'singleFulltest':
             print 'add singleFulltest subTestResults'
             self.ResultData['SubTestResultDictList'] = [
@@ -38,31 +38,57 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 },
                                                         ]
+        self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
    
-    def extractTests(self):
-        print 'Extract Tests from config file'
+    def appendOperationDetails(self,testlist):
+        Operator = 'UNKNOWN'
+        Hostname = 'UNKNOWN'
+        TestCenter = 'UNKNOWN'
+        if self.initParser:
+            if self.initParser.has_option('OperationDetails','Operator'):
+                Operator = self.initParser.get('OperationDetails','Operator')
+            if self.initParser.has_option('OperationDetails','Hostname'):
+                Hostname = self.initParser.get('OperationDetails','Hostname')
+            if self.initParser.has_option('OperationDetails','TestCenter'):
+                TestCenter = self.initParser.get('OperationDetails','TestCenter')
+        
+        for i in testlist:
+            print i,type(i),i.has_key('InitialAttributes')
+            i['InitialAttributes']['Operator'] = Operator
+            i['InitialAttributes']['Hostname'] = Hostname
+            i['InitialAttributes']['TestCenter'] = TestCenter
+            print Operator,Hostname,TestCenter
+            
+    def analyseTestIniFile(self):
         absPath = self.TestResultEnvironmentObject.ModuleDataDirectory+'/configfiles'
-        testList = []
         if not os.path.isdir(absPath):
-            print 'dir: %s does not exist'%absPath
+            raise Exception( 'dir for Tests.ini / elComandante.ini: %s does not exist'%absPath)
             pass
         self.initParser = AbstractClasses.Helper.BetterConfigParser.BetterConfigParser()
         fileName = absPath+'/elComandante.ini'
         fileName2 = absPath+'/Tests.ini'
         if os.path.isfile(fileName):
             self.initParser.read(fileName)
-            tests = self.initParser.get('Tests','Test')
-            testList = self.analyseTestList(tests)
         elif os.path.isfile(fileName2):
             self.initParser.read(fileName2)
+        else:
+            raise Exception("file %s doesn't exist, cannot extract Tests from ini file"%fileName)
+        
+        return self.extractTests()
+       
+        
+            
+    def extractTests(self):
+        if self.initParser:
+            print 'Extract Tests from config file'
+            testList = []
             tests = self.initParser.get('Tests','Test')
             testList = self.analyseTestList(tests)
+    #        print 'done with extraction'
+            return testList
+            pass
         else:
-            print "file %s doesn't exist"%fileName
-#        print 'done with extraction'
-        return testList
-        pass
-    
+            raise Exception('Cannot read from configparser')
     def analyseTestList(self,testList):
         tests =[]
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
@@ -247,7 +273,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'TestTemperature':test.environment.temperature,
                         'Target': environment.name,
                         'TargetEnergy': TargetEnergy,
-                        'TargetNElectrons': TargetNElectrons
+                        'TargetNElectrons': TargetNElectrons,
+                        'Operator': 'UNKNOWN',
+                        'Hostname': 'UNKNOWN',
+                        'TestCenter': 'UNKNOWN',
                 },
                 'DisplayOptions':{
                         'Order':len(tests[-1]['InitialAttributes']['SubTestResultDictList'])+1        

@@ -178,8 +178,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 while i<0 or i>= len(files):
                     try:
                         #TODO: How to continue when it happens in automatic processing...
-                        rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]\t'%(len(files)-1))
-                        i =  int(rawInput)
+
+                        if self.verbose:
+                            rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]\t'%(len(files)-1))
+                            i =  int(rawInput)
+                        else:
+                            i = 0
+
+
                     except:
                         print '%s is not an integer, please enter a valid integer'%rawInput
                 fileHandlePath = self.RawTestSessionDataPath+'/'+files[i]
@@ -199,17 +205,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
     
     def CustomWriteToDatabase(self, ParentID):
+        CurrentAtVoltage150 = 0
+        IVSlope = 0
         if self.ResultData['SubTestResults'].has_key('IVCurve'):
 #             self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key('recalculatedCurrentAtVoltage150V'):
                 CurrentAtVoltage150 = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']['Value'])
-            else:
+            elif self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key('CurrentAtVoltage150V'):
                 CurrentAtVoltage150 = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'])
-            IVSlope = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['Variation']['Value'])
-        else:
-            CurrentAtVoltage150 = 0
-            IVSlope = 0
+            if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key('Variation'):
+                IVSlope = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['Variation']['Value'])
         initialCurrent = 0
+        print 'fill row'
         Row = {
             'ModuleID' : self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
@@ -238,6 +245,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'nCycles': None,
             'CycleTempLow': None,
             'CycleTempHigh':None,
+
 #
 # added by Tommaso
 #
@@ -248,8 +256,40 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'nNoisyPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'],
             'nGainDefPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
             'nPedDefPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPedestalDefects']['Value'],
-            'nPar1DefPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPar1Defects']['Value']
+            'nPar1DefPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPar1Defects']['Value'],
+
+            'TestCenter':  self.Attributes['TestCenter'],
+            'Hostname':  self.Attributes['Hostname'],
+            'Operator':  self.Attributes['Operator'],
+#
+#    added by Felix for the new Overview Table
+#
+# for A/B/C sub gradings 
+            'PixelDefectsNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeAROCs']['Value'],
+            'PixelDefectsNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeBROCs']['Value'],
+            'PixelDefectsNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeCROCs']['Value'],
+            
+            'NoiseNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeAROCs']['Value'],
+            'NoiseNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeBROCs']['Value'],
+            'NoiseNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeCROCs']['Value'],
+            
+            'VcalWidthNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeAROCs']['Value'],
+            'VcalWidthNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeBROCs']['Value'],
+            'VcalWidthNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeCROCs']['Value'],
+            
+            'GainNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeAROCs']['Value'],
+            'GainNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeBROCs']['Value'],
+            'GainNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeCROCs']['Value'],
+            
+            'PedSpreadNGradeA':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeAROCs']['Value'],
+            'PedSpreadNGradeB':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeBROCs']['Value'],
+            'PedSpreadNGradeC':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeCROCs']['Value'],
+
+            'Par1NGradeA':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeAROCs']['Value'],
+            'Par1NGradeB':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeBROCs']['Value'],
+            'Par1NGradeC':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeCROCs']['Value'],
         }
+        print 'fill row end'
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             from PixelDB import *
 #modified by Tommaso
