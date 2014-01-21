@@ -49,9 +49,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         nPedA =   self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeAROCs']['Value']
         nPedB =   self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeBROCs']['Value']
         nPedC =   self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeCROCs']['Value']
-        nPar1A =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeAROCs']['Value']
-        nPar1B =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeBROCs']['Value']
-        nPar1C =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeCROCs']['Value']
+        try:
+            nPar1A =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeAROCs']['Value']
+        except:
+            nPar1A = -1
+        try:
+            nPar1B =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeBROCs']['Value']
+        except:
+            nPar1C = -1
+        try:
+            nPar1C =  self.ParentObject.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeCROCs']['Value']
+        except:
+            nPar1C = -1
         self.ResultData['KeyValueDictPairs'] = {
             'Noise': {
                 'Value':noise, 

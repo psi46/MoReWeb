@@ -28,6 +28,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if not self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}Distribution".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
         if self.ResultData['Plot']['ROOTObject']:
+            self.Canvas.Clear()
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
             if not isDigitalROC:
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
@@ -50,7 +51,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.Cut.SetLineWidth(2)
             self.Cut.SetLineStyle(2)
             self.Cut.SetLineColor(ROOT.kRed)
-            self.Cut.Draw()
+            self.Cut.Draw('PL')
         
         if self.SavePlotFile:
             self.Canvas.SaveAs(self.GetPlotFileName())      

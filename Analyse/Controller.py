@@ -153,20 +153,20 @@ def CopyMD5File(FinalModuleResultsPath):
 
 def GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInformation):
     return TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
-        TestResultEnvironmentInstance, 
-        None, 
-        'TestResultClasses.CMSPixel.QualificationGroup', 
-        FinalModuleResultsPath,
-        {
-            'TestDate':ModuleInformation['TestDate'],
-            'TestedObjectID':ModuleInformation['ModuleID'],
-            'ModuleID':ModuleInformation['ModuleID'],
-            'ModuleVersion':ModuleVersion,
-            'ModuleType':'a',
-            'TestType':TestType,
-            'QualificationType': ModuleInformation['QualificationType']
-        }    
-    )
+            TestResultEnvironmentInstance, 
+            None, 
+            'TestResultClasses.CMSPixel.QualificationGroup', 
+            FinalModuleResultsPath,
+            {
+                'TestDate':ModuleInformation['TestDate'],
+                'TestedObjectID':ModuleInformation['ModuleID'],
+                'ModuleID':ModuleInformation['ModuleID'],
+                'ModuleVersion':ModuleVersion,
+                'ModuleType':'a',
+                'TestType':TestType,
+                'QualificationType': ModuleInformation['QualificationType']
+            }    
+        )
     
 
 def CreateApacheWebserverConfiguration(FinalResultsPath):

@@ -10,112 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-#        self.Attributes['NumberOfChips'] = 16
-#        
-#        if self.Attributes['ModuleVersion'] == 1:
-#            if self.Attributes['ModuleType'] == 'a':
-#                self.Attributes['StartChip'] = 0
-#            elif self.Attributes['ModuleType'] == 'b':
-#                self.Attributes['StartChip'] = 7
-#            else:
-#                self.Attributes['StartChip'] = 0
-#            
-#        elif self.Attributes['ModuleVersion'] == 2:
-#            self.Attributes['StartChip'] = 0
-        
-        
-        
-        
-#        self.ResultData['SubTestResultDictList'] = [
-#            {
-#                'Key':'Chips',
-#                'DisplayOptions':{
-#                    'GroupWithNext':True,
-#                    'Order':1,
-#                },
-#                'InitialAttributes':{
-#                    'ModuleVersion':self.Attributes['ModuleVersion'],   
-#                },
-#            },
-#            {
-#                'Key':'AddressLevelOverview',
-#                'DisplayOptions':{
-#                    'Order':2,
-#                }
-#            },
-#            {
-#                'Key':'BumpBondingMap',
-#                'DisplayOptions':{
-#                    'Width':4,
-#                    'Order':5,
-#                }
-#            },
-#            
-#            {
-#                'Key':'VcalThreshold',
-#                'DisplayOptions':{
-#                    'Width':4,
-#                    'Order':3,
-#                }
-#            },
-#        ]
-        
-#        if self.Attributes['IncludeIVCurve']:
-#            self.ResultData['SubTestResultDictList'] += [
-#                {
-#                    'Key':'IVCurve',
-#                    'DisplayOptions':{
-#                        'Order':8,
-#                        'Width':3,
-#                    }
-#                },
-#            ]
-#        else:
-#            self.ResultData['SubTestResultDictList'] += [
-#                {
-#                    'Key':'Dummy1',
-#                    'Module':'Dummy',
-#                    'DisplayOptions':{
-#                        'Order':8,
-#                        'Width':3,
-#                    }
-#                },
-#            ]
-        
-#        self.ResultData['SubTestResultDictList'] += [
-#            {'Key':'Noise'},
-#            {'Key':'VcalThresholdWidth'},
-#            {'Key':'RelativeGainWidth'},
-#            {'Key':'PedestalSpread'},
-#        ]
-        
-#        if self.Attributes['ModuleVersion'] == 1:
-#            self.ResultData['SubTestResultDictList'] += [
-#                {'Key':'Parameter1'},
-#            ]
-            
-#        self.ResultData['SubTestResultDictList'] += [
-#            {
-#                'Key':'Summary1',
-#                'DisplayOptions':{
-#                    'Order':4,
-#                }
-#            },
-#            {
-#                'Key':'Summary2',
-#                'DisplayOptions':{
-#                    'Order':6,
-#                }
-#            },
-#            {
-#                'Key':'Summary3',
-#                'DisplayOptions':{
-#                    'Order':7,
-#                }
-#            },
-#            
-#        ]
-            
+
         
     def OpenFileHandle(self):
         self.FileHandle = ConfigParser.ConfigParser()
@@ -136,40 +31,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                                 'Unit': '℃',
                                                                 }
         self.ResultData['KeyList'] = ['nCycles','CycleTempLow','CycleTempHigh']
-#        self.ResultData['Table'] = {
-#            'HEADER':[
-#                [
-#                    'Test Name',
-#                    'nCycles',
-#                    'CycleTempLow',
-#                    'CycleTempHigh',
-#                ]
-#            ],
-#            'BODY':[],
-#            'FOOTER':[],
-#        }
-#        LinkHTMLTemplate = self.TestResultEnvironmentObject.HtmlParser.getSubpart(
-#            self.TestResultEnvironmentObject.OverviewHTMLTemplate,
-#            '###LINK###'
-#        )
-        #for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']:
-#        self.ResultData['Table']['BODY'].append(
-#            [
-#                self.TestResultEnvironmentObject.HtmlParser.substituteMarkerArray(
-#                    LinkHTMLTemplate,
-#                    {
-#                        '###LABEL###':'TemperatureCycle',
-#                        #i['TestResultObject'].FinalResultsStoragePath, self.FinalResultsStoragePath)+'/TestResult.html'
-#                        '###URL###':os.path.relpath(self.FinalResultsStoragePath, self.FinalResultsStoragePath)+'/TestResult.html'
-#                    }
-#                ),
-#                self.Attributes['nCycles'],
-#                self.Attributes['CycleTempLow'],
-#                self.Attributes['CycleTempHigh'],
-#            ]   
-#        )
+
         del self.FileHandle
-#        self.FileHandle.Close()
     
         
     

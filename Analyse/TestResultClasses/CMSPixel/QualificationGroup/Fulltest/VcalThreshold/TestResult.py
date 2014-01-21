@@ -13,20 +13,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         
         ROOT.gStyle.SetOptStat(0);
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", 416, 0., 416., 160, 0., 160.); # mThreshold
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", 8*self.nCols, 0., 8*self.nCols., 2*self.nRows, 0., 2*self.nRows.); # mThreshold
         
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            for j in range(52): # Columns
-                for k in range(80): # Rows
+            for j in range(self.nCols): # Columns
+                for k in range(self.nRows): # Rows
                     if ChipTestResultObject.Attributes['ChipNo'] < 8:
-                        tmpCol = 8*52-(ChipTestResultObject.Attributes['ChipNo']*52+j)
-                        tmpRow = 2*80-k
+                        tmpCol = 8*self.nCols-(ChipTestResultObject.Attributes['ChipNo']*self.nCols+j)
+                        tmpRow = 2*self.nRows-k
                     else:
-                        tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*52+j)+1
+                        tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*self.nCols+j)+1
                         tmpRow = k+1
                     if ChipTestResultObject.Attributes['ChipNo'] < 8:
-                        #tmpRow += 80
+                        #tmpRow += self.nRows
                         pass
                     # Get the data from the chip sub test result VcalThresholdUntrimmed
                     self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, ChipTestResultObject.ResultData['SubTestResults']['VcalThresholdUntrimmed'].ResultData['Plot']['ROOTObject'].GetBinContent(j+1, k+1))
@@ -56,12 +56,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         box = ROOT.TBox();
         box.SetFillColor(3);
         box.SetFillStyle(3004);
-        if self.ParentObject.Attributes['NumberOfChips'] < 16 and self.ParentObject.Attributes['StartChip'] == 0: 
+        if self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 0: 
             box.SetFillColor(29);
-            box.DrawBox( 0, 0,  416,  80);
-        elif self.ParentObject.Attributes['NumberOfChips'] < 16 and self.ParentObject.Attributes['StartChip'] == 8:
+            box.DrawBox( 0, 0,  8*self.nCols,  self.nRows);
+        elif self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 8:
             box.SetFillColor(29);
-            box.DrawBox( 0, 0,  416,  160);
+            box.DrawBox( 0, 0,  8*self.nCols,  2*self.nRows);
         
         self.ResultData['Plot']['Format'] = 'png'
         

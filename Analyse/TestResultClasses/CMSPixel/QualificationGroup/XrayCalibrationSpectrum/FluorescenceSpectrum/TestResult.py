@@ -317,7 +317,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #		self.ResultData['Plot']['ROOTObject_hGain'] = ROOT.TH1D(self.GetUniqueID(), "", 300, -2.0, 5.5)  # hGain
 #
 #		#hgm
-#		self.ResultData['Plot']['ROOTObject_hGainMap'] = ROOT.TH2D(self.GetUniqueID(), "", 52, 0, 52, 80, 0, 80) # hGainMap
+#		self.ResultData['Plot']['ROOTObject_hGainMap'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0, self.nCols, self.nRows, 0, self.nRows) # hGainMap
 #
 #		#hp
 #		self.ResultData['Plot']['ROOTObject_hPedestal'] = ROOT.TH1D(self.GetUniqueID(), "", 900, -300., 600.) # hPedestal
@@ -343,8 +343,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #			for i in range(4):
 #				Line = PHCalibrationFitFile.readline() # Omit first four lines
 #
-#			for i in range(52): #Columns
-#				for j in range(80): #Rows
+#			for i in range(self.nCols): #Columns
+#				for j in range(self.nRows): #Rows
 #					Line = PHCalibrationFitFile.readline()
 #					if Line:
 #

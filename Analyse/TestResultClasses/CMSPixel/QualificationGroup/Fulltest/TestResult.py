@@ -25,7 +25,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.verbose = False
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-        self.Attributes['NumberOfChips'] = 16
+        self.Attributes['NumberOfChips'] = self.nTotalChips
         
         if self.Attributes['ModuleVersion'] == 1:
             if self.Attributes['ModuleType'] == 'a':
@@ -63,6 +63,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 },
             },
             {
+                'Key':'Temperature',
+                'DisplayOptions':{
+                    'GroupWithNext':False,
+                    'Width':2,
+                    'Order':20,
+                },
+            },
+            {
                 'Key':'Chips',
                 'DisplayOptions':{
                     'GroupWithNext':True,
@@ -89,6 +97,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             },
         ]
+#         self.ResultData['SubTestResultDictList'].append({'Key': 'Temperature'})
         if not self.Attributes['isDigital']:
             self.ResultData['SubTestResultDictList'].append({
                 'Key':'AddressLevelOverview',
@@ -121,18 +130,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ]
         
         self.ResultData['SubTestResultDictList'] += [
-            {'Key':'Noise'},
-            {'Key':'VcalThresholdWidth'},
-            {'Key':'RelativeGainWidth'},
-            {'Key':'PedestalSpread'},
+            {'Key':'Noise','DisplayOptions':{'Order':9,}},
+            {'Key':'VcalThresholdWidth','DisplayOptions':{'Order':10,}},
+            {'Key':'RelativeGainWidth','DisplayOptions':{'Order':11,}},
+            {'Key':'PedestalSpread','DisplayOptions':{'Order':12,}},
         ]
         
         if self.Attributes['ModuleVersion'] == 1:
             self.ResultData['SubTestResultDictList'] += [
-                {'Key':'Parameter1'},
+                {'Key':'Parameter1','DisplayOptions':{'Order':13,}}
             ]
             
-        self.ResultData['SubTestResultDictList'] += [{'Key': 'TemperatureAnalysis'}]
             
         self.ResultData['SubTestResultDictList'] += [
             {

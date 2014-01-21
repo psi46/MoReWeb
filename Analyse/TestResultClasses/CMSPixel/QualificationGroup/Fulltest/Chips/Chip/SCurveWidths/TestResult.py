@@ -14,12 +14,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         #   // -- sCurve width and noise level
         
-        self.ParentObject.ParentObject.FileHandle.Get("AddressLevels_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
+#         self.ParentObject.ParentObject.FileHandle.Get("AddressLevels_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
         
         #hw
         self.ResultData['Plot']['ROOTObject'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) # hw
         self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) #Noise in unbonded pixel (not displayed) # hd
-        self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", 52, 0., 52., 80, 0., 80.) # ht
+        self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols., self.nRows, 0., self.nRows.) # ht
         isDigitalROC = False
         if self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo'])):
 #            print 'SCurve Analog module'
@@ -44,8 +44,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Line = SCurveFile.readline()
             Line = SCurveFile.readline()
             
-            for column in range(52): #Columns
-                for row in range(80): #Rows
+            for column in range(self.nCols): #Columns
+                for row in range(self.nRows): #Rows
                     Line = SCurveFile.readline()
                     if Line:
                         LineArray = Line.strip().split()

@@ -89,6 +89,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
         else:
             raise Exception('Cannot read from configparser')
+        
     def analyseTestList(self,testList):
         tests =[]
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
@@ -100,6 +101,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             test = test.next()
         index = 0
         test = testchain.next()
+        tests,test,index = self.appendTemperatureGraph(tests, test, index)
         while test:
             if 'Fulltest' in test.testname:
                 tests,test,index = self.appendFulltest(tests,test,index)
@@ -130,6 +132,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #            pass
         
         return tests
+    
+    def appendTemperatureGraph(self,tests,test,index):
+        tests.append(
+                      {
+                    'Key':'Temperature',
+                    'Module':'Temperature',
+                    'InitialAttributes':{
+                        'StorageKey':    'ModuleQualification_Temperature',
+                        'TestResultSubDirectory': 'logfiles',
+                        'ModuleID':self.Attributes['ModuleID'],
+                        'ModuleVersion':self.Attributes['ModuleVersion'],
+                        'ModuleType':self.Attributes['ModuleType'],
+                        'TestType':'Temperature',
+                    },
+                    'DisplayOptions':{
+                        'Order':len(tests)+1,
+                        'Width':5, 
+                    }
+                })
+        return tests,test,index
+        
     
     def appendTemperatureCycle(self,tests,test,index):
 #         print  '%03d'%index, test.testname, test.environment
@@ -234,7 +257,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         elif "Ni" in elementName:
             return 7461.03
         elif "Cu" in elementName:
-            return 8027.84
+            return self.nRows27.84
         elif "Br" in elementName:
             return 11877.75
         elif "Mo" in elementName:
@@ -244,7 +267,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         elif "Sn" in elementName:
             return 25044.04
         elif "Ba" in elementName:
-            return 31816.615
+            return 318self.nTotalChips.615
         else:
             return 0
 

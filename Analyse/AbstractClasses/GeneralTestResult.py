@@ -15,6 +15,9 @@ import traceback
 import warnings
 
 class GeneralTestResult:
+        nRows = 80
+        nCols = 52
+        nTotalChips = 16
     
     
     '''
@@ -341,16 +344,25 @@ class GeneralTestResult:
     def SetFinalResultsStoragePath(self):
         pass
     
+    def CanvasSize(self,canvas):
+        canvas.SetCanvasSize(
+            self.DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'],
+            self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight']
+        )
+        canvas.Draw()
+        canvas.Update()
+        return canvas
     '''
         Sets the canvas size
     '''
     def SetCanvasSize(self):
-        self.Canvas.SetCanvasSize(
-            self.DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'],
-            self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight']
-        )
-        self.Canvas.Draw()
-        self.Canvas.Update()
+        self.Canvas = self.CanvasSize(self.Canvas)
+#         self.Canvas.SetCanvasSize(
+#             self.DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'],
+#             self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight']
+#         )
+#         self.Canvas.Draw()
+#         self.Canvas.Update()
     
     
     '''
@@ -577,6 +589,9 @@ class GeneralTestResult:
                 SVGContent = SVGContent.replace('height=" ', 'height="')
                 SVGContent = SVGContent.replace('x=" ', 'x="')
                 SVGContent = SVGContent.replace('y=" ', 'y="')
+                SVGContent = SVGContent.replace('r=" ', 'r="')
+                SVGContent = SVGContent.replace('=" ', '="')
+                SVGContent = SVGContent.replace('&#786', '&#176')
                 
                 if self.GzipSVG and TestResultObject.ResultData['Plot']['ImageFile'].find('.svgz') == -1:
                     os.remove(TestResultObject.ResultData['Plot']['ImageFile'])

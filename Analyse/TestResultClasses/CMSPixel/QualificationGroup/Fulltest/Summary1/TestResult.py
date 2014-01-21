@@ -35,7 +35,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         TotalDefects = 0
         chipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
         for i in chipResults:
-            if int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Total']['Value']) > 0.01 * 52*80:
+            if int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Total']['Value']) > 0.01 * self.nCols*self.nRows:
                 BadRocs += 1
             DeadPixels += int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadPixel']['Value'])
             AddressProblems += int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nAddressProblems']['Value'])
@@ -71,9 +71,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     grade = 2
                 else:
                     grade = 3
-                if grade == 1 and nValue < (4160 - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
+                if grade == 1 and nValue < (8*self.nCols0 - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
                     grade = 2
-                if nValue < (4160 - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
+                if nValue < (8*self.nCols0 - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
                     grade = 3
                 subgrading.append('%d'%grade)
                     
@@ -81,9 +81,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     Grade = 2
                 if Value > TestResultObject.ResultData['HiddenData']['LimitC']:
                     Grade = 3
-                if Grade == 1 and nValue < (4160 - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
+                if Grade == 1 and nValue < (8*self.nCols0 - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
                     Grade = 2
-                if nValue < (4160 - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
+                if nValue < (8*self.nCols0 - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
                     Grade = 3
                 '''
                 # Failures reasons...
@@ -219,7 +219,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for i in subgradings:
             for grade in GradeMapping:
                 key = i+'Grade'+GradeMapping[grade]+"ROCs"
-                nRocs = self.getNumberOfRocsWithGrade('%d'%grade,subgradings[i])
+                try:
+                    nRocs = self.getNumberOfRocsWithGrade('%d'%grade,subgradings[i])
+                except:
+                    nRocs = -1
                 entry = {
                     'Value': nRocs,
                     'Label': '%s grade %s ROCs'%(i,GradeMapping[grade])

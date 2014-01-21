@@ -201,8 +201,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 for i in range(3):
                     self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].FileHandle.readline() #Omit first three lines
         
-        for column in range(52): #Column
-            for row in range(80): #Row
+        for column in range(self.nCols): #Column
+            for row in range(self.nRows): #Row
                 pixelAlive = True
         
                 PixelMapCurrentValue = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)

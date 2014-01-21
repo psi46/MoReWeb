@@ -34,8 +34,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             for i in range(3):
                 PHCalibrationFitTanFile.readline() #Omit first three lines
             
-            for i in range(52): #Columns
-                for j in range(80): #Rows
+            for i in range(self.nCols): #Columns
+                for j in range(self.nRows): #Rows
                     Line = PHCalibrationFitTanFile.readline()
                     if Line:
                         LineArray = Line.strip().split()
