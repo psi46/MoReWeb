@@ -257,7 +257,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         elif "Ni" in elementName:
             return 7461.03
         elif "Cu" in elementName:
-            return self.nRows27.84
+            return 8027.84
         elif "Br" in elementName:
             return 11877.75
         elif "Mo" in elementName:
@@ -267,7 +267,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         elif "Sn" in elementName:
             return 25044.04
         elif "Ba" in elementName:
-            return 318self.nTotalChips.615
+            return 31816.615
         else:
             return 0
 
