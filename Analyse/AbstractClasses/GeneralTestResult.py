@@ -15,11 +15,10 @@ import traceback
 import warnings
 
 class GeneralTestResult:
-        nRows = 80
-        nCols = 52
-        nTotalChips = 16
-    
-    
+       
+    nRows = 80
+    nCols = 52
+    nTotalChips = 16
     '''
         Initialization function
         @param ParentObject Reference to the Parent Object
