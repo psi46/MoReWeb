@@ -71,9 +71,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     grade = 2
                 else:
                     grade = 3
-                if grade == 1 and nValue < (8*self.nCols0 - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
+                if grade == 1 and nValue < (8*self.nCols - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
                     grade = 2
-                if nValue < (8*self.nCols0 - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
+                if nValue < (8*self.nCols - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
                     grade = 3
                 subgrading.append('%d'%grade)
                     
@@ -81,9 +81,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     Grade = 2
                 if Value > TestResultObject.ResultData['HiddenData']['LimitC']:
                     Grade = 3
-                if Grade == 1 and nValue < (8*self.nCols0 - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
+                if Grade == 1 and nValue < (8*self.nCols - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
                     Grade = 2
-                if nValue < (8*self.nCols0 - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
+                if nValue < (8*self.nCols - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
                     Grade = 3
                 '''
                 # Failures reasons...
