@@ -1,22 +1,50 @@
 import AbstractClasses
 import ROOT
 import os
+from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def ReadModuleVersion(self):
         if self.verbose:
             print 'Read configParameters'
-        fileName = '%s/configParameters.dat'%self.RawTestSessionDataPath
-        f = open(fileName)
-        version = 'none'
-        for line in  f.readlines():
-            if line.strip().startswith('rocType'):
-                version = line.split(' ')[-1]
-            elif line.strip().startswith('nRocs'):
-                nRocs = int(line.split(' ')[-1])
-                if self.verbose: print '\tnRocs: %s'%nRocs
-            elif line.strip().startswith('halfModule'):
-                halfModule = int(line.split(' ')[-1])
-                if self.verbose: print '\thalfModule: %s'%halfModule
+        self.check_Test_Software()
+        format = self.HistoDict.get(self.NameSingle,'configFormat')
+        fileNames = self.HistoDict.get(self.NameSingle,'configParameters').split(',')
+        print fileNames
+        if format == 'dat':
+            lines = []
+            for filename in fileNames:
+                fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
+                f = open(fileName)
+                lines.extend(f.readlines())
+                f.close()
+            version = 'none'
+            for line in lines:
+                if line.strip().startswith('rocType'):
+                    version = line.split(' ')[-1]
+                elif line.strip().startswith('nRocs'):
+                    nRocs = int(line.split(' ')[-1])
+                    if self.verbose: print '\tnRocs: %s'%nRocs
+                elif line.strip().startswith('halfModule'):
+                    halfModule = int(line.split(' ')[-1])
+                    if self.verbose: print '\thalfModule: %s'%halfModule
+        elif format =='cfg':
+            config = BetterConfigParser()
+            for filename in fileNames:
+                fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
+                print fileName
+                config.read(fileName)
+            try:
+                version = config.get('ROC','type')
+            except:
+                version = 'none'
+            try:
+                nRocs = config.getint   ('Module','rocs')
+            except:
+                nRocs = 0
+            try:
+                halfModule = config.get('Module','halfModule')
+            except:
+                halfModule = 0
         return (version,nRocs,halfModule)
                     
     def CustomInit(self):
@@ -171,13 +199,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
         
     def check_Test_Software(self):
-        if os.path.exists(self.RawTestSessionDataPath+'test.cfg'):
+#         print self.RawTestSessionDataPath
+        file = self.RawTestSessionDataPath+'/test.cfg'
+#         print file
+        if os.path.exists(file):
             self.testSoftware = 'pyxar'
         else:
             self.testSoftware = 'psi46expert'
-        self.HistoDict  = AbstractClasses.Helper.BetterConfigParser.BetterConfigParser()
+        self.HistoDict  = BetterConfigParser()
         fileName = 'Configuration/HistoNames/%s.cfg'%self.testSoftware
-#         print fileName, os.path.exists(fileName),os.getcwd()
+        print fileName, os.path.exists(fileName),os.getcwd()
         self.HistoDict.read(fileName)
         
     def OpenFileHandle(self):

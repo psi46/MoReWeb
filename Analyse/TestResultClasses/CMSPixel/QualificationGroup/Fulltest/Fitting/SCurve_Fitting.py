@@ -8,7 +8,7 @@ import time
 class SCurve_Fitting():
     nCols = 52
     nRows = 80    
-    def __init__(self,refit=True):
+    def __init__(self,refit=True,HistoDict = None):
         ROOT.gStyle
         self.verbose = False
         self.refit = refit
@@ -17,6 +17,7 @@ class SCurve_Fitting():
         self.chiLimit = 2.
         self.ePerVcal = 65
         self.slope = self.getVcal(0,255)/256
+        self.HistoDict = HistoDict
         print "ePerVcal ",self.ePerVcal 
         print 'slope: ',self.slope
         self.InitFit()
@@ -53,7 +54,15 @@ class SCurve_Fitting():
         pass
     def getInputFile(self,dirName,chip):
         
-        inputFileName = '%s/SCurveData_C%i.dat'%(dirName,chip)
+        inputFileName = '%s/'%dirName
+        if self.HistoDict:
+            dir = self.HistoDict.get('SCurveFitting','dir')
+            filename = self.HistoDict.get('SCurveFitting','inputFileName')
+            inputFileName += dir+'/'
+            inputFileName += filename%chip
+            print inputFileName
+        else:
+            inputFileName += 'SCurveData_C%i.dat'%(chip)
         try:
             inputFile = open(inputFileName,'r')
         except IOError as e:
@@ -79,6 +88,7 @@ class SCurve_Fitting():
 
     def FitSCurve(self,dirName,chip):
         print "Fitting SCurve for chip %i"%chip
+        print 'HistoDict',self.HistoDict
         inputFile = self.getInputFile(dirName,chip)
         if type(inputFile)==list:
             return inputFile
