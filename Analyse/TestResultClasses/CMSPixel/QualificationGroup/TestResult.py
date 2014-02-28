@@ -13,6 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='QualificationGroup'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = self.Attributes['QualificationType'] + " " + self.Attributes['ModuleID']
+        self.initParser = None
         if self.Attributes['TestType'] == 'automatic':
             self.ResultData['SubTestResultDictList'] = self.analyseTestIniFile()
         elif self.Attributes['TestType'] == 'singleFulltest':
