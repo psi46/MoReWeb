@@ -152,12 +152,7 @@ def CopyMD5File(FinalModuleResultsPath):
     shutil.copyfile('checksum.md5',md5FileName)
 
 def GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInformation):
-    return TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
-            TestResultEnvironmentInstance, 
-            None, 
-            'TestResultClasses.CMSPixel.QualificationGroup', 
-            FinalModuleResultsPath,
-            {
+    newModuleInformation = {
                 'TestDate':ModuleInformation['TestDate'],
                 'TestedObjectID':ModuleInformation['ModuleID'],
                 'ModuleID':ModuleInformation['ModuleID'],
@@ -165,7 +160,15 @@ def GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInfor
                 'ModuleType':'a',
                 'TestType':TestType,
                 'QualificationType': ModuleInformation['QualificationType']
-            }    
+            }
+    if ModuleInformation.has_key('TestType'):
+        newModuleInformation['TestType'] =  ModuleInformation['TestType']
+    return TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
+            TestResultEnvironmentInstance, 
+            ParentObject = None, 
+            InitialModulePath = 'TestResultClasses.CMSPixel.QualificationGroup', 
+            InitialFinalResultsStoragePath = FinalModuleResultsPath,
+            InitialAttributes = newModuleInformation
         )
     
 
@@ -259,9 +262,11 @@ def AnalyseSingleFullTest(singleFulltestPath):
         'ModuleID': ModuleID,
         'TestDate': TestDate,
         'QualificationType': 'SingleFulltest',
+        'TestType': 'singleFulltest'
     }
     FinalResultsPath = args.singleFulltestPath+'/FinalResults'+RevisionString
     ModuleTestResult = GetModuleTestResult(TestResultEnvironment, FinalResultsPath, ModuleInformation)
+    print 'ModuleTestResult',ModuleTestResult
                 # add apache webserver configuration for compressed svg images  
     CreateApacheWebserverConfiguration(FinalResultsPath)
     print 'Working on: ',ModuleInformation
