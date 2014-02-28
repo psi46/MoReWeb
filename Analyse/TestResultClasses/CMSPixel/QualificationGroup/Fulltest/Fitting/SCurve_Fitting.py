@@ -60,9 +60,10 @@ class SCurve_Fitting():
             filename = self.HistoDict.get('SCurveFitting','inputFileName')
             inputFileName += dir+'/'
             inputFileName += filename%chip
-            print inputFileName
         else:
             inputFileName += 'SCurveData_C%i.dat'%(chip)
+        inputFileName = os.path.abspath(inputFileName)
+        print inputFileName
         try:
             inputFile = open(inputFileName,'r')
         except IOError as e:
@@ -88,7 +89,6 @@ class SCurve_Fitting():
 
     def FitSCurve(self,dirName,chip):
         print "Fitting SCurve for chip %i"%chip
-        print 'HistoDict',self.HistoDict
         inputFile = self.getInputFile(dirName,chip)
         if type(inputFile)==list:
             return inputFile
@@ -104,6 +104,7 @@ class SCurve_Fitting():
         
         maxChi2 = [-1]*4
         assert len(dataSet)== self.nCols*self.nRows
+        badPixels = []
         for col in range(self.nCols):
             for row in range(self.nRows):
                 data = [int(i) for i in  dataSet[col*self.nRows+row].split()]
@@ -111,7 +112,11 @@ class SCurve_Fitting():
                 if fitResults:
                     outputFile.write("%+.3e %+.3e   Pix %2i %2i\n"%(fitResults[0],fitResults[1],col,row))
                 else:
-                    print 'problem with chip %s, col %s, row %s'%(chip,col,row)
+                    badPixels.append((chip,col,row))
+                    if self.verbose:
+                        print 'problem with chip %s, col %s, row %s'%(chip,col,row)
+        print 'Problem with %s / %s Pixels: '%(len(badPixels),self.nRows*self.nCols)
+        print badPixels
         inputFile.close()
         outputFile.close()
         return [chi2,[]]
@@ -167,10 +172,13 @@ class SCurve_Fitting():
         y = []
         ex = []
         ey = []
+        if self.verbose:
+            print data,self.nReadouts
         for i in range(n):
             value = data[i]
             isDeadPixel= isDeadPixel and value == 0
-            if plateau and value ==0: value = self.nReadouts
+            if plateau and value ==0: 
+                value = self.nReadouts
             if value<0 or value > self.nReadouts: isBadPixel = True
             if value == self.nReadouts: plateau = True
             zeroLevel = zeroLevel or value == 0
@@ -180,6 +188,11 @@ class SCurve_Fitting():
             y.append(self.nReadouts*eff)
             ey.append(self.nReadouts * math.sqrt((eff*(1-eff))/(self.nReadouts+3.)))
         if not plateau or not zeroLevel:
+            if self.verbose:
+                if not plateau:
+                    print 'Plateau: ',plateau
+                if not zeroLevel:
+                    print 'ZeroLevel: ',zeroLevel
             isBadPixel = True
             
         if self.verbose:

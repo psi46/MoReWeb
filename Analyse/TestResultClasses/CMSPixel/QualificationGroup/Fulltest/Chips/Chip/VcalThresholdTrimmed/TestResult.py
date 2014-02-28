@@ -22,16 +22,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'ThresholdMap')%ChipNo
         self.ResultData['Plot']['ROOTObject'] =  fileHandle.Get(histname).Clone(self.GetUniqueID())
         
-        
         #mG
         MeanVcalThr = self.ResultData['Plot']['ROOTObject'].GetMean()
         #sG
         RMSVcalThr = self.ResultData['Plot']['ROOTObject'].GetRMS()
         #nG
-        IntegralVcalThr = self.ResultData['Plot']['ROOTObject'].Integral(
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), 
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()
-        )
+        first = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst()
+        last = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()
+        IntegralVcalThr = self.ResultData['Plot']['ROOTObject'].Integral(first,last)
         #nG_entries
         IntegralVcalThr_Entries = self.ResultData['Plot']['ROOTObject'].GetEntries()
         

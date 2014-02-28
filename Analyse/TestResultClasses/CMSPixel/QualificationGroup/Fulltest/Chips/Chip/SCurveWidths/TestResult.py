@@ -28,13 +28,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             histname = HistoDict.get(self.NameSingle,'Analog')%ChipNo
             if fileHandle.Get(histname):
 #                 print 'SCurve Analog module'
-                self.ResultData['Plot']['ROOTObject_h2'] = ROOT.TH2D( fileHandle.Get(histname) )
+                self.ResultData['Plot']['ROOTObject_h2'] = fileHandle.Get(histname).Clone(self.GetUniqueID())
         
-        if not self.ResultData['Plot']['ROOTObject_h2']:
+        if not self.ResultData['Plot'].has_key('ROOTObject_h2'):
 #            print 'SCurve Digital module'
             isDigitalROC = True
             histname = HistoDict.get(self.NameSingle,'Digital')%ChipNo
-            self.ResultData['Plot']['ROOTObject_h2'] = ROOT.TH2D( fileHandle.Get(histname) )
+            self.ResultData['Plot']['ROOTObject_h2'] = fileHandle.Get(histname).Clone(self.GetUniqueID())
         
         Directory = self.RawTestSessionDataPath
         SCurveFileName = "{Directory}/SCurve_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])

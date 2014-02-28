@@ -24,7 +24,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject_Calibrate'] = fileHandle.Get(histname_Calibrate).Clone(self.GetUniqueID())
             histname_Calibrate = HistoDict.get(self.NameSingle,'Mask')%ChipNo
             self.ResultData['Plot']['ROOTObject_Mask'] = fileHandle.Get(histname_Calibrate).Clone(self.GetUniqueID())
-            if not self.ResultData['Plot']['ROOTObject_Mask'] or not self.ResultData['Plot']['ROOTObject_Calibtate']:
+            if not self.ResultData['Plot']['ROOTObject_Mask'] or not self.ResultData['Plot']['ROOTObject_Calibrate']:
                 raise Exception('Cannot create PixelMap because of not found histos Mask: %s, Calibrate: %s'%(
                                  self.ResultData['Plot']['ROOTObject_Mask'],
                                  self.ResultData['Plot']['ROOTObject_Calibrate'],

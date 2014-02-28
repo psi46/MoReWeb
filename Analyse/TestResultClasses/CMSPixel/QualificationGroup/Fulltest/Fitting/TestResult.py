@@ -20,8 +20,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         fitter = SCurve_Fitting(refit,HistoDict = self.ParentObject.HistoDict)
         fitter.FitAllSCurve(directory,nRocs)
         print 'linear PH fitting...'
-        fitter = PH_Fitting(0,refit)
+        fitter = PH_Fitting(0,refit,HistoDict = self.ParentObject.HistoDict)
         fitter.FitAllPHCurves(directory,nRocs)
         print 'tanh PH fitting...'
-        fitter = PH_Fitting(3,refit)
+        fitter = PH_Fitting(3,refit,HistoDict = self.ParentObject.HistoDict)
         fitter.FitAllPHCurves(directory,nRocs)

@@ -14,7 +14,7 @@ class PH_Fitting():
     vcalSteps = 5
     rangeConversion = 7
     
-    def __init__(self,fitMode,refit=True):
+    def __init__(self,fitMode,refit=True,HistoDict = None):
         ROOT.gStyle
         self.verbose = False
         self.fitMode = fitMode
@@ -22,6 +22,7 @@ class PH_Fitting():
         self.DrawHistos = False
         self.vcal = [50,100,150,200,250,30,50,70,90,200];
         self.vcalLow = self.vcal
+        self.HistoDict = HistoDict
         for  i  in range( 0, 2 * self.vcalSteps):
             self.vcalLow[i] = self.vcal[i];
             if i > (self.vcalSteps - 1):
@@ -161,7 +162,18 @@ class PH_Fitting():
 
     def FitPHCurve(self,dirName,chip,result):
         print "Fitting pulse height curves for chip %i"%chip
-        inputFileName = '%s/phCalibration_C%i.dat'%(dirName,chip)
+        
+        inputFileName = '%s/'%dirName
+        if self.HistoDict:
+            dir = self.HistoDict.get('PHCalibrationFitting','dir')
+            filename = self.HistoDict.get('PHCalibrationFitting','inputFileName')
+            inputFileName += dir+'/'
+            inputFileName += filename%chip
+        else:
+            inputFileName += 'phCalibration_C%i.dat'%(chip)
+        inputFileName = os.path.abspath(inputFileName)
+        print inputFileName
+            
         try:
             inputFile = open(inputFileName,'r')
         except IOError as e:
@@ -226,7 +238,6 @@ class PH_Fitting():
         retVal = [maxChi2,[self.histoChi,self.histoFits]]
         print "\tMax Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
         result.put(retVal)
-        print '\tin Queue'
 #         sys.exit()
         return
 #         return retVal
