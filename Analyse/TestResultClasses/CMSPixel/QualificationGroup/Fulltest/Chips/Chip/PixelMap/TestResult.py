@@ -31,7 +31,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                  ))
             self.ResultData['Plot']['ROOTObject'] = self.ResultData['Plot']['ROOTObject_Calibrate'].Clone(self.GetUniqueID())
             nXbins = self.ResultData['Plot']['ROOTObject'].GetNbinsX()
-            nYBins = self.ResultData['Plot']['ROOTObject'].GetNbinsY()
+            nYbins = self.ResultData['Plot']['ROOTObject'].GetNbinsY()
             for xbin in range(1,nXbins+1):
                 for ybin in range(1,nYbins+1):
                     binContent = self.ResultData['Plot']['ROOTObject_Mask'].GetBinContent(xbin,ybin)
