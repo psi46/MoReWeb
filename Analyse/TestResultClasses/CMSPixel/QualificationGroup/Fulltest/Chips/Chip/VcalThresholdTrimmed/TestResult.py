@@ -16,9 +16,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         ROOT.gPad.SetLogy(1);
         ROOT.gStyle.SetOptStat(1);
-        
+        fileHandle = self.ParentObject.ParentObject.FileHandle
+        ChipNo=self.ParentObject.Attributes['ChipNo']
         # TH1D
-        self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("VcalThresholdMap_C{ChipNo}Distribution;7".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'ThresholdMap')%ChipNo
+        self.ResultData['Plot']['ROOTObject'] =  fileHandle.Get(histname).Clone(self.GetUniqueID())
         
         
         #mG

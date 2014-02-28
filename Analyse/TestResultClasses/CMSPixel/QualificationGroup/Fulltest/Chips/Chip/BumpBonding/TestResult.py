@@ -11,8 +11,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
     def PopulateResultData(self):
         
-
-        
         ROOT.gPad.SetLogy(1);
         isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
         mean = -9999
@@ -21,12 +19,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         nSigma = self.TestResultEnvironmentObject.GradingParameters['BumpBondingProblemsNSigma']
         thr=0
         # TH1D
+        ChipNo=self.ParentObject.Attributes['ChipNo']
         try:
-            self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}Distribution".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+            histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'Analog')%ChipNo
+            self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get(histname).Clone(self.GetUniqueID())
         except:
-            pass
-        if not self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}Distribution".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+            histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'Digital')%ChipNo
+            self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get(histname).Clone(self.GetUniqueID())
         if self.ResultData['Plot']['ROOTObject']:
             self.Canvas.Clear()
             self.ResultData['Plot']['ROOTObject'].SetTitle("");

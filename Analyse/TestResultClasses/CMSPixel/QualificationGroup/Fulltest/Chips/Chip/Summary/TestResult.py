@@ -176,13 +176,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #         if self.isDigitalROC:
         
         TrimBitHistograms = []
+        ChipNo=self.ParentObject.Attributes['ChipNo']
+        fileHandle = self.ParentObject.ParentObject.FileHandle
+        HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         for k in range(5):
-            tmpHistogram = self.ParentObject.ParentObject.FileHandle.Get("CalThresholdMap_C{ChipNo};{pos}".format(ChipNo=self.ParentObject.Attributes['ChipNo'], pos=k+1) ).Clone(self.GetUniqueID())
+            histname = HistoDict.get(self.NameSingle,'TrimBitMap%d'%k)%ChipNo
+            tmpHistogram = fileHandle.Get(histname).Clone(self.GetUniqueID())
             TrimBitHistograms.append(tmpHistogram )
-            
         
         # TH2D
-        VcalThresholdMapHistogram =  self.ParentObject.ParentObject.FileHandle.Get("VcalThresholdMap_C{ChipNo};8".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        
+        histname = HistoDict.get(self.NameSingle,'ThresholdMap')%ChipNo
+        VcalThresholdMapHistogram =  fileHandle.Get(histname).Clone(self.GetUniqueID())
         
         #reset file pointers
         if self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].FileHandle:

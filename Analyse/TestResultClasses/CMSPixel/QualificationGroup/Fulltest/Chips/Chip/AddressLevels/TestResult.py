@@ -16,7 +16,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gPad.SetLogy(1);
         
         # TH1D
-        self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("AddressLevels_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        ChipNo=self.ParentObject.Attributes['ChipNo']
+        histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'AddressLevels')%ChipNo
+        self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get(histname).Clone(self.GetUniqueID())
         
         
         if self.ResultData['Plot']['ROOTObject']:

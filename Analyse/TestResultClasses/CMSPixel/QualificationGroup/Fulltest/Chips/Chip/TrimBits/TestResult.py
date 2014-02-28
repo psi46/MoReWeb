@@ -14,10 +14,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         
         ROOT.gStyle.SetOptStat(0);
-        self.ResultData['Plot']['ROOTObject'] =  ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols., self.nRows, 0., self.nRows., ) # htm
+        self.ResultData['Plot']['ROOTObject'] =  ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows ) # htm
         # TH2D
-        self.ResultData['Plot']['ROOTObject_TrimMap'] =   self.ParentObject.ParentObject.FileHandle.Get("TrimMap_C{ChipNo};8".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
         
+        ChipNo=self.ParentObject.Attributes['ChipNo']
+        histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'TrimBits')%ChipNo
+        self.ResultData['Plot']['ROOTObject_TrimMap'] =  self.ParentObject.ParentObject.FileHandle.Get(histname).Clone(self.GetUniqueID())
         
         if self.ResultData['Plot']['ROOTObject']:
             for i in range(self.nCols): # Columns
@@ -25,7 +27,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['Plot']['ROOTObject'].SetBinContent(i+1, j+1, self.ResultData['Plot']['ROOTObject_TrimMap'].GetBinContent(i+1, j+1))
             
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0., self.nTotalChips.);
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0., self.nTotalChips);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();

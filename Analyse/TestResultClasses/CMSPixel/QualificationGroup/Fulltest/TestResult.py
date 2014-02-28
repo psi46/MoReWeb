@@ -170,7 +170,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ]
             
         
+    def check_Test_Software(self):
+        if os.path.exists(self.RawTestSessionDataPath+'test.cfg'):
+            self.testSoftware = 'pyxar'
+        else:
+            self.testSoftware = 'psi46expert'
+        self.HistoDict  = AbstractClasses.Helper.BetterConfigParser.BetterConfigParser()
+        fileName = 'Configuration/HistoNames/%s.cfg'%self.testSoftware
+#         print fileName, os.path.exists(fileName),os.getcwd()
+        self.HistoDict.read(fileName)
+        
     def OpenFileHandle(self):
+        self.check_Test_Software()
         fileHandlePath = self.RawTestSessionDataPath+'/commander_Fulltest.root'
         self.FileHandle = ROOT.TFile.Open(fileHandlePath)
         if not self.FileHandle:

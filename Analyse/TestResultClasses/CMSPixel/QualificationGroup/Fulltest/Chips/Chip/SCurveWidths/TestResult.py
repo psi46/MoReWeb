@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import ROOT
 import AbstractClasses
 import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
@@ -19,19 +18,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #hw
         self.ResultData['Plot']['ROOTObject'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) # hw
         self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) #Noise in unbonded pixel (not displayed) # hd
-        self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols., self.nRows, 0., self.nRows.) # ht
+        self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # ht
         isDigitalROC = False
-        if self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo'])):
-#            print 'SCurve Analog module'
-            self.ResultData['Plot']['ROOTObject_h2'] = ROOT.TH2D(
-                                                             self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
-                                                             )
-        else:
+        
+        ChipNo=self.ParentObject.Attributes['ChipNo']
+        HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
+        fileHandle = self.ParentObject.ParentObject.FileHandle
+        if HistoDict.has_option(self.NameSingle,'Analog'):
+            histname = HistoDict.get(self.NameSingle,'Analog')%ChipNo
+            if fileHandle.Get(histname):
+#                 print 'SCurve Analog module'
+                self.ResultData['Plot']['ROOTObject_h2'] = ROOT.TH2D( fileHandle.Get(histname) )
+        
+        if not self.ResultData['Plot']['ROOTObject_h2']:
 #            print 'SCurve Digital module'
             isDigitalROC = True
-            self.ResultData['Plot']['ROOTObject_h2'] = ROOT.TH2D(
-                                                             self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
-                                                             )
+            histname = HistoDict.get(self.NameSingle,'Digital')%ChipNo
+            self.ResultData['Plot']['ROOTObject_h2'] = ROOT.TH2D( fileHandle.Get(histname) )
         
         Directory = self.RawTestSessionDataPath
         SCurveFileName = "{Directory}/SCurve_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])

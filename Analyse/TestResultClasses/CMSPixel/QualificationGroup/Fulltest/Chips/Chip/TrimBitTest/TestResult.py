@@ -16,13 +16,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gPad.SetLogy(1);
         
         # TH1D
-        self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("TrimBit14_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        fileHandle = self.ParentObject.ParentObject.FileHandle
+        ChipNo=self.ParentObject.Attributes['ChipNo']
+        HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
+        histname = HistoDict.get(self.NameSingle,'TrimBit0')%ChipNo
+        self.ResultData['Plot']['ROOTObject'] = fileHandle.Get(histname).Clone(self.GetUniqueID())
+        
         # TH1D
-        self.ResultData['Plot']['ROOTObject_TrimBit13'] =  self.ParentObject.ParentObject.FileHandle.Get("TrimBit13_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        histname = HistoDict.get(self.NameSingle,'TrimBit1')%ChipNo
+        self.ResultData['Plot']['ROOTObject_TrimBit13'] = fileHandle.Get(histname).Clone(self.GetUniqueID())
         # TH1D
-        self.ResultData['Plot']['ROOTObject_TrimBit11'] =   self.ParentObject.ParentObject.FileHandle.Get("TrimBit11_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        histname = HistoDict.get(self.NameSingle,'TrimBit2')%ChipNo
+        self.ResultData['Plot']['ROOTObject_TrimBit11'] = fileHandle.Get(histname).Clone(self.GetUniqueID())
         # TH1D
-        self.ResultData['Plot']['ROOTObject_TrimBit7'] =  self.ParentObject.ParentObject.FileHandle.Get("TrimBit7_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+        histname = HistoDict.get(self.NameSingle,'TrimBit3')%ChipNo
+        self.ResultData['Plot']['ROOTObject_TrimBit7'] = fileHandle.Get(histname).Clone(self.GetUniqueID())
         
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");

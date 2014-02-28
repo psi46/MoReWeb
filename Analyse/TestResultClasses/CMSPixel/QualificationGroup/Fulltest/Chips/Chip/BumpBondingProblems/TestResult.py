@@ -1,6 +1,5 @@
 import ROOT
 import AbstractClasses
-import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_BumpBondingProblems_TestResult'
@@ -15,16 +14,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gPad.SetLogy(0);
         isDigitalROC =  self.ParentObject.ParentObject.ParentObject.Attributes['isDigital'] 
         # TH2D
+        ChipNo=self.ParentObject.Attributes['ChipNo']
         try:
-            self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get("vcals_xtalk_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
+            histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'Analog')%ChipNo
+            self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get(histname).Clone(self.GetUniqueID())
         except:
-            pass
-        if not self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ParentObject.FileHandle.Get("BumpBondMap_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) ).Clone(self.GetUniqueID())
-            if not isDigitalROC:
-                print "ERROR Cannot find vcals_xtal_CXXX but is analog Module..."
-        elif isDigitalROC:
-                print "ERROR: FOound vcals_xtal_CXXX but is digital Module..."
+            histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'Digital')%ChipNo
+            self.ResultData['Plot']['ROOTObject'] =   self.ParentObject.ParentObject.FileHandle.Get(histname).Clone(self.GetUniqueID())
+#             if not isDigitalROC:
+#                 print "ERROR Cannot find vcals_xtal_CXXX but is analog Module..."
+#             elif isDigitalROC:
+#                 print "ERROR: FOound vcals_xtal_CXXX but is digital Module..."
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
             if not isDigitalROC:
