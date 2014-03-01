@@ -133,7 +133,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Order':2,
                 }
             })
-            pass
+        else:
+            self.ResultData['SubTestResultDictList'].append(
+                {
+                    'Key':'Dummy0',
+                    'Module':'Dummy',
+                    'DisplayOptions':{
+                        'Order':2,
+                    }
+                },
+            )
         
         if self.Attributes['IncludeIVCurve']:
             self.ResultData['SubTestResultDictList'] += [
