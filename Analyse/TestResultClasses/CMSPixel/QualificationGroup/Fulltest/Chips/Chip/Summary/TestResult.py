@@ -22,35 +22,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
         
 
-    
-    def IsDeadPixel(self, column, row,PixelMapCurrentValue):
-        if PixelMapCurrentValue == 0:
-            self.DeadPixelList.add((self.chipNo,column,row))
-            return True
-        return False
-    
-    def IsNoisyPixel(self,column, row, PixelMapCurrentValue):
-        if PixelMapCurrentValue  > self.TestResultEnvironmentObject.GradingParameters['PixelMapMaxValue']:
-            self.Noisy1PixelList.add((self.chipNo,column,row))
-            return True
-        return False
-    
-    def HasMaskDefect(self,column,row, PixelMapCurrentValue):
-        thr = 0
-        if self.TestResultEnvironmentObject.GradingParameters.has_key('PixelMapMaskDefectUpperThreshold'):
-            thr = self.TestResultEnvironmentObject.GradingParameters['PixelMapMaskDefectUpperThreshold']
-        else:
-            print "self.TestResultEnvironmentObject.GradingParameters['PixelMapMaskDefectUpperThreshold'] doesn't exist..."
-        if PixelMapCurrentValue  <  thr:
-            self.MaskDefectList.add((self.chipNo,column,row)) 
-            return True
-        return False 
-    
-    def IsInefficientPixel(self,column,row,PixelMapCurrentValue):
-        if PixelMapCurrentValue  < self.TestResultEnvironmentObject.GradingParameters['PixelMapMinValue']:
-            self.IneffPixelList.add((self.chipNo,column,row))
-            return True
-        return False
+
     
     def HasBumpBondingProblems(self,column,row,threshold):
         binContent = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
@@ -206,20 +178,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 for i in range(3):
                     self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].FileHandle.readline() #Omit first three lines
         
+        notAlivePixels = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NotAlivePixels']['Value']
         for column in range(self.nCols): #Column
             for row in range(self.nRows): #Row
-                pixelAlive = True
-        
-                PixelMapCurrentValue = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
-                
-                
-                pixelAlive = pixelAlive and not self.IsDeadPixel(column, row,PixelMapCurrentValue)
-                pixelAlive = pixelAlive and not self.IsNoisyPixel(column,row,PixelMapCurrentValue)
-                pixelAlive = pixelAlive and not self.HasMaskDefect(column,row,PixelMapCurrentValue)
-                pixelAlive = pixelAlive and not self.IsInefficientPixel(column,row,PixelMapCurrentValue)
                 # -- Bump bonding
-                
-                if  pixelAlive:
+                if  (self.chipNo,column,row) not in notAlivePixels:
                     self.HasBumpBondingProblems(column,row,BumpBondingProblems_Mean+ BumpBondingProblems_nSigma * BumpBondingProblems_RMS)
                     self.HasDeadTrimBit(column, row, TrimBitHistograms)
                     self.HasAddressDecodingProblem(column,row)
@@ -228,7 +191,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #                     self.HasBadPedestalValue(column,row)
 #                     self.HasBadGainValue(column,row)
 #                     self.HasPar1Problem(column,row)
-                
+        self.DeadPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
+        self.Noisy1PixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value']
+        self.MaskDefectList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['MaskDefects']['Value']
+        self.IneffPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['InefficentPixels']['Value']
         totalList = self.DeadPixelList.union(self.MaskDefectList).union(self.DeadTrimbitsList).union(self.AddressProblemList)
         
         if True or (len(totalList) > 0) :

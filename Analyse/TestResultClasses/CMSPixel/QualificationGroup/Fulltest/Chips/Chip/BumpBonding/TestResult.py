@@ -61,13 +61,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyList'].append('Mean')
         self.ResultData['KeyValueDictPairs']['RMS'] = {'Value':round(rms,2), 'Label':'RMS',}
         self.ResultData['KeyList'].append('RMS')
+        self.ResultData['KeyValueDictPairs']['Threshold'] = {'Value':round(thr,2), 'Label':'Threshold',}
+        self.ResultData['KeyList'].append('Threshold')
         
         if isDigitalROC:
                 self.ResultData['KeyValueDictPairs']['nSigma'] = {'Value':  nSigma, 'Label':'σ'}
-                self.ResultData['KeyValueDictPairs']['Threshold'] = {'Value':  round(thr,2), 'Label':'threshold'}
                 self.ResultData['KeyValueDictPairs']['nBumpBondingProblems'] = {'Value': round(nBumpBondingProblems,0), 'Label':'N BumpProblems'}
                 self.ResultData['KeyList'].append('nSigma')
-                self.ResultData['KeyList'].append('Threshold')
                 self.ResultData['KeyList'].append('nBumpBondingProblems')
                 
         
