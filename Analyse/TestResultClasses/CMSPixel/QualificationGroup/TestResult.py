@@ -54,7 +54,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 TestCenter = self.initParser.get('OperationDetails','TestCenter')
         
         for i in testlist:
-            print i,type(i),i.has_key('InitialAttributes')
+            #print i,type(i),i.has_key('InitialAttributes')
             i['InitialAttributes']['Operator'] = Operator
             i['InitialAttributes']['Hostname'] = Hostname
             i['InitialAttributes']['TestCenter'] = TestCenter
@@ -247,7 +247,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tests,test,index = self.appendFluorescenceTarget(tests,test,index)
         
         targetList = [i['InitialAttributes']['Target'] for i in tests[-1]['InitialAttributes']['SubTestResultDictList'] ]
-        print 'XraySpectrumMethod with Targets %s'%targetList
+        #print 'XraySpectrumMethod with Targets %s'%targetList
         
         return tests,test,index
 
@@ -293,7 +293,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tests[-1]['InitialAttributes']['SubTestResultDictList']=[]
         tests[-1]['InitialAttributes']['SubTestResultDictList'].append({
                'Key': key,
-               'Module':'FluorescenceSpectrum',
+               'Module':'FluorescenceSpectrumModule',
                'InitialAttributes':{
                          'StorageKey':    key,
                         'TestResultSubDirectory': directory,
@@ -311,7 +311,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'TestCenter': 'UNKNOWN',
                 },
                 'DisplayOptions':{
-                        'Order':len(tests[-1]['InitialAttributes']['SubTestResultDictList'])+1        
+                        'Order':len(tests[-1]['InitialAttributes']['SubTestResultDictList']) + 2
                 }
            })
         test = test.next()
