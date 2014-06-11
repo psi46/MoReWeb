@@ -80,15 +80,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':13,
                     }
                 },
-                {'Key':'PHCalibrationGainMap',
+                {'Key':'TrimBitMap',
                     'DisplayOptions':{
                         'Order':14,
+                    }
+                },
+                {'Key':'PHCalibrationGainMap',
+                    'DisplayOptions':{
+                        'Order':15,
                     }
                 }, # depends on PHCalibrationGain 
                 
                 {'Key':'OpParameters',
                     'DisplayOptions':{
-                        'Order':15,
+                        'Order':16,
                     }
                 },
                 #{'Key':'TemperatureCalibration'},
