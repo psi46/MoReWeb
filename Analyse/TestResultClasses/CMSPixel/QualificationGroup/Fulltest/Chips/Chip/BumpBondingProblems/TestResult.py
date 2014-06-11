@@ -27,12 +27,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #                 print "ERROR Cannot find vcals_xtal_CXXX but is analog Module..."
 #             elif isDigitalROC:
 #                 print "ERROR: FOound vcals_xtal_CXXX but is digital Module..."
+
+        threshold = self.CheckBumpBondingProblems()
+
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
             if not self.isDigitalROC:
                 self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(self.TestResultEnvironmentObject.GradingParameters['minThrDiff'], self.TestResultEnvironmentObject.GradingParameters['maxThrDiff']);
             else:
-                self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0,255)
+                #self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0,255)
+                minZ = self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['Plot']['ROOTObject'].FindFirstBinAbove(.9)
+                minZ = self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['Plot']['ROOTObject'].GetXaxis().GetBinLowEdge(minZ)
+                self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(minZ,threshold)
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
@@ -43,7 +49,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw("colz");
             self.ResultData['Plot']['ROOTObject'].SaveAs(self.GetPlotFileName()+'.cpp')
-        self.CheckBumpBondingProblems()
         if self.SavePlotFile:
             self.Canvas.SaveAs(self.GetPlotFileName())      
         self.ResultData['Plot']['Enabled'] = 1
@@ -60,6 +65,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for column in range(self.nCols):
             for row in range(self.nRows):
                 self.HasBumpBondingProblems(column,row,threshold)
+        return threshold
         
     def HasBumpBondingProblems(self,column,row,threshold):
         binContent = self.ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
