@@ -75,7 +75,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     Ymin = 1.2*Value
                 i2 += 1
             
-            Average = Sum / (i2 + 1.)
+            if i2==0: i2=1
+            Average = Sum / (i2)
             
             TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerColor(Parameters['MarkerColor']);
             TestResultObject.ResultData['Plot']['ROOTObject'].SetLineColor(Parameters['LineColor']);
