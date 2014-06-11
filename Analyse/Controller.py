@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+ # -*- coding: utf-8 -*-
 '''
 Program    : MORE-Web 
  Author    : Esteban Marin - estebanmarin@gmx.ch
