@@ -13,6 +13,7 @@ import datetime
 import json
 import traceback
 import warnings
+from sets import Set
 
 class GeneralTestResult:
        
@@ -788,9 +789,23 @@ class GeneralTestResult:
         @final
     '''
     def GenerateDataFileJSON(self):
-        f = open(self.FinalResultsStoragePath+'/KeyValueDictPairs.json', 'w')
-        f.write(json.dumps(self.ResultData['KeyValueDictPairs'], sort_keys=True,indent=4, separators=(',', ': ')))
-        f.close()
+        try:
+            data = self.ResultData['KeyValueDictPairs']
+            for key in data:
+                #{'NotAlivePixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'MaskDefects': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'NoisyPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'DeadPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'InefficentPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}}
+                if data[key].has_key('Value'):
+                    value = data[key]['Value']
+                    if type(value) == Set:
+                        value = list(value)
+                        data[key]['Value']=value
+                pass
+#self.ResultData['KeyValueDictPairs']
+            f = open(self.FinalResultsStoragePath+'/KeyValueDictPairs.json', 'w')
+            f.write(json.dumps(self.ResultData['KeyValueDictPairs'], sort_keys=True,indent=4, separators=(',', ': ')))
+            f.close()
+        except:
+            print 'Cannot create JSON for %s'%self.ResultData['KeyValueDictPairs']
+
     '''
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in ASCII format
         @final
