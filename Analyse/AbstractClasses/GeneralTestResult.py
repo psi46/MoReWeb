@@ -26,6 +26,7 @@ class GeneralTestResult:
         @param InitialModulePath Starting point of modules
     '''
     def __init__(self, TestResultEnvironmentObject, ParentObject = None, InitialModulePath = None, InitialFinalResultsStoragePath = None, InitialAttributes = None, Key = None, DisplayOptions = None):
+        self.verbose = False
         
         # Name of the Test Result, only a-zA-Z0-9_
         self.Name = ''
