@@ -33,8 +33,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tuples = [i.strip().split('\t') for i  in lines]
             times = [int(i[0]) for i in tuples]
             temps = [float(i[1]) for i in tuples]
-            print times
-            print temps
             if len(temps)>0:
                 temp = sum(temps)/len(temps)
                 temp2 = sum([i*i for i in temps])/len(temps)
@@ -48,7 +46,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #             
 #             # get RMS Temp 
             tempError = math.sqrt(temp2-temp*temp)
-            print temp2, temp, tempError
 #             ROOT.TMath.RMS(tuple.GetSelectedRows(),tuple.GetV1())
 #             
             if len(temps)>0:
@@ -198,7 +195,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.analyseTempPrepare()
         self.analyseTempExecute()
         self.analyseTempCleanup()
-        print self.duration, self.tempTest,self.tempError
         
         self.ResultData['KeyValueDictPairs'] = {
             'TemperaturePrepare': {
