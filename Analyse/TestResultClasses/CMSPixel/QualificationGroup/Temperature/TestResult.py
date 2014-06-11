@@ -114,7 +114,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         fileHandlePath = self.RawTestSessionDataPath
         print fileHandlePath
         self.analyseTemp(fileHandlePath+'/temperature.log')
-        raw_input('Press enter')
+        if self.verbose: raw_input('Press enter')
         if self.SavePlotFile:
             self.Canvas.SaveAs(self.GetPlotFileName())      
         self.ResultData['Plot']['Enabled'] = 1
