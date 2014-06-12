@@ -1,13 +1,13 @@
 import AbstractClasses
 import ROOT
 import os
-import AbstractClasses.Helper.BetterConfigParser 
+import AbstractClasses.Helper.BetterConfigParser
 import AbstractClasses.Helper.HtmlParser
 import AbstractClasses.Helper.environment
 #as BetterConfigParser
 import AbstractClasses.Helper.testchain
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
-  
+
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_TestResult'
         self.NameSingle='QualificationGroup'
@@ -35,12 +35,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'ChipNo':0,
                     },
                     'DisplayOptions':{
-                        'Order':1        
+                        'Order':1
                     }
                 },
                                                         ]
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
-   
+
     def appendOperationDetails(self,testlist):
         Operator = 'UNKNOWN'
         Hostname = 'UNKNOWN'
@@ -52,14 +52,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Hostname = self.initParser.get('OperationDetails','Hostname')
             if self.initParser.has_option('OperationDetails','TestCenter'):
                 TestCenter = self.initParser.get('OperationDetails','TestCenter')
-        
+
         for i in testlist:
             #print i,type(i),i.has_key('InitialAttributes')
             i['InitialAttributes']['Operator'] = Operator
             i['InitialAttributes']['Hostname'] = Hostname
             i['InitialAttributes']['TestCenter'] = TestCenter
             print Operator,Hostname,TestCenter
-            
+
     def analyseTestIniFile(self):
         absPath = self.TestResultEnvironmentObject.ModuleDataDirectory+'/configfiles'
         if not os.path.isdir(absPath):
@@ -74,11 +74,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.initParser.read(fileName2)
         else:
             raise Exception("file %s doesn't exist, cannot extract Tests from ini file"%fileName)
-        
+
         return self.extractTests()
-       
-        
-            
+
+
+
     def extractTests(self):
         if self.initParser:
             print 'Extract Tests from config file'
@@ -90,7 +90,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
         else:
             raise Exception('Cannot read from configparser')
-        
+
     def analyseTestList(self,testList):
         tests =[]
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
@@ -117,12 +117,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             else:
                 index += 1
                 test = test.next()
-                
+
 #        print '\n'
 #        for item in tests:
 #            for key in item:
 #                print key,": ",item[key]
-            
+
 #            for key, value in item:
 #                print key, value
 #            print '\n'
@@ -131,9 +131,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #        for item in testList:
 #            item.
 #            pass
-        
+
         return tests
-    
+
     def appendTemperatureGraph(self,tests,test,index):
         tests.append(
                       {
@@ -149,12 +149,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     },
                     'DisplayOptions':{
                         'Order':len(tests)+1,
-                        'Width':5, 
+                        'Width':5,
                     }
                 })
         return tests,test,index
-        
-    
+
+
     def appendTemperatureCycle(self,tests,test,index):
 #         print  '%03d'%index, test.testname, test.environment
          tests.append(
@@ -170,13 +170,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'TestType':'TemperatureCycle',
                     },
                     'DisplayOptions':{
-                        'Order':len(tests)+1        
+                        'Order':len(tests)+1
                     }
                 })
          test = test.next()
          index += 1
          return tests,test,index
-     
+
     def appendFulltest(self,tests,test,index):
 #        print  '%03d'%index, test.testname, test.environment
         environment = test.environment
@@ -185,7 +185,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for item in tests:
             if item['Key'].startswith(key):
                 nKeys +=1
-        key+='_%s'%(nKeys)        
+        key+='_%s'%(nKeys)
         directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
         tests.append( {
             'Key': key,
@@ -201,7 +201,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'TestTemperature':test.environment.temperature,
             },
             'DisplayOptions':{
-                'Order':len(tests)+1        
+                'Order':len(tests)+1
             }
            })
         if test.environment.temperature != 17:
@@ -215,7 +215,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             test = test.next()
             index += 1
         return tests,test,index
-    
+
     def appendXraySpectrum(self,tests,test,index):
         environment = test.environment
         key = 'XraySpectrumMethod'
@@ -223,7 +223,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for item in tests:
             if item['Key'].startswith(key):
                 nKeys +=1
-        key+='_%s'%(nKeys)        
+        key+='_%s'%(nKeys)
         directory =  "."
         tests.append( {
             'Key': key,
@@ -245,10 +245,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
            })
         while test and 'XraySpectrum' in test.testname:
             tests,test,index = self.appendFluorescenceTarget(tests,test,index)
-        
+
         targetList = [i['InitialAttributes']['Target'] for i in tests[-1]['InitialAttributes']['SubTestResultDictList'] ]
         #print 'XraySpectrumMethod with Targets %s'%targetList
-        
+
         return tests,test,index
 
     # Hard coded initial guess for signal position based on element name
@@ -279,7 +279,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for item in tests:
             if item['Key'].startswith(key):
                 nKeys +=1
-        key+='_%s'%(nKeys)        
+        key+='_%s'%(nKeys)
         directory = '%03d' % index + '_%s' % (test.testname)
         if test.environment.temperature >= 0:
             directory += "_p%i" % (test.environment.temperature)
@@ -316,7 +316,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
            })
         test = test.next()
         index +=1
-        return tests,test,index 
+        return tests,test,index
 
     ## Appends a high rate test to the list of tests to be analysed
     ##
@@ -466,10 +466,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
            })
 
     def PopulateResultData(self):
-        
+
         ModuleResultOverviewObject = AbstractClasses.ModuleResultOverview.ModuleResultOverview(self.TestResultEnvironmentObject)
         ModuleResultOverviewObject.FinalResultsStoragePath = self.FinalResultsStoragePath
         self.ResultData['Table'] = ModuleResultOverviewObject.TableData(self.Attributes['ModuleID'],self.Attributes['TestDate'],GlobalOverviewList = False)
-        
+
     def PostWriteToDatabase(self):
         self.PopulateResultData();

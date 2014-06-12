@@ -11,9 +11,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='Temperature'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = 'Temperature'
-        
-    
-    
+
+
+
     def analyseTemp(self,fileName):
         print 'analyse Temp for "%s"'%fileName
         duration = 0
@@ -26,6 +26,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         name = fileName.split('/')[-1].split('.')[0]
         name.strip()
         varlist = 'time:temp'
+        if not self.ResultData['Plot'].has_key('ObjectCanvas'):
+                self.ResultData['Plot']['ObjectCanvas'] = {}
         if Helper.fileExists(fileName):
             file = open(fileName)
             lines = file.readlines()
@@ -43,11 +45,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 tempMax = 0
                 timeMin = 0
                 timeMax = 0
-#             
-#             # get RMS Temp 
+#
+#             # get RMS Temp
             tempError = math.sqrt(temp2-temp*temp)
 #             ROOT.TMath.RMS(tuple.GetSelectedRows(),tuple.GetV1())
-#             
+#
             if len(temps)>0:
 #             # get Min Temp
                 tempMin = min(temps)
@@ -56,10 +58,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 #calculate time difference
                 timeMin = min(times)
                 timeMax = max(times)
-#             
+#
             duration = timeMax - timeMin
             temp_List =   array.array('d',temps)
-            time_List = array.array('d',times)      
+            time_List = array.array('d',times)
             if not self.ResultData['Plot'].has_key('ROOTObjects'):
                 self.ResultData['Plot']['ROOTObjects']={}
             name = '%02d_%s'%(len(self.ResultData['Plot']['ROOTObjects']),name)
@@ -73,16 +75,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             canvas = self.TestResultEnvironmentObject.Canvas
             self.CanvasSize(canvas)
             canvas.cd()
-            
+
             graph.SetTitle('')
             graph.Draw("APL")
             graph.SetLineColor(4)
             graph.SetLineWidth(2)
-            
+
             graph.GetXaxis().SetTitle("Time")
             graph.GetXaxis().SetTimeDisplay(1)
             graph.GetYaxis().SetTitle("Temperature [#circ C]")
-            
+
             graph.GetYaxis().SetDecimals()
             graph.GetYaxis().SetTitleOffset(1.5)
             graph.GetYaxis().CenterTitle()
@@ -118,16 +120,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObjects'][name].GetYaxis().SetDecimals();
                 self.ResultData['Plot']['ROOTObjects'][name].GetYaxis().SetTitleOffset(1.5);
                 self.ResultData['Plot']['ROOTObjects'][name].GetYaxis().CenterTitle();
-                
-            if not self.ResultData['Plot'].has_key('ObjectCanvas'):
-                self.ResultData['Plot']['ObjectCanvas'] = {}
+
+
             self.ResultData['Plot']['ObjectCanvas'][name] = canvas
-            
-            
+
+
 #             tuple.Draw("time:temp","","APL")
-            
-            
-            #get 
+
+
+            #get
         print 'Analysed "%s"'%fileName
         print 'Temp: %2.2f +/- %2.2f °C, Min: %2.2f, Max %2.2f'%(temp,tempError,tempMin,tempMax)
         print 'duration: %s - %s, %s, %s'%(str(datetime.timedelta(seconds=duration)),timeMax-timeMin,timeMax,timeMin)
@@ -147,12 +148,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #         self.ResultData['Plot']['ROOTObject'].Draw("APL");
 #         self.ResultData['Plot']['ROOTObject'].SetLineColor(4);
 #         self.ResultData['Plot']['ROOTObject'].SetLineWidth(2);
-#         
+#
 #         self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Time ")
 #         self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Tempeature [#circ C]")
-        
-        self.ResultData['Plot']['ROOTObject'].Draw("APL");
-        
+        if self.ResultData['Plot']['ROOTObject']:
+            self.ResultData['Plot']['ROOTObject'].Draw("APL")
+
     def analyseTempPrepare(self):
         Directory = self.ParentObject.RawTestSessionDataPath
         Directory.rstrip('/')
@@ -162,7 +163,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.tempPrepare = temp
         self.tempPrepareError = tempError
         pass
-    
+
     def analyseTempExecute(self):
         Directory = self.ParentObject.RawTestSessionDataPath
         Directory.rstrip('/')
@@ -171,7 +172,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.duration = duration
         self.tempTest = temp
         self.tempError = tempError
-        
+
     def analyseTempCleanup(self):
         Directory = self.ParentObject.RawTestSessionDataPath
         Directory.rstrip('/')
@@ -180,7 +181,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.durationCleanup = duration
         self.tempCleanup = temp
         self.tempCleanupError = tempError
-        
+
     def PopulateResultData(self):
 #         self.tempPrepare = 0
 #         self.tempPrepareError = 0
@@ -191,63 +192,63 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #         self.duration = 0
 #         self.durationPrepare = 0
 #         self.durationCleanup = 0
-        
+
         self.analyseTempPrepare()
         self.analyseTempExecute()
         self.analyseTempCleanup()
-        
+
         self.ResultData['KeyValueDictPairs'] = {
             'TemperaturePrepare': {
-                'Value':'%2.2f'%(self.tempPrepare),  
+                'Value':'%2.2f'%(self.tempPrepare),
                 'Unit':'°C',
                 'Label': 'Temp. preparing test',
             },
             'TemperaturePrepareError': {
-                'Value':'%2.2f'%(self.tempPrepareError),  
+                'Value':'%2.2f'%(self.tempPrepareError),
                 'Unit':'°C',
                 'Label': 'Temp. error preparing test',
             },
-                                                
+
             'TemperatureTest': {
-                'Value':'%2.1f'%(self.tempTest),  
+                'Value':'%2.1f'%(self.tempTest),
                 'Unit':'°C',
                 'Label': 'Temp. while test',
             },
             'TemperatureTestError': {
-                'Value':'%2.2f'%(self.tempError),  
+                'Value':'%2.2f'%(self.tempError),
                 'Unit':'°C',
                 'Label': 'Temp. error while test',
             },
-                                                
+
             'TemperatureCleanup': {
-                'Value':'%2.2f'%(self.tempCleanup),  
+                'Value':'%2.2f'%(self.tempCleanup),
                 'Unit':'°C',
                 'Label': 'Temp. cleaning up test',
             },
             'TemperatureCleanupError': {
-                'Value':'%2.2f'%(self.tempCleanupError),  
+                'Value':'%2.2f'%(self.tempCleanupError),
                 'Unit':'°C',
                 'Label': 'Temp. error cleaning up test',
             },
-                                                
+
             'Temperature': {
-                'Value':'%2.2f +/- %2.2f'%(self.tempTest,self.tempError),  
+                'Value':'%2.2f +/- %2.2f'%(self.tempTest,self.tempError),
                 'Unit':'°C',
                 'Label': 'Temp. while test',
             },
-                                                
+
             'Duration': {
                 'Value':'%s'%(str(datetime.timedelta(seconds=self.duration))),
                 'Unit':'',
                 'Label': 'Duration of test',
             },
-                                                
+
             'DurationPrepare': {
                 'Value':'%s'%(str(datetime.timedelta(seconds=self.durationPrepare))),
                 'Unit':'',
                 'Label': 'Duration preparing test',
             },
-                                                
+
             'DurationCleanup': {
                 'Value':'%s'%(str(datetime.timedelta(seconds=self.duration))),
                 'Unit':'',
@@ -257,7 +258,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyList'] = ['Temperature','Duration']
         self.createTemperaturePlot()
         if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())      
+            self.Canvas.SaveAs(self.GetPlotFileName())
         self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['Caption'] = 'Temperature'
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()

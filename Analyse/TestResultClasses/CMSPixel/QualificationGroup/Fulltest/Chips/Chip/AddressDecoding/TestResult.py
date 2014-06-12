@@ -1,6 +1,6 @@
 import ROOT
+import AbstractClasses.Helper.HistoGetter as HistoGetter
 import AbstractClasses
-import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_AddressDecoding_TestResult'
@@ -15,8 +15,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         # TH2D
         ChipNo=self.ParentObject.Attributes['ChipNo']
-        histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'AddressDecoding')%ChipNo
-        self.ResultData['Plot']['ROOTObject'] =  self.ParentObject.ParentObject.FileHandle.Get(histname).Clone(self.GetUniqueID())
+        self.HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict 
+        histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'AddressDecoding')
+        self.ResultData['Plot']['ROOTObject'] =  HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle,histname,rocNo=ChipNo).Clone(self.GetUniqueID())
         
         
         if self.ResultData['Plot']['ROOTObject']:

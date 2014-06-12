@@ -46,7 +46,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             except:
                 halfModule = 0
         return (version,nRocs,halfModule)
-                    
+
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_TestResult'
         self.NameSingle='Fulltest'
@@ -54,7 +54,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Attributes['NumberOfChips'] = self.nTotalChips
-        
+
         if self.Attributes['ModuleVersion'] == 1:
             if self.Attributes['ModuleType'] == 'a':
                 self.Attributes['StartChip'] = 0
@@ -62,7 +62,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.Attributes['StartChip'] = 7
             else:
                 self.Attributes['StartChip'] = 0
-            
+
         elif self.Attributes['ModuleVersion'] == 2:
             self.Attributes['StartChip'] = 0
         elif self.Attributes['ModuleVersion'] == 3:
@@ -77,17 +77,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print 'Analysing Fulltest with the following Attributes:'
             for name,value in self.Attributes.items():
                 print "\t%25s:  %s"%(name,value)
-        
+
         self.ResultData['SubTestResultDictList'] = [
             {
                 'Key':'Fitting',
                 'DisplayOptions':{
                     'GroupWithNext':False,
-                    'Order':100,
+                    'Order':0,
                 },
                 'InitialAttributes':{
                     'ModuleVersion': self.Attributes['ModuleVersion'],
-                    'NumberOfChips': self.Attributes['NumberOfChips'],   
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
                 },
             },
             {
@@ -105,10 +105,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Order':1,
                 },
                 'InitialAttributes':{
-                    'ModuleVersion':self.Attributes['ModuleVersion'],   
+                    'ModuleVersion':self.Attributes['ModuleVersion'],
                 },
             },
-            
+
             {
                 'Key':'BumpBondingMap',
                 'DisplayOptions':{
@@ -116,7 +116,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Order':5,
                 }
             },
-            
+
             {
                 'Key':'VcalThreshold',
                 'DisplayOptions':{
@@ -143,7 +143,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 },
             )
-        
+
         if self.Attributes['IncludeIVCurve']:
             self.ResultData['SubTestResultDictList'] += [
                 {
@@ -165,20 +165,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 },
             ]
-        
+
         self.ResultData['SubTestResultDictList'] += [
             {'Key':'Noise','DisplayOptions':{'Order':9,}},
             {'Key':'VcalThresholdWidth','DisplayOptions':{'Order':10,}},
             {'Key':'RelativeGainWidth','DisplayOptions':{'Order':11,}},
             {'Key':'PedestalSpread','DisplayOptions':{'Order':12,}},
         ]
-        
+
         if self.Attributes['ModuleVersion'] == 1:
             self.ResultData['SubTestResultDictList'] += [
                 {'Key':'Parameter1','DisplayOptions':{'Order':13,}}
             ]
-            
-            
+
+
         self.ResultData['SubTestResultDictList'] += [
             {
                 'Key':'Summary1',
@@ -205,25 +205,29 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             },
         ]
-            
-        
+
+
     def check_Test_Software(self):
 #         print self.RawTestSessionDataPath
         file = self.RawTestSessionDataPath+'/test.cfg'
 #         print file
         if os.path.exists(file):
             self.testSoftware = 'pyxar'
+        elif os.path.exists(self.RawTestSessionDataPath+'/pxar.log'):
+            self.testSoftware = 'pxar'
         else:
             self.testSoftware = 'psi46expert'
         self.HistoDict  = BetterConfigParser()
         fileName = 'Configuration/HistoNames/%s.cfg'%self.testSoftware
         print fileName, os.path.exists(fileName),os.getcwd()
+        print 'test software is %s'%self.testSoftware
         self.HistoDict.read(fileName)
-        
+
     def OpenFileHandle(self):
         self.check_Test_Software()
         fileHandlePath = self.RawTestSessionDataPath+'/commander_Fulltest.root'
         self.FileHandle = ROOT.TFile.Open(fileHandlePath)
+        self.verbose = True
         if not self.FileHandle:
             print 'problem to find %s'%fileHandlePath
             files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.root')]
@@ -234,6 +238,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     print '\t[%3d]\t%s'%(i,f)
                     i += 1
                 i = len(files)
+                if self.HistoDict.has_option('RootFile','filename'):
+                    print 'checking for backup rootfile name'
+                    if self.HistoDict.get('RootFile','filename') in files:
+                        i = files.index(self.HistoDict.get('RootFile','filename'))
+                        print 'rootfile exists: index ',i
                 while i<0 or i>= len(files):
                     try:
                         #TODO: How to continue when it happens in automatic processing...
@@ -241,9 +250,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         if self.verbose:
                             rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]\t'%(len(files)-1))
                             i =  int(rawInput)
+                        elif self.HistoDict.has_option('RootFile','filename'):
+                            if self.HistoDict.get('RootFile','filename') in files:
+                                i = files.index(self.HistoDict.get('RootFile','filename'))
                         else:
                             i = 0
-
 
                     except:
                         print '%s is not an integer, please enter a valid integer'%rawInput
@@ -257,12 +268,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
             else:
                 print 'There exist no ROOT file in "%s"'%self.RawTestSessionDataPath
-            
+
     def PopulateResultData(self):
         self.FileHandle.Close()
-    
-        
-    
+
+
+
     def CustomWriteToDatabase(self, ParentID):
         CurrentAtVoltage150 = 0
         IVSlope = 0
@@ -323,23 +334,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #
 #    added by Felix for the new Overview Table
 #
-# for A/B/C sub gradings 
+# for A/B/C sub gradings
             'PixelDefectsNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeAROCs']['Value'],
             'PixelDefectsNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeBROCs']['Value'],
             'PixelDefectsNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeCROCs']['Value'],
-            
+
             'NoiseNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeAROCs']['Value'],
             'NoiseNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeBROCs']['Value'],
             'NoiseNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeCROCs']['Value'],
-            
+
             'VcalWidthNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeAROCs']['Value'],
             'VcalWidthNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeBROCs']['Value'],
             'VcalWidthNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['VcalThresholdWidthGradeCROCs']['Value'],
-            
+
             'GainNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeAROCs']['Value'],
             'GainNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeBROCs']['Value'],
             'GainNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['RelativeGainWidthGradeCROCs']['Value'],
-            
+
             'PedSpreadNGradeA':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeAROCs']['Value'],
             'PedSpreadNGradeB':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeBROCs']['Value'],
             'PedSpreadNGradeC':self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PedestalSpreadGradeCROCs']['Value'],
@@ -355,7 +366,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             #
             # try and speak directly with PixelDB
             #
-            
+
             pdb = PixelDBInterface(operator="tommaso",center="pisa")
             pdb.connectToDB()
 	    OPERATOR=os.environ['PIXEL_OPERATOR']
@@ -376,7 +387,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             with self.TestResultEnvironmentObject.LocalDBConnection:
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute('DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',Row)
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
-                    '''INSERT INTO ModuleTestResults 
+                    '''INSERT INTO ModuleTestResults
                     (
                         ModuleID,
                         TestDate,
@@ -423,5 +434,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     )
                     ''', Row)
                 return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid
-            
-    
+
+

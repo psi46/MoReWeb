@@ -6,20 +6,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_BumpBondingMap_TestResult'
         self.NameSingle='BumpBondingMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-        
 
-        
+
+
     def PopulateResultData(self):
-        
+
         ROOT.gPad.SetLogy(0);
         ROOT.gStyle.SetOptStat(0);
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(),     "",self.nCols, 0., 8*self.nCols, 2*self.nRows, 0.,2*self.nRows); # mBumps
-        
+
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
             isDigital = ChipTestResultObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs'].has_key('Threshold')
             if isDigital:
                 thr = ChipTestResultObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Threshold']['Value']
+            histo = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject']
+            print histo
+            if not histo:
+                print 'cannot get BumpBondingProblems histo for chip ',ChipTestResultObject.Attributes['ChipNo']
+                continue
             for j in range(self.nCols): # Columns
                 for k in range(self.nRows): # Rows
                     if ChipTestResultObject.Attributes['ChipNo'] < 8:
@@ -32,12 +37,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         #tmpRow += self.nRows
                         pass
                     # Get the data from the chip sub test result bump bonding
-                    result = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject'].GetBinContent(j+1, k+1)
+                    result = histo.GetBinContent(j+1, k+1)
                     if isDigital:
                         result = not (result < thr)
                     self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, result)
-                    
-        
+
+
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
             if isDigital:
@@ -54,21 +59,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("#Delta Threshold [DAC]");
             self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
-        
-        
+
+
         box = ROOT.TBox();
         box.SetFillColor(3);
         box.SetFillStyle(3004);
-        if self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 0: 
+        if self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 0:
             box.SetFillColor(29);
             box.DrawBox( 0, 0,  8*self.nCols,  self.nRows);
         elif self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 8:
             box.SetFillColor(29);
             box.DrawBox( 0, 0,  8*self.nCols,  2*self.nRows);
-        
+
         #self.ResultData['Plot']['Format'] = 'png'
-        
-        
+
+
         if self.SavePlotFile:
             self.Canvas.SaveAs(self.GetPlotFileName())
         #self.Canvas.SaveAs(self.GetPlotFileName()+'.root')

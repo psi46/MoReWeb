@@ -9,10 +9,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='Fitting'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = '_'
-        
-        
-    def PopulateResultData(self):
 
+
+    def PopulateResultData(self):
+        print 'do fitting...'
         nRocs = self.Attributes['NumberOfChips']
         directory = self.RawTestSessionDataPath
         refit = self.TestResultEnvironmentObject.Configuration['Fitting']['refit']
