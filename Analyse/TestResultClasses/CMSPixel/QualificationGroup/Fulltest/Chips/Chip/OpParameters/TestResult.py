@@ -3,6 +3,7 @@ import glob
 import AbstractClasses
 import os
 import re
+from operator import itemgetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
@@ -19,12 +20,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         Directory = self.RawTestSessionDataPath
         vcalTrim = 0
+        # get all dacParameters files
         dacfilename = '{Directory}/dacParameters*_C{ChipNo}.dat'.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         names = glob.glob(dacfilename)
+        # sort by creation date
         names.sort(key=lambda x: os.stat(os.path.join('', x)).st_mtime)
-        name = names[-1]
+        names = [(os.stat(os.path.join('', x)).st_mtime, x) for x in names]
+        names.sort(key = itemgetter(0))
+        # get newest file
+        name = names[-1][1]
         DacParametersFileName = name
         name = name.split('/')[-1]
+
         vcalTrim = map(int, re.findall(r'\d+', name))
         if len(vcalTrim )==2:
             vcalTrim=vcalTrim[0]
@@ -32,7 +39,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             vcalTrim =-1
             i = ''
-
+        print 'newest file: ', name, 'Vcal: ', i
 
         if os.path.exists(DacParametersFileName):
 #            if not vcalTrim:
@@ -46,10 +53,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             if DacParametersFile :
                 for line in DacParametersFile:
-                    if self.ParentObject.ParentObject.ParentObject.testSoftware == 'pxar':
-                         Key, ParameterValue = line.strip().split()
+                    results  = line.strip().split()
+                    if len(results) == 2:
+                        Key, ParameterValue = results
                     else:
-                        a, Key, ParameterValue = line.strip().split()
+                        a, Key, ParameterValue = results
+
                     if Key.lower() in ['viref_adc','ibias_dac']:
                         Key = 'PHScale'
                     if Key.lower() in ['voffsetro','voffsetr0']:

@@ -22,7 +22,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         fileHandle=self.ParentObject.ParentObject.FileHandle
         histname = HistoDict.get(self.NameSingle,'ThresholdMap')
         object =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
-        self.ResultData['Plot']['ROOTObject'] =object.Clone(self.GetUniqueID())
+        self.ResultData['Plot']['ROOTObject'] = object.Clone(self.GetUniqueID())
         #mG
         MeanVcalThr = self.ResultData['Plot']['ROOTObject'].GetMean()
         #sG

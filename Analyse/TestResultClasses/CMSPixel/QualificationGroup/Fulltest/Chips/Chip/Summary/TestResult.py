@@ -17,7 +17,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.MaskDefectList = set()
         self.IneffPixelList = set()
         self.DeadBumpList = set()
-        self.DeadTrimbitsList = set()
+
         self.AddressProblemList = set()
         self.ThrDefectList = set()
         self.NoisyPixelSCurveList = set()
@@ -40,17 +40,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return False
 
     # todo: think about counting of dead trim bits
-    def HasDeadTrimBit(self,column,row,TrimBitHistograms):
-        gradingCriteria = self.TestResultEnvironmentObject.GradingParameters['TrimBitDifference']
-        for k in range(1,5):
-            trimBit0 = TrimBitHistograms[0].GetBinContent(column+1, row+1)
-            trimBitK = TrimBitHistograms[k].GetBinContent(column+1, row+1)
-            TrimBitDifference = abs( trimBitK- trimBit0)
-            if TrimBitDifference  <= gradingCriteria :
-#                 print 'added', column,row,trimBitK,trimBit0,TrimBitDifference,gradingCriteria,(gradingCriteria  <=  gradingCriteria)
-                self.DeadTrimbitsList.add((self.chipNo,column,row))
-                return True
-        return False
+#     def HasDeadTrimBit(self,column,row,TrimBitHistograms):
+#         gradingCriteria = self.TestResultEnvironmentObject.GradingParameters['TrimBitDifference']
+#         for k in range(1,5):
+#             trimBit0 = TrimBitHistograms[0].GetBinContent(column+1, row+1)
+#             trimBitK = TrimBitHistograms[k].GetBinContent(column+1, row+1)
+#             TrimBitDifference = abs( trimBitK- trimBit0)
+#             if TrimBitDifference  <= gradingCriteria :
+# #                 print 'added', column,row,trimBitK,trimBit0,TrimBitDifference,gradingCriteria,(gradingCriteria  <=  gradingCriteria)
+#                 self.DeadTrimbitsList.add((self.chipNo,column,row))
+#                 return True
+#         return False
 
     def HasAddressDecodingProblem(self,column,row):
         if self.ParentObject.ResultData['SubTestResults']['AddressDecoding'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1) < 1:
@@ -189,13 +189,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 # -- Bump bonding
                 if  (self.chipNo,column,row) not in notAlivePixels:
                     self.HasBumpBondingProblems(column,row,BumpBondingProblems_Mean+ BumpBondingProblems_nSigma * BumpBondingProblems_RMS)
-                    self.HasDeadTrimBit(column, row, TrimBitHistograms)
+#                     self.HasDeadTrimBit(column, row, TrimBitHistograms)
                     self.HasAddressDecodingProblem(column,row)
                     self.HasThresholdDefect(column,row,VcalThresholdMapHistogram)
                     #self.IsNoisyPixelSCurve(column,row)
 #                     self.HasBadPedestalValue(column,row)
 #                     self.HasBadGainValue(column,row)
 #                     self.HasPar1Problem(column,row)
+        self.DeadTrimbitsList = self.ParentObject.ResultData['SubTestResults']['TrimBitProblems'].ResultData['KeyValueDictPairs']['deadTrimbits']['Value']
         self.DeadPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
         self.Noisy1PixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value']
         self.MaskDefectList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['MaskDefects']['Value']

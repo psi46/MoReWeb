@@ -58,7 +58,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Threshold = float(LineArray[0])
                         Width = float(LineArray[1])
 #                         if self.verbose:
-                        print column,row,Threshold,Width
+                        if self.verbose:  print column, row, Threshold, Width
                         #Threshold, Sign, SomeString, a, b = Line.strip().split()
 
                         self.ResultData['Plot']['ROOTObject'].Fill(Width)
@@ -69,9 +69,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         elif isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) <= self.TestResultEnvironmentObject.GradingParameters['BumpBondThr']:
                             self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
                     else:
-                        print column,row,'NAN'
-            print 'Entries: ',self.ResultData['Plot']['ROOTObject'].GetEntries(),self.ResultData['Plot']['ROOTObject'].GetMean(),self.ResultData['Plot']['ROOTObject'].GetRMS()
-            raw_input()
+                        if self.verbose: print column, row, 'NAN'
+            if self.verbose:
+                print 'Entries: ', self.ResultData['Plot']['ROOTObject'].GetEntries(), self.ResultData['Plot']['ROOTObject'].GetMean(), self.ResultData['Plot']['ROOTObject'].GetRMS()
+                raw_input()
 
         self.ResultData['HiddenData']['htmax'] = 255.;
         self.ResultData['HiddenData']['htmin'] = 0.
@@ -136,4 +137,3 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['Caption'] = 'S-Curve widths: Noise (e^{-})'
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-        raw_input('end scurvewidth')

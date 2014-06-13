@@ -1,17 +1,17 @@
 import AbstractClasses
 import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
-    
-        
+
+
     def CustomInit(self):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
-        
+
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_TestResult'
         self.NameSingle = 'Chip'
         self.Title = 'Chip '+str(self.Attributes['ChipNo'])
         # order!
         self.ResultData['SubTestResultDictList'] = []
-        
+
         if self.Attributes['ModuleVersion'] == 1:
             self.ResultData['SubTestResultDictList'] += [
                 {
@@ -21,7 +21,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 }
             ]
-        
+
         self.ResultData['SubTestResultDictList'] += [
                 {
                     'Key':'PixelMap',
@@ -69,7 +69,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':11,
                     }
                 },
-                
+
                 {'Key':'PHCalibrationPedestal',
                     'DisplayOptions':{
                         'Order':12,
@@ -89,11 +89,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                         'Order':15,
                     }
-                }, # depends on PHCalibrationGain 
-                
+                },  # depends on PHCalibrationGain
+
                 {'Key':'OpParameters',
                     'DisplayOptions':{
                         'Order':16,
+                    }
+                },
+
+                {'Key':'TrimBitProblems',
+                    'DisplayOptions':{
+                        'Order':17,
                     }
                 },
                 #{'Key':'TemperatureCalibration'},
@@ -102,10 +108,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':8,
                     }
                 },
-                 
-                
+
+
             ]
-        
+
         if not self.ParentObject.ParentObject.Attributes['isDigital']:
                 self.ResultData['SubTestResultDictList'].append(
                                                             {'Key':'AddressLevels',
@@ -114,7 +120,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                                 }
                                                             }
                                                             )
-            
-                
+
+
     def PopulateResultData(self):
         self.CloseSubTestResultFileHandles()
