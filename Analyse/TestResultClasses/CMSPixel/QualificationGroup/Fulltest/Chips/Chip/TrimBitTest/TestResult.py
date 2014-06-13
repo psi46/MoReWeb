@@ -7,11 +7,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='TrimBitTest'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
-
-
     def PopulateResultData(self):
-
-
+        ROOT.gStyle.SetOptStat(0);
 
         ROOT.gPad.SetLogy(1);
 
@@ -57,7 +54,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject_TrimBit7'].SetLineColor(ROOT.kGreen);
             self.ResultData['Plot']['ROOTObject_TrimBit7'].Draw('same');
 
-            Legend = ROOT.TLegend()
+            Legend = ROOT.TLegend(0.5, 0.67, 0.84, 0.89, '', 'brNDC')
             Legend.AddEntry(self.ResultData['Plot']['ROOTObject'], 'Trim Value 14', 'l')
             Legend.AddEntry(self.ResultData['Plot']['ROOTObject_TrimBit13'], 'Trim Value 13', 'l')
             Legend.AddEntry(self.ResultData['Plot']['ROOTObject_TrimBit11'], 'Trim Value 11', 'l')

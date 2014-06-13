@@ -54,7 +54,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = 'Trim Bit Problems'
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
         self.ResultData['KeyValueDictPairs'] = {
-            'deadTrimbits': {
+            'DeadTrimbits': {
                 'Value':self.DeadTrimbitsList,
                 'Label':'Dead Trimbits'
             },

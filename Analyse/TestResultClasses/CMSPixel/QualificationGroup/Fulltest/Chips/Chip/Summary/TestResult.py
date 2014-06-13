@@ -16,7 +16,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Noisy1PixelList = set()
         self.MaskDefectList = set()
         self.IneffPixelList = set()
-        self.DeadBumpList = set()
 
         self.AddressProblemList = set()
         self.ThrDefectList = set()
@@ -27,17 +26,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
 
 
-    def HasBumpBondingProblems(self,column,row,threshold):
-        binContent = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
-        if self.isDigitalROC:
-            if binContent >= threshold:
-                self.DeadBumpList.add((self.chipNo,column,row))
-                return True
-        else:# is analog ROC
-            if binContent >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:#analog Roc
-                self.DeadBumpList.add((self.chipNo,column,row))
-                return True
-        return False
+#     def HasBumpBondingProblems(self,column,row,threshold):
+#         binContent = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
+#         if self.isDigitalROC:
+#             if binContent >= threshold:
+#                 self.DeadBumpList.add((self.chipNo,column,row))
+#                 return True
+#         else:# is analog ROC
+#             if binContent >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:#analog Roc
+#                 self.DeadBumpList.add((self.chipNo,column,row))
+#                 return True
+#         return False
 
     # todo: think about counting of dead trim bits
 #     def HasDeadTrimBit(self,column,row,TrimBitHistograms):
@@ -52,20 +51,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #                 return True
 #         return False
 
-    def HasAddressDecodingProblem(self,column,row):
-        if self.ParentObject.ResultData['SubTestResults']['AddressDecoding'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1) < 1:
-            self.AddressProblemList.add((self.chipNo,column,row))
-            return True
-        return False
+#     def HasAddressDecodingProblem(self,column,row):
+#         if self.ParentObject.ResultData['SubTestResults']['AddressDecoding'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1) < 1:
+#             self.AddressProblemList.add((self.chipNo,column,row))
+#             return True
+#         return False
 
-    def HasThresholdDefect(self,column,row,VcalThresholdMapHistogram):
-        if self.ParentObject.ResultData['SubTestResults']['OpParameters'].ResultData['HiddenData'].has_key('vcalTrim'):
-            binContent = VcalThresholdMapHistogram.GetBinContent(column+1,row+1)
-            vcalTrim = self.ParentObject.ResultData['SubTestResults']['OpParameters'].ResultData['HiddenData']['vcalTrim']
-            if abs(binContent - vcalTrim) > self.TestResultEnvironmentObject.GradingParameters['tthrTol']:
-                self.ThrDefectList.add((self.chipNo,column,row))
-                return True
-        return False
+#     def HasThresholdDefect(self,column,row,VcalThresholdMapHistogram):
+#         if self.ParentObject.ResultData['SubTestResults']['OpParameters'].ResultData['HiddenData'].has_key('vcalTrim'):
+#             binContent = VcalThresholdMapHistogram.GetBinContent(column+1,row+1)
+#             vcalTrim = self.ParentObject.ResultData['SubTestResults']['OpParameters'].ResultData['HiddenData']['vcalTrim']
+#             if abs(binContent - vcalTrim) > self.TestResultEnvironmentObject.GradingParameters['tthrTol']:
+#                 self.ThrDefectList.add((self.chipNo,column,row))
+#                 return True
+#         return False
 
     def IsNoisyPixelSCurve(self,column,row):
         LineArray = self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].FileHandle.readline().strip().split()
@@ -188,20 +187,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             for row in range(self.nRows): #Row
                 # -- Bump bonding
                 if  (self.chipNo,column,row) not in notAlivePixels:
-                    self.HasBumpBondingProblems(column,row,BumpBondingProblems_Mean+ BumpBondingProblems_nSigma * BumpBondingProblems_RMS)
+                    pass
+#                     self.HasBumpBondingProblems(column,row,BumpBondingProblems_Mean+ BumpBondingProblems_nSigma * BumpBondingProblems_RMS)
 #                     self.HasDeadTrimBit(column, row, TrimBitHistograms)
-                    self.HasAddressDecodingProblem(column,row)
-                    self.HasThresholdDefect(column,row,VcalThresholdMapHistogram)
+#                     self.HasAddressDecodingProblem(column,row)
+#                     self.HasThresholdDefect(column,row,VcalThresholdMapHistogram)
                     #self.IsNoisyPixelSCurve(column,row)
 #                     self.HasBadPedestalValue(column,row)
 #                     self.HasBadGainValue(column,row)
 #                     self.HasPar1Problem(column,row)
-        self.DeadTrimbitsList = self.ParentObject.ResultData['SubTestResults']['TrimBitProblems'].ResultData['KeyValueDictPairs']['deadTrimbits']['Value']
+        self.ThrDefectList = self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['TrimProblems']['Value']
+        self.AddressProblemList = self.ParentObject.ResultData['SubTestResults']['AddressDecoding'].ResultData['KeyValueDictPairs']['AddressDecodingProblems']['Value']
+        self.DeadBumpList = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['DeadBumps']['Value']
+        self.DeadTrimbitsList = self.ParentObject.ResultData['SubTestResults']['TrimBitProblems'].ResultData['KeyValueDictPairs']['DeadTrimbits']['Value']
         self.DeadPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
         self.Noisy1PixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value']
         self.MaskDefectList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['MaskDefects']['Value']
         self.IneffPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['InefficentPixels']['Value']
-        totalList = self.DeadPixelList.union(self.MaskDefectList).union(self.DeadTrimbitsList).union(self.AddressProblemList)
+        self.DeadTrimbitsList = self.DeadTrimbitsList - self.DeadPixelList
+        self.MaskDefectList = self.MaskDefectList - self.DeadPixelList
+        self.AddressProblemList = self.AddressProblemList - self.DeadPixelList
+        self.DeadBumpList = self.DeadBumpList - self.DeadPixelList
+        totalList = self.DeadPixelList.union(self.MaskDefectList).union(self.DeadTrimbitsList).union(self.AddressProblemList).union(self.DeadBumpList)
 
         if True or (len(totalList) > 0) :
             print '\nChip %d'%self.chipNo
@@ -212,6 +219,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print '\tmask:  %4d'%len(self.MaskDefectList)
             print '\ttrim:  %4d'%len(self.DeadTrimbitsList)
             print '\taddr:  %4d'%len(self.AddressProblemList)
+            print '\tbump:  %4d' % len(self.DeadBumpList)
+
 #                 = %d + %d + %d + %d'%(len(totalList),len(self.DeadPixelList) , len(self.MaskDefectList) , len(self.DeadTrimbitsList) , len(self.AddressProblemList))
         # -- Compute the final verdict on this chip  //?? FIXME (below is pure randomness)
         finalVerdict = 0
@@ -254,7 +263,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'nDeadPixel': {
                 'Value':'{0:1.0f}'.format(len(self.DeadPixelList)),
-                'Label':'Dead Pixels'
+                'Label':' - Dead Pixels'
             },
             'nNoisy1Pixel': {
                 'Value':'{0:1.0f}'.format(len(self.Noisy1PixelList)),
@@ -262,26 +271,26 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'nMaskDefect': {
                 'Value':'{0:1.0f}'.format(len(self.MaskDefectList)),
-                'Label':'Mask Defects'
+                'Label':' - Mask Defects'
             },
             'nDeadBumps': {
                 'Value':'{0:1.0f}'.format(len(self.DeadBumpList)),
-                'Label':'Dead Bumps'
+                'Label':' - Dead Bumps'
             },
             'nDeadTrimbits': {
                 'Value':'{0:1.0f}'.format(len(self.DeadTrimbitsList)),
-                'Label':'Dead Trimbits'
+                'Label':' - Dead Trimbits'
             },
             'nAddressProblems': {
                 'Value':'{0:1.0f}'.format(len(self.AddressProblemList)),
-                'Label':'Address Problems'
+                'Label':' - Address Problems'
             },
             'nNoisy2Pixel': {
                 'Value':'{0:1.0f}'.format(len(self.NoisyPixelSCurveList)),
                 'Label':'Noisy Pixels 2'
             },
             'nThrDefect': {
-                'Value':'{0:1.0f}'.format(len(self.NoisyPixelSCurveList)),
+                'Value':'{0:1.0f}'.format(len(self.ThrDefectList)),
                 'Label':'Trim Problems'
             },
             'nGainDefect': {
@@ -299,8 +308,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'PixelDefectsGrade':{
                 'Value': '%d'%pixelDefectsGrade,
                 'Label': 'Pixel Defects Grade ROC'
+            },
+            'empty':{
+                'Value': '',
+                'Label': ''
             }
         }
-        self.ResultData['KeyList'] = ['Total','nDeadPixel','nNoisy1Pixel','nMaskDefect','nDeadBumps','nDeadTrimbits'
-                                      ,'nAddressProblems','nNoisy2Pixel','nThrDefect','nGainDefect','nPedDefect','nPar1Defect','PixelDefectsGrade']
+        self.ResultData['KeyList'] = ['Total', 'nDeadPixel', 'nMaskDefect', 'nDeadBumps', 'nDeadTrimbits', 'nAddressProblems', 'empty',
+                                      'nNoisy1Pixel', 'nNoisy2Pixel', 'nThrDefect', 'nGainDefect', 'nPedDefect', 'nPar1Defect', 'PixelDefectsGrade']
 

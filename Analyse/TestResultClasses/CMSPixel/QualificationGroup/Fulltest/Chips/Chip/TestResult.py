@@ -4,6 +4,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def CustomInit(self):
+        ROOT.gStyle.SetOptStat(0)
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_TestResult'
@@ -23,6 +24,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ]
 
         self.ResultData['SubTestResultDictList'] += [
+
+                {'Key':'OpParameters',
+                    'DisplayOptions':{
+                        'Order':16,
+                    }
+                },
                 {
                     'Key':'PixelMap',
                     'DisplayOptions':{
@@ -91,11 +98,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 },  # depends on PHCalibrationGain
 
-                {'Key':'OpParameters',
-                    'DisplayOptions':{
-                        'Order':16,
-                    }
-                },
 
                 {'Key':'TrimBitProblems',
                     'DisplayOptions':{

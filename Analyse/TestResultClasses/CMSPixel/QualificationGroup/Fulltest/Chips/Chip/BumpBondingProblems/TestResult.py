@@ -17,9 +17,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def PopulateResultData(self):
-
-        ROOT.gStyle.SetOptStat(0);
-        ROOT.gPad.SetLogy(0);
+        ROOT.gStyle.SetOptStat(0)
+        ROOT.gPad.SetLogy(0)
         # TH2D
         ChipNo=self.ParentObject.Attributes['ChipNo']
         self.HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
@@ -62,6 +61,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['Enabled'] = 1
         self.Title = 'Bump Bonding Problems: C{ChipNo}'.format(ChipNo=self.chipNo)
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        self.ResultData['KeyValueDictPairs']['DeadBumps'] = { 'Value':self.DeadBumpList, 'Label':'Dead Bumps'}
+        self.ResultData['KeyValueDictPairs']['NDeadBumps'] = { 'Value':len(self.DeadBumpList), 'Label':'N Dead Bumps'}
+        self.ResultData['KeyList'].append('NDeadBumps')
+
+
 
     def CheckBumpBondingProblems(self):
         BumpBondingProblems_Mean = self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Mean']['Value']
@@ -87,3 +91,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 return True
         return False
 
+'''
+    def HasBumpBondingProblems(self,column,row,threshold):
+        binContent = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
+        if self.isDigitalROC:
+            if binContent >= threshold:
+                self.DeadBumpList.add((self.chipNo,column,row))
+                return True
+        else:# is analog ROC
+            if binContent >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:#analog Roc
+                self.DeadBumpList.add((self.chipNo,column,row))
+                return True
+        return False
+'''

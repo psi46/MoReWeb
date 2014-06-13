@@ -1,5 +1,5 @@
 import ROOT
-import sys,os 
+import sys, os
 import math
 import time
 import functools
@@ -13,7 +13,7 @@ class PH_Fitting():
     nRows = 80
     vcalSteps = 5
     rangeConversion = 7
-    
+
     def __init__(self,fitMode,refit=True,HistoDict = None):
         ROOT.gStyle
         self.verbose = False
@@ -31,11 +31,11 @@ class PH_Fitting():
         self.InitResultHistos()
 
     def convertStringToPH(self,i):
-        try: 
+        try:
             retVal = int(i)
         except ValueError:
             retVal = -99999
-        return retVal 
+        return retVal
 
     def InitResultHistos(self):
         self.histoFits = [None]*6
@@ -47,38 +47,38 @@ class PH_Fitting():
         self.histoFits[5] = ROOT.TH1D("histoFit6", "histoFit6", 400, -4.e-4, 0.)
         self.histoChi = ROOT.TH1D("histoChi", "histoChi", 1000, 0., 10.)
         pass
-    
+
     def ClearResultHistos(self):
         for histo in self.histoFits:
             histo.Reset()
         self.histoChi.Reset()
-    
+
     def SaveResultHistos(self):
         if not self.DrawHistos:
             return
         self.c1 = ROOT.TCanvas();
         self.c1.Divide(3, 2);
-        
+
         self.c1.cd(1);
         self.histoFits[0].Draw();
-        
+
         self.c1.cd(2);
         self.histoFits[1].Draw();
-        
+
         self.c1.cd(3);
         self.histoFits[2].Draw();
-        
+
         self.c1.cd(4);
         self.histoFits[3].Draw();
-        
+
         self.c1.cd(5);
         self.histoFits[4].Draw();
-        
+
         self.c1.cd(6);
         self.histoChi.Draw();
-    
+
     def FillResultHistos(self,results):
-        
+
         self.histoChi.Fill(results[-1])
         i = 0
         for value in results[:-1]:
@@ -92,7 +92,7 @@ class PH_Fitting():
         self.histoChi.Add(histos[0])
         for i in range(len(histos[1])):
             self.histoFits[i].Add(histos[1][i])
-            
+
     def FitAllPHCurves(self, dir, nRocs):
 #         FILE * inputFile, *outputFile;
 #     char fname[1000], string[500];
@@ -102,14 +102,14 @@ class PH_Fitting():
         print "Fitting PH Curves %s"%dir
         maxChi2 = [-1]*4
 #         self.ClearResultHistos()
-#         
-#         
+#
+#
 #         print 'using pool '
-#         pool = Pool(processes=1)  
-#         
+#         pool = Pool(processes=1)
+#
 #         res = pool.map(functools.partial(self.FitPHCurve,dirName=dir), range(nRocs))
 #         print res
-#         
+#
         threads = []
         #result = Queue()
         result = Queue()
@@ -118,7 +118,7 @@ class PH_Fitting():
             self.FitPHCurve(dir, chip, result)
             p = chip
             threads.append(p)
-            
+
 #         #loop as long as not all finished
 #         nProcesses = 3
 #         i = 0
@@ -140,7 +140,7 @@ class PH_Fitting():
 # #                 print 0
 # #             else:
 # #                 print result.qsize()
-# #             
+# #
 #         for p in threads:
 #             p.join()
 
@@ -155,14 +155,14 @@ class PH_Fitting():
                 if chi2[0] > maxChi2[0]:
                     maxChi2 = chi2
                 self.AddToHistos(histos)
-            
+
         print "Total Max Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
         self.SaveResultHistos()
-      
+
 
     def FitPHCurve(self,dirName,chip,result):
         print "Fitting pulse height curves for chip %i"%chip
-        
+
         inputFileName = '%s/'%dirName
         if self.HistoDict:
             dir = self.HistoDict.get('PHCalibrationFitting','dir')
@@ -173,7 +173,7 @@ class PH_Fitting():
             inputFileName += 'phCalibration_C%i.dat'%(chip)
         inputFileName = os.path.abspath(inputFileName)
         print inputFileName
-            
+
         try:
             inputFile = open(inputFileName,'r')
         except IOError as e:
@@ -185,7 +185,7 @@ class PH_Fitting():
 #             if result:
             result.put(retVal)
             return
-        
+
         if self.fitMode ==3:
             outputFileName = '%s//phCalibrationFitTan_C%i.dat'%(dirName, chip)
         else:
@@ -198,17 +198,17 @@ class PH_Fitting():
 #             if result:
             result.put(retVal)
             return
-        
+
         dataSet = inputFile.readlines()
         if self.verbose:
             print '\tLength of Dataset: %s'%len(dataSet)
         # remove header
         dataSet = dataSet[4:]
-        
+
         outputFile = open(outputFileName, "w")
-        
+
         outputFile.write("Parameters of the vcal vs. pulse height fits\n")
-        if 3 == self.fitMode: 
+        if 3 == self.fitMode:
             outputFile.write("%s\n"%self.FitfcnTanName)
         else:
             outputFile.write("%s\n"%self.FitfcnName)
@@ -216,9 +216,11 @@ class PH_Fitting():
 
         maxChi2 = [-1]*4
         for data in dataSet:
+            #   2  12  19  29  38  30  62  94 127 232    Pix  0  0
                 calibration = data.split() #dataSet[iCol*self.nRows+iRow].split()
+            #   [2,12,19,29,38,30,62,94,127,232,Pix,0,0]
                 if len(calibration) != 2*self.vcalSteps +3:
-                    raise Exception
+                    raise Exception ('Length of PHCalibration file does not fit! %s' % calibration)
                 row = int(calibration[-1])
                 column = int(calibration[-2])
                 calibration = calibration [:-3]
@@ -230,7 +232,7 @@ class PH_Fitting():
                 chi2 = fitResult[-1]
                 if not isDead:
                     if chi2 > maxChi2[0]:
-                        maxChi2 = [chi2,chip,column,row] 
+                        maxChi2 = [chi2, chip, column, row]
                 self.FillOutputFile(outputFile,fitResult,column,row)
                 self.FillResultHistos(fitResult)
         inputFile.close()
@@ -241,28 +243,28 @@ class PH_Fitting():
 #         sys.exit()
         return
 #         return retVal
-                
-                
+
+
     def FillOutputFile(self,outputFile,fitResult,column,row):
-        for i in fitResult[:-1]: 
+        for i in fitResult[:-1]:
             outputFile.write('%s\t'%i)
         outputFile.write('Pix %2d %2d\n'%(column,row))
-        pass  
-                  
+        pass
+
     def Fit(self,calibration):
-        if 0 == self.fitMode: 
+        if 0 == self.fitMode:
             return self.FitLin(calibration)
         elif 1 == self.fitMode:
             return self.FitTanPol(calibration)
-        elif 3 == self.fitMode: 
+        elif 3 == self.fitMode:
             return self.FitTanh(calibration)
 
     def InitFit(self):
         if 3 == self.fitMode:
             self.nFitParams = 4
-        else: 
+        else:
             self.nFitParams = 6
-        if 3 == self.fitMode: 
+        if 3 == self.fitMode:
             self.phFit = ROOT.TF1("phFit", "[3] + [2] * TMath::TanH([0]*x - [1])", 50., 1500.)
         else:
             self.phFit = ROOT.TF1("phFit", "TMath::Tan([0]*x - [4]) + [1]*x**3+ [5]*x[0]**2 + [2]*x[0] + [3]", -400., 1000.)
@@ -285,9 +287,9 @@ class PH_Fitting():
                 ex.append(xErr[i])
             i += 1
         return  [n, x, y, ex, ey]
-    
+
     def GetGraph(self,calibrationPoints):
-        if self.verbose: 
+        if self.verbose:
             print 'create graph with %s points '%calibrationPoints[0]
         graph = ROOT.TGraphErrors(calibrationPoints[0])
         for i in range(0,calibrationPoints[0]):
@@ -295,9 +297,9 @@ class PH_Fitting():
             graph.SetPoint(i,calibrationPoints[2][i],calibrationPoints[1][i])
             graph.SetPointError(i,calibrationPoints[4][i],calibrationPoints[3][i])
         return graph
-    
+
     def FitTanh(self,calibration):
-            
+
         calibrationPoints = self.getArrayOfCalibrationPoints(calibration)
         graph = self.GetGraph(calibrationPoints)
         phFitClone = self.phFit
@@ -306,12 +308,12 @@ class PH_Fitting():
         phFitClone.SetParameter(2, 1000)
         phFitClone.SetParameter(3, 0)
         phFitClone.SetRange(50, 1500)
-    
+
         if self.verbose:
             graph.Fit(phFitClone, "R", "")
         else:
             graph.Fit(phFitClone, "RQ")
-            
+
 #         for (int i = 0; i < nFitParams; i++) {histoFit[i]->Fill(phFitClone.GetParameter(i))}
 
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
@@ -323,9 +325,9 @@ class PH_Fitting():
             print retVal
         return retVal
         pass
-    
+
     def FitTanPol(self,calibration):
-            
+
         n,x,y,ex,ey = self.getArrayOfCalibrationPoints(calibration)
         graph = self.GetGraph([n,x,y,ex,ey])
         phFitClone = self.phFit
@@ -333,79 +335,79 @@ class PH_Fitting():
         #What is the reason?
         upperPoint = self.vcalSteps + 2 - 1;
         lowerPoint = self.vcalSteps / 3 - 1;
-    
+
         if (upperPoint in range (0,n) ) and (lowerPoint in range(0,n) ) and ((x[upperPoint] - x[lowerPoint]) != 0):
             slope = (y[upperPoint] - y[lowerPoint]) / (x[upperPoint] - x[lowerPoint])
         else:
             slope = 0.5;
-    
+
         phFitClone.SetParameter(2, slope)
         phFitClone.SetParameter(3, y[upperPoint] - slope * x[upperPoint])
         par0 = (math.pi / 2. - 1.4) / x[-1];
         phFitClone.SetParameter(0, par0)
         phFitClone.SetParameter(1, 5.e-7)
         phFitClone.SetParameter(4, -1.4)
-        if x[upperPoint] != 0.: 
+        if x[upperPoint] != 0.:
             #woher?
-            par5 = ( y[upperPoint] 
-                     - math.tan(phFitClone.GetParameter(0)*x[upperPoint] - phFitClone.GetParameter(4) ) 
-                     - phFitClone.GetParameter(1)*x[upperPoint]*x[upperPoint]*x[upperPoint] 
-                     - slope * x[upperPoint] 
+            par5 = (y[upperPoint]
+                     - math.tan(phFitClone.GetParameter(0) * x[upperPoint] - phFitClone.GetParameter(4))
+                     - phFitClone.GetParameter(1) * x[upperPoint] * x[upperPoint] * x[upperPoint]
+                     - slope * x[upperPoint]
                      - phFitClone.GetParameter(3))
             par5 /=   (x[upperPoint]*x[upperPoint])
             phFitClone.SetParameter(5, par5)
         else:
             phFitClone.SetParameter(5, 0.)
-    
+
         if self.verbose:
             graph.Fit("phFit", "R", "")
         else:
             graph.Fit("phFit", "RQ", "")
-        
+
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
         retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF())
         print retVal
         return retVal
-    
+
     def FitLin(self,calibration):
         n,x,y,ex,ey = self.getArrayOfCalibrationPoints(calibration)
         graph = self.GetGraph([n,x,y,ex,ey])
-        
+
         phFitClone = self.phFit
         phFitClone.SetRange(self.vcal[2], self.vcalLow[8])
         #original: vcal[8]*rangeConversion, replaced by self.vcalLow[8]
-        
+
         upperPoint = self.vcalSteps + 2 - 1;
         lowerPoint = self.vcalSteps / 3 - 1;
-        
+
         if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((x[upperPoint] - x[lowerPoint]) != 0):
             slope = (y[upperPoint] - y[lowerPoint]) / (x[upperPoint] - x[lowerPoint])
         else:
             slope = 0.5;
-        
+
         phFitClone.SetParameter(2, slope)
         try:
             phFitClone.SetParameter(3, y[upperPoint] - slope * x[upperPoint])
         except:
             #data is missing, or N/A
-            return [0]*(self.nFitParams+1) 
-        
+            return [0] * (self.nFitParams + 1)
+
         phFitClone.FixParameter(0, 0.)
         phFitClone.FixParameter(1, 0.)
         phFitClone.FixParameter(4, 0.)
         phFitClone.FixParameter(5, 0.)
-        
+
         if self.verbose:
             graph.Fit("phFit", "R", "")
         else:
             graph.Fit("phFit", "RQ", "")
-        
+
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
         retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF())
         return retVal
 
 
-#                 
+#
 #                 for i in range(0,self.vcalSteps):
 #                     calibration = data[j]
 #                     j +=1
@@ -417,7 +419,7 @@ class PH_Fitting():
 #                             x[n] = (double)ph[i];
 #                             y[n] = vcalLow[i];
 #                             n++;
-#                     
+#
 #                     if 0 == self.fitMode:
 #                         if calibration.find("N/A") !=-1 or not i <2 or not i>2 * self.vcalSteps -2:
 #                             calibration = calibration.split()
@@ -427,7 +429,7 @@ class PH_Fitting():
 #                             y[n] = vcalLow[i];
 #                             n++;
 #                 fscanf(inputFile, "%s %2i %2i", string, &a, &b)  //comment
-# 
+#
 #                 if (n != 0)
 #                 {
 #                     if (3 == fitMode) FitTanh()
@@ -435,4 +437,4 @@ class PH_Fitting():
 if __name__=='__main__':
     fitter = PH_Fitting(3)
     fitter.FitAllPHCurves('.',16)
-    
+

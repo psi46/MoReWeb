@@ -1,8 +1,10 @@
 import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
+import AbstractClasses.Helper.ROOTConfiguration as ROOTConfiguration
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
+        ROOTConfiguration.initialise_ROOT()
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_PixelMap_TestResult'
         self.NameSingle='PixelMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
@@ -15,7 +17,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def PopulateResultData(self):
-        ROOT.gPad.SetLogy(0);
+        ROOT.gStyle.SetOptStat(0)
+        ROOT.gPad.SetLogy(0)
         # TH2D
         fileHandle = self.ParentObject.ParentObject.FileHandle
         self.HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
@@ -80,16 +83,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 pixelAlive = pixelAlive and not self.IsInefficientPixel(column,row,PixelMapCurrentValue)
 
         NotAlivePixelList = self.DeadPixelList.union(self.Noisy1PixelList).union(self.MaskDefectList).union(self.IneffPixelList)
-        self.ResultData['KeyValueDictPairs']['DeadPixels'] = {'Value':self.DeadPixelList, 'Label':'Pixels',}
-        self.ResultData['KeyList'].append('DeadPixels')
-        self.ResultData['KeyValueDictPairs']['NoisyPixels'] = {'Value':self.Noisy1PixelList, 'Label':'Pixels',}
-        self.ResultData['KeyList'].append('NoisyPixels')
-        self.ResultData['KeyValueDictPairs']['MaskDefects'] = {'Value':self.MaskDefectList, 'Label':'Pixels',}
-        self.ResultData['KeyList'].append('MaskDefects')
-        self.ResultData['KeyValueDictPairs']['InefficentPixels'] = {'Value':self.IneffPixelList, 'Label':'Pixels',}
-        self.ResultData['KeyList'].append('InefficentPixels')
-        self.ResultData['KeyValueDictPairs']['NotAlivePixels'] = {'Value':NotAlivePixelList, 'Label':'Pixels',}
-        self.ResultData['KeyList'].append('NotAlivePixels')
+        self.ResultData['KeyValueDictPairs'][ 'NotAlivePixels'] = {'Value':   (NotAlivePixelList), 'Label':'  Not Alive Pixels', }
+        self.ResultData['KeyValueDictPairs']['NNotAlivePixels'] = {'Value':len(NotAlivePixelList), 'Label':'Tot. Dead Pixels', }
+        self.ResultData['KeyList'].append('NNotAlivePixels')
+        self.ResultData['KeyValueDictPairs'][ 'DeadPixels'] = {'Value':   (self.DeadPixelList), 'Label':'  Dead Pixels', }
+        self.ResultData['KeyValueDictPairs']['NDeadPixels'] = {'Value':len(self.DeadPixelList), 'Label':'- N Dead Pixels', }
+        self.ResultData['KeyList'].append('NDeadPixels')
+        self.ResultData['KeyValueDictPairs'][ 'NoisyPixels'] = {'Value':   (self.Noisy1PixelList), 'Label':'  Noisy Pixels', }
+        self.ResultData['KeyValueDictPairs']['NNoisyPixels'] = {'Value':len(self.Noisy1PixelList), 'Label':'- N Noisy Pixels', }
+        self.ResultData['KeyList'].append('NNoisyPixels')
+        self.ResultData['KeyValueDictPairs'][ 'MaskDefects'] = {'Value':   (self.MaskDefectList), 'Label':'  Mask Defects', }
+        self.ResultData['KeyValueDictPairs']['NMaskDefects'] = {'Value':len(self.MaskDefectList), 'Label':'- N Mask Defects', }
+        self.ResultData['KeyList'].append('NMaskDefects')
+        self.ResultData['KeyValueDictPairs'][ 'InefficentPixels'] = {'Value':   (self.IneffPixelList), 'Label':'  Inefficent Pixels', }
+        self.ResultData['KeyValueDictPairs']['NInefficentPixels'] = {'Value':len(self.IneffPixelList), 'Label':'- N Inefficent Pixels', }
+        self.ResultData['KeyList'].append('NInefficentPixels')
 
     def IsDeadPixel(self, column, row,PixelMapCurrentValue):
         if PixelMapCurrentValue == 0:

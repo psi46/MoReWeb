@@ -9,6 +9,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
     def PopulateResultData(self):
+        ROOT.gStyle.SetOptStat(1)
         print 'SCurveWidth'
         #   // -- sCurve width and noise level
 

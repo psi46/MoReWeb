@@ -68,7 +68,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 DacParametersFile.close()
 
         self.ResultData['HiddenData']['vcalTrim'] = vcalTrim
-        self.ResultData['HiddenData']['DacParameters']['vcalTrim'] = vcalTrim
+        self.ResultData['HiddenData']['DacParameters']['vcaltrim'] = i
         ParameterList = [
             'vcalTrim',
             'Vana',

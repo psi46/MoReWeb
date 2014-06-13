@@ -13,7 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
 
         ROOT.gPad.SetLogy(0);
-        ROOT.gStyle.SetOptStat(1);
+        ROOT.gStyle.SetOptStat(0)
 
         self.ResultData['Plot']['ROOTObject'] =  self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['Plot']['ROOTObject_ht'].Clone(self.GetUniqueID())
         #self.ResultData['Plot']['ROOTObject_ht'] = self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['Plot']['ROOTObject_ht'];

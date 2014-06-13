@@ -196,7 +196,9 @@ class SCurve_Fitting():
             ex.append(0)
             eff = (value+1)/(self.nReadouts +2.)
             y.append(self.nReadouts*eff)
-            ey.append(self.nReadouts * math.sqrt((eff*(1-eff))/(self.nReadouts+3.)))
+            if self.nReadouts + 3. == 0:
+                eq.append(0)
+            ey.append(self.nReadouts * math.sqrt(abs((eff * (1 - eff)) / (self.nReadouts + 3.))))
         if not plateau or not zeroLevel:
             if self.verbose:
                 if not plateau:

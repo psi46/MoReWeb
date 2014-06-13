@@ -12,6 +12,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def PopulateResultData(self):
+        ROOT.gStyle.SetOptStat(0)
 
         ROOT.gPad.SetLogy(1);
         isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']

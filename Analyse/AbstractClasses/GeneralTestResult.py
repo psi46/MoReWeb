@@ -18,7 +18,7 @@ try:
        set
 except NameError:
        from sets import Set as set
-
+import Helper.ROOTConfiguration as ROOTConfiguration
 class GeneralTestResult:
 
     nRows = 80
@@ -30,6 +30,7 @@ class GeneralTestResult:
         @param InitialModulePath Starting point of modules
     '''
     def __init__(self, TestResultEnvironmentObject, ParentObject = None, InitialModulePath = None, InitialFinalResultsStoragePath = None, InitialAttributes = None, Key = None, DisplayOptions = None):
+        ROOTConfiguration.initialise_ROOT()
         self.verbose = False
 
         # Name of the Test Result, only a-zA-Z0-9_
