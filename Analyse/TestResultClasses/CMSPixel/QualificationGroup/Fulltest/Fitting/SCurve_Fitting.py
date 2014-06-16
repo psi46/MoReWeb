@@ -117,7 +117,20 @@ class SCurve_Fitting():
         if self.verbose:
             print '\tLength of Dataset: %s'%len(dataSet)
         # remove header
-        self.mode = int(dataSet[0].split()[-1])
+        header = dataSet[0].split()
+        print 'header', header
+        for i in header:
+            if 'mode' in i.lower():
+                index = header.index(i)
+                if len(header) > index + 1:
+                    self.mode = int(header[index + 1])
+#                     raw_input('Mode: %d' % self.mode)
+            if 'ntrig' in i.lower():
+                index = header.index(i)
+                print index, len(header), index + 1,
+                if len(header) > index + 1:
+                    self.nReadouts = int(header[index + 1])
+#                     raw_input('Ntrig: %d' % self.nReadouts)
         dataSet = dataSet[1:]
 
 #         maxChi2 = [-1]*4
@@ -142,8 +155,11 @@ class SCurve_Fitting():
 
 
     def fitSCurveData(self,data,chip,row,col):
+        if self.verbose:
+            print 'fit Scurve data ROC %d %2d/%2d' % (chip, row, col)
         isValid, calibrationPoints = self.extractSCurveData(data)
         if not isValid:
+            print '\tnot Valid'
             return [[-3,chip,row,col],[]]
         graph = self.GetGraph(calibrationPoints)
 
@@ -165,7 +181,8 @@ class SCurve_Fitting():
             if self.verbose:
                 if (chi2 > self.chiLimit):
                     print "Chi %e"%chi2
-                else: print "not converged"
+                else:
+                    print "not converged"
         return [[chi2,chip,row,col],[thr,sig]]
         pass
 
