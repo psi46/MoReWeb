@@ -20,19 +20,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gStyle.SetOptStat(0)
         ROOT.gPad.SetLogy(0)
         # TH2D
-        fileHandle = self.ParentObject.ParentObject.FileHandle
         self.HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         ChipNo=self.ParentObject.Attributes['ChipNo']
         if self.HistoDict.has_option(self.NameSingle,'PixelMap'):
             histname = self.HistoDict.get(self.NameSingle,'PixelMap')
-            object =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
+            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             self.ResultData['Plot']['ROOTObject']  = object.Clone(self.GetUniqueID())
         elif self.HistoDict.has_option(self.NameSingle,'Calibrate') and self.HistoDict.has_option(self.NameSingle,'Mask'):
             # TO BE CHECKED
             histname_Calibrate = self.HistoDict.get(self.NameSingle,'Calibrate')
-            self.ResultData['Plot']['ROOTObject_Calibrate'] = HistoGetter.get_histo(fileHandle,histname_Calibrate,rocNo=ChipNo).Clone(self.GetUniqueID())
+            self.ResultData['Plot']['ROOTObject_Calibrate'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname_Calibrate, rocNo = ChipNo).Clone(self.GetUniqueID())
             histname_Mask = self.HistoDict.get(self.NameSingle,'Mask')
-            self.ResultData['Plot']['ROOTObject_Mask'] = HistoGetter.get_histo(fileHandle,histname_Mask,rocNo=ChipNo).Clone(self.GetUniqueID())
+            self.ResultData['Plot']['ROOTObject_Mask'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname_Mask, rocNo = ChipNo).Clone(self.GetUniqueID())
             if not self.ResultData['Plot']['ROOTObject_Mask'] or not self.ResultData['Plot']['ROOTObject_Calibrate']:
                 raise Exception('Cannot create PixelMap because of not found histos Mask: %s, Calibrate: %s'%(
                                  self.ResultData['Plot']['ROOTObject_Mask'],

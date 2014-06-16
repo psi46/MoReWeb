@@ -83,7 +83,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Key':'Fitting',
                 'DisplayOptions':{
                     'GroupWithNext':False,
-                    'Order':0,
+                    'Order':99,
                 },
                 'InitialAttributes':{
                     'ModuleVersion': self.Attributes['ModuleVersion'],

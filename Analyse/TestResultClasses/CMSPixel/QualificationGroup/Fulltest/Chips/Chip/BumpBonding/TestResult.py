@@ -24,14 +24,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # TH1D
         ChipNo=self.ParentObject.Attributes['ChipNo']
         self.HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
-        self.FileHandle = self.ParentObject.ParentObject.FileHandle
         try:
             histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'Analog')
-            object =  HistoGetter.get_histo(self.FileHandle,histname,rocNo=ChipNo)
+            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             self.ResultData['Plot']['ROOTObject']  = object.Clone(self.GetUniqueID())
         except:
             histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'Digital')
-            object =  HistoGetter.get_histo(self.FileHandle,histname,rocNo=ChipNo)
+            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             self.ResultData['Plot']['ROOTObject']  = object.Clone(self.GetUniqueID())
         if self.ResultData['Plot']['ROOTObject']:
             self.Canvas.Clear()

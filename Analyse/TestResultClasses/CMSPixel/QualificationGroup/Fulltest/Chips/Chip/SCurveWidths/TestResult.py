@@ -23,10 +23,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ChipNo=self.ParentObject.Attributes['ChipNo']
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
-        fileHandle = self.ParentObject.ParentObject.FileHandle
         if HistoDict.has_option(self.NameSingle,'Analog'):
             histname = HistoDict.get(self.NameSingle,'Analog')
-            object =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
+            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             if object != None:
                 self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
 
@@ -34,7 +33,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if not self.ResultData['Plot'].has_key('ROOTObject_h2'):
             isDigitalROC = True
             histname = HistoDict.get(self.NameSingle,'Digital')
-            object =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
+            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
 
         Directory = self.RawTestSessionDataPath

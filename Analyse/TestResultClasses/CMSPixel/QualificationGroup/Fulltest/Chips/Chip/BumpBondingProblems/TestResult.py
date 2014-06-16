@@ -56,8 +56,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw("colz");
             self.ResultData['Plot']['ROOTObject'].SaveAs(self.GetPlotFileName()+'.cpp')
+
+        self.ResultData['Plot']['ROOTObject2'] = self.ResultData['Plot']['ROOTObject'].Clone(self.GetUniqueID())
         if self.SavePlotFile:
             self.Canvas.SaveAs(self.GetPlotFileName())
+
         self.ResultData['Plot']['Enabled'] = 1
         self.Title = 'Bump Bonding Problems: C{ChipNo}'.format(ChipNo=self.chipNo)
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()

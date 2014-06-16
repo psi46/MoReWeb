@@ -3,7 +3,6 @@ import ROOT
 
 def get_histo(rootfile,histoname,rocNo = None):
     if rocNo !=None:
-        print histoname
         histoname = histoname%rocNo
     histoname = histoname.split('.')
     dir = rootfile
@@ -13,9 +12,7 @@ def get_histo(rootfile,histoname,rocNo = None):
         dir = dir.Get(i)
         if dir==None:
             break
-    print dir
     if dir == None:
         return None
     histo = dir.Get(histoname[-1])
-    print 'Return Histo ',histoname,histo
     return histo

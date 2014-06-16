@@ -18,14 +18,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ChipNo=self.ParentObject.Attributes['ChipNo']
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
-        fileHandle=self.ParentObject.ParentObject.FileHandle
         if HistoDict.has_option(self.NameSingle,'TrimBits'):
             histname = HistoDict.get(self.NameSingle,'TrimBits')
-            object =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
+            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             self.ResultData['Plot']['ROOTObject']  = object.Clone(self.GetUniqueID())
         else:
             histname = HistoDict.get(self.NameSingle,'TrimBitMap')
-            object =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
+            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             self.ResultData['Plot']['ROOTObject']  = ROOT.TH1F(self.GetUniqueID(),'TrimBitDistribution',17,-.5,16.5)
             for col in range(self.nCols): #Columns
                 for row in range(self.nRows): #Rows

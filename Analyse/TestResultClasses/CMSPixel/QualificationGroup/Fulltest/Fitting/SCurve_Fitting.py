@@ -118,7 +118,6 @@ class SCurve_Fitting():
             print '\tLength of Dataset: %s'%len(dataSet)
         # remove header
         header = dataSet[0].split()
-        print 'header', header
         for i in header:
             if 'mode' in i.lower():
                 index = header.index(i)

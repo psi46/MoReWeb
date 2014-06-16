@@ -15,17 +15,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ROOT.gPad.SetLogy(1);
         ROOT.gStyle.SetOptStat(1);
-        fileHandle = self.ParentObject.ParentObject.FileHandle
         ChipNo=self.ParentObject.Attributes['ChipNo']
         # TH1D
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
-        fileHandle=self.ParentObject.ParentObject.FileHandle
         histname = HistoDict.get(self.NameSingle, 'ThresholdDist')
-        object =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
+        object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
         self.ResultData['Plot']['ROOTObject'] = object.Clone(self.GetUniqueID())
 
         histname = HistoDict.get(self.NameSingle, 'ThresholdMap')
-        object = HistoGetter.get_histo(fileHandle, histname, rocNo = ChipNo)
+        object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
         self.ResultData['Plot']['ROOTObject_Map'] = object.Clone(self.GetUniqueID())
         #mG
         MeanVcalThr = self.ResultData['Plot']['ROOTObject'].GetMean()

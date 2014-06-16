@@ -19,13 +19,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # TH2D
         TrimBitHistograms = []
         ChipNo = self.ParentObject.Attributes['ChipNo']
-        fileHandle = self.ParentObject.ParentObject.FileHandle
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         self.DeadTrimbitsList = set()
         self.PixelNotAliveList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NotAlivePixels']['Value']
         for k in range(5):
             histname = HistoDict.get(self.NameSingle, 'TrimBitMap%d' % k)
-            tmpHistogram = HistoGetter.get_histo(fileHandle, histname, rocNo = ChipNo)
+            tmpHistogram = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             tmpHistogram = tmpHistogram.Clone(self.GetUniqueID())
             TrimBitHistograms.append(tmpHistogram)
         for col in range(self.nCols):  # Column

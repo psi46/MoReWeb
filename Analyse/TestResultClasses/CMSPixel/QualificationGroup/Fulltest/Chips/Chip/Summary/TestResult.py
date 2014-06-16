@@ -151,18 +151,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         TrimBitHistograms = []
         ChipNo=self.ParentObject.Attributes['ChipNo']
-        fileHandle = self.ParentObject.ParentObject.FileHandle
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         for k in range(5):
             histname = HistoDict.get(self.NameSingle,'TrimBitMap%d'%k)
-            tmpHistogram = HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
+            tmpHistogram = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
             tmpHistogram = tmpHistogram.Clone(self.GetUniqueID())
             TrimBitHistograms.append(tmpHistogram )
 
         # TH2D
 
         histname = HistoDict.get(self.NameSingle,'ThresholdMap')
-        tmpHistogram = HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo)
+        tmpHistogram = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
         VcalThresholdMapHistogram =  tmpHistogram.Clone(self.GetUniqueID())
 
         #reset file pointers

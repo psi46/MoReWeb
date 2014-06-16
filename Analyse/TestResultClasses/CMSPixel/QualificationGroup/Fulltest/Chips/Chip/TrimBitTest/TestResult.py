@@ -14,21 +14,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # TH1D
         ChipNo=self.ParentObject.Attributes['ChipNo']
-        fileHandle = self.ParentObject.ParentObject.FileHandle
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         histname = HistoDict.get(self.NameSingle,'TrimBit0')
-        self.ResultData['Plot']['ROOTObject'] =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo).Clone(self.GetUniqueID())
+        self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo).Clone(self.GetUniqueID())
 
         # TH1D
         histname = HistoDict.get(self.NameSingle,'TrimBit1')
-        self.ResultData['Plot']['ROOTObject_TrimBit13'] =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo).Clone(self.GetUniqueID())
+        self.ResultData['Plot']['ROOTObject_TrimBit13'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo).Clone(self.GetUniqueID())
         # TH1D
         histname = HistoDict.get(self.NameSingle,'TrimBit2')
-        self.ResultData['Plot']['ROOTObject_TrimBit11'] =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo).Clone(self.GetUniqueID())
+        self.ResultData['Plot']['ROOTObject_TrimBit11'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo).Clone(self.GetUniqueID())
 
         # TH1D
         histname = HistoDict.get(self.NameSingle,'TrimBit3')
-        self.ResultData['Plot']['ROOTObject_TrimBit7'] =  HistoGetter.get_histo(fileHandle,histname,rocNo=ChipNo).Clone(self.GetUniqueID())
+        self.ResultData['Plot']['ROOTObject_TrimBit7'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo).Clone(self.GetUniqueID())
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
