@@ -1,5 +1,5 @@
 '''
-Program : MORE-Web 
+Program : MORE-Web
  Author : Esteban Marin - estebanmarin@gmx.ch
  Version    : 2.1
  Release Date   : 2013-05-30
@@ -25,7 +25,7 @@ class TestResultEnvironment:
         'DefaultImageFormat':'svg',
         'AbsoluteOverviewPage': None,
     }
-    
+
     GradingParameters = {
         'noiseMin':50,
         'noiseMax':400,
@@ -63,45 +63,46 @@ class TestResultEnvironment:
         'StandardADC2ElectronConversionFactor':65,
         'IVCurrentFactor':-1e6,
         'TrimBitDifference':2.,
+        'excludeTrimBit14':1,
         'PixelMapMaxValue':10,
         'PixelMapMinValue':0,
         'PixelMapMaskDefectUpperThreshold': 0,
         'BumpBondingProblemsNSigma': 5
     }
-    
-    
+
+
     # Database connection
     GlobalDBConnection = None
     GlobalDBConnectionCursor = None
-    
+
     # Database connection
     LocalDBConnection = None
     LocalDBConnectionCursor = None
-    
+
     # Path to the test results
     ModuleDataDirectory = '';
-    
+
     # path to folder with all test results
     GlobalDataDirectory = ''
-    
+
     TestResultHTMLTemplate = ''
-    
+
     TestResultStylesheetPath = ''
-    
+
     # Path to temporary folder
     TempPath = '/tmp'
-    
+
     # Path to the SQLite Database File for storing the test result
     SQLiteDBPath = ''
-    
+
     # Path to the Overview
     GlobalOverviewPath = ''
-    
+
     LastUniqueIDCounter = 0;
-    
+
     #Error Handling
     ErrorList = []
-    
+
     def __init__(self, Configuration = None):
         if Configuration:
             self.Configuration['Database'] = {
@@ -122,24 +123,24 @@ class TestResultEnvironment:
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
             for i in self.GradingParameters:
                 self.GradingParameters[i] = float(Configuration.get('GradingParameters', i))
-                
-            
+
+
         self.MainStylesheet = open('HTML/Main.css').read()
-        
+
         self.TestResultHTMLTemplate = open('HTML/TestResult/TestResultTemplate.html').read()
         self.TestResultStylesheet = open('HTML/TestResult/TestResultTemplate.css').read()
-        
+
         self.OverviewHTMLTemplate = open('HTML/Overview/OverviewTemplate.html').read()
         self.OverviewStylesheet = open('HTML/Overview/OverviewTemplate.css').read()
         self.HtmlParser = Helper.HtmlParser.HtmlParser()
-        
+
         ROOT.gEnv.GetValue("Canvas.SavePrecision", -1)
         ROOT.gEnv.SetValue('Canvas.SavePrecision', "30")
         self.Canvas = ROOT.TCanvas()#'c1', '', 900, 700
-        
+
         # Prevent garbage collection
         ROOT.SetOwnership(self.Canvas,False)
-    
+
     def OpenDBConnection(self):
         if self.Configuration['Database']['UseGlobal']:
             import MySQLdb
@@ -155,16 +156,16 @@ class TestResultEnvironment:
                 Head, Tail = os.path.split(self.SQLiteDBPath)
                 if not os.path.exists(Head):
                     os.makedirs(Head)
-                
+
                 f = open(self.SQLiteDBPath, 'w')
                 f.close()
                 CreateDBStructure = True
-            
+
             self.LocalDBConnection = sqlite3.connect(self.SQLiteDBPath)
             self.LocalDBConnection.row_factory = sqlite3.Row
             self.LocalDBConnectionCursor =  self.LocalDBConnection.cursor()
             self.LocalDBConnection.text_factory = str
-            
+
             if CreateDBStructure:
                 self.LocalDBConnectionCursor.executescript('''
                      CREATE TABLE ModuleTestResults(
@@ -174,9 +175,9 @@ class TestResultEnvironment:
                         QualificationType TEXT,
                         Grade TEXT,
                         PixelDefects TEXT,
-                        ROCsMoreThanOnePercent INT, 
+                        ROCsMoreThanOnePercent INT,
                         Noise INT,
-                        Trimming INT, 
+                        Trimming INT,
                         PHCalibration INT,
                         CurrentAtVoltage150 FLOAT,
                         IVSlope FLOAT,
@@ -190,31 +191,31 @@ class TestResultEnvironment:
                         CycleTempHigh FLOAT
                     );
                 ''')
-            
-    
+
+
     def GetUniqueID(self, Prefix = ''):
         self.LastUniqueIDCounter += 1
-        return Prefix + '_'+str(self.LastUniqueIDCounter) 
-    
+        return Prefix + '_' + str(self.LastUniqueIDCounter)
+
     def FetchOneAssoc(cursor) :
         data = cursor.fetchone()
         if data == None :
             return None
         desc = cursor.description
-    
+
         retDict = {}
-    
+
         for (name, value) in zip(desc, data) :
             retDict[name[0]] = value
-    
+
         return retDict
-    
+
     def __del__(self):
         if self.Configuration['Database']['UseGlobal']:
             pass
         else:
             self.LocalDBConnection.close()
-    
+
     def existInDB(self,moduleID,QualificationType):
         print 'check wheather module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
         AdditionalWhere =""
@@ -234,4 +235,4 @@ class TestResultEnvironment:
             Rows = self.LocalDBConnectionCursor.fetchall()
             return len(Rows)>0
         return False
-    
+

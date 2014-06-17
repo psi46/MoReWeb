@@ -32,7 +32,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 deadTrimBits = self.GetDeadTrimBits(col, row, TrimBitHistograms)
                 self.ResultData['Plot']['ROOTObject'].Fill(col, row, deadTrimBits)
 
-
         if self.ResultData['Plot']['ROOTObject']:
 
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
@@ -71,13 +70,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def GetDeadTrimBits(self, column, row, TrimBitHistograms):
         gradingCriteria = self.TestResultEnvironmentObject.GradingParameters['TrimBitDifference']
+        excludeTrimBit14 = bool(self.TestResultEnvironmentObject.GradingParameters['excludeTrimBit14'])
         retVal = 0
         for k in range(1, 5):
             trimBit0 = TrimBitHistograms[0].GetBinContent(column + 1, row + 1)
             trimBitK = TrimBitHistograms[k].GetBinContent(column + 1, row + 1)
+            if excludeTrimBit14 and k == 1:
+                continue
             TrimBitDifference = abs(trimBitK - trimBit0)
             if TrimBitDifference <= gradingCriteria :
                 self.DeadTrimbitsList.add((self.chipNo, column, row))
                 retVal += 2 ** (4 - (k - 1))
-                print 'added %2d,%2d %d' % (column, row, k), trimBitK, trimBit0, TrimBitDifference, gradingCriteria, (gradingCriteria <= gradingCriteria), retVal
+                print 'Dead TrimBit: added %2d,%2d %d' % (column, row, k), trimBitK, trimBit0, TrimBitDifference, gradingCriteria, (TrimBitDifference <= gradingCriteria), retVal
         return retVal
