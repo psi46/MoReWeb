@@ -1,7 +1,7 @@
 #!/usr/bin/env python
  # -*- coding: utf-8 -*-
 '''
-Program    : MORE-Web 
+Program    : MORE-Web
  Author    : Esteban Marin - estebanmarin@gmx.ch
  Version    : 2.1
  Release Date    : 2013-05-30
@@ -25,7 +25,7 @@ parser.add_argument('-FQ','--singleQualification',dest='singleQualificationPath'
                     default='')
 # parser.add_argument('-M','--ModuleVersion',dest='ModuleVersion',metavar='VERSION',
 #                     help='option to choose which module version is analysed [singleROC =3, Module ={1,2}]',default='')
-parser.add_argument('-noDB','--noDBupload',dest='DBUpload',action='store_false',
+parser.add_argument('-noDB', '--noDBupload', dest = 'DBUpload', action = 'store_false', default = True,
                     help='deactivates upload to DB within this analysis session')
 parser.add_argument('-v','--verbose',dest='verbose',action='store_true',default = False,
                     help='activates verbose mode')
@@ -35,6 +35,8 @@ parser.add_argument('-rev','--analysis-revision',dest='revision',metavar='REV',d
                     help='setting analysis revision number by hand to create an extra directory, alternative: Configuration/SystemConfiguration.cfg --> AnalysisRevision')
 parser.add_argument('-norev','--no-revisionnumber',dest='norev',action='store_true',default=False,
                     help='deactivates the revsion sting with in the path')
+parser.add_argument('-f', '--force', dest = 'force', action = 'store_true', default = False,
+                    help = 'Forces runnig analysis even if checksums agree')
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
 verbose = args.verbose
@@ -45,8 +47,8 @@ import AbstractClasses.Helper.ROOTConfiguration as ROOTConfiguration
 ROOTConfiguration.initialise_ROOT()
 Configuration = ConfigParser.ConfigParser()
 Configuration.read([
-    'Configuration/GradingParameters.cfg', 
-    'Configuration/SystemConfiguration.cfg', 
+    'Configuration/GradingParameters.cfg',
+    'Configuration/SystemConfiguration.cfg',
     'Configuration/Paths.cfg',
     'Configuration/ModuleInformation.cfg'])
 
@@ -79,10 +81,10 @@ else:
 print 'GlobalFinalResultsPath: "%s"'%GlobalFinalResultsPath
 if GlobalFinalResultsPath!= '' and not os.path.exists(GlobalFinalResultsPath):
     os.makedirs(GlobalFinalResultsPath)
-    
+
 SQLiteDBPath = GlobalOverviewPath + '/ModuleResultDB.sqlite'
 ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
-     
+
 TestType = Configuration.get('TestType','TestType')
 
 TestResultEnvironmentInstance = TestResultEnvironment.TestResultEnvironment(Configuration)
@@ -114,11 +116,11 @@ def GetFinalModuleResultsPath(ModuleFolder):
         folders = folder.rsplit('/',1)
         ModuleFolder = folders[-1]
         ModuleFolderPath = folders[0]
-    
+
     if GlobalFinalResultsPath=='':
         if args.singleQualificationPath == '':
             ModuleFolderPath = GlobalDataDirectory
-            
+
         FinalModuleResultsPath = ModuleFolderPath+'/'+ModuleFolder+'/FinalResults'+RevisionString
     else:
         if RevisionString == '':
@@ -128,8 +130,10 @@ def GetFinalModuleResultsPath(ModuleFolder):
     if not os.path.exists(FinalModuleResultsPath):
         os.makedirs(FinalModuleResultsPath)
     return FinalModuleResultsPath
-   
+
 def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):
+    if args.force == True:
+        return True
     md5FileName= FinalModuleResultsPath+'/'+ 'checksum.md5'
     retVal = True
     if os.path.exists(md5FileName):
@@ -165,60 +169,60 @@ def GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInfor
     if ModuleInformation.has_key('TestType'):
         newModuleInformation['TestType'] =  ModuleInformation['TestType']
     return TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
-            TestResultEnvironmentInstance, 
-            ParentObject = None, 
-            InitialModulePath = 'TestResultClasses.CMSPixel.QualificationGroup', 
+            TestResultEnvironmentInstance,
+            ParentObject = None,
+            InitialModulePath = 'TestResultClasses.CMSPixel.QualificationGroup',
             InitialFinalResultsStoragePath = FinalModuleResultsPath,
             InitialAttributes = newModuleInformation
         )
-    
+
 
 def CreateApacheWebserverConfiguration(FinalResultsPath):
-    # add apache webserver configuration for compressed svg images  
+    # add apache webserver configuration for compressed svg images
     f = open(FinalResultsPath + '/.htaccess', 'w')
     f.write('''
     AddType image/svg+xml svg
     AddType image/svg+xml svgz
     AddEncoding x-gzip .svgz
     ''')
-    f.close()    
-    
+    f.close()
+
 def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
     global FinalResultDirectory
     print ModuleInformationRaw, ModuleFolder
     #,ModuleInformation
-    ModuleInformation = extractModuleInformation(ModuleInformationRaw) 
-    
+    ModuleInformation = extractModuleInformation(ModuleInformationRaw)
+
     if not args.singleQualificationPath == '':
         print 'singleQualification'
         TestResultEnvironmentInstance.ModuleDataDirectory = ModuleFolder
         FinalModuleResultsPath = GetFinalModuleResultsPath(ModuleFolder)
-    
-    else: 
+
+    else:
         FinalModuleResultsPath = GetFinalModuleResultsPath(ModuleFolder)
         TestResultEnvironmentInstance.ModuleDataDirectory = GlobalDataDirectory+'/'+ModuleFolder
-   
-    TestResultEnvironmentInstance.FinalModuleResultsPath = FinalModuleResultsPath 
+
+    TestResultEnvironmentInstance.FinalModuleResultsPath = FinalModuleResultsPath
 
     if not NeedsToBeAnalyzed(TestResultEnvironmentInstance.FinalModuleResultsPath ,ModuleInformation):
         return
-    
+
     ModuleTestResult = GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInformation)
-    
+
     CreateApacheWebserverConfiguration(FinalModuleResultsPath)
-    
+
     print 'Working on: ',ModuleInformation
     print ' -- '
-    
+
     print '    Populating Data'
     ModuleTestResult.PopulateAllData()
     ModuleTestResult.WriteToDatabase() # needed before final output
-    
+
     print '    Generating Final Output'
     ModuleTestResult.GenerateFinalOutput()
     ModuleTestResults.append(ModuleTestResult)
     CopyMD5File(TestResultEnvironmentInstance.FinalModuleResultsPath)
-    print 'DONE' 
+    print 'DONE'
     pass
 
 
@@ -234,7 +238,7 @@ def AnalyseSingleQualification(Folder):
        )
         print TestResultEnvironmentInstance
         print 'ERROR'
-        return 
+        return
     Folder.rstrip('/')
     ModuleInformationRaw = Folder.rstrip('/').split('/')[-1]
     print ModuleInformationRaw
@@ -251,9 +255,9 @@ def AnalyseAllTestDataInDirectory(GlobalDataDirectory):
         ModuleInformationRaw = Folder.split('_')
         if len(ModuleInformationRaw) == 5:
             AnalyseTestData(ModuleInformationRaw,Folder)
-            
+
 def AnalyseSingleFullTest(singleFulltestPath):
-    print 'analysing a single Fulltest at destination: "%s"'%args.singleFulltestPath 
+    print 'analysing a single Fulltest at destination: "%s"' % args.singleFulltestPath
     TestResultEnvironmentInstance.ModuleDataDirectory  = args.singleFulltestPath
     TestResultEnvironmentInstance.FinalModuleResultsPath = args.singleFulltestPath
     ModuleID = args.singleFulltestPath.split('/')[-1]
@@ -268,19 +272,19 @@ def AnalyseSingleFullTest(singleFulltestPath):
     FinalResultsPath = args.singleFulltestPath+'/FinalResults'+RevisionString
     ModuleTestResult = GetModuleTestResult(TestResultEnvironment, FinalResultsPath, ModuleInformation)
     print 'ModuleTestResult',ModuleTestResult
-                # add apache webserver configuration for compressed svg images  
+                # add apache webserver configuration for compressed svg images
     CreateApacheWebserverConfiguration(FinalResultsPath)
     print 'Working on: ',ModuleInformation
     print ' -- '
-    
+
     print '    Populating Data'
     ModuleTestResult.PopulateAllData()
     if args.DBUpload:
         ModuleTestResult.WriteToDatabase() # needed before final output
-    
+
     print '    Generating Final Output'
     ModuleTestResult.GenerateFinalOutput()
-    pass  
+    pass
 
 if not args.singleFulltestPath=='':
     AnalyseSingleFullTest(args.singleFulltestPath)
@@ -288,7 +292,7 @@ elif not args.singleQualificationPath=='':
     AnalyseSingleQualification(args.singleQualificationPath)
 elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
     AnalyseAllTestDataInDirectory(GlobalDataDirectory)
-    
+
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
 # TestResultEnvironmentInstance.ErrorList.append( {'test1':'bla'})
