@@ -1,0 +1,7 @@
+.project
+.pydevproject
+.settings/
+checksum.md5
+*.pyc
+*.*~
+
