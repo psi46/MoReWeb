@@ -5,3 +5,6 @@ It can analyse the output of the following readout softwares:
 * pXar
 * Pyxar
 * PSI46expert
+ 
+You can find further information on the Twiki Page
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/MoReWeb
