@@ -1,6 +1,6 @@
 import ROOT
 import AbstractClasses
-import AbstractClasses.Helpeer.HistoGetter as HistoGetter
+import AbstractClasses.Helper.HistoGetter as HistoGetter
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_AddressLevels_TestResult'
