@@ -21,7 +21,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             isDigital = ChipTestResultObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs'].has_key('Threshold')
             if isDigital:
                 thr = ChipTestResultObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Threshold']['Value']
-            print ChipTestResultObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']
             deadBumps = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['DeadBumps']
             histo = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject']
             if not histo:
@@ -55,7 +54,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         boxes = []
         startChip = self.ParentObject.Attributes['StartChip']
         endChip = self.ParentObject.Attributes['NumberOfChips'] + startChip - 1
-        print 'Used chips: %2d -%2d'%(startChip,endChip)
+        if self.verbose:
+            print 'Used chips: %2d -%2d' % (startChip, endChip)
         for i in range(0,16):
             if i < startChip or endChip < i:
                 if i < 8:
@@ -66,7 +66,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 endX = beginX + self.nCols
                 beginY = int(j / 8) * self.nRows
                 endY = beginY + self.nRows
-                print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
+                if self.verbose:
+                    print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
                 newBox = ROOT.TPaveText(beginX, beginY, endX, endY)
 #                 newBox.AddText('%2d' % i)
                 newBox.SetFillColor(29)
