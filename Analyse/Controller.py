@@ -104,9 +104,11 @@ ModuleTestResults = []
 
 
 def extractModuleInformation(ModuleInformationRaw):
+    lenght = len(ModuleInformationRaw)
+    type = '_'.join(ModuleInformationRaw[1: 1 + lenght - 4])
     return {
                     'ModuleID': ModuleInformationRaw[0],
-                    'TestDate': ModuleInformationRaw[4],
+                    'TestDate': ModuleInformationRaw[-1],
                     'QualificationType': ModuleInformationRaw[1]
                 }
 
@@ -244,7 +246,7 @@ def AnalyseSingleQualification(Folder):
     print ModuleInformationRaw
     ModuleInformationRaw = ModuleInformationRaw.split('_')
     print ModuleInformationRaw
-    if len(ModuleInformationRaw) == 5:
+    if len(ModuleInformationRaw) >= 5:
         AnalyseTestData(ModuleInformationRaw, Folder)
 
 def AnalyseAllTestDataInDirectory(GlobalDataDirectory):
@@ -253,7 +255,7 @@ def AnalyseAllTestDataInDirectory(GlobalDataDirectory):
         if not os.path.isdir(absPath):
             continue
         ModuleInformationRaw = Folder.split('_')
-        if len(ModuleInformationRaw) == 5:
+        if len(ModuleInformationRaw) >= 5:
             AnalyseTestData(ModuleInformationRaw,Folder)
 
 def AnalyseSingleFullTest(singleFulltestPath):
