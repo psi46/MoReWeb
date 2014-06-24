@@ -18,7 +18,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
             histo = ChipTestResultObject.ResultData['SubTestResults']['VcalThresholdUntrimmed'].ResultData['Plot']['ROOTObject']
-            print histo
             if not histo:
                 print 'cannot get VcalThresholdUntrimmed histo for chip ',ChipTestResultObject.Attributes['ChipNo']
                 continue
@@ -62,7 +61,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         boxes = []
         startChip = self.ParentObject.Attributes['StartChip']
         endChip = self.ParentObject.Attributes['NumberOfChips'] + startChip - 1
-        print 'Used chips: %2d -%2d' % (startChip, endChip)
+        if self.verbose:
+            print 'Used chips: %2d -%2d' % (startChip, endChip)
         for i in range(0, 16):
             if i < startChip or endChip < i:
                 if i < 8:
@@ -73,7 +73,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 endX = beginX + self.nCols
                 beginY = int(j / 8) * self.nRows
                 endY = beginY + self.nRows
-                print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
+                if self.verbose:
+                    print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
                 newBox = ROOT.TPaveText(beginX, beginY, endX, endY)
 #                 newBox.AddText('%2d' % i)
                 newBox.SetFillColor(29)
