@@ -114,6 +114,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 # Accept all tests with names 'HighRateTest', 'HighRatePixelMap', and 'HighRateEfficiency' as high rate tests
                 # The distinction of the tests is made within the 'appendHighRateTest' function.
                 tests, test, index = self.appendHighRateTest(tests, test, index)
+            elif 'powercycle' in test.testname:
+                test = test.next()
             else:
                 index += 1
                 test = test.next()
