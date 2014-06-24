@@ -5,6 +5,8 @@ import time
 import functools
 from multiprocessing import Pool, Process, Queue, Pipe
 import multiprocessing
+import time
+import random
 
 class PH_Fitting():
     FitfcnTanName = "FitfcnTanName"
@@ -15,6 +17,7 @@ class PH_Fitting():
     rangeConversion = 7
 
     def __init__(self,fitMode,refit=True,HistoDict = None):
+        self.k = 0
         ROOT.gStyle
         self.verbose = False
         self.fitMode = fitMode
@@ -30,6 +33,11 @@ class PH_Fitting():
         self.InitFit()
         self.InitResultHistos()
 
+    def getUniqueID(self, name):
+        ts = int(time.time() * 1e3)
+        return'%s_%d_%d' % (name, self.k, ts)
+
+
     def convertStringToPH(self,i):
         try:
             retVal = int(i)
@@ -39,13 +47,13 @@ class PH_Fitting():
 
     def InitResultHistos(self):
         self.histoFits = [None]*6
-        self.histoFits[0] = ROOT.TH1D("histoFit1", "histoFit1", 200, 0.0001, 0.0003)
-        self.histoFits[1] = ROOT.TH1D("histoFit2", "histoFit2", 400, 0,2) # 0.0000001, .0000009)
-        self.histoFits[2] = ROOT.TH1D("histoFit3", "histoFit3", 300, 0.4, 0.7)
-        self.histoFits[3] = ROOT.TH1D("histoFit4", "histoFit4", 160, 180., 340.)
-        self.histoFits[4] = ROOT.TH1D("histoFit5", "histoFit5", 200, -1.5, -1.3)
-        self.histoFits[5] = ROOT.TH1D("histoFit6", "histoFit6", 400, -4.e-4, 0.)
-        self.histoChi = ROOT.TH1D("histoChi", "histoChi", 1000, 0., 10.)
+        self.histoFits[0] = ROOT.TH1D(self.getUniqueID("histoFit1"), "histoFit1", 200, 0.0001, 0.0003)
+        self.histoFits[1] = ROOT.TH1D(self.getUniqueID("histoFit2"), "histoFit2", 400, 0, 2)  # 0.0000001, .0000009)
+        self.histoFits[2] = ROOT.TH1D(self.getUniqueID("histoFit3"), "histoFit3", 300, 0.4, 0.7)
+        self.histoFits[3] = ROOT.TH1D(self.getUniqueID("histoFit4"), "histoFit4", 160, 180., 340.)
+        self.histoFits[4] = ROOT.TH1D(self.getUniqueID("histoFit5"), "histoFit5", 200, -1.5, -1.3)
+        self.histoFits[5] = ROOT.TH1D(self.getUniqueID("histoFit6"), "histoFit6", 400, -4.e-4, 0.)
+        self.histoChi = ROOT.TH1D(self.getUniqueID("histoChi"), "histoChi", 1000, 0., 10.)
         pass
 
     def ClearResultHistos(self):

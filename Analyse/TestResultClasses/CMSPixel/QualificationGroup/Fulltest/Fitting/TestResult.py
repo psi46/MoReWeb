@@ -25,3 +25,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         print 'tanh PH fitting...'
         fitter = PH_Fitting(3,refit,HistoDict = self.ParentObject.HistoDict)
         fitter.FitAllPHCurves(directory,nRocs)
+        print 'done'
