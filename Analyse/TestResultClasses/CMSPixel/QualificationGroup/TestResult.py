@@ -6,6 +6,7 @@ import AbstractClasses.Helper.HtmlParser
 import AbstractClasses.Helper.environment
 #as BetterConfigParser
 import AbstractClasses.Helper.testchain
+import warnings
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def CustomInit(self):
@@ -263,6 +264,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             return 8027.84
         elif "Br" in elementName:
             return 11877.75
+        elif "Rb" in elementName:
+            return 13335.88
         elif "Mo" in elementName:
             return 17374.29
         elif "Ag" in elementName:
@@ -271,7 +274,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             return 25044.04
         elif "Ba" in elementName:
             return 31816.615
+        elif "Tb" in elementName:
+            return 43744.62
         else:
+            warnings.warn('Cannot find TArget: %s' % elementName)
             return 0
 
     def appendFluorescenceTarget(self,tests,test,index):
