@@ -107,7 +107,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tmpRow = row
         # Get the data from the chip sub test result bump bonding
 
-        if result:
+        if result and self.verbose:
             print chipNo, col, row, '--->', tmpCol, tmpRow, result
 #         self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol + 1, tmpRow + 1, result)
         self.ResultData['Plot']['ROOTObject'].Fill(tmpCol, tmpRow, result)
