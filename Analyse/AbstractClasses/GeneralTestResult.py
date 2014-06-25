@@ -14,6 +14,8 @@ import json
 import traceback
 import warnings
 import Helper.HistoGetter as HistoGetter
+import os
+from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 try:
        set
 except NameError:
@@ -252,7 +254,21 @@ class GeneralTestResult:
             i['TestResultObject'] = self.ResultData['SubTestResults'][ i['Key']]
             i2+= 1
 
-
+    def check_Test_Software(self):
+#         print self.RawTestSessionDataPath
+        file = self.RawTestSessionDataPath + '/test.cfg'
+#         print file
+        if os.path.exists(file):
+            self.testSoftware = 'pyxar'
+        elif os.path.exists(self.RawTestSessionDataPath + '/pxar.log'):
+            self.testSoftware = 'pxar'
+        else:
+            self.testSoftware = 'psi46expert'
+        self.HistoDict = BetterConfigParser()
+        fileName = 'Configuration/HistoNames/%s.cfg' % self.testSoftware
+        print fileName, os.path.exists(fileName), os.getcwd()
+        print 'test software is %s' % self.testSoftware
+        self.HistoDict.read(fileName)
 
     '''
         Populates all necessary data
