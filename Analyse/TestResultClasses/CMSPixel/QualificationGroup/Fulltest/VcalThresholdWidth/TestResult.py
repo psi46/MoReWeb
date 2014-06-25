@@ -8,14 +8,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = 'Vcal Threshold Width'
 
-        
+
     def PopulateResultData(self):
-        
+
         ROOT.gPad.SetLogy(0);
-        
+
         self.ResultData['HiddenData']['LimitB'] = self.TestResultEnvironmentObject.GradingParameters['trimmingB']
         self.ResultData['HiddenData']['LimitC'] = self.TestResultEnvironmentObject.GradingParameters['trimmingC']
-        self.ParentObject.ResultData['SubTestResults']['Noise'].SpecialPopulateData(self, {
+        self.ParentObject.ResultData['SubTestResults']['Noise'].SpecialPopulateData(self,
+                {
                 'Key':'Vcal Threshold Width',
                 'DataKey':'VcalThresholdTrimmed', # which sub test result to take the data from
                 'DataParameterKey':'sigma', # which part of key value dict pairs
@@ -25,5 +26,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'LineColor':ROOT.kGreen,
                 'MarkerStyle':21,
                 'YaxisTitle':'Width of Vcal Threshold',
-                
-        })
+                }
+                                                                                    )
