@@ -81,6 +81,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if TrimBitDifference <= gradingCriteria :
                 self.DeadTrimbitsList.add((self.chipNo, column, row))
                 retVal += 2 ** (4 - (k - 1))
-                if self.verbosity:
+                if self.verbose:
                     print 'Dead TrimBit: added %2d,%2d %d' % (column, row, k), trimBitK, trimBit0, TrimBitDifference, gradingCriteria, (TrimBitDifference <= gradingCriteria), retVal
         return retVal
