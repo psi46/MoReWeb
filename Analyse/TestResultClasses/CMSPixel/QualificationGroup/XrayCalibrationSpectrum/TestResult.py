@@ -40,21 +40,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.Attributes['TestedObjectType'] = 'XrayCalibrationSpectrum'
 
-    def check_Test_Software(self):
-#         print self.RawTestSessionDataPath
-        file = self.RawTestSessionDataPath + '/test.cfg'
-#         print file
-        if os.path.exists(file):
-            self.testSoftware = 'pyxar'
-        elif os.path.exists(self.RawTestSessionDataPath + '/pxar.log'):
-            self.testSoftware = 'pxar'
-        else:
-            self.testSoftware = 'psi46expert'
-        self.HistoDict = BetterConfigParser()
-        fileName = 'Configuration/HistoNames/%s.cfg' % self.testSoftware
-        print fileName, os.path.exists(fileName), os.getcwd()
-        print 'test software is %s' % self.testSoftware
-        self.HistoDict.read(fileName)
 
     def PopulateResultData(self):
         if self.verbose:
