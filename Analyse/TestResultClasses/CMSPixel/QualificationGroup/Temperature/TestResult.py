@@ -11,20 +11,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_TemperatureCycle_TestResult'
         self.NameSingle='TemperatureCycle'
-        
+
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
-        
+
     def OpenFileHandle(self):
         self.FileHandle = ConfigParser.ConfigParser()
         fileName = self.RawTestSessionDataPath+'/elComandante.ini'
         if not os.path.isfile(fileName):
             fileName = self.RawTestSessionDataPath+'/Tests.ini'
-#        print 'open ConfigFile "%s"'%fileName 
+#        print 'open ConfigFile "%s"'%fileName
         self.FileHandle.read(fileName)
-        
-        
+
+
     def analyseTemp(self,fileName):
         print 'analyse Temp for "%s"'%fileName
         duration = 0
@@ -54,11 +54,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 tempMax = 0
                 timeMin = 0
                 timeMax = 0
-#             
-#             # get RMS Temp 
+#
+#             # get RMS Temp
             tempError = math.sqrt(temp2-temp*temp)
 #             ROOT.TMath.RMS(tuple.GetSelectedRows(),tuple.GetV1())
-#             
+#
             if len(temps)>0:
 #             # get Min Temp
                 tempMin = min(temps)
@@ -67,10 +67,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 #calculate time difference
                 timeMin = min(times)
                 timeMax = max(times)
-#             
+#
             duration = timeMax - timeMin
             temp_List =   array.array('d',temps)
-            time_List = array.array('d',times)      
+            time_List = array.array('d', times)
             if not self.ResultData['Plot'].has_key('ROOTObjects'):
                 self.ResultData['Plot']['ROOTObjects']={}
             name = '%02d_%s'%(len(self.ResultData['Plot']['ROOTObjects']),name)
@@ -79,11 +79,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'] = ROOT.TMultiGraph()
             else:
                 graph =  ROOT.TGraph()
-            
+
             canvas = self.TestResultEnvironmentObject.Canvas
             self.CanvasSize(canvas)
             canvas.cd()
-            
+
             graph.SetTitle('')
             graph.Draw("APL")
             graph.SetLineColor(4)
@@ -91,23 +91,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             graph.SetMarkerSize(.2)
             graph.SetMarkerColor(1)
             graph.SetMarkerStyle(8)
-            
+
             graph.GetXaxis().SetTitle("Time")
             graph.GetXaxis().SetTimeDisplay(1)
             graph.GetYaxis().SetTitle("Temperature [#circ C]")
-            
+
             graph.GetYaxis().SetDecimals()
             graph.GetYaxis().SetTitleOffset(1.5)
             graph.GetYaxis().CenterTitle()
             graph.Draw("APL")
             canvas.Clear()
-            self.ResultData['Plot']['ROOTObject'].Add(graph,"P")
-            self.ResultData['Plot']['ROOTObject'].Draw("a")
-            self.ResultData['Plot']['ROOTObject'].SetTitle(';Time; Temp [#circ C]')
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTimeDisplay(1)
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetDecimals();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
+            if self.ResultData['Plot']['ROOTObject']:
+                if graph:
+                    self.ResultData['Plot']['ROOTObject'].Add(graph, "P")
+                self.ResultData['Plot']['ROOTObject'].Draw("a")
+                self.ResultData['Plot']['ROOTObject'].SetTitle(';Time; Temp [#circ C]')
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTimeDisplay(1)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetDecimals();
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
             self.Canvas = canvas
 
     def PopulateResultData(self):
@@ -116,12 +118,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.analyseTemp(fileHandlePath+'/temperature.log')
         if self.verbose: raw_input('Press enter')
         if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())      
+            self.Canvas.SaveAs(self.GetPlotFileName())
         self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['Caption'] = 'Temperature'
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-    
-        
-    
+
+
+
     def CustomWriteToDatabase(self, ParentID):
         pass
