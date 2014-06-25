@@ -1,5 +1,5 @@
 '''
-Program : MORE-Web 
+Program : MORE-Web
  Author : Esteban Marin - estebanmarin@gmx.ch
  Version    : 2.1
  Release Date   : 2013-05-30
@@ -11,12 +11,10 @@ class ModuleResultOverview:
     def __init__(self, TestResultEnvironmentObject):
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
         self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
-        
+
     def TableData(self, ModuleID = None, TestDate = None, GlobalOverviewList = True):
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
-        
-        
-        
+
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             Rows = {}
         else:
@@ -36,11 +34,11 @@ class ModuleResultOverview:
                 }
             )
             Rows = self.TestResultEnvironmentObject.LocalDBConnectionCursor.fetchall()
-            
+
         TableHTMLTemplate = HtmlParser.getSubpart(self.TestResultEnvironmentObject.OverviewHTMLTemplate, '###OVERVIEWTABLE###')
         TableBodyHTMLTemplate = HtmlParser.getSubpart(TableHTMLTemplate, '###BODY###')
         CellLinkHTMLTemplate  = HtmlParser.getSubpart(TableBodyHTMLTemplate, '###LINK###')
-        
+
         TableColumns = [
             {
                 'Label':'Module ID',
@@ -108,7 +106,7 @@ class ModuleResultOverview:
              {
                 'Label':'initial Current',
                 'DBColumnName':'initialCurrent',
-             },    
+             },
              {
                 'Label':'Comments',
                 'DBColumnName':'Comments',
@@ -125,37 +123,37 @@ class ModuleResultOverview:
                 'DBColumnName':'CycleTempLow',
                 'InGlobalOverviewList': True,
                 'InFullList': False,
-             },    
+             },
              {
                 'Label':'CycleTempHigh',
                 'DBColumnName':'CycleTempHigh',
                 'InGlobalOverviewList': True,
                 'InFullList': False,
-             },               
-                        
+             },
+
         ]
-        
-        
+
+
         TableData = {
             'HEADER':[[]],
             'BODY':[],
             'FOOTER':[],
         }
         TableColumnList = []
-    
-    
+
+
         for ColumnDict in TableColumns:
             if ((not GlobalOverviewList and ColumnDict.has_key('InFullList')  and ColumnDict['InFullList'] == True)
                 or
                 (not GlobalOverviewList and not ColumnDict.has_key('InFullList'))
-                or 
+                or
                 (GlobalOverviewList and ColumnDict.has_key('InGlobalOverviewList') and ColumnDict['InGlobalOverviewList'] == True)):
                 TableData['HEADER'][0].append(ColumnDict['Label'])
                 TableColumnList.append(ColumnDict['DBColumnName'])
-        
+
         FinalModuleRowsDict = {}
         ModuleIDList = []
-            
+
         for RowTuple in Rows:
             Identificator = RowTuple['ModuleID']
             if not GlobalOverviewList:
@@ -168,17 +166,17 @@ class ModuleResultOverview:
 #            print Identificator
             if not FinalModuleRowsDict.has_key(Identificator):
                 FinalModuleRowsDict[Identificator] = {}
-                ModuleIDList.append(Identificator)    
+                ModuleIDList.append(Identificator)
 #                print 'added'
-    
+
                 RowDict = FinalModuleRowsDict[Identificator]
                 for Key in TableColumnList:
                     RowDict[Key] = RowTuple[Key]
-                    
+
                 ResultHTMLFileName = 'TestResult.html'
                 QualificationGroupSubfolder = 'QualificationGroup'
-                
-                
+
+
                 if GlobalOverviewList:
                 	Link = os.path.relpath(
 				self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/'+ResultHTMLFileName,
@@ -188,21 +186,21 @@ class ModuleResultOverview:
 			CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
 			# change directory one level up since we are in QualificationGroup folder and FulltestSubfolder is relative to ModuleFinalResultsPath...
                 	Link = '../'+RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
-			
-                    
-                
-                
+
+
+
+
                 #Link the module ID
-                
+
                 RowDict['ModuleID'] = HtmlParser.substituteMarkerArray(
                         CellLinkHTMLTemplate,
                         {
                             '###URL###':HtmlParser.MaskHTML(Link),
-                            '###LABEL###':HtmlParser.MaskHTML(RowTuple['ModuleID'])                   
+                            '###LABEL###':HtmlParser.MaskHTML(RowTuple['ModuleID'])
                         }
                     )
-                
-                
+
+
                 # Parse the date
                 RowDict['TestDate'] = datetime.datetime.fromtimestamp(RowTuple['TestDate']).strftime("%Y-%m-%d %H:%m")
             else:
@@ -217,12 +215,12 @@ class ModuleResultOverview:
                        if FinalModuleRowsDict[Identificator]['Temperature']:
                            FinalModuleRowsDict[Identificator]['Temperature'] += " / %s"%RowTuple['Temperature']
                        else:
-                           FinalModuleRowsDict[Identificator]['Temperature'] = "%s"%RowTuple['Temperature'] 
+                           FinalModuleRowsDict[Identificator]['Temperature'] = "%s" % RowTuple['Temperature']
                  if RowTuple['initialCurrent'] and FinalModuleRowsDict[Identificator].has_key('initialCurrent'):
-                       if FinalModuleRowsDict[Identificator]['initialCurrent']:      
+                       if FinalModuleRowsDict[Identificator]['initialCurrent']:
                            FinalModuleRowsDict[Identificator]['initialCurrent'] += " / %s"%RowTuple['initialCurrent']
                        else:
-                           FinalModuleRowsDict[Identificator]['initialCurrent'] = "%s"%RowTuple['initialCurrent'] 
+                           FinalModuleRowsDict[Identificator]['initialCurrent'] = "%s" % RowTuple['initialCurrent']
                  if RowTuple['Comments'] and FinalModuleRowsDict[Identificator].has_key('Comments'):
                        if FinalModuleRowsDict[Identificator]['Comments']:
                            FinalModuleRowsDict[Identificator]['Comments'] += " / %s"%RowTuple['Comments']
@@ -232,25 +230,25 @@ class ModuleResultOverview:
                        FinalModuleRowsDict[Identificator]['nCycles'] = RowTuple['nCycles']
                        FinalModuleRowsDict[Identificator]['CycleTempLow'] = RowTuple['CycleTempLow']
                        FinalModuleRowsDict[Identificator]['CycleTempHigh'] = RowTuple['CycleTempHigh']
-        
+
         for ModuleID in ModuleIDList:
             RowDict = FinalModuleRowsDict[ModuleID]
             Row = []
             for Key in TableColumnList:
                 Row.append(RowDict[Key])
             TableData['BODY'].append(Row)
-            
-            
+
+
         return TableData
-    
+
     def GenerateOverviewHTML(self):
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
-        
+
         HTMLTemplate = self.TestResultEnvironmentObject.OverviewHTMLTemplate
         FinalHTML = HTMLTemplate
-        
-        
-        
+
+
+
         # Stylesheet
 
         StylesheetHTMLTemplate = HtmlParser.getSubpart(HTMLTemplate, '###HEAD_STYLESHEET_TEMPLATE###')
@@ -262,19 +260,19 @@ class ModuleResultOverview:
             }
         )
         FinalHTML = HtmlParser.substituteSubpart(
-            FinalHTML, 
-            '###HEAD_STYLESHEETS###', 
+            FinalHTML,
+            '###HEAD_STYLESHEETS###',
             StylesheetHTML
         )
         FinalHTML = HtmlParser.substituteSubpart(
-            FinalHTML, 
-            '###HEAD_STYLESHEET_TEMPLATE###', 
+            FinalHTML,
+            '###HEAD_STYLESHEET_TEMPLATE###',
             ''
         )
-        
+
         TableData = self.TableData()
         TableHTMLTemplate = HtmlParser.getSubpart(self.TestResultEnvironmentObject.OverviewHTMLTemplate, '###OVERVIEWTABLE###')
-        
+
         TableHTML = HtmlParser.GenerateTableHTML(TableHTMLTemplate, TableData, {
                 '###ADDITIONALCSSCLASS###':'',
                 '###ID###':'OverviewTable',
@@ -284,16 +282,16 @@ class ModuleResultOverview:
             '###OVERVIEWTABLE###',
             TableHTML
         )
-        
-        
-        return FinalHTML        
-    
-        
+
+
+        return FinalHTML
+
+
     def GenerateOverviewHTMLFile(self):
         HTMLFileName = 'Overview.html'
         FinalHTML = self.GenerateOverviewHTML()
-        
+
         f = open(self.GlobalOverviewPath+'/'+HTMLFileName, 'w')
         f.write(FinalHTML)
         f.close()
-    
+
