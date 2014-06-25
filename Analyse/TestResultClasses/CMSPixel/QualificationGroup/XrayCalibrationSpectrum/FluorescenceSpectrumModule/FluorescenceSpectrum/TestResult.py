@@ -8,6 +8,7 @@
 import ROOT
 import AbstractClasses
 from ROOT import TFile,TF1,TH1F
+import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -279,12 +280,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         myfit.SetParameter(4,gaus2)
         #Make sure signal peak is reasonably narrow
         myfit.SetParLimits(4,signalSigma-5,signalSigma+5)
-        
+
         histo.Fit(myfit,"R"+self.fitOption)
         return myfit
 
     def PopulateResultData(self):
-        self.ResultData['Plot']['ROOTObject'] = self.FileHandle.Get("ph_cal_C%i" % (self.Attributes["ChipNo"])).Clone(self.GetUniqueID())
+        HistoDict = self.ParentObject.ParentObject.HistoDict
+        histname = HistoDict.get(self.NameSingle, 'PH_Calibration')
+
+        # self.ResultData['Plot']['ROOTObject'] = self.FileHandle.Get("ph_cal_C%i" % (self.Attributes["ChipNo"])).Clone(self.GetUniqueID())
+        object = HistoGetter.get_histo(self.FileHandle, histname,)
+        if not object:
+            print "couldn't find histname %s" % histname
+            histname = HistoDict.get(self.NameSingle, 'PH_Calibration_ROC')
+            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = self.Attributes["ChipNo"])
+
+        self.ResultData['Plot']['ROOTObject'] = object.Clone(self.GetUniqueID())
+
         if self.ResultData['Plot']['ROOTObject']:
             histo = self.ResultData['Plot']['ROOTObject']
             min = 0
