@@ -5,21 +5,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_VcalCalibrationModule_TestResult"
         self.NameSingle = "VcalCalibrationModule"
-        self.verbose = False
+        self.verbose = True
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
             print tag
 
         # Determine the number or ROCs
-        for a in self.ParentObject.ResultData['SubTestResults']:
-            if 'ModuleXraySpectrum' in a:
-                self.nRocs = self.ParentObject.ResultData['SubTestResults'][a].nRocs
-                break
-
+        self.nRocs = self.ParentObject.nRocs
         self.ResultData["SubTestResultDictList"] = []
 
         for roc in range(self.nRocs):
+            if self.verbose:
+                print 'add subtest for Roc ',roc, "VcalCalibrationROC" + str(roc)
             self.ResultData["SubTestResultDictList"].append(
                 {
                     "Key": "VcalCalibrationROC" + str(roc),
@@ -35,14 +33,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         "TestTemperature": self.Attributes["TestTemperature"],
                         "ChipNo": roc,
                     },
-                    "DisplayOptions":{
+                    "DisplayOptions": {
                         "Order": 1,
                         "Width": 1
                     }
                 }
             )
-
         self.Attributes['TestedObjectType'] = "VcalCalibrationModule"
+        raw_input()
 
     def PopulateResultData(self):
         if self.verbose:
@@ -51,7 +49,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print tag
 
         self.ResultData['Table'] = {
-            'HEADER':[
+            'HEADER': [
                 [
                     'ROC', 'Slope', 'Slope Error', 'Offset', 'Offset Error'
                 ]
