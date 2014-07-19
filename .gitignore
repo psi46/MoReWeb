@@ -2,6 +2,8 @@
 .pydevproject
 .settings/
 checksum.md5
+.DS_Store
+.idea/
 *.pyc
 *.*~
 
