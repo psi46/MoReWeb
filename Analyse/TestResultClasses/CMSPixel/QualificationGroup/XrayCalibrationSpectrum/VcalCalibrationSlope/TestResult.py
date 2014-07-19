@@ -6,7 +6,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_VcalCalibrationSlope_TestResult"
         self.NameSingle = "VcalCalibrationSlope"
         self.Title = "Slope of Vcal Calibration"
-        self.verbose = True
+        self.verbose = False
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
@@ -46,29 +46,32 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print tag
         self.get_n_rocs()
         slopes = []
+        error_slopes = []
         for roc in range(self.nRocs):
             vcal_calibration_module = self.ParentObject.ResultData['SubTestResults']['VcalCalibrationModule']
             roc_results = vcal_calibration_module.ResultData['SubTestResults'][
                 'VcalCalibrationROC%i' % (roc)].ResultData
             roc_slope = roc_results['KeyValueDictPairs']['Slope']['Value']
             roc_slope_error = roc_results['KeyValueDictPairs']['Slope']['Sigma']
-            print roc, roc_slope, roc_slope_error
+            error_slopes.append(roc_slope_error)
+            if self.verbose:
+                print roc, roc_slope, roc_slope_error
             slopes.append(roc_slope)
-        print slopes,type(slopes)
-        raw_input()
 
-        self.SpecialPopulateData(self,slopes,{'Key':'Slope',
+        self.SpecialPopulateData(self,slopes,error_slopes,{'Key':'Slope',
                 'MarkerColor':ROOT.kPink,
                 'LineColor':ROOT.kPink,
                 'MarkerStyle':21,
                 'YaxisTitle':'Slope [e- / Vcal]',})
 
-    def SpecialPopulateData(self,TestResultObject, array, Parameters):
-        print array,type(array)
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), '', TestResultObject.nRocs, 0,
+    def SpecialPopulateData(self,TestResultObject, array, error_array, Parameters):
+        TestResultObject.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), '', TestResultObject.nRocs, 0,
                                                           TestResultObject.nRocs)
+        with_errors = (len(array) == len(error_array))
         for i in range(len(array)):
             TestResultObject.ResultData['Plot']['ROOTObject'].SetBinContent(i + 1, array[i])
+            if with_errors:
+                TestResultObject.ResultData['Plot']['ROOTObject'].SetBinError(i+1, error_array[i])
         min_array = min(array)
         max_array= max(array)
         median_array = self.median(array)
