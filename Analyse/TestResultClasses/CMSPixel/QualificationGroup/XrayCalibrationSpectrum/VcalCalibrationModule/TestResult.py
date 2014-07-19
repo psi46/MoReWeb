@@ -5,7 +5,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_VcalCalibrationModule_TestResult"
         self.NameSingle = "VcalCalibrationModule"
-        self.verbose = True
+        self.verbose = False
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
