@@ -83,16 +83,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def extractTests(self):
         if self.initParser:
             print 'Extract Tests from config file'
-            testList = []
+            test_list = []
             tests = self.initParser.get('Tests','Test')
-            testList = self.analyseTestList(tests)
-    #        print 'done with extraction'
-            return testList
+            test_list = self.analyse_test_list(tests)
+            print test_list
+            print 'done with extraction'
+            return test_list
             pass
         else:
             raise Exception('Cannot read from configparser')
 
-    def analyseTestList(self,testList):
+    def analyse_test_list(self,testList):
+        print 'analyse_test_list'
         tests =[]
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
         test = testchain.next()
@@ -105,19 +107,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         test = testchain.next()
         tests,test,index = self.appendTemperatureGraph(tests, test, index)
         while test:
-            if 'Fulltest' in test.testname:
+            if 'fulltest' in test.testname.lower():
+                print 'appendFulltest'
                 tests,test,index = self.appendFulltest(tests,test,index)
-            elif 'Cycle' in test.testname:
+            elif 'cycle' in test.testname.lower():
+                print 'appendTemperatureCycle'
                 tests,test,index = self.appendTemperatureCycle(tests, test, index)
-            elif 'XraySpectrum' in test.testname:
+            elif 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
+                print 'appendXraySpectrum'
                 tests,test,index = self.appendXraySpectrum(tests,test,index)
             elif 'HighRateTest' in test.testname or 'HighRatePixelMap' in test.testname or 'HighRateEfficiency' in test.testname:
                 # Accept all tests with names 'HighRateTest', 'HighRatePixelMap', and 'HighRateEfficiency' as high rate tests
                 # The distinction of the tests is made within the 'appendHighRateTest' function.
+                print 'appendHighRateTest'
                 tests, test, index = self.appendHighRateTest(tests, test, index)
             elif 'powercycle' in test.testname:
                 test = test.next()
             else:
+                print 'cannot convert ', test.testname
                 index += 1
                 test = test.next()
 
@@ -228,6 +235,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 nKeys +=1
         key+='_%s'%(nKeys)
         directory =  "."
+
+        directory = './%03d' % index + '_%s' % (test.testname)
+        if test.environment.temperature >= 0:
+            directory += "_p%i" % (test.environment.temperature)
+        else:
+            directory += "_m%i" % (-test.environment.temperature)
+
+
+        # directory = '%03d' % index + '_%s' % (test.testname)
         tests.append( {
             'Key': key,
             'Module':'XrayCalibrationSpectrum',
@@ -246,12 +262,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Width':2
             }
            })
-        while test and 'XraySpectrum' in test.testname:
-            tests,test,index = self.appendFluorescenceTarget(tests,test,index)
-
+        while test:
+            if 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
+                tests,test,index = self.appendFluorescenceTarget(tests,test,index)
+            else:
+                break
         targetList = [i['InitialAttributes']['Target'] for i in tests[-1]['InitialAttributes']['SubTestResultDictList'] ]
-        #print 'XraySpectrumMethod with Targets %s'%targetList
-
+        print 'XraySpectrumMethod with Targets %s'%targetList
         return tests,test,index
 
     # Hard coded initial guess for signal position based on element name
@@ -277,18 +294,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         elif "Tb" in elementName:
             return 43744.62
         else:
-            warnings.warn('Cannot find TArget: %s' % elementName)
+            warnings.warn('Cannot find Target: %s' % elementName)
             return 0
 
     def appendFluorescenceTarget(self,tests,test,index):
         environment = test.environment
-        key = 'Module%s_%s'%(test.testname,test.environment.name)
+        key = 'FluorescenceSpectrumModule_%s'%(test.environment.name)
+
         nKeys = 1
         for item in tests:
             if item['Key'].startswith(key):
                 nKeys +=1
         key+='_%s'%(nKeys)
-        directory = '%03d' % index + '_%s' % (test.testname)
+        directory = '../%03d' % index + '_%s' % (test.testname)
         if test.environment.temperature >= 0:
             directory += "_p%i" % (test.environment.temperature)
         else:
