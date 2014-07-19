@@ -190,7 +190,8 @@ def CreateApacheWebserverConfiguration(FinalResultsPath):
     f.close()
 
 def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
-    global FinalResultDirectory
+    print 'AnalyseTestData',ModuleInformationRaw,ModuleFolder
+    global final_result_directory
     print ModuleInformationRaw, ModuleFolder
     #,ModuleInformation
     ModuleInformation = extractModuleInformation(ModuleInformationRaw)
