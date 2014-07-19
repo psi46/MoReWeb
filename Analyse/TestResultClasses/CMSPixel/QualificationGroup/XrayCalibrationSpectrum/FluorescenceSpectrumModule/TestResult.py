@@ -6,7 +6,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_FluorescenceSpectrumModule_TestResult"
         self.NameSingle = "FluorescenceSpectrumModule"
         self.Title = "Module Spectrum %s" % (self.Attributes["Target"])
-        self.verbose = True
+        self.verbose = False
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
