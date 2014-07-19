@@ -4,6 +4,7 @@ Program : MORE-Web
  Version    : 2.1
  Release Date   : 2013-05-30
 '''
+from _ast import Sub
 
 import os
 import ROOT
@@ -21,6 +22,7 @@ try:
 except NameError:
        from sets import Set as set
 import Helper.ROOTConfiguration as ROOTConfiguration
+import glob
 class GeneralTestResult:
 
     nRows = 80
@@ -239,7 +241,15 @@ class GeneralTestResult:
 
             i['DisplayOptions'] = DisplayOptions
 
-            f = __import__(self.ModulePath+'.'+SubModule+'.TestResult' ,fromlist=[''])
+            try:
+                importdir = self.ModulePath+'.'+SubModule
+                f = __import__(importdir+'.'+SubModule ,fromlist=[importdir+'.'+'TestResult'])
+            except:
+                f = __import__(self.ModulePath+'.'+SubModule+'.TestResult' ,fromlist=[''])
+                print 'imported',f, 'please change name of file'
+            except:
+                pass
+            pass
 
             self.ResultData['SubTestResults'][ i['Key'] ] = f.TestResult(
                 self.TestResultEnvironmentObject,
@@ -260,15 +270,61 @@ class GeneralTestResult:
 #         print file
         if os.path.exists(file):
             self.testSoftware = 'pyxar'
-        elif os.path.exists(self.RawTestSessionDataPath + '/pxar.log'):
-            self.testSoftware = 'pxar'
         else:
-            self.testSoftware = 'psi46expert'
+            paths = self.RawTestSessionDataPath + '/*pxar*.*'
+            data = glob.glob(paths)
+            if len(data):
+                self.testSoftware = 'pxar'
+            else:
+                self.testSoftware = 'psi46expert'
         self.HistoDict = BetterConfigParser()
         fileName = 'Configuration/HistoNames/%s.cfg' % self.testSoftware
-        print fileName, os.path.exists(fileName), os.getcwd()
-        print 'test software is %s' % self.testSoftware
         self.HistoDict.read(fileName)
+
+    def ReadModuleVersion(self):
+        if self.verbose:
+            print 'Read configParameters'
+        self.check_Test_Software()
+        format = self.HistoDict.get('ConfigParameters','configFormat')
+        fileNames = self.HistoDict.get('ConfigParameters','configParameters').split(',')
+        print fileNames
+        if format == 'dat':
+            lines = []
+            for filename in fileNames:
+                fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
+                f = open(fileName)
+                lines.extend(f.readlines())
+                f.close()
+            version = 'none'
+            for line in lines:
+                if line.strip().startswith('rocType'):
+                    version = line.split(' ')[-1]
+                elif line.strip().startswith('nRocs'):
+                    nRocs = int(line.split(' ')[-1])
+                    if self.verbose: print '\tnRocs: %s'%nRocs
+                elif line.strip().startswith('halfModule'):
+                    halfModule = int(line.split(' ')[-1])
+                    if self.verbose: print '\thalfModule: %s'%halfModule
+        elif format =='cfg':
+            config = BetterConfigParser()
+            for filename in fileNames:
+                fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
+                print fileName
+                config.read(fileName)
+            try:
+                version = config.get('ROC','type')
+            except:
+                version = 'none'
+            try:
+                nRocs = config.getint   ('Module','rocs')
+            except:
+                nRocs = 0
+            try:
+                halfModule = config.get('Module','halfModule')
+            except:
+                halfModule = 0
+        version=version.rstrip('\n')
+        return (version,nRocs,halfModule)
 
     '''
         Populates all necessary data
