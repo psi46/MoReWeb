@@ -6,4 +6,4 @@ checksum.md5
 .idea/
 *.pyc
 *.*~
-
+Configuration/Paths.cfg
