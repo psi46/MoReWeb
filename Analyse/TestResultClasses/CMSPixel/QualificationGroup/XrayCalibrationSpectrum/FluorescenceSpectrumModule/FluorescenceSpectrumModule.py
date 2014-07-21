@@ -3,10 +3,12 @@ import ROOT
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_FluorescenceSpectrumModule_TestResult"
+        method = self.Attributes['Method']
+        self.Name = "CMSPixel_QualificationGroup_XrayCalibration_"+method+"_FluorescenceTargetModule_"+self.Attributes["Target"]
+        self.Name += "_TestResult"
         self.NameSingle = "FluorescenceSpectrumModule"
-        self.Title = "Module Spectrum %s" % (self.Attributes["Target"])
-        self.verbose = False
+                          # + self.Attributes["Target"] + '_' + method
+        self.Title = "Xray Module %s - %s" % (method,self.Attributes["Target"])
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
@@ -38,6 +40,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Target': self.Attributes['Target'],
                         'TargetEnergy': self.Attributes['TargetEnergy'],
                         'TargetNElectrons': self.Attributes['TargetNElectrons'],
+                        'Method': method
                     },
                     "DisplayOptions":{
                         "Order": roc + 1,
