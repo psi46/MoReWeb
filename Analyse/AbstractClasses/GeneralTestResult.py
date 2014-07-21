@@ -243,12 +243,11 @@ class GeneralTestResult:
 
             try:
                 importdir = self.ModulePath+'.'+SubModule
-                f = __import__(importdir+'.'+SubModule ,fromlist=[importdir+'.'+'TestResult'])
+                # print 'import ',importdir,SubModule
+                f = __import__(importdir + '.'+SubModule ,fromlist=[importdir+'.'+'TestResult'])
             except:
-                f = __import__(self.ModulePath+'.'+SubModule+'.TestResult' ,fromlist=[''])
+                f = __import__(importdir + '.TestResult' ,fromlist=[''])
                 print 'imported',f, 'please change name of file'
-            except:
-                pass
             pass
 
             self.ResultData['SubTestResults'][ i['Key'] ] = f.TestResult(
@@ -686,19 +685,22 @@ class GeneralTestResult:
 
             if not TestResultObject.ResultData['Plot']['Caption']:
                 TestResultObject.ResultData['Plot']['Caption'] = TestResultObject.Title
-
-            PlotImageHTML = HtmlParser.substituteMarkerArray(
-                PlotImageHTML,
-                {
-                    '###FILENAME###':HtmlParser.MaskHTML(RecursionRelativePath+os.path.basename(TestResultObject.ResultData['Plot']['ImageFile'])),
-                    '###IMAGELARGECONTAINERID###':HtmlParser.MaskHTML(TestResultObject.Name+'_'+TestResultObject.Key),
-                    '###MARGIN_TOP###':str(int(-800./float(DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'])*
-                        float(self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight'])/2.)),
-                    '###TITLE###':TestResultObject.ResultData['Plot']['Caption'],
-                    '###WIDTH###':str(DisplayOptions['Width']),
-                    '###HEIGHT###':str(1),
-                }
-            )
+            try:
+                PlotImageHTML = HtmlParser.substituteMarkerArray(
+                    PlotImageHTML,
+                    {
+                        '###FILENAME###':HtmlParser.MaskHTML(RecursionRelativePath+os.path.basename(TestResultObject.ResultData['Plot']['ImageFile'])),
+                        '###IMAGELARGECONTAINERID###':HtmlParser.MaskHTML(TestResultObject.Name+'_'+TestResultObject.Key),
+                        '###MARGIN_TOP###':str(int(-800./float(DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'])*
+                            float(self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight'])/2.)),
+                        '###TITLE###':TestResultObject.ResultData['Plot']['Caption'],
+                        '###WIDTH###':str(DisplayOptions['Width']),
+                        '###HEIGHT###':str(1),
+                    }
+                )
+            except TypeError:
+                print TestResultObject.Name,'_',TestResultObject.Key
+                raise TypeError('Canntot convert, '+str(TestResultObject.Name) + str(TestResultObject.Key) )
             #PlotHTML = HtmlParser.substituteSubpart(PlotHTML, '###PLOT_IMAGE_'+i+'###', PlotImageHTML)
             PlotHTML = HtmlParser.substituteSubpart(PlotHTML, '###PLOT_IMAGE###', PlotImageHTML)
 
