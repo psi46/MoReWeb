@@ -2,12 +2,18 @@ import AbstractClasses
 import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_TestResult'
-        self.NameSingle='Chips'
+        self.Name='CMSPixel_QualificationGroup_Xray_Chips_TestResult'
+        self.NameSingle='Chips_Xray'
+        if self.verbose:
+            tag = self.Name + ": Custom Init"
+            print "".ljust(len(tag), '=')
+            print tag
 
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-        print 'nChips', self.ParentObject.Attributes['NumberOfChips'],type(self.ParentObject.Attributes['NumberOfChips'])
-        print 'startChip', self.ParentObject.Attributes['StartChip'],type(self.ParentObject.Attributes['StartChip'])
+        if self.verbose:
+            print 'nChips', self.ParentObject.Attributes['NumberOfChips'],type(self.ParentObject.Attributes['NumberOfChips'])
+        if self.verbose:
+            print 'startChip', self.ParentObject.Attributes['StartChip'],type(self.ParentObject.Attributes['StartChip'])
         for i in range(self.ParentObject.Attributes['NumberOfChips']-self.ParentObject.Attributes['StartChip']):
             self.ResultData['SubTestResultDictList'].append( {
                 'Key':'Chip_Xray'+str(i),
@@ -17,17 +23,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'StorageKey':'Chip_Xray'+str(i),
                     'ModuleVersion':self.Attributes['ModuleVersion'],
                     'NumberOfChips': self.Attributes['NumberOfChips'],
-                    'StartChip': self.Attributes['StartChip']
+                    'StartChip': self.Attributes['StartChip'],
+                    'SubTestResultDictList':self.Attributes["SubTestResultDictList"]
                 },
             })
 
-    def append_target(self,SubTestResult_template):
-        print 'appending target ',SubTestResult_template['Key']
-        for i in self.ResultData['SubTestResultDictList']:
-            if i['Key'].startwith('Chip'):
-                print 'append to ',i['Key']
-
     def OpenFileHandle(self):
         self.FileHandle = self.ParentObject.FileHandle
+
     def PopulateResultData(self):
         pass
