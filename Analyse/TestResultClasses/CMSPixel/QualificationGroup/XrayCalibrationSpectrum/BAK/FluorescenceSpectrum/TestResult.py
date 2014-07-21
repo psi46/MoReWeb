@@ -6,6 +6,7 @@
     Release Date: 2013-07-18
 '''
 import ROOT
+import os.path
 import AbstractClasses
 from ROOT import TFile,TF1,TH1F
 
@@ -28,11 +29,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         fileHandleName =  self.RawTestSessionDataPath + '/commander_XraySpectrum.root'
         if self.verbose:
             print "Open File Handle: %s"%fileHandleName
-        self.FileHandle = ROOT.TFile.Open(fileHandleName)
-        if not self.FileHandle:
+        if os.path.isfile(fileHandleName):
+            self.FileHandle = ROOT.TFile.Open(fileHandleName)
+        else
             fileHandleName =  self.RawTestSessionDataPath +'/commander_XrayPxar.root'
             self.FileHandle = ROOT.TFile.Open(fileHandleName)
-        raw_input('New File Handle: %s'fileHandleName)
 
     # Hard coded initial guess for signal position based on element name
     def GetInitialEnergyGuess(self,elementName):
