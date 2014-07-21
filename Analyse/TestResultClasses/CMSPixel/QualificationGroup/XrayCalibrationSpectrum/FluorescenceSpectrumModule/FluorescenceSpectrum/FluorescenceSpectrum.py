@@ -6,6 +6,7 @@
     Release Date: 2013-07-18
 '''
 import ROOT
+import os.path
 
 import AbstractClasses
 from ROOT import TFile, TF1, TH1F
@@ -14,10 +15,14 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name = 'CMSPixel_ModuleTestGroup_Module_XRayCalibration_FluorescenceTarget_TestResult'
+        self.method = self.Attributes['Method']
+        self.Name = 'CMSPixel_ModuleTestGroup_Module_XRayCalibration_{Method}_FluorescenceTarget_TestResult'.format(Method = self.method)
         self.NameSingle = 'FluorescenceTarget'
         self.Attributes['TestedObjectType'] = 'CMSPixel_ModuleTestGroup_Module_ROC'
-        self.verbose = False
+        if self.verbose:
+            tag = self.Name + ": Custom Init"
+            print "".ljust(len(tag), '=')
+            print tag
         self.fitOption = ''
         print self.NameSingle
         self.check_Test_Software()
@@ -77,13 +82,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def OpenFileHandle(self):
         if self.verbose: print self.RawTestSessionDataPath
         fileHandleName = self.RawTestSessionDataPath + '/commander_XraySpectrum.root'
+        fileHandleName =  os.path.abspath(fileHandleName)
         if self.verbose:
             print "Open File Handle: %s" % fileHandleName
-        self.FileHandle = ROOT.TFile.Open(fileHandleName)
-        if not self.FileHandle:
-            fileHandleName = self.RawTestSessionDataPath + '/commander_XrayPxar.root'
+        if os.path.isfile(fileHandleName):
             self.FileHandle = ROOT.TFile.Open(fileHandleName)
-        print self.FileHandle
+        else:
+            fileHandleName = self.RawTestSessionDataPath + '/commander_XrayPxar.root'
+            fileHandleName =  os.path.abspath(fileHandleName)
+            self.FileHandle = ROOT.TFile.Open(fileHandleName)
 
     # Hard coded initial guess for signal position based on element name
     def GetInitialEnergyGuess(self, elementName):
