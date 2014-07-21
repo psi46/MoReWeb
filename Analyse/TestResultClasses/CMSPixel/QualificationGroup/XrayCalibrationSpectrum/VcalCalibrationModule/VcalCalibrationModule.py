@@ -1,11 +1,14 @@
 import AbstractClasses
+import math
 import ROOT
+
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_VcalCalibrationModule_TestResult"
+        self.Name = "CMSPixel_QualificationGroup_XrayCalibration_{Method}_VcalCalibrationModule_TestResult".format(
+            Method=self.Attributes['Method'])
         self.NameSingle = "VcalCalibrationModule"
-        self.verbose = False
+        self.Title = 'Vcal Calibration Module - {Method}'.format(Method=self.Attributes['Method'])
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
@@ -17,13 +20,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         for roc in range(self.nRocs):
             if self.verbose:
-                print 'add subtest for Roc ',roc, "VcalCalibrationROC" + str(roc)
+                print 'add subtest for Roc ', roc, "VcalCalibrationROC" + str(roc)
             self.ResultData["SubTestResultDictList"].append(
                 {
-                    "Key": "VcalCalibrationROC" + str(roc),
+                    "Key": "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc),
                     "Module": "VcalCalibrationROC",
                     "InitialAttributes": {
-                        "StorageKey": "VcalCalibrationROC" + str(roc),
+                        "StorageKey": "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'],
+                                                                                 ROC=roc),
                         "TestResultSubDirectory": ".",
                         "IncludeIVCurve": False,
                         "ModuleID": self.Attributes["ModuleID"],
@@ -32,6 +36,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         "TestType": "Chips",
                         "TestTemperature": self.Attributes["TestTemperature"],
                         "ChipNo": roc,
+                        "Method": self.Attributes['Method'],
                     },
                     "DisplayOptions": {
                         "Order": 1,
@@ -40,7 +45,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             )
         self.Attributes['TestedObjectType'] = "VcalCalibrationModule"
-        raw_input()
 
     def PopulateResultData(self):
         if self.verbose:
@@ -54,32 +58,45 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'ROC', 'Slope', 'Slope Error', 'Offset', 'Offset Error'
                 ]
             ],
-            'BODY':[],
-            'FOOTER':[],
+            'BODY': [],
+            'FOOTER': [],
         }
 
         slopes = []
         offsets = []
+        error_slopes = []
+        error_offsets = []
         for roc in range(self.nRocs):
-            roc_results = self.ResultData['SubTestResults']['VcalCalibrationROC%i' % (roc)].ResultData
-            table_line = []
-            table_line.append(roc)
-            table_line.append("%.1f e- / Vcal" % (roc_results['KeyValueDictPairs']['Slope']['Value']))
-            table_line.append("%.1f e- / Vcal" % (roc_results['KeyValueDictPairs']['Slope']['Sigma']))
-            table_line.append("%.1f e-" % (roc_results['KeyValueDictPairs']['Offset']['Value']))
-            table_line.append("%.1f e-" % (roc_results['KeyValueDictPairs']['Offset']['Sigma']))
+            key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
+            roc_results = self.ResultData['SubTestResults'][key].ResultData
+
             slopes.append(roc_results['KeyValueDictPairs']['Slope']['Value'])
             offsets.append(roc_results['KeyValueDictPairs']['Offset']['Value'])
+
+            error_slopes.append(roc_results['KeyValueDictPairs']['Slope']['Sigma'])
+            error_offsets.append(roc_results['KeyValueDictPairs']['Offset']['Sigma'])
+
+        for roc in range (self.nRocs):
+            table_line = []
+            table_line.append(roc)
+            table_line.append("%.1f e- / Vcal" % (slopes[roc]))
+            table_line.append("%.1f e- / Vcal" % (error_slopes[roc]))
+            table_line.append("%.1f e-" % (offsets[roc]))
+            table_line.append("%.1f e-" % (error_offsets[roc]))
             self.ResultData['Table']['BODY'].append(table_line)
 
-        average_slope = 0;
-        average_offset = 0;
-        for roc in range(self.nRocs):
-            average_slope += slopes[roc]
-            average_offset += offsets[roc]
+        average_offset = reduce(lambda x, y: x + y, offsets)
+        average_slope = reduce(lambda x, y: x + y, slopes)
+        # for roc in range(self.nRocs):
+        # average_slope += slopes[roc]
+        # average_offset += offsets[roc]
 
         average_slope /= self.nRocs
+        sigma_slope = math.sqrt(
+            reduce(lambda x, y: x + y, map(lambda x: x ** 2, slopes)) / self.nRocs - average_slope ** 2)
         average_offset /= self.nRocs
+        sigma_offset = math.sqrt(
+            reduce(lambda x, y: x + y, map(lambda x: x ** 2, offsets)) / self.nRocs - average_offset ** 2)
 
         table_line = []
         table_line.append("Average")
@@ -101,3 +118,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         table_line.append("%.1f e-" % (median_offset))
         table_line.append("")
         self.ResultData['Table']['FOOTER'].append(table_line)
+
+        self.ResultData['KeyValueDictPairs'] = {
+            'avrg_Slope': {
+                'Value': round(average_slope, 3),
+                'Label': 'avrg. Slope',
+                'Unit': 'nElectrons/VCal',
+                'Sigma': round(sigma_slope, 3),
+            },
+            'avrg_Offset': {
+                'Value': round(average_offset, 3),
+                'Label': 'avrg. Offset',
+                'Unit': 'nElectrons',
+                'Sigma': round(sigma_offset, 3),
+            },
+
+        }
+        # self.ResultData['KeyList'] = ['avrg_Slope', 'avrg_Offset']
