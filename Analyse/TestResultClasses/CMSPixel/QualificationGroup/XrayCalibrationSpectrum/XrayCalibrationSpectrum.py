@@ -1,4 +1,5 @@
 import AbstractClasses
+import copy
 import ROOT
 import os
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
@@ -8,7 +9,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_TestResult"
         self.NameSingle = "XrayCalibrationSpectrum"
         self.Title = "X-ray Calibration (Pulse Height Method)"
-        self.verbose = False
         self.check_Test_Software()
         self.ROCtype, self.nRocs,self.halfModule = self.ReadModuleVersion()
         self.Attributes['NumberOfChips'] = self.nRocs
@@ -18,8 +18,47 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
             print tag
+        specturm_method_testlist = copy.deepcopy(self.Attributes["SubTestResultDictList"])
+        scurve_method_testlist = copy.deepcopy(self.Attributes["SubTestResultDictList"])
+        items = len (specturm_method_testlist)
+        start_position = 7
+        if self.verbose:
+            print 'subtestresultdict list:',self.ResultData["SubTestResultDictList"]
+        for i in specturm_method_testlist:
+            i['InitialAttributes']['Method'] = 'Spectrum'
+            i['InitialAttributes']['StorageKey'] = i['InitialAttributes']['StorageKey'] + '_Spectrum'
+            i['Key'] = i['Key']+ '_Spectrum'
+            i['DisplayOptions']['Order'] = specturm_method_testlist.index(i) + start_position
+            if self.verbose:
+                print i['Key'],':',i['DisplayOptions']['Order']
+        ntargets = len(specturm_method_testlist)
+        n_dummies = ntargets%5-1
+        for i in range(n_dummies):
+            pos =start_position+ntargets+i
+            specturm_method_testlist.append(
+            {
+                    'Key':'Dummy_{Position}'.format(Position = pos),
+                    'Module':'Dummy',
+                    'DisplayOptions':{
+                        'Order':pos,
+                    }
+                }
+            )
 
-        self.ResultData["SubTestResultDictList"] = self.Attributes["SubTestResultDictList"]
+        start_position = 8 + len(specturm_method_testlist)
+        for i in scurve_method_testlist:
+            i['InitialAttributes']['Method'] = 'SCurve'
+            i['InitialAttributes']['StorageKey'] = i['InitialAttributes']['StorageKey'] + '_SCurve'
+            i['Key'] = i['Key']+ '_SCurve'
+            i['DisplayOptions']['Order'] = scurve_method_testlist.index(i) + start_position
+            if self.verbose:
+                print i['Key'],':',i['DisplayOptions']['Order']
+
+
+        self.ResultData["SubTestResultDictList"].extend(specturm_method_testlist)
+        self.ResultData["SubTestResultDictList"].extend(scurve_method_testlist)
+
+
         self.ResultData["SubTestResultDictList"].append(
             {
                 "Key": "VcalCalibrationModule",
@@ -35,20 +74,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     "TestTemperature": self.Attributes["TestTemperature"],
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                     'NumberOfChips': self.Attributes['NumberOfChips'],
-                    'StartChip': self.Attributes['StartChip']
+                    'StartChip': self.Attributes['StartChip'],
+                    'Method':  'Spectrum'
                 },
                 "DisplayOptions":{
-                    "Order": 0,
+                    "Order": 5,
                     "Width": 5
                 }
             }
         )
         self.ResultData["SubTestResultDictList"].append(
             {
-                "Key": "VcalCalibrationSlope",
-                "Module": "VcalCalibrationSlope",
+                "Key": "VcalCalibrationModule",
+                "Module": "VcalCalibrationModule",
                 "InitialAttributes": {
-                    "StorageKey": "VcalCalibrationSlope",
+                    "StorageKey": "VcalCalibrationModule",
                     "TestResultSubDirectory": ".",
                     "IncludeIVCurve": False,
                     "ModuleID": self.Attributes["ModuleID"],
@@ -58,33 +98,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     "TestTemperature": self.Attributes["TestTemperature"],
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                     'NumberOfChips': self.Attributes['NumberOfChips'],
-                    'StartChip': self.Attributes['StartChip']
+                    'StartChip': self.Attributes['StartChip'],
+                    'Method':  'Spectrum'
                 },
                 "DisplayOptions":{
-                    "Order": 1,
-                    "Width": 1
-                }
-            }
-        )
-        self.ResultData["SubTestResultDictList"].append(
-            {
-                "Key": "VcalCalibrationOffset",
-                "Module": "VcalCalibrationOffset",
-                "InitialAttributes": {
-                    "StorageKey": "VcalCalibrationOffset",
-                    "TestResultSubDirectory": ".",
-                    "IncludeIVCurve": False,
-                    "ModuleID": self.Attributes["ModuleID"],
-                    "ModuleVersion": self.Attributes["ModuleVersion"],
-                    "ModuleType": self.Attributes["ModuleType"],
-                    "TestType": "Chips",
-                    "TestTemperature": self.Attributes["TestTemperature"],
-                    'NumberOfChips': self.Attributes['NumberOfChips'],
-                    'StartChip': self.Attributes['StartChip']
-                },
-                "DisplayOptions":{
-                    "Order": 1,
-                    "Width": 1
+                    "Order": 6,
+                    "Width": 5
                 }
             }
         )
@@ -103,14 +122,116 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     "ModuleType": self.Attributes["ModuleType"],
                     "TestType": "Chips",
                     "TestTemperature": self.Attributes["TestTemperature"],
+                    'SubTestResultDictList': self.ResultData["SubTestResultDictList"],
+                    # self.Attributes["SubTestResultDictList"],
+                    'Operator': self.Attributes['Operator'],
+                    'Method':  'Spectrum'
+
                 },
                 "DisplayOptions":{
-                    "Order": 1,
+                    "Order": 0,
                     "Width": 1
                 }
             }
         )
-
+        self.ResultData["SubTestResultDictList"].append(
+            {
+                "Key": "VcalCalibrationSlope",
+                "Module": "VcalCalibrationSlope",
+                "InitialAttributes": {
+                    "StorageKey": "VcalCalibrationSlope",
+                    "TestResultSubDirectory": ".",
+                    "IncludeIVCurve": False,
+                    "ModuleID": self.Attributes["ModuleID"],
+                    "ModuleVersion": self.Attributes["ModuleVersion"],
+                    "ModuleType": self.Attributes["ModuleType"],
+                    "TestType": "Chips",
+                    "TestTemperature": self.Attributes["TestTemperature"],
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StartChip': self.Attributes['StartChip'],
+                    'Method':  'Spectrum'
+                },
+                "DisplayOptions":{
+                    "Order": 2,
+                    "Width": 1
+                }
+            }
+        )
+        self.ResultData["SubTestResultDictList"].append(
+            {
+                "Key": "VcalCalibrationOffset",
+                "Module": "VcalCalibrationOffset",
+                "InitialAttributes": {
+                    "StorageKey": "VcalCalibrationOffset",
+                    "TestResultSubDirectory": ".",
+                    "IncludeIVCurve": False,
+                    "ModuleID": self.Attributes["ModuleID"],
+                    "ModuleVersion": self.Attributes["ModuleVersion"],
+                    "ModuleType": self.Attributes["ModuleType"],
+                    "TestType": "Chips",
+                    "TestTemperature": self.Attributes["TestTemperature"],
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StartChip': self.Attributes['StartChip'],
+                    'Method':  'Spectrum'
+                },
+                "DisplayOptions":{
+                    "Order": 2,
+                    "Width": 1
+                }
+            }
+        )
+        self.ResultData["SubTestResultDictList"].append(
+            {
+                "Key": "VcalCalibrationSlope",
+                "Module": "VcalCalibrationSlope",
+                "InitialAttributes": {
+                    "StorageKey": "VcalCalibrationSlope",
+                    "TestResultSubDirectory": ".",
+                    "IncludeIVCurve": False,
+                    "ModuleID": self.Attributes["ModuleID"],
+                    "ModuleVersion": self.Attributes["ModuleVersion"],
+                    "ModuleType": self.Attributes["ModuleType"],
+                    "TestType": "Chips",
+                    "TestTemperature": self.Attributes["TestTemperature"],
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StartChip': self.Attributes['StartChip'],
+                    'Method':  'SCurve'
+                },
+                "DisplayOptions":{
+                    "Order": 2,
+                    "Width": 1
+                }
+            }
+        )
+        self.ResultData["SubTestResultDictList"].append(
+            {
+                "Key": "VcalCalibrationOffset",
+                "Module": "VcalCalibrationOffset",
+                "InitialAttributes": {
+                    "StorageKey": "VcalCalibrationOffset",
+                    "TestResultSubDirectory": ".",
+                    "IncludeIVCurve": False,
+                    "ModuleID": self.Attributes["ModuleID"],
+                    "ModuleVersion": self.Attributes["ModuleVersion"],
+                    "ModuleType": self.Attributes["ModuleType"],
+                    "TestType": "Chips",
+                    "TestTemperature": self.Attributes["TestTemperature"],
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StartChip': self.Attributes['StartChip'],
+                    'Method':  'SCurve'
+                },
+                "DisplayOptions":{
+                    "Order": 2,
+                    "Width": 1
+                }
+            }
+        )
+        print_list = map(lambda i:[i["DisplayOptions"]['Order'],i['Key']], self.ResultData["SubTestResultDictList"])
+        for i in sorted(print_list):
+            if self.verbose:
+                print i[0],i[1]
 
         self.check_Test_Software()
 
@@ -132,3 +253,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #    'BODY':[],
         #    'FOOTER':[],
         #}
+
+    def CustomWriteToDatabase(self, ParentID):
+         pass
