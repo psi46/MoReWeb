@@ -84,9 +84,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             table_line.append("%.1f e-" % (offsets[roc]))
             table_line.append("%.1f e-" % (error_offsets[roc]))
             self.ResultData['Table']['BODY'].append(table_line)
-        print self.nRocs
-        print 'offset', offsets
-        print 'slope', slopes
+        if self.verbose:
+            print self.nRocs
+            print 'offset', offsets
+            print 'slope', slopes
         if len(slopes) == 0:
             average_offset = -1e9
             average_slope = -1e9
