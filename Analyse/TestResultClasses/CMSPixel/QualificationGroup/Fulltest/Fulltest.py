@@ -168,7 +168,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.check_Test_Software()
         fileHandlePath = self.RawTestSessionDataPath+'/commander_Fulltest.root'
         self.FileHandle = ROOT.TFile.Open(fileHandlePath)
-        self.verbose = False
         if not self.FileHandle:
             print 'problem to find %s'%fileHandlePath
             files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.root')]
@@ -181,9 +180,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 i = len(files)
                 if self.HistoDict.has_option('RootFile','filename'):
                     print 'checking for backup rootfile name'
-                    if self.HistoDict.get('RootFile','filename') in files:
-                        i = files.index(self.HistoDict.get('RootFile','filename'))
-                        print 'rootfile exists: index ',i
+                    if self.HistoDict.has_option('RootFile','filename'):
+                        if self.HistoDict.get('RootFile','filename') in files:
+                            i = files.index(self.HistoDict.get('RootFile','filename'))
+                            print 'rootfile exists: index ',i
                 while i<0 or i>= len(files):
                     try:
                         #TODO: How to continue when it happens in automatic processing...
