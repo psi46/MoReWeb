@@ -84,19 +84,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             table_line.append("%.1f e-" % (offsets[roc]))
             table_line.append("%.1f e-" % (error_offsets[roc]))
             self.ResultData['Table']['BODY'].append(table_line)
-
-        average_offset = reduce(lambda x, y: x + y, offsets)
-        average_slope = reduce(lambda x, y: x + y, slopes)
-        # for roc in range(self.nRocs):
-        # average_slope += slopes[roc]
-        # average_offset += offsets[roc]
-
-        average_slope /= self.nRocs
-        sigma_slope = math.sqrt(
-            reduce(lambda x, y: x + y, map(lambda x: x ** 2, slopes)) / self.nRocs - average_slope ** 2)
-        average_offset /= self.nRocs
-        sigma_offset = math.sqrt(
-            reduce(lambda x, y: x + y, map(lambda x: x ** 2, offsets)) / self.nRocs - average_offset ** 2)
+        print self.nRocs
+        print 'offset', offsets
+        print 'slope', slopes
+        if len(slopes) == 0:
+            average_offset = -1e9
+            average_slope = -1e9
+            sigma_slope = -1e9
+            sigma_offset = -1e9
+        else:
+            average_offset = reduce(lambda x, y: x + y, offsets)
+            average_slope = reduce(lambda x, y: x + y, slopes)
+            average_slope /= self.nRocs
+            sigma_slope = math.sqrt(
+                reduce(lambda x, y: x + y, map(lambda x: x ** 2, slopes)) / self.nRocs - average_slope ** 2)
+            average_offset /= self.nRocs
+            sigma_offset = math.sqrt(
+                reduce(lambda x, y: x + y, map(lambda x: x ** 2, offsets)) / self.nRocs - average_offset ** 2)
 
         table_line = []
         table_line.append("Average")
