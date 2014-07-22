@@ -48,5 +48,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'MarkerColor':ROOT.kPink,
                 'LineColor':ROOT.kPink,
                 'MarkerStyle':21,
-                'YaxisTitle':'Offset [e- / Vcal]',})
+                'YaxisTitle':'Offset [e- / Vcal]',
+                'MinY':-1000,
+                'MaxY':+1000,})
 
