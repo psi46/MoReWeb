@@ -48,7 +48,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                               'MarkerColor': ROOT.kPink,
                                                               'LineColor': ROOT.kPink,
                                                               'MarkerStyle': 21,
-                                                              'YaxisTitle': 'Slope [e- / Vcal]', })
+                                                              'YaxisTitle': 'Slope [e- / Vcal]',
+                                                              'MinY': 0,
+                                                              'MaxY': 100,})
 
     def SpecialPopulateData(self, TestResultObject, array, error_array, Parameters):
         TestResultObject.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), '', TestResultObject.nRocs, 0,
@@ -58,12 +60,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             TestResultObject.ResultData['Plot']['ROOTObject'].SetBinContent(i + 1, array[i])
             if with_errors:
                 TestResultObject.ResultData['Plot']['ROOTObject'].SetBinError(i + 1, error_array[i])
-        min_array = min(array)
-        max_array = max(array)
-        median_array = self.median(array)
-        average_array = reduce(lambda x, y: x + y, array) / len(array)
-        ymin = min_array
-        ymax = max_array
+        mapped_array = map(lambda x: Parameters['MinY'] < x and x < Parameters['MaxY'],array)
+        filtered_array = filter(lambda x: Parameters['MinY'] < x and x < Parameters['MaxY'], array)
+        print filtered_array,mapped_array
+        invalid_filter = (len(filtered_array) == 0)
+        if invalid_filter:
+            filtered_array = array
+        min_array = min(filtered_array)
+        max_array = max(filtered_array)
+        median_array = self.median(filtered_array)
+        average_array = reduce(lambda x, y: x + y, filtered_array) / len(filtered_array)
+        if not 'MinY' in Parameters or not 'MaxY' in Parameters:
+            print 'Cannot find Key in Parameters: ',Parameters.keys()
+            raw_input()
+        if invalid_filter:
+            ymin = min_array
+            ymax = max_array
+        else:
+           ymin = max(min_array,Parameters.get('MinY',-1e9))
+           ymax = min(max_array,Parameters.get('MaxY',+1e9))
         if ymin > 0:
             ymin *= .8
         else:
@@ -79,7 +94,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerStyle(Parameters['MarkerStyle'])
         TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerSize(0.5)
         TestResultObject.ResultData['Plot']['ROOTObject'].SetTitle("")
-        TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(ymin, ymax)
+        TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(ymin,ymax)
         TestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("ROC No.")
         TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle(Parameters['YaxisTitle'])
         TestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
