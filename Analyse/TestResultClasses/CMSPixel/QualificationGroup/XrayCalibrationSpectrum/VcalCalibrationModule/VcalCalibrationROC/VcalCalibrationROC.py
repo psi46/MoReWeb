@@ -83,18 +83,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                   sortedPeakCenters[len(sortedPeakCenters) - 1])
         chi2Total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
-        chi2Total /= ndf_total
+        if ndf_total > 0:
+            chi2Total /= ndf_total
         self.ResultData['Plot']['ROOTObject'].Fit("pol1", fitOption, "SAME", sortedPeakCenters[1],
                                                   sortedPeakCenters[len(sortedPeakCenters) - 1])
         chi2Right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
-        if ndf_right:
+        if ndf_right > 0:
             chi2Right /= ndf_right
         self.ResultData['Plot']['ROOTObject'].Fit("pol1", fitOption, "SAME", sortedPeakCenters[0],
                                                   sortedPeakCenters[len(sortedPeakCenters) - 2])
         chi2Left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
-        if ndf_left:
+        if ndf_left > 0:
             chi2Left /= ndf_left
         if self.verbose:
             print 'Comparing Chi^2 for different fit ranges:'
