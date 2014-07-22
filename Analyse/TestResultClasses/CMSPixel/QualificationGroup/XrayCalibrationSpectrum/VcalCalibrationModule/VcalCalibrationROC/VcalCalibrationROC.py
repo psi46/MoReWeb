@@ -8,6 +8,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_VcalCalibrationModule_VcalCalibrationROC_TestResult"
         self.NameSingle = "VcalCalibrationROC"
         self.Title = "Vcal Calibration ROC %i" % (self.Attributes['ChipNo'])
+        self.ChipNo = self.Attributes['ChipNo']
+        self.Method = self.Attributes['Method']
         self.verbose = False
         if self.verbose:
             tag = self.Name + ": Custom Init"
@@ -75,6 +77,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'].SetMarkerColor(4)
         self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.6)
         # self.ResultData['Plot']['ROOTObject'].SetMarkerStyle(21)
+
+        #Fitting of Slope
         self.ResultData['Plot']['ROOTObject'].Fit("pol1", fitOption, "SAME", sortedPeakCenters[0],
                                                   sortedPeakCenters[len(sortedPeakCenters) - 1])
         chi2Total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
@@ -113,6 +117,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                       sortedPeakCenters[len(sortedPeakCenters) - 1])
 
         fit = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1")
+        name = 'linFit_{Method}_C{ChipNo}'.format(Method = self.Method,ChipNo = self.ChipNo)
+        self.ResultData['Plot']['ROOTObject'].GetListOfFunctions().Add(fit.Clone(name))
+        self.ResultData['Plot']['ROOTObject'].GetFunction(name).SetRange(0,255)
+        self.ResultData['Plot']['ROOTObject'].GetFunction(name).SetLineStyle(2)
+
         self.ResultData['KeyValueDictPairs'] = {
             'Slope': {
                 'Value': round(fit.GetParameter(1), 3),
