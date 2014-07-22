@@ -62,7 +62,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 TestResultObject.ResultData['Plot']['ROOTObject'].SetBinError(i + 1, error_array[i])
         mapped_array = map(lambda x: Parameters['MinY'] < x and x < Parameters['MaxY'],array)
         filtered_array = filter(lambda x: Parameters['MinY'] < x and x < Parameters['MaxY'], array)
-        print filtered_array,mapped_array
+        if TestResultObject.verbose:
+            print filtered_array,mapped_array
         invalid_filter = (len(filtered_array) == 0)
         if invalid_filter:
             filtered_array = array
