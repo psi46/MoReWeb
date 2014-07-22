@@ -323,6 +323,10 @@ class GeneralTestResult:
             except:
                 halfModule = 0
         version=version.rstrip('\n')
+        if self.verbose:
+            print 'Version:    ', version
+            print 'nRocs:      ', nRocs
+            print 'halfModule: ', halfModule
         return (version,nRocs,halfModule)
 
     '''
