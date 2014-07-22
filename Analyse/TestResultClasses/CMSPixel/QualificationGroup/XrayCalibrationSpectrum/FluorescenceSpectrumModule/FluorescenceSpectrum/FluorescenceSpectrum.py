@@ -16,15 +16,19 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.method = self.Attributes['Method']
-        self.Name = 'CMSPixel_ModuleTestGroup_Module_XRayCalibration_{Method}_FluorescenceTarget_TestResult'.format(Method = self.method)
+        self.Name = 'CMSPixel_ModuleTestGroup_Module_XRayCalibration'
+        self.Name += '_{Method}_FluorescenceTarget_{Target}_C{ChipNo}_TestResult'.format(Method = self.method,
+                                                                                  ChipNo = self.Attributes['ChipNo'],
+                                                                                  Target = self.Attributes["Target"])
         self.NameSingle = 'FluorescenceTarget'
+        #_{Method}_C{ChipNo}'.format(Method = self.method, ChipNo = self.Attributes['ChipNo'])
         self.Attributes['TestedObjectType'] = 'CMSPixel_ModuleTestGroup_Module_ROC'
+        self.verbose = True
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
             print tag
         self.fitOption = ''
-        print self.NameSingle
         self.check_Test_Software()
         if not self.verbose:
             self.fitOption += 'Q'
@@ -90,7 +94,56 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             fileHandleName = self.RawTestSessionDataPath + '/commander_XrayPxar.root'
             fileHandleName =  os.path.abspath(fileHandleName)
-            self.FileHandle = ROOT.TFile.Open(fileHandleName)
+            if os.path.exists(fileHandleName):
+                if self.verbose:
+                    print "Open File Handle: %s" % fileHandleName
+                self.FileHandle = ROOT.TFile.Open(fileHandleName)
+            elif self.verbose:
+                print 'path does not exists ',fileHandleName
+        if self.verbose:
+            print "File Handle: %s" % self.FileHandle
+        if not self.FileHandle:
+            if self.verbose:
+                print 'problem to find %s'%fileHandleName
+            files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.root')]
+            i = 0
+            if len(files)>1:
+                print '\nPossible Candidates for ROOT files are:'
+                for f in files:
+                    print '\t[%3d]\t%s'%(i,f)
+                    i += 1
+                i = len(files)
+                if self.HistoDict.has_option('RootFile','filename'):
+                    print 'checking for backup rootfile name'
+                    if self.HistoDict.get('RootFile','filename') in files:
+                        i = files.index(self.HistoDict.get('RootFile','filename'))
+                        print 'rootfile exists: index ',i
+                while i<0 or i>= len(files):
+                    try:
+                        #TODO: How to continue when it happens in automatic processing...
+
+                        if self.verbose:
+                            rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]\t'%(len(files)-1))
+                            i =  int(rawInput)
+                        elif self.HistoDict.has_option('RootFile','filename'):
+                            if self.HistoDict.get('RootFile','filename') in files:
+                                i = files.index(self.HistoDict.get('RootFile','filename'))
+                        else:
+                            i = 0
+
+                    except:
+                        print '%s is not an integer, please enter a valid integer'%rawInput
+                fileHandlePath = self.RawTestSessionDataPath+'/'+files[i]
+                print "open '%s'"%fileHandlePath
+                self.FileHandle = ROOT.TFile.Open(fileHandlePath)
+            elif len(files) == 1:
+                i = 0
+                fileHandlePath = self.RawTestSessionDataPath+'/'+files[i]
+                if self.verbose:
+                    print "only one other ROOT file exists. Open '%s'"%fileHandlePath
+                self.FileHandle = ROOT.TFile.Open(fileHandlePath)
+            else:
+                print 'There exist no ROOT file in "%s"'%self.RawTestSessionDataPath
 
     # Hard coded initial guess for signal position based on element name
     def GetInitialEnergyGuess(self, elementName):
@@ -114,6 +167,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             return self.InitialEnergyGuess
         if "Sn" in elementName:
             self.InitialEnergyGuess = 198
+            return self.InitialEnergyGuess
+        if "Ba" in elementName:
+            self.InitialEnergyGuess = 185
             return self.InitialEnergyGuess
         self.InitialEnergyGuess = -1
         return self.InitialEnergyGuess
@@ -271,7 +327,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #Signal peak should be have a sigma of ~10
         signalSigma = 10
         #Try to get where the peak should be
-        initguess = self.GetInitialEnergyGuess(histo.GetName())
+        initguess = self.GetInitialEnergyGuess(self.Attributes["Target"])
         left = 0
         right = 0
         if (initguess < 0):
@@ -348,7 +404,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         if self.verbose:
-            print '\nPopulateResultData', self.NameSingle, self.Attributes['Target']
+            tag = 'PopulateResultData', self.NameSingle, self.Attributes['Target']+ ": Custom Init"
+            print "".ljust(len(tag), '=')
+            print tag
         HistoDict = self.HistoDict
         histname = HistoDict.get(self.NameSingle, 'PH_Calibration')
 
