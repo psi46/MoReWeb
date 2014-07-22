@@ -63,7 +63,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             i['InitialAttributes']['Operator'] = Operator
             i['InitialAttributes']['Hostname'] = Hostname
             i['InitialAttributes']['TestCenter'] = TestCenter
-            print i['Key'],i['InitialAttributes']['Operator'],i['InitialAttributes']['Hostname'], i['InitialAttributes']['TestCenter']
+            if self.verbose:
+                print i['Key'],i['InitialAttributes']['Operator'],i['InitialAttributes']['Hostname'], i['InitialAttributes']['TestCenter']
 
     def analyseTestIniFile(self):
         absPath = self.TestResultEnvironmentObject.ModuleDataDirectory+'/configfiles'
@@ -90,7 +91,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             test_list = []
             tests = self.initParser.get('Tests','Test')
             test_list = self.analyse_test_list(tests)
-            print test_list
             print 'done with extraction'
             return test_list
             pass
@@ -112,39 +112,26 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         tests,test,index = self.appendTemperatureGraph(tests, test, index)
         while test:
             if 'fulltest' in test.testname.lower():
-                print 'appendFulltest'
+                print '\t-> appendFulltest'
                 tests,test,index = self.appendFulltest(tests,test,index)
             elif 'cycle' in test.testname.lower():
-                print 'appendTemperatureCycle'
+                print '\t-> appendTemperatureCycle'
                 tests,test,index = self.appendTemperatureCycle(tests, test, index)
             elif 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
-                print 'appendXraySpectrum'
+                print '\t-> appendXraySpectrum'
                 tests,test,index = self.appendXraySpectrum(tests,test,index)
             elif 'HighRateTest' in test.testname or 'HighRatePixelMap' in test.testname or 'HighRateEfficiency' in test.testname:
                 # Accept all tests with names 'HighRateTest', 'HighRatePixelMap', and 'HighRateEfficiency' as high rate tests
                 # The distinction of the tests is made within the 'appendHighRateTest' function.
-                print 'appendHighRateTest'
+                print '\t-> appendHighRateTest'
                 tests, test, index = self.appendHighRateTest(tests, test, index)
             elif 'powercycle' in test.testname:
                 test = test.next()
             else:
-                print 'cannot convert ', test.testname
+                if self.verbose:
+                    print '\t-> cannot convert ', test.testname
                 index += 1
                 test = test.next()
-
-#        print '\n'
-#        for item in tests:
-#            for key in item:
-#                print key,": ",item[key]
-
-#            for key, value in item:
-#                print key, value
-#            print '\n'
-#        for item in testchain:
-#            print item
-#        for item in testList:
-#            item.
-#            pass
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
         return tests
 
@@ -272,7 +259,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             else:
                 break
         targetList = [i['InitialAttributes']['Target'] for i in tests[-1]['InitialAttributes']['SubTestResultDictList'] ]
-        print 'XraySpectrumMethod with Targets %s'%targetList
+        print '\t    XraySpectrumMethod with Targets %s'%targetList
         self.appendOperationDetails(tests)
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
         return tests,test,index
