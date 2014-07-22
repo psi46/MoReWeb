@@ -21,7 +21,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                                                                   Method=self.method)
 
     def PopulateResultData(self):
-        self.verbose = True
         if self.verbose:
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')
@@ -30,8 +29,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         all_targets = filter(lambda x: x.startswith('Fluorescence'),
                              self.ParentObject.ParentObject.ParentObject.ResultData['SubTestResults'])
-
-        print self.ParentObject.ParentObject.ParentObject.ResultData['SubTestResults'].keys()
 
         all_targets = self.ParentObject.ParentObject.ParentObject.ResultData['SubTestResults'][
             self.Attributes['target_key']]
@@ -65,5 +62,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
 
         self.ResultData['KeyList'] = ['Slope', 'Offset']
-        print slope
         self.ResultData['KeyValueDictPairs'] = {'Slope': slope,'Offset': offset}
