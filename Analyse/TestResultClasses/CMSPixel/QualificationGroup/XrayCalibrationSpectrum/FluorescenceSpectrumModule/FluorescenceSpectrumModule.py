@@ -38,8 +38,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         "TestTemperature": self.Attributes["TestTemperature"],
                         "ChipNo": roc,
                         'Target': self.Attributes['Target'],
-                        'TargetEnergy': self.Attributes['TargetEnergy'],
-                        'TargetNElectrons': self.Attributes['TargetNElectrons'],
                         'Method': method
                     },
                     "DisplayOptions":{
