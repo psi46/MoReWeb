@@ -111,25 +111,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         TestResultObject.ResultData['KeyValueDictPairs'] = {
             'avrg%s' % Parameters['Key']: {
                 "Value": average_array,
-                "Sigma": 0,
+                # "Sigma": 0,
                 "Label": 'avrg %s' % Parameters['Key'],
                 "Unit": "",
             },
             'min%s' % Parameters['Key']: {
                 "Value": min_array,
-                "Sigma": 0,
+                # "Sigma": 0,
                 "Label": 'min %s' % Parameters['Key'],
                 "Unit": "",
             },
             'max%s' % Parameters['Key']: {
                 "Value": max_array,
-                "Sigma": 0,
+                # "Sigma": 0,
                 "Label": 'max %s' % Parameters['Key'],
                 "Unit": "",
             },
             'median%s' % Parameters['Key']: {
                 "Value": median_array,
-                "Sigma": 0,
+                # "Sigma": 0,
                 "Label": 'median %s' % Parameters['Key'],
                 "Unit": "",
             }
