@@ -279,6 +279,8 @@ class GeneralTestResult:
         self.HistoDict = BetterConfigParser()
         fileName = 'Configuration/HistoNames/%s.cfg' % self.testSoftware
         self.HistoDict.read(fileName)
+        fileName = 'Configuration/HistoNames/global.cfg'
+        self.HistoDict.read(fileName)
 
     def ReadModuleVersion(self):
         if self.verbose:
@@ -286,7 +288,6 @@ class GeneralTestResult:
         self.check_Test_Software()
         format = self.HistoDict.get('ConfigParameters','configFormat')
         fileNames = self.HistoDict.get('ConfigParameters','configParameters').split(',')
-        print fileNames
         if format == 'dat':
             lines = []
             for filename in fileNames:
@@ -308,11 +309,13 @@ class GeneralTestResult:
             config = BetterConfigParser()
             for filename in fileNames:
                 fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
-                print fileName
                 config.read(fileName)
             try:
                 version = config.get('ROC','type')
             except:
+                warnings.warn('cannot find version name {section}'.format(section = config.sections()))
+                if 'ROC' in config.sections():
+                    warnings.warn('cannot find version ROC-section {section}'.format(section = config.options('ROC')))
                 version = 'none'
             try:
                 nRocs = config.getint   ('Module','rocs')
@@ -327,6 +330,9 @@ class GeneralTestResult:
             print 'Version:    ', version
             print 'nRocs:      ', nRocs
             print 'halfModule: ', halfModule
+        self.version = version
+        self.nRocs = nRocs
+        self.halfModule = halfModule
         return (version,nRocs,halfModule)
 
     '''
