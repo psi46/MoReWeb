@@ -43,12 +43,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print roc, roc_offset, roc_offset_error
             offsets.append(roc_offset)
             error_offsets.append(roc_offset_error)
-        vcal_calibration = self.ParentObject.ResultData['SubTestResults']['VcalCalibrationSlope']
+        vcal_calibration = self.ParentObject.ResultData['SubTestResults']['VcalCalibrationSlope_'+self.method]
         vcal_calibration.SpecialPopulateData(self,offsets,error_offsets,{'Key':'Offset',
                 'MarkerColor':ROOT.kPink,
                 'LineColor':ROOT.kPink,
                 'MarkerStyle':21,
                 'YaxisTitle':'Offset [e- / Vcal]',
-                'MinY':-1000,
-                'MaxY':+1000,})
+                'MinY':-2000,
+                'MaxY':+2000,})
 
