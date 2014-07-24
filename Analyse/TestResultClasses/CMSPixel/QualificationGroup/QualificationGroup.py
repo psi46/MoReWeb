@@ -58,13 +58,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Hostname = self.initParser.get('OperationDetails','Hostname')
             if self.initParser.has_option('OperationDetails','TestCenter'):
                 TestCenter = self.initParser.get('OperationDetails','TestCenter')
-
-        for i in testlist:
-            i['InitialAttributes']['Operator'] = Operator
-            i['InitialAttributes']['Hostname'] = Hostname
-            i['InitialAttributes']['TestCenter'] = TestCenter
-            if self.verbose:
-                print i['Key'],i['InitialAttributes']['Operator'],i['InitialAttributes']['Hostname'], i['InitialAttributes']['TestCenter']
+        if testlist:
+            for i in testlist:
+                i['InitialAttributes']['Operator'] = Operator
+                i['InitialAttributes']['Hostname'] = Hostname
+                i['InitialAttributes']['TestCenter'] = TestCenter
+                if self.verbose:
+                    print i['Key'],i['InitialAttributes']['Operator'],i['InitialAttributes']['Hostname'], i['InitialAttributes']['TestCenter']
 
     def analyseTestIniFile(self):
         absPath = self.TestResultEnvironmentObject.ModuleDataDirectory+'/configfiles'
@@ -261,34 +261,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         targetList = [i['InitialAttributes']['Target'] for i in tests[-1]['InitialAttributes']['SubTestResultDictList'] ]
         print '\t    XraySpectrumMethod with Targets %s'%targetList
         self.appendOperationDetails(tests)
-        self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
+        self.appendOperationDetails(tests[-1]['InitialAttributes']['SubTestResultDictList'])
         return tests,test,index
 
     # Hard coded initial guess for signal position based on element name
-    def GetEnergy(self,elementName):
-        if "Fe" in elementName:
-            return 6391.02
-        elif "Ni" in elementName:
-            return 7461.03
-        elif "Cu" in elementName:
-            return 8027.84
-        elif "Br" in elementName:
-            return 11877.75
-        elif "Rb" in elementName:
-            return 13335.88
-        elif "Mo" in elementName:
-            return 17374.29
-        elif "Ag" in elementName:
-            return 21990.30
-        elif "Sn" in elementName:
-            return 25044.04
-        elif "Ba" in elementName:
-            return 31816.615
-        elif "Tb" in elementName:
-            return 43744.62
-        else:
-            warnings.warn('Cannot find Target: %s' % elementName)
-            return 0
 
     def appendFluorescenceTarget(self,tests,test,index):
         environment = test.environment
@@ -304,8 +280,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             directory += "_p%i" % (test.environment.temperature)
         else:
             directory += "_m%i" % (-test.environment.temperature)
-        TargetEnergy= self.GetEnergy(environment.name)
-        TargetNElectrons = TargetEnergy / 3.6
         if not tests[-1].has_key('InitialAttributes'):
             tests[-1]['InitialAttributes'] = {}
         if not tests[-1]['InitialAttributes'].has_key('SubTestResultDictList'):
@@ -323,8 +297,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'TestType': '%s_%s'%(test.environment.name,nKeys),
                         'TestTemperature':test.environment.temperature,
                         'Target': environment.name,
-                        'TargetEnergy': TargetEnergy,
-                        'TargetNElectrons': TargetNElectrons,
                         'Operator': 'UNKNOWN',
                         'Hostname': 'UNKNOWN',
                         'TestCenter': 'UNKNOWN',
