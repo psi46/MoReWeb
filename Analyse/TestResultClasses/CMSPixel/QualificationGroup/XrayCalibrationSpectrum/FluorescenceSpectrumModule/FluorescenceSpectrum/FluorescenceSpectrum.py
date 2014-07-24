@@ -23,66 +23,35 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle = 'FluorescenceTarget'
         #_{Method}_C{ChipNo}'.format(Method = self.method, ChipNo = self.Attributes['ChipNo'])
         self.Attributes['TestedObjectType'] = 'CMSPixel_ModuleTestGroup_Module_ROC'
-        self.verbose = True
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
             print tag
         self.fitOption = ''
         self.check_Test_Software()
+        self.ReadModuleVersion()
         if not self.verbose:
             self.fitOption += 'Q'
+        if self.Attributes['ChipNo'] == 1 and 'Mo' in self.Attributes['Target']:
+            self.verbose = True
+            # 'TargetEnergy': TargetEnergy,
+        TargetEnergy = self.GetEnergy(self.Attributes['Target'])
+        self.Attributes['TargetEnergy'] = TargetEnergy
+        self.Attributes['TargetNElectrons'] = TargetEnergy / 3.6
+
+
+    def GetEnergy(self,elementName):
+        keys = self.HistoDict.options('XrayTargetEnergies')
+        energy = 0
+        for target in keys:
+            if target in elementName:
+                energy = self.HistoDict.getfloat('XrayTargetEnergies',target)
+                return energy
+        return energy
 
     def SetStoragePath(self):
         pass
 
-    #
-    # def OpenFileHandle(self):
-    # self.check_Test_Software()
-    #         fileHandlePath = self.RawTestSessionDataPath+'/commander_Fulltest.root'
-    #         self.FileHandle = ROOT.TFile.Open(fileHandlePath)
-    #         self.verbose = True
-    #         if not self.FileHandle:
-    #             print 'problem to find %s'%fileHandlePath
-    #             files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.root')]
-    #             i = 0
-    #             if len(files)>1:
-    #                 print '\nPossible Candidates for ROOT files are:'
-    #                 for f in files:
-    #                     print '\t[%3d]\t%s'%(i,f)
-    #                     i += 1
-    #                 i = len(files)
-    #                 if self.HistoDict.has_option('RootFile','filename'):
-    #                     print 'checking for backup rootfile name'
-    #                     if self.HistoDict.get('RootFile','filename') in files:
-    #                         i = files.index(self.HistoDict.get('RootFile','filename'))
-    #                         print 'rootfile exists: index ',i
-    #                 while i<0 or i>= len(files):
-    #                     try:
-    #                         #TODO: How to continue when it happens in automatic processing...
-    #
-    #                         if self.verbose:
-    #                             rawInput = raw_input('There are more than one possbile candidate for the ROOT file. Which file should be used? [0-%d]\t'%(len(files)-1))
-    #                             i =  int(rawInput)
-    #                         elif self.HistoDict.has_option('RootFile','filename'):
-    #                             if self.HistoDict.get('RootFile','filename') in files:
-    #                                 i = files.index(self.HistoDict.get('RootFile','filename'))
-    #                         else:
-    #                             i = 0
-    #
-    #                     except:
-    #                         print '%s is not an integer, please enter a valid integer'%rawInput
-    #                 fileHandlePath = self.RawTestSessionDataPath+'/'+files[i]
-    #                 print "open '%s'"%fileHandlePath
-    #                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
-    #             elif len(files) == 1:
-    #                 i = 0
-    #                 fileHandlePath = self.RawTestSessionDataPath+'/'+files[i]
-    #                 print "only one other ROOT file exists. Open '%s'"%fileHandlePath
-    #                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
-    #             else:
-    #                 print 'There exist no ROOT file in "%s"'%self.RawTestSessionDataPath
-    #
     def OpenFileHandle(self):
         if self.verbose: print self.RawTestSessionDataPath
         fileHandleName = self.RawTestSessionDataPath + '/commander_XraySpectrum.root'
@@ -147,32 +116,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     # Hard coded initial guess for signal position based on element name
     def GetInitialEnergyGuess(self, elementName):
-        if "Fe" in elementName:
-            self.InitialEnergyGuess = 56.7
-            return self.InitialEnergyGuess
-        if "Ni" in elementName:
-            self.InitialEnergyGuess = 63.7
-            return self.InitialEnergyGuess
-        if "Cu" in elementName:
-            self.InitialEnergyGuess = 81.8
-            return self.InitialEnergyGuess
-        if "Br" in elementName:
-            self.InitialEnergyGuess = 112.1
-            return self.InitialEnergyGuess
-        if "Mo" in elementName:
-            self.InitialEnergyGuess = 138.9
-            return self.InitialEnergyGuess
-        if "Ag" in elementName:
-            self.InitialEnergyGuess = 156.6
-            return self.InitialEnergyGuess
-        if "Sn" in elementName:
-            self.InitialEnergyGuess = 198
-            return self.InitialEnergyGuess
-        if "Ba" in elementName:
-            self.InitialEnergyGuess = 185
-            return self.InitialEnergyGuess
-        self.InitialEnergyGuess = -1
-        return self.InitialEnergyGuess
+        if self.HistoDict.has_option(self.version,'InitalXrayEnergyVcalFit'):
+            fit_string = self.HistoDict.get(self.version,'InitalXrayEnergyVcalFit')
+        else:
+            fit_string = self.HistoDict.get('psi46digv2.1','InitalXrayEnergyVcalFit')
+
+        energy = self.Attributes['TargetEnergy']
+        energy_conversion = ROOT.TFormula("fEnergyConversion",fit_string)
+        vcal_guess = energy_conversion.Eval(energy)
+        self.InitialEnergyGuess = vcal_guess
+        return vcal_guess
+
 
     #'''
     #    * Function to fit a histogram with a gaussian signal riding on top of
@@ -199,6 +153,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         gaus0 = gausfit.GetParameter(0)
         gaus1 = gausfit.GetParameter(1)
         gaus2 = gausfit.GetParameter(2)
+        if self.verbose:
+            print 'Found Start parameter: ', gaus0, gaus1, gaus2
 
         myfit = TF1(name, "([0]+[1]*x+gaus(2)+gaus(5))*(1+TMath::Erf((x-[8])/[9]))/2", min, max)
 
@@ -223,38 +179,63 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         #Initial guess of constant part is half of the overall y-average
         myfit.SetParameter(0, y_avg / 2)
+        if self.verbose:
+            print 'SetParameter0: ',myfit.GetParameter(0)
 
         #Limit on the constant part; it should be positive, and below the y-average because the y-average is biased above the noise by the signal peak
         myfit.SetParLimits(0, 0, y_avg)
+        if self.verbose:
+            print 'SetParameterLimits0: ', 0, y_avg
 
         #Initial guess of the linear part is flat
         myfit.SetParameter(1, 0)
+        if self.verbose:
+            print 'SetParameter1: ',myfit.GetParameter(1)
 
         #Limits on the linear part, from the hardcoded value above
         myfit.SetParLimits(1, -1 * param1limit, param1limit)
+        if self.verbose:
+            print 'SetParameterLimits1: ', -1 * param1limit, param1limit
 
         #Initial guess for the size of the signal is the maximum of the histogram
         myfit.SetParameter(2, maximum)
+        if self.verbose:
+            print 'SetParameter2: ',myfit.GetParameter(2)
         myfit.SetParLimits(2, 0.5 * maximum, 2 * maximum)
+        if self.verbose:
+            print 'SetParameterLimits2: ', 0.5 * maximum, 2 * maximum
 
         #Initial guess for the center of the signal to be where the maximum bin is located
         myfit.SetParameter(3, maxbin)
+        if self.verbose:
+            print 'SetParameter3: ',myfit.GetParameter(3)
 
         low = maxbin - 2 * signalSigma
 
         if (low < trimvalue):
             low = trimvalue
         myfit.SetParLimits(3, low, maxbin + 2 * signalSigma)
+        if self.verbose:
+            print 'SetParameterLimits3: ', maxbin + 2 * signalSigma
 
         #Initial guess for the sigma of the signal, from the hardcoded value above
         myfit.SetParameter(4, signalSigma)
+        if self.verbose:
+            print 'SetParameter4: ',myfit.GetParameter(4)
 
         myfit.SetParLimits(4, signalSigma - 5, signalSigma + 5)
+        if self.verbose:
+            print 'SetParameterLimits4: ', signalSigma - 5, signalSigma + 5
 
         #Initial guess for the size of the guassian noise to be half of the overall y-average (other half is the constant term)
         myfit.SetParameter(5, y_avg / 2)
+
+        if self.verbose:
+            print 'SetParameter5: ',myfit.GetParameter(5)
         #Limits on the amount of gaussian noise, should be below y-average but above 0 for the same reasons as listed for Par0
         myfit.SetParLimits(5, 0, y_avg)
+        if self.verbose:
+            print 'SetParameterLimits4: ',0, y_avg
 
         #Initial guess for gaussian noise at the mean of the histogram
         myfit.SetParameter(6, mean)
@@ -277,6 +258,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         myfit.SetParLimits(9, 0.01, 10)
 
         histo.Fit(myfit, self.fitOption)
+        if self.verbose:
+            for i in range(10):
+                a = ROOT.Double(0)
+                b = ROOT.Double(0)
+                myfit.GetParLimits(i,a,b)
+                print i,'%8.2f [%6.2f,%6.2f]'%(myfit.GetParameter(i),a,b)
+
         if self.Attributes.has_key('TargetEnergy'):
             targetEnergy = self.Attributes['TargetEnergy']
         else:
