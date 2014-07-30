@@ -60,7 +60,7 @@ class TestResultEnvironment:
         'minThrDiff':-5,
         'maxThrDiff':5,
         'BumpBondThr': 150,
-        'StandardADC2ElectronConversionFactor':65,
+        'StandardVcal2ElectronConversionFactor':50,
         'IVCurrentFactor':-1e6,
         'TrimBitDifference':2.,
         'excludeTrimBit14':1,
