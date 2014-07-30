@@ -3,7 +3,10 @@ import ROOT
 
 def get_histo(rootfile,histoname,rocNo = None):
     if rocNo !=None:
-        histoname = histoname%rocNo
+        try:
+            histoname = histoname%rocNo
+        except TypeError:
+            print 'cannot append RocNo: ',rocNo,' at ', histoname
 
     histoname = histoname.split('.')
     if not type(rootfile) == ROOT.TFile:
