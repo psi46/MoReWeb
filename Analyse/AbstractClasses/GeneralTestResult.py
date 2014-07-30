@@ -284,9 +284,9 @@ class GeneralTestResult:
             else:
                 self.testSoftware = 'psi46expert'
         self.HistoDict = BetterConfigParser()
-        fileName = 'Configuration/HistoNames/%s.cfg' % self.testSoftware
+        fileName = 'Configuration/Software/%s.cfg' % self.testSoftware
         self.HistoDict.read(fileName)
-        fileName = 'Configuration/HistoNames/global.cfg'
+        fileName = 'Configuration/Software/global.cfg'
         self.HistoDict.read(fileName)
 
     def check_for_comments(self):
