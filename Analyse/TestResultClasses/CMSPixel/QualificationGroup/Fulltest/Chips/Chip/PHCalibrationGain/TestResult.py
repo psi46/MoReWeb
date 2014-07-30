@@ -100,7 +100,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             self.ResultData['Plot']['ROOTObject_hGain'].GetYaxis().SetRangeUser(0.5, 5.0*self.ResultData['Plot']['ROOTObject_hGain'].GetMaximum())
             self.ResultData['Plot']['ROOTObject_hGain'].SetLineColor(ROOT.kBlack)
-            self.ResultData['Plot']['ROOTObject_hGain'].GetXaxis().SetTitle("Gain [ADC/DAC]");
+            self.ResultData['Plot']['ROOTObject_hGain'].GetXaxis().SetTitle("Gain [ADC/Vcal - Par1]");
             self.ResultData['Plot']['ROOTObject_hGain'].GetYaxis().SetTitle("No. of Entries");
             self.ResultData['Plot']['ROOTObject_hGain'].GetXaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject_hGain'].GetYaxis().SetTitleOffset(1.2);

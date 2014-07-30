@@ -62,7 +62,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         #Threshold, Sign, SomeString, a, b = Line.strip().split()
 
                         self.ResultData['Plot']['ROOTObject'].Fill(Width)
-                        Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardADC2ElectronConversionFactor']
+                        Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         if not isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:
                             self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
