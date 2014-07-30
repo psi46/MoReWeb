@@ -6,8 +6,8 @@ Program : MORE-Web
 '''
 from _ast import Sub
 
-import os
 import ROOT
+import glob
 import gzip
 import sys
 import datetime
@@ -245,7 +245,10 @@ class GeneralTestResult:
                 importdir = self.ModulePath+'.'+SubModule
                 # print 'import ',importdir,SubModule
                 f = __import__(importdir + '.'+SubModule ,fromlist=[importdir+'.'+'TestResult'])
-            except:
+            except Exception as inst:
+                # print 'could not ',importdir+'.'+SubModule,SubModule
+                # print 'type',type(inst)
+                # print 'inst',inst
                 f = __import__(importdir + '.TestResult' ,fromlist=[''])
                 print 'imported',f, 'please change name of file'
             pass
@@ -264,14 +267,18 @@ class GeneralTestResult:
             i2+= 1
 
     def check_Test_Software(self):
-#         print self.RawTestSessionDataPath
-        file = self.RawTestSessionDataPath + '/test.cfg'
+        # file = self.RawTestSessionDataPath + '/test.cfg'
 #         print file
-        if os.path.exists(file):
+        self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
+        files = glob.glob(self.RawTestSessionDataPath+'/test.cfg') + \
+        glob.glob(self.RawTestSessionDataPath+'/*/test.cfg')
+        # print 'pyxar:',files
+        if len(files) > 0:
             self.testSoftware = 'pyxar'
         else:
-            paths = self.RawTestSessionDataPath + '/*pxar*.*'
-            data = glob.glob(paths)
+            data = glob.glob(self.RawTestSessionDataPath+'/*pxar*.*') + \
+                    glob.glob(self.RawTestSessionDataPath+'/*/*pxar*.*')
+
             if len(data):
                 self.testSoftware = 'pxar'
             else:
@@ -281,6 +288,31 @@ class GeneralTestResult:
         self.HistoDict.read(fileName)
         fileName = 'Configuration/HistoNames/global.cfg'
         self.HistoDict.read(fileName)
+
+    def check_for_comments(self):
+        dir = os.path.abspath(self.RawTestSessionDataPath)
+        comment_files = glob.glob(dir+'/comment*')
+        comment =''
+        for filename in comment_files:
+            comment +='{filename}:\n'.format(filename=filename.split('/')[-1])
+            with file(filename) as f:
+                s = f.read()
+            comment += s +'\n\n'
+        # if self.ResultData:
+        #     if not 'KeyVaueDictPairs' in self.ResultData:
+        #         self.ResultData['KeyValueDictPairs'] = {}
+        #
+        #     if not 'KeyValueList' in self.ResultData:
+        #         self.ResultData['KeyValueList'] = []
+        if self.verbose:
+            print 'checking',self.RawTestSessionDataPath,comment_files
+        if comment != '':
+            if self.verbose:
+                print 'added comment',comment,'to ',self.Name
+            self.ResultData['KeyValueDictPairs']['Comment'] = {
+                'Value': comment,
+            }
+            self.ResultData['KeyList'].append('Comment')
 
     def ReadModuleVersion(self):
         if self.verbose:
@@ -346,6 +378,7 @@ class GeneralTestResult:
                 self.SetCanvasSize()
                 try:
                     i['TestResultObject'].PopulateAllData()
+                    # i['TestResultObject'].check_for_comments()
                 except Exception as inst:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     # Start red color
@@ -369,6 +402,7 @@ class GeneralTestResult:
         self.SetCanvasSize()
         try:
             self.PopulateResultData()
+            self.check_for_comments()
         except Exception as inst:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     # Start red color
