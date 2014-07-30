@@ -20,7 +20,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         methods = set()
         for i in self.Attributes["SubTestResultDictList"]:
-            if i['Module'] == 'FluorescenceSpectrumModule':
+            if i['Module'] == 'FluorescenceTargetModule':
                 target_key = i['InitialAttributes']['StorageKey']
                 target = i['InitialAttributes']['Target']
                 key = 'Xray_Target_' + target + '_Chip' + str(self.Attributes['ChipNo'])

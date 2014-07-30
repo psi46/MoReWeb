@@ -24,8 +24,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return s[i / 2]
 
     def PopulateResultData(self):
-        if self.method == 'SCurve':
-            return
+        # if self.method == 'SCurve':
+        #     return
         if self.verbose:
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')
@@ -131,6 +131,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 "Value": median_array,
                 # "Sigma": 0,
                 "Label": 'median %s' % Parameters['Key'],
+                "Unit": "",
+            },
+            '%ss' % Parameters['Key']: {
+                "Value": array,
+                "Label": '%ss' % Parameters['Key'],
                 "Unit": "",
             }
         }

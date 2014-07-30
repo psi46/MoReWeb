@@ -15,17 +15,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.check_Test_Software()
         self.Attributes['TestedObjectType'] = 'VcalCalibrationOffset'
 
-    def get_n_rocs(self):
-        self.nRocs = 0
-        for i in self.ParentObject.ResultData['SubTestResultDictList']:
-            if i['Key'].startswith('FluorescenceSpectrumModule'):
-                self.nRocs = i['TestResultObject'].ResultData['HiddenData']['nRocs']
-                break
-
 
     def PopulateResultData(self):
-        if self.method == 'SCurve':
-            return
         if self.verbose:
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')

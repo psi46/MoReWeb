@@ -10,6 +10,7 @@ import os.path
 
 import AbstractClasses
 from ROOT import TFile, TF1, TH1F
+import ConfigParser
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 
@@ -33,8 +34,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if not self.verbose:
             self.fitOption += 'Q'
         if self.Attributes['ChipNo'] == 1 and 'Mo' in self.Attributes['Target']:
-            self.verbose = True
+            # self.verbose = True
             # 'TargetEnergy': TargetEnergy,
+            pass
         TargetEnergy = self.GetEnergy(self.Attributes['Target'])
         self.Attributes['TargetEnergy'] = TargetEnergy
         self.Attributes['TargetNElectrons'] = TargetEnergy / 3.6
@@ -296,7 +298,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
 
         }
-        self.ResultData['KeyList'] = ['Center', 'TargetEnergy', 'TargetNElectrons']
+        self.ResultData['KeyList'].extend(['Center', 'TargetEnergy', 'TargetNElectrons'])
         if self.verbose: print self.ResultData
         if self.verbose: print self.ResultData['KeyValueDictPairs']
 
@@ -395,15 +397,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tag = 'PopulateResultData', self.NameSingle, self.Attributes['Target']+ ": Custom Init"
             print "".ljust(len(tag), '=')
             print tag
+        # self.check_Test_Software()
         HistoDict = self.HistoDict
-        histname = HistoDict.get(self.NameSingle, 'PH_Calibration')
 
-        # self.ResultData['Plot']['ROOTObject'] = self.FileHandle.Get("ph_cal_C%i" % (self.Attributes["ChipNo"])).Clone(self.GetUniqueID())
-        object = HistoGetter.get_histo(self.FileHandle, histname, )
+        # print self.Name,'softwareVersion:',self.testSoftware
+        try:
+            histname = HistoDict.get(self.NameSingle, self.Attributes['Method'])
+        except ConfigParser.NoOptionError as e:
+            print HistoDict.sections()
+            if HistoDict.has_section(self.NameSingle):
+                for i in HistoDict.options(self.NameSingle):
+                    print i, HistoDict.get(self.NameSingle,i)
+            raise e
+        object = HistoGetter.get_histo(self.FileHandle, histname, rocNo=self.Attributes["ChipNo"])
         if not object:
             if self.verbose:
                 print "couldn't find histname %s" % histname
-            histname = HistoDict.get(self.NameSingle, 'PH_Calibration_ROC')
+            histname = HistoDict.get(self.NameSingle, self.Attributes['Method'])
+            #'PH_Calibration_ROC')
             if self.verbose:
                 print ' try to find histname %s' % histname
             object = HistoGetter.get_histo(self.FileHandle, histname, rocNo=self.Attributes["ChipNo"])
@@ -415,14 +426,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             histo = self.ResultData['Plot']['ROOTObject']
             if self.verbose:
                 print 'found Plot ', histo
-            min = 0
-            max = 255
-            self.FitHisto(histo, min, max)
+            minX = 0
+            maxX = 255
+            self.FitHisto(histo, minX, maxX)
             #            self.ResultData['Plot']['ROOTObject'].SetTitle("");
             #            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
             #            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0*self.ResultData['Plot']['ROOTObject'].GetMaximum());
             #            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold difference");
             #            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
+            bin = self.ResultData['Plot']['ROOTObject'].FindLastBinAbove(0)
+            bin *= 1.2
+            bin = int(bin)
+            bin = min([bin, self.ResultData['Plot']['ROOTObject'].GetNbinsX()])
+            xmax = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetBinUpEdge(bin)
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0,xmax)
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle('Pulseheight / Vcal')
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);

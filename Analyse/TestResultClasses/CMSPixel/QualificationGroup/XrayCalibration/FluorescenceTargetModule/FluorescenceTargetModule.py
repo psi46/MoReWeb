@@ -1,34 +1,37 @@
 import AbstractClasses
 import ROOT
 
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         method = self.Attributes['Method']
-        self.Name = "CMSPixel_QualificationGroup_XrayCalibration_"+method+"_FluorescenceTargetModule_"+self.Attributes["Target"]
+        self.Name = "CMSPixel_QualificationGroup_XrayCalibration_" + method + "_FluorescenceTargetModule_" + \
+                    self.Attributes["Target"]
         self.Name += "_TestResult"
-        self.NameSingle = "FluorescenceSpectrumModule"
-                          # + self.Attributes["Target"] + '_' + method
-        self.Title = "Xray Module %s - %s" % (method,self.Attributes["Target"])
+        self.NameSingle = "FluorescenceTargetModule"
+        # + self.Attributes["Target"] + '_' + method
+        self.Title = "Xray Module %s - %s" % (method, self.Attributes["Target"])
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
             print tag
         self.ResultData["SubTestResultDictList"] = []
         self.check_Test_Software()
-        self.nRocs=self.ParentObject.nRocs
-        self.ROCtype=self.ParentObject.ROCtype
-        self.halfModule=self.ParentObject.halfModule
+        self.nRocs = self.ParentObject.nRocs
+        self.ROCtype = self.ParentObject.ROCtype
+        self.halfModule = self.ParentObject.halfModule
         # Get module information
         self.ResultData['HiddenData']['ModuleVersion'] = self.ROCtype
         self.ResultData['HiddenData']['nRocs'] = self.nRocs
         self.ResultData['HiddenData']['halfModule'] = self.halfModule
         for roc in range(self.nRocs):
+            key = "FluorescenceTarget_C{ROC}".format(ROC=roc)
             self.ResultData["SubTestResultDictList"].append(
                 {
-                    "Key": "FluorescenceSpectrum_C" + str(roc),
-                    "Module": "FluorescenceSpectrum",
+                    "Key": key,
+                    "Module": "FluorescenceTargetROC",
                     "InitialAttributes": {
-                        "StorageKey": "Chip" + str(roc),
+                        "StorageKey": key,
                         "TestResultSubDirectory": ".",
                         "IncludeIVCurve": False,
                         "ModuleID": self.Attributes["ModuleID"],
@@ -40,14 +43,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Target': self.Attributes['Target'],
                         'Method': method
                     },
-                    "DisplayOptions":{
+                    "DisplayOptions": {
                         "Order": roc + 1,
                         "Width": 1
                     }
                 }
             )
-
-        self.Attributes['TestedObjectType'] = 'FluorescenceSpectrumModule'
+        # TODO: @ Esteban - Explain what is the TestedObjectType for?
+        self.Attributes['TestedObjectType'] = 'FluorescenceTargetModule'
 
 
     def PopulateResultData(self):
@@ -56,15 +59,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print "".ljust(len(tag), '=')
             print tag
         self.ResultData['KeyValueDictPairs'] = {
-            'ModuleNROCs' : {
-                "Value" : self.nRocs,
-                "Sigma" : 0,
-                "Label" : "Number of ROCs",
-                "Unit" : "",
+            'ModuleNROCs': {
+                "Value": self.nRocs,
+                "Sigma": 0,
+                "Label": "Number of ROCs",
+                "Unit": "",
             }
         }
 
-        #self.ResultData['Table'] = {
+        # self.ResultData['Table'] = {
         #    'HEADER':[
         #        [
         #            'ROC', 'Vcal'

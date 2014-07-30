@@ -5,13 +5,13 @@ import array
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum"
+        self.Name = "CMSPixel_QualificationGroup_XrayCalibration_{Method}".format(Method=self.Attributes['Method'])
         self.Name += "_VcalCalibrationModule_VcalCalibrationROC_TestResult"
         self.NameSingle = "VcalCalibrationROC"
-        self.Title = "Vcal Calibration ROC %i" % (self.Attributes['ChipNo'])
+        self.Title = "Vcal Calibration ROC {ROC} - Method {Method}".format(ROC=self.Attributes['ChipNo'],
+                                                                           Method=self.Attributes['Method'])
         self.ChipNo = self.Attributes['ChipNo']
         self.Method = self.Attributes['Method']
-        self.verbose = False
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
@@ -38,10 +38,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         n_electrons = array.array('d', [])
         top_parent = self.ParentObject.ParentObject
         for test in top_parent.ResultData['SubTestResults']:
-            if not "FluorescenceSpectrumModule" in test:
+            if not "FluorescenceTargetModule" in test:
                 continue
             module_results = top_parent.ResultData['SubTestResults'][test].ResultData['SubTestResults']
-            roc_results = module_results['FluorescenceSpectrum_C%i' % (self.Attributes["ChipNo"])]
+            roc_results = module_results['FluorescenceTarget_C%i' % (self.Attributes["ChipNo"])]
             key_value_pairs = roc_results.ResultData['KeyValueDictPairs']
             if self.verbose:
                 print test, key_value_pairs['Center']['Value'], key_value_pairs['TargetNElectrons']['Value']
@@ -143,7 +143,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': round(fit.GetParameter(0), 3),
                 'Label': 'Chi2',
                 'Unit': 'per NDF',
-                'Sigma': round(fit.GetChisquare()/fit.GetNDF(), 3),
+                'Sigma': round(fit.GetChisquare() / fit.GetNDF(), 3),
             },
 
         }

@@ -2,14 +2,16 @@ import AbstractClasses
 import copy
 import ROOT
 import os
+import sys
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
+        # self.verbose = True
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_TestResult"
-        self.NameSingle = "XrayCalibrationSpectrum"
-        self.Title = "X-ray Calibration"
+        self.NameSingle = "XrayCalibration"
+        self.Title = "X-ray Calibration - {Method}".format(Method=self.Attributes['Method'])
         self.check_Test_Software()
         self.ROCtype, self.nRocs, self.halfModule = self.ReadModuleVersion()
         self.Attributes['NumberOfChips'] = self.nRocs
@@ -19,37 +21,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
             print tag
-        do_spectrum_method = True
-        do_scurve_method = False
-        specturm_method_testlist = copy.deepcopy(self.Attributes["SubTestResultDictList"])
-        scurve_method_testlist = copy.deepcopy(self.Attributes["SubTestResultDictList"])
-        items = len(specturm_method_testlist)
+        target_list = copy.deepcopy(self.Attributes["SubTestResultDictList"])
+        items = len(target_list)
         start_position = 7
         if self.verbose:
             print 'subtestresultdict list:', self.ResultData["SubTestResultDictList"]
-        for i in specturm_method_testlist:
-            i['InitialAttributes']['Method'] = 'Spectrum'
-            i['InitialAttributes']['StorageKey'] = i['InitialAttributes']['StorageKey'] + '_Spectrum'
-            i['Key'] = i['Key'] + '_Spectrum'
-            i['DisplayOptions']['Order'] = specturm_method_testlist.index(i) + start_position
-            if self.verbose:
-                print i['Key'], ':', i['DisplayOptions']['Order']
-
-        start_position = 8 + len(specturm_method_testlist)
-        for i in scurve_method_testlist:
-            i['InitialAttributes']['Method'] = 'SCurve'
-            i['InitialAttributes']['StorageKey'] = i['InitialAttributes']['StorageKey'] + '_SCurve'
-            i['Key'] = i['Key'] + '_SCurve'
-            i['DisplayOptions']['Order'] = scurve_method_testlist.index(i) + start_position
+        for i in target_list:
+            i['InitialAttributes']['Method'] = self.Attributes['Method']
+            i['InitialAttributes']['StorageKey'] = i['InitialAttributes']['StorageKey'] + '_' + self.Attributes[
+                'Method']
+            i['Key'] = i['Key'] + '_' + self.Attributes['Method']
+            i['DisplayOptions']['Order'] = target_list.index(i) + start_position
             if self.verbose:
                 print i['Key'], ':', i['DisplayOptions']['Order']
         self.order_counter = 0
-        if do_spectrum_method:
-            self.add_calibration_method(specturm_method_testlist)
-            # self.ResultData["SubTestResultDictList"].extend(specturm_method_testlist)
-        if do_scurve_method:
-            self.add_calibration_method(scurve_method_testlist)
-            # self.ResultData["SubTestResultDictList"].extend(scurve_method_testlist)
+        self.add_calibration_method(target_list)
         self.add_chips()
 
     def add_chips(self):
@@ -70,7 +56,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     "TestTemperature": self.Attributes["TestTemperature"],
                     'SubTestResultDictList': self.ResultData["SubTestResultDictList"],
                     'Operator': self.Attributes['Operator'],
-                    'Method': 'Spectrum'
+                    'Method': self.Attributes['Method']
 
                 },
                 "DisplayOptions": {
@@ -84,12 +70,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def add_calibration_method(self, target_test_list):
         if len(target_test_list) == 0:
             return
-        method = target_test_list[-1]['InitialAttributes']['Method']
         for i in target_test_list:
             k = target_test_list.index(i) + self.order_counter + 6
             i['DisplayOptions']['Order'] = k
             i['DisplayOptions']['Width'] = 1
-            print k, i['Key']
+            # print k, i['Key']
 
         self.ResultData["SubTestResultDictList"].extend(target_test_list)
 
@@ -108,7 +93,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'ModuleVersion': self.Attributes['ModuleVersion'],
                 'NumberOfChips': self.Attributes['NumberOfChips'],
                 'StartChip': self.Attributes['StartChip'],
-                'Method': method,
+                'Method': self.Attributes['Method'],
             },
             "DisplayOptions": {
                 "Order": self.order_counter + 5,
@@ -117,16 +102,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         }
         )
 
-        print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
-        self.ResultData["SubTestResultDictList"][-1]['Key']
+        # print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
+        # self.ResultData["SubTestResultDictList"][-1]['Key']
         # ['DisplayOptions']['Order'],
         # self.ResultData["SubTestResultDictList"][-1]['Key']
         self.ResultData["SubTestResultDictList"].append(
             {
-                "Key": "VcalCalibrationSlope_" + method,
+                "Key": "VcalCalibrationSlope_" + self.Attributes['Method'],
                 "Module": "VcalCalibrationSlope",
                 "InitialAttributes": {
-                    "StorageKey": "VcalCalibrationSlope_" + method,
+                    "StorageKey": "VcalCalibrationSlope_" + self.Attributes['Method'],
                     "TestResultSubDirectory": ".",
                     "IncludeIVCurve": False,
                     "ModuleID": self.Attributes["ModuleID"],
@@ -137,7 +122,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                     'NumberOfChips': self.Attributes['NumberOfChips'],
                     'StartChip': self.Attributes['StartChip'],
-                    'Method': method,
+                    'Method': self.Attributes['Method'],
                 },
                 "DisplayOptions": {
                     "Order": self.order_counter + 1,
@@ -145,14 +130,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             }
         )
-        print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
-        self.ResultData["SubTestResultDictList"][-1]['Key']
+        # print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
+        #     self.ResultData["SubTestResultDictList"][-1]['Key']
         self.ResultData["SubTestResultDictList"].append(
             {
-                "Key": "VcalCalibrationOffset_" + method,
+                "Key": "VcalCalibrationOffset_" + self.Attributes['Method'],
                 "Module": "VcalCalibrationOffset",
                 "InitialAttributes": {
-                    "StorageKey": "VcalCalibrationOffset_" + method,
+                    "StorageKey": "VcalCalibrationOffset_" + self.Attributes['Method'],
                     "TestResultSubDirectory": ".",
                     "IncludeIVCurve": False,
                     "ModuleID": self.Attributes["ModuleID"],
@@ -162,7 +147,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     "TestTemperature": self.Attributes["TestTemperature"],
                     'NumberOfChips': self.Attributes['NumberOfChips'],
                     'StartChip': self.Attributes['StartChip'],
-                    'Method': method,
+                    'Method': self.Attributes['Method'],
                 },
                 "DisplayOptions": {
                     "Order": self.order_counter + 2,
@@ -170,48 +155,44 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             }
         )
-        print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
-        self.ResultData["SubTestResultDictList"][-1]['Key']
+        # print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
+        #     self.ResultData["SubTestResultDictList"][-1]['Key']
         self.ResultData["SubTestResultDictList"].append(
-                {
-                    "Key": "VcalCalibrationChi2_"+method,
-                    "Module": "VcalCalibrationChi2",
-                    "InitialAttributes": {
-                        "StorageKey": "VcalCalibrationChi2_"+method,
-                        "TestResultSubDirectory": ".",
-                        "IncludeIVCurve": False,
-                        "ModuleID": self.Attributes["ModuleID"],
-                        "ModuleVersion": self.Attributes["ModuleVersion"],
-                        "ModuleType": self.Attributes["ModuleType"],
-                        "TestType": "Chips",
-                        "TestTemperature": self.Attributes["TestTemperature"],
-                        'NumberOfChips': self.Attributes['NumberOfChips'],
-                        'StartChip': self.Attributes['StartChip'],
-                        'Method': method,
-                    },
-                    "DisplayOptions": {
-                        "Order": self.order_counter + 3,
-                        "Width": 1
-                    }
+            {
+                "Key": "VcalCalibrationChi2_" + self.Attributes['Method'],
+                "Module": "VcalCalibrationChi2",
+                "InitialAttributes": {
+                    "StorageKey": "VcalCalibrationChi2_" + self.Attributes['Method'],
+                    "TestResultSubDirectory": ".",
+                    "IncludeIVCurve": False,
+                    "ModuleID": self.Attributes["ModuleID"],
+                    "ModuleVersion": self.Attributes["ModuleVersion"],
+                    "ModuleType": self.Attributes["ModuleType"],
+                    "TestType": "Chips",
+                    "TestTemperature": self.Attributes["TestTemperature"],
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StartChip': self.Attributes['StartChip'],
+                    'Method': self.Attributes['Method'],
+                },
+                "DisplayOptions": {
+                    "Order": self.order_counter + 3,
+                    "Width": 1
                 }
-            )
-        print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
-        self.ResultData["SubTestResultDictList"][-1]['Key']
-
-        # ntargets = len(specturm_method_testlist)
-        # n_dummies = ntargets % 5 - 1
-        # for i in range(n_dummies):
-        #     pos = start_position + ntargets + i
-        #     specturm_method_testlist.append(
-        #         {
-        #             'Key': 'Dummy_{Position}'.format(Position=pos),
-        #             'Module': 'Dummy',
-        #             'DisplayOptions': {
-        #                 'Order': pos,
-        #             }
-        #         }
-        #     )
-
+            }
+        )
+        # print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
+        # self.ResultData["SubTestResultDictList"][-1]['Key']
+        pos = self.order_counter + 4
+        self.ResultData["SubTestResultDictList"].append(
+            {
+                'Key': 'Dummy_{Position}'.format(Position=pos),
+                'Module': 'Dummy',
+                'DisplayOptions': {
+                    'Order': pos,
+                    'Width': 1
+                }
+            }
+        )
 
         if self.verbose:
             print_list = map(lambda i: [i["DisplayOptions"]['Order'], i['Key']],
@@ -220,7 +201,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print i[0], i[1]
 
         self.check_Test_Software()
-        self.Attributes['TestedObjectType'] = 'XrayCalibrationSpectrum'
+        self.Attributes['TestedObjectType'] = 'XrayCalibration'
 
 
     def PopulateResultData(self):
@@ -228,6 +209,176 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')
             print tag
+        slope_key = 'VcalCalibrationSlope_' +  self.Attributes['Method']
+        avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
+                'avrgSlope']['Value']
+        self.ResultData['KeyValueDictPairs'] = {
+            'Slope': {
+                "Value": avrgSlope,
+                # "Sigma": 0,
+                "Label": 'avrg Slope',
+                "Unit": "",
+            }
+        }
+        self.ResultData['KeyList'].append('Slope')
 
     def CustomWriteToDatabase(self, ParentID):
-        pass
+        print 'fill row'
+        method = self.Attributes['Method']
+        comments = self.ResultData['KeyValueDictPairs'].get('comments', None)
+        slope_key = 'VcalCalibrationSlope_' + method
+        try:
+            avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
+                'avrgSlope']['Value']
+            minSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
+                'minSlope']['Value']
+            maxSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
+                'maxSlope']['Value']
+            Slopes = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
+                'Slopes']['Value']
+            avrgOffset = self.ResultData['SubTestResults'][offset_key].ResultData['KeyValueDictPairs'][
+                'avrgOffset']['Value']
+            minOffset = self.ResultData['SubTestResults'][offset_key].ResultData['KeyValueDictPairs'][
+                'minOffset']['Value']
+            maxOffset = self.ResultData['SubTestResults'][offset_key].ResultData['KeyValueDictPairs'][
+                'maxOffset']['Value']
+            Offsets = self.ResultData['SubTestResults'][offset_key].ResultData['KeyValueDictPairs'][
+                'Offsets']['Value']
+        except:
+            print self.ResultData['SubTestResults'].keys()
+            if slope_key in self.ResultData['SubTestResults']:
+                print self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'].keys()
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            avrgSlope = 0
+            minSlope = 0
+            maxSlope = 0
+            Slopes = []
+            avrgOffset = 0
+            minOffset = 0
+            maxOffset = 0
+            Offsets = []
+        Row = {
+            'ModuleID': self.Attributes['ModuleID'],
+            'TestDate': self.Attributes['TestDate'],
+            'TestType': self.Attributes['TestType'],
+            'QualificationType': self.ParentObject.Attributes['QualificationType'],
+            'avrgSlope': avrgSlope,
+            'minSlope': minSlope,
+            'maxSlope': maxSlope,
+            'Slopes': Slopes,
+            'avrgOffset': avrgOffset,
+            'minOffset': minOffset,
+            'maxOffset': maxOffset,
+            'Offsets': Offsets,
+            'Grade': None,
+            'PixelDefects': None,
+            'ROCsMoreThanOnePercent': None,
+            'Noise': None,
+            'Trimming': None,
+            'PHCalibration': None,
+            'CurrentAtVoltage150': None,
+            'IVSlope': None,
+            'Temperature': None,
+            'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
+                                                              self.TestResultEnvironmentObject.GlobalOverviewPath),
+            'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
+                                                 self.TestResultEnvironmentObject.FinalModuleResultsPath),
+            # needed for PixelDB
+            'AbsModuleFulltestStoragePath': self.TestResultEnvironmentObject.FinalModuleResultsPath,
+            'AbsFulltestSubfolder': self.FinalResultsStoragePath,
+            'InputTarFile': os.environ.get('TARFILE', None),
+            'MacroVersion': os.environ.get('MACROVERSION', None),
+            #
+
+            'initialCurrent': None,
+            'Comments': comments,
+            'nCycles': None,
+            'CycleTempLow': None,
+            'CycleTempHigh': None,
+
+            # added by Tommaso
+            'TestCenter': self.Attributes['TestCenter'],
+            'Hostname': self.Attributes['Hostname'],
+            'Operator': self.Attributes['Operator'],
+            #
+        }
+
+        print 'fill row end'
+        # TODO: Please check if uplaod to DB is ok in this way...
+        if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal'] and False:
+            from PixelDB import *
+            # modified by Tommaso
+            #
+            # try and speak directly with PixelDB
+            #
+
+            pdb = PixelDBInterface(operator="tommaso", center="pisa")
+            pdb.connectToDB()
+            OPERATOR = os.environ['PIXEL_OPERATOR']
+            CENTER = os.environ['PIXEL_CENTER']
+            s = Session(CENTER, OPERATOR)
+            pdb.insertSession(s)
+            print "--------------------"
+            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
+            print "--------------------"
+            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
+
+            if (pp is None):
+                print "INSERTION FAILED!"
+                sys.exit(31)
+
+        else:
+            with self.TestResultEnvironmentObject.LocalDBConnection:
+                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
+                    'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',
+                    Row)
+                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
+                    '''INSERT INTO ModuleTestResults
+                    (
+                        ModuleID,
+                        TestDate,
+                        TestType,
+                        QualificationType,
+                        Grade,
+                        PixelDefects,
+                        ROCsMoreThanOnePercent,
+                        Noise,
+                        Trimming,
+                        PHCalibration,
+                        CurrentAtVoltage150,
+                        IVSlope,
+                        Temperature,
+                        RelativeModuleFinalResultsPath,
+                        FulltestSubfolder,
+                        initialCurrent,
+                        Comments,
+                        nCycles,
+                        CycleTempLow,
+                        CycleTempHigh
+                    )
+                    VALUES (
+                        :ModuleID,
+                        :TestDate,
+                        :TestType,
+                        :QualificationType,
+                        :Grade,
+                        :PixelDefects,
+                        :ROCsMoreThanOnePercent,
+                        :Noise,
+                        :Trimming,
+                        :PHCalibration,
+                        :CurrentAtVoltage150,
+                        :IVSlope,
+                        :Temperature,
+                        :RelativeModuleFinalResultsPath,
+                        :FulltestSubfolder,
+                        :initialCurrent,
+                        :Comments,
+                        :nCycles,
+                        :CycleTempLow,
+                        :CycleTempHigh
+                    )
+                    ''', Row)
+                return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid
