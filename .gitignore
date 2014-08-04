@@ -3,6 +3,8 @@ Analyse/Configuration/Paths.cfg
 .pydevproject
 .settings/
 checksum.md5
+.DS_Store
+.idea/
 *.pyc
 *.*~
-
+Configuration/Paths.cfg

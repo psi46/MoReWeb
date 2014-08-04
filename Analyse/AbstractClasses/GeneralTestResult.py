@@ -4,9 +4,10 @@ Program : MORE-Web
  Version    : 2.1
  Release Date   : 2013-05-30
 '''
+from _ast import Sub
 
-import os
 import ROOT
+import glob
 import gzip
 import sys
 import datetime
@@ -21,6 +22,7 @@ try:
 except NameError:
        from sets import Set as set
 import Helper.ROOTConfiguration as ROOTConfiguration
+import glob
 class GeneralTestResult:
 
     nRows = 80
@@ -239,7 +241,17 @@ class GeneralTestResult:
 
             i['DisplayOptions'] = DisplayOptions
 
-            f = __import__(self.ModulePath+'.'+SubModule+'.TestResult' ,fromlist=[''])
+            try:
+                importdir = self.ModulePath+'.'+SubModule
+                # print 'import ',importdir,SubModule
+                f = __import__(importdir + '.'+SubModule ,fromlist=[importdir+'.'+'TestResult'])
+            except Exception as inst:
+                # print 'could not ',importdir+'.'+SubModule,SubModule
+                # print 'type',type(inst)
+                # print 'inst',inst
+                f = __import__(importdir + '.TestResult' ,fromlist=[''])
+                print 'imported',f, 'please change name of file'
+            pass
 
             self.ResultData['SubTestResults'][ i['Key'] ] = f.TestResult(
                 self.TestResultEnvironmentObject,
@@ -255,20 +267,105 @@ class GeneralTestResult:
             i2+= 1
 
     def check_Test_Software(self):
-#         print self.RawTestSessionDataPath
-        file = self.RawTestSessionDataPath + '/test.cfg'
+        # file = self.RawTestSessionDataPath + '/test.cfg'
 #         print file
-        if os.path.exists(file):
+        self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
+        files = glob.glob(self.RawTestSessionDataPath+'/test.cfg') + \
+        glob.glob(self.RawTestSessionDataPath+'/*/test.cfg')
+        # print 'pyxar:',files
+        if len(files) > 0:
             self.testSoftware = 'pyxar'
-        elif os.path.exists(self.RawTestSessionDataPath + '/pxar.log'):
-            self.testSoftware = 'pxar'
         else:
-            self.testSoftware = 'psi46expert'
+            data = glob.glob(self.RawTestSessionDataPath+'/*pxar*.*') + \
+                    glob.glob(self.RawTestSessionDataPath+'/*/*pxar*.*')
+
+            if len(data):
+                self.testSoftware = 'pxar'
+            else:
+                self.testSoftware = 'psi46expert'
         self.HistoDict = BetterConfigParser()
-        fileName = 'Configuration/HistoNames/%s.cfg' % self.testSoftware
-        print fileName, os.path.exists(fileName), os.getcwd()
-        print 'test software is %s' % self.testSoftware
+        fileName = 'Configuration/Software/%s.cfg' % self.testSoftware
         self.HistoDict.read(fileName)
+        fileName = 'Configuration/Software/global.cfg'
+        self.HistoDict.read(fileName)
+
+    def check_for_comments(self):
+        dir = os.path.abspath(self.RawTestSessionDataPath)
+        comment_files = glob.glob(dir+'/comment*')
+        comment =''
+        for filename in comment_files:
+            comment +='{filename}:\n'.format(filename=filename.split('/')[-1])
+            with file(filename) as f:
+                s = f.read()
+            comment += s +'\n\n'
+        # if self.ResultData:
+        #     if not 'KeyVaueDictPairs' in self.ResultData:
+        #         self.ResultData['KeyValueDictPairs'] = {}
+        #
+        #     if not 'KeyValueList' in self.ResultData:
+        #         self.ResultData['KeyValueList'] = []
+        if self.verbose:
+            print 'checking',self.RawTestSessionDataPath,comment_files
+        if comment != '':
+            if self.verbose:
+                print 'added comment',comment,'to ',self.Name
+            self.ResultData['KeyValueDictPairs']['Comment'] = {
+                'Value': comment,
+            }
+            self.ResultData['KeyList'].append('Comment')
+
+    def ReadModuleVersion(self):
+        if self.verbose:
+            print 'Read configParameters'
+        self.check_Test_Software()
+        format = self.HistoDict.get('ConfigParameters','configFormat')
+        fileNames = self.HistoDict.get('ConfigParameters','configParameters').split(',')
+        if format == 'dat':
+            lines = []
+            for filename in fileNames:
+                fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
+                f = open(fileName)
+                lines.extend(f.readlines())
+                f.close()
+            version = 'none'
+            for line in lines:
+                if line.strip().startswith('rocType'):
+                    version = line.split(' ')[-1]
+                elif line.strip().startswith('nRocs'):
+                    nRocs = int(line.split(' ')[-1])
+                    if self.verbose: print '\tnRocs: %s'%nRocs
+                elif line.strip().startswith('halfModule'):
+                    halfModule = int(line.split(' ')[-1])
+                    if self.verbose: print '\thalfModule: %s'%halfModule
+        elif format =='cfg':
+            config = BetterConfigParser()
+            for filename in fileNames:
+                fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
+                config.read(fileName)
+            try:
+                version = config.get('ROC','type')
+            except:
+                warnings.warn('cannot find version name {section}'.format(section = config.sections()))
+                if 'ROC' in config.sections():
+                    warnings.warn('cannot find version ROC-section {section}'.format(section = config.options('ROC')))
+                version = 'none'
+            try:
+                nRocs = config.getint   ('Module','rocs')
+            except:
+                nRocs = 0
+            try:
+                halfModule = config.get('Module','halfModule')
+            except:
+                halfModule = 0
+        version=version.rstrip('\n')
+        if self.verbose:
+            print 'Version:    ', version
+            print 'nRocs:      ', nRocs
+            print 'halfModule: ', halfModule
+        self.version = version
+        self.nRocs = nRocs
+        self.halfModule = halfModule
+        return (version,nRocs,halfModule)
 
     '''
         Populates all necessary data
@@ -281,6 +378,7 @@ class GeneralTestResult:
                 self.SetCanvasSize()
                 try:
                     i['TestResultObject'].PopulateAllData()
+                    # i['TestResultObject'].check_for_comments()
                 except Exception as inst:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     # Start red color
@@ -304,6 +402,7 @@ class GeneralTestResult:
         self.SetCanvasSize()
         try:
             self.PopulateResultData()
+            self.check_for_comments()
         except Exception as inst:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     # Start red color
@@ -630,19 +729,22 @@ class GeneralTestResult:
 
             if not TestResultObject.ResultData['Plot']['Caption']:
                 TestResultObject.ResultData['Plot']['Caption'] = TestResultObject.Title
-
-            PlotImageHTML = HtmlParser.substituteMarkerArray(
-                PlotImageHTML,
-                {
-                    '###FILENAME###':HtmlParser.MaskHTML(RecursionRelativePath+os.path.basename(TestResultObject.ResultData['Plot']['ImageFile'])),
-                    '###IMAGELARGECONTAINERID###':HtmlParser.MaskHTML(TestResultObject.Name+'_'+TestResultObject.Key),
-                    '###MARGIN_TOP###':str(int(-800./float(DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'])*
-                        float(self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight'])/2.)),
-                    '###TITLE###':TestResultObject.ResultData['Plot']['Caption'],
-                    '###WIDTH###':str(DisplayOptions['Width']),
-                    '###HEIGHT###':str(1),
-                }
-            )
+            try:
+                PlotImageHTML = HtmlParser.substituteMarkerArray(
+                    PlotImageHTML,
+                    {
+                        '###FILENAME###':HtmlParser.MaskHTML(RecursionRelativePath+os.path.basename(TestResultObject.ResultData['Plot']['ImageFile'])),
+                        '###IMAGELARGECONTAINERID###':HtmlParser.MaskHTML(TestResultObject.Name+'_'+TestResultObject.Key),
+                        '###MARGIN_TOP###':str(int(-800./float(DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'])*
+                            float(self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight'])/2.)),
+                        '###TITLE###':TestResultObject.ResultData['Plot']['Caption'],
+                        '###WIDTH###':str(DisplayOptions['Width']),
+                        '###HEIGHT###':str(1),
+                    }
+                )
+            except TypeError:
+                print TestResultObject.Name,'_',TestResultObject.Key
+                raise TypeError('Canntot convert, '+str(TestResultObject.Name) + str(TestResultObject.Key) )
             #PlotHTML = HtmlParser.substituteSubpart(PlotHTML, '###PLOT_IMAGE_'+i+'###', PlotImageHTML)
             PlotHTML = HtmlParser.substituteSubpart(PlotHTML, '###PLOT_IMAGE###', PlotImageHTML)
 

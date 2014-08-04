@@ -20,7 +20,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Key':'Vcal Threshold Width',
                 'DataKey':'VcalThresholdTrimmed', # which sub test result to take the data from
                 'DataParameterKey':'sigma', # which part of key value dict pairs
-                'DataFactor':self.TestResultEnvironmentObject.GradingParameters['StandardADC2ElectronConversionFactor'],
+                'DataFactor':self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor'],
                 'YLimitB':self.TestResultEnvironmentObject.GradingParameters['trimmingB'],# limit for grading
                 'MarkerColor':ROOT.kGreen,
                 'LineColor':ROOT.kGreen,

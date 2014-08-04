@@ -3,54 +3,11 @@ import ROOT
 import os
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
-    def ReadModuleVersion(self):
-        if self.verbose:
-            print 'Read configParameters'
-        self.check_Test_Software()
-        format = self.HistoDict.get(self.NameSingle,'configFormat')
-        fileNames = self.HistoDict.get(self.NameSingle,'configParameters').split(',')
-        print fileNames
-        if format == 'dat':
-            lines = []
-            for filename in fileNames:
-                fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
-                f = open(fileName)
-                lines.extend(f.readlines())
-                f.close()
-            version = 'none'
-            for line in lines:
-                if line.strip().startswith('rocType'):
-                    version = line.split(' ')[-1]
-                elif line.strip().startswith('nRocs'):
-                    nRocs = int(line.split(' ')[-1])
-                    if self.verbose: print '\tnRocs: %s'%nRocs
-                elif line.strip().startswith('halfModule'):
-                    halfModule = int(line.split(' ')[-1])
-                    if self.verbose: print '\thalfModule: %s'%halfModule
-        elif format =='cfg':
-            config = BetterConfigParser()
-            for filename in fileNames:
-                fileName = '%s/%s'%(self.RawTestSessionDataPath,filename)
-                print fileName
-                config.read(fileName)
-            try:
-                version = config.get('ROC','type')
-            except:
-                version = 'none'
-            try:
-                nRocs = config.getint   ('Module','rocs')
-            except:
-                nRocs = 0
-            try:
-                halfModule = config.get('Module','halfModule')
-            except:
-                halfModule = 0
-        return (version,nRocs,halfModule)
+
 
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_TestResult'
         self.NameSingle='Fulltest'
-        self.verbose = False
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Attributes['NumberOfChips'] = self.nTotalChips
@@ -211,7 +168,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.check_Test_Software()
         fileHandlePath = self.RawTestSessionDataPath+'/commander_Fulltest.root'
         self.FileHandle = ROOT.TFile.Open(fileHandlePath)
-        self.verbose = True
         if not self.FileHandle:
             print 'problem to find %s'%fileHandlePath
             files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.root')]
@@ -224,9 +180,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 i = len(files)
                 if self.HistoDict.has_option('RootFile','filename'):
                     print 'checking for backup rootfile name'
-                    if self.HistoDict.get('RootFile','filename') in files:
-                        i = files.index(self.HistoDict.get('RootFile','filename'))
-                        print 'rootfile exists: index ',i
+                    if self.HistoDict.has_option('RootFile','filename'):
+                        if self.HistoDict.get('RootFile','filename') in files:
+                            i = files.index(self.HistoDict.get('RootFile','filename'))
+                            print 'rootfile exists: index ',i
                 while i<0 or i>= len(files):
                     try:
                         #TODO: How to continue when it happens in automatic processing...

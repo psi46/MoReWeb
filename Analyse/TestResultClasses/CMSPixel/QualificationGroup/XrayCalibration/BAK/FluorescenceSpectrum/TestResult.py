@@ -6,6 +6,7 @@
     Release Date: 2013-07-18
 '''
 import ROOT
+import os.path
 import AbstractClasses
 from ROOT import TFile,TF1,TH1F
 
@@ -14,7 +15,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name='CMSPixel_ModuleTestGroup_Module_XRayCalibration_FluorescenceTarget_TestResult'
         self.NameSingle='FluorescenceTarget'
         self.Attributes['TestedObjectType'] = 'CMSPixel_ModuleTestGroup_Module_ROC'
-        self.verbose = False
         self.fitOption =''
         if not self.verbose:
             self.fitOption +='Q'
@@ -23,10 +23,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         pass
 
     def OpenFileHandle(self):
-        if self.verbose: print self.RawTestSessionDataPath
+        if self.verbose:
+            print self.RawTestSessionDataPath
         fileHandleName =  self.RawTestSessionDataPath + '/commander_XraySpectrum.root'
-        if self.verbose: print "Open File Handle: %s"%fileHandleName
-        self.FileHandle = ROOT.TFile.Open(fileHandleName)
+        if self.verbose:
+            print "Open File Handle: %s"%fileHandleName
+        if os.path.isfile(fileHandleName):
+            self.FileHandle = ROOT.TFile.Open(fileHandleName)
+        else
+            fileHandleName =  self.RawTestSessionDataPath +'/commander_XrayPxar.root'
+            self.FileHandle = ROOT.TFile.Open(fileHandleName)
 
     # Hard coded initial guess for signal position based on element name
     def GetInitialEnergyGuess(self,elementName):

@@ -48,7 +48,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if self.ResultData['Plot']['ROOTObject'].GetMinimum() > mThresholdMin:
                 mThresholdMin = self.ResultData['Plot']['ROOTObject'].GetMinimum();
 
-
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");

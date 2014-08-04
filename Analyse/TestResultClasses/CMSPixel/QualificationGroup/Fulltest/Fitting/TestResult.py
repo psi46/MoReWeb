@@ -17,7 +17,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         directory = self.RawTestSessionDataPath
         refit = self.TestResultEnvironmentObject.Configuration['Fitting']['refit']
         print 'SCurve fitting...'
-        fitter = SCurve_Fitting(refit,HistoDict = self.ParentObject.HistoDict)
+        ePerVcal =  self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
+        fitter = SCurve_Fitting(refit,HistoDict = self.ParentObject.HistoDict,ePerVcal=ePerVcal)
         fitter.FitAllSCurve(directory,nRocs)
         print 'linear PH fitting...'
         fitter = PH_Fitting(0,refit,HistoDict = self.ParentObject.HistoDict)
