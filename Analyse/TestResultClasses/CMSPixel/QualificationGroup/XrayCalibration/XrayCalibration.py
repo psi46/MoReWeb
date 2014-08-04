@@ -210,8 +210,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print "".ljust(len(tag), '=')
             print tag
         slope_key = 'VcalCalibrationSlope_' +  self.Attributes['Method']
-        avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
-                'avrgSlope']['Value']
+        try:
+            avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs']['avrgSlope']['Value']
+        except:
+            avrgSlope = None
+            print self.ResultData['SubTestResults'].keys()
         self.ResultData['KeyValueDictPairs'] = {
             'Slope': {
                 "Value": avrgSlope,
