@@ -21,10 +21,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')
             print tag
-        self.nRocs = self.ParentObject.nRocs
+        self.Attributes['nRocs'] = self.ParentObject.nRocs
         offsets = []
         error_offsets = []
-        for roc in range(self.nRocs):
+        for roc in range(self.Attributes['nRocs']):
             vcal_calibration_module = self.ParentObject.ResultData['SubTestResults']['VcalCalibrationModule']
             key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
             roc_results = vcal_calibration_module.ResultData['SubTestResults'][key].ResultData
