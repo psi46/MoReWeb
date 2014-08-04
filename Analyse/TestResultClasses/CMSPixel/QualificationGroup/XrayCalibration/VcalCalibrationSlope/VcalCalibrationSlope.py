@@ -1,13 +1,13 @@
-import AbstractClasses
+from  AbstractClasses.GeneralTestResult import GeneralTestResult
 import ROOT
 
 
-class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+class TestResult(GeneralTestResult):
+    # AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_VcalCalibrationSlope_TestResult"
         self.NameSingle = "VcalCalibrationSlope"
-        self.method = self.Attributes['Method']
-        self.Title = "Slope of {Method} Vcal Calibration".format(Method=self.method)
+        self.Title = "Slope of {Method} Vcal Calibration".format(Method=self.Attributes['Method'])
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
@@ -16,7 +16,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.check_Test_Software()
         self.Attributes['TestedObjectType'] = 'VcalCalibrationSlope'
 
-    def median(self, l):
+    @staticmethod
+    def median(l):
         s = sorted(l)
         i = len(s)
         if not i % 2:
@@ -24,16 +25,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return s[i / 2]
 
     def PopulateResultData(self):
-        # if self.method == 'SCurve':
-        #     return
         if self.verbose:
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')
             print tag
-        self.nRocs = self.ParentObject.nRocs
+        self.Attributes['nRocs']= self.ParentObject.nRocs
         slopes = []
         error_slopes = []
-        for roc in range(self.nRocs):
+        for roc in range(self.Attributes['nRocs']):
             vcal_calibration_module = self.ParentObject.ResultData['SubTestResults']['VcalCalibrationModule']
             key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
             roc_results = vcal_calibration_module.ResultData['SubTestResults'][key].ResultData
@@ -50,20 +49,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                               'MarkerStyle': 21,
                                                               'YaxisTitle': 'Slope [e- / Vcal]',
                                                               'MinY': 0,
-                                                              'MaxY': 100,})
+                                                              'MaxY': 100, })
 
     def SpecialPopulateData(self, TestResultObject, array, error_array, Parameters):
-        TestResultObject.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), '', TestResultObject.nRocs, 0,
-                                                                      TestResultObject.nRocs)
+        TestResultObject.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), '',
+                                                                      TestResultObject.Attributes['nRocs'], 0,
+                                                                      TestResultObject.Attributes['nRocs'])
         with_errors = (len(array) == len(error_array))
         for i in range(len(array)):
             TestResultObject.ResultData['Plot']['ROOTObject'].SetBinContent(i + 1, array[i])
             if with_errors:
                 TestResultObject.ResultData['Plot']['ROOTObject'].SetBinError(i + 1, error_array[i])
-        mapped_array = map(lambda x: Parameters['MinY'] < x and x < Parameters['MaxY'],array)
-        filtered_array = filter(lambda x: Parameters['MinY'] < x and x < Parameters['MaxY'], array)
+        mapped_array = map(lambda x: Parameters['MinY'] < x < Parameters['MaxY'], array)
+        filtered_array = filter(lambda x: Parameters['MinY'] < x < Parameters['MaxY'], array)
         if TestResultObject.verbose:
-            print filtered_array,mapped_array
+            print filtered_array, mapped_array
         invalid_filter = (len(filtered_array) == 0)
         if invalid_filter:
             filtered_array = array
@@ -72,14 +72,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         median_array = self.median(filtered_array)
         average_array = reduce(lambda x, y: x + y, filtered_array) / len(filtered_array)
         if not 'MinY' in Parameters or not 'MaxY' in Parameters:
-            print 'Cannot find Key in Parameters: ',Parameters.keys()
+            print 'Cannot find Key in Parameters: ', Parameters.keys()
             raw_input()
         if invalid_filter:
             ymin = min_array
             ymax = max_array
         else:
-           ymin = max(min_array,Parameters.get('MinY',-1e9))
-           ymax = min(max_array,Parameters.get('MaxY',+1e9))
+            ymin = max(min_array, Parameters.get('MinY', -1e9))
+            ymax = min(max_array, Parameters.get('MaxY', +1e9))
         if ymin > 0:
             ymin *= .8
         else:
@@ -95,7 +95,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerStyle(Parameters['MarkerStyle'])
         TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerSize(0.5)
         TestResultObject.ResultData['Plot']['ROOTObject'].SetTitle("")
-        TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(ymin,ymax)
+        TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(ymin, ymax)
         TestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("ROC No.")
         TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle(Parameters['YaxisTitle'])
         TestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
@@ -103,8 +103,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
         TestResultObject.ResultData['Plot']['ROOTObject'].Draw('LP')
         Line = ROOT.TLine()
-        lineB = Line.DrawLine(0, average_array, TestResultObject.nRocs, average_array)
-        lineB.SetLineWidth(2);
+        lineB = Line.DrawLine(0, average_array, TestResultObject.Attributes['nRocs'], average_array)
+        lineB.SetLineWidth(2)
         lineB.SetLineStyle(2)
         lineB.SetLineColor(ROOT.kRed)
 
