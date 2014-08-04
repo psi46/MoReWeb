@@ -1,4 +1,5 @@
 .project
+Analyse/Configuration/Paths.cfg
 .pydevproject
 .settings/
 checksum.md5
