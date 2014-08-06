@@ -53,13 +53,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         print sorted_points
         prev_point = sorted_points[0][0]
         num = 0
-        for e in sorted_points:
-            if e[0] < prev_point:
-                if self.verbose:
-                    print "Error: Lower VCal for higher energy...possible fit error. Point in question: ", e
-                sorted_points.pop(num)
-            num += 1
-            prev_point = e[0]
+        # for e in sorted_points:
+        #     if e[0] < prev_point:
+        #         if self.verbose:
+        #             print "Error: Lower VCal for higher energy...possible fit error. Point in question: ", e
+        #         sorted_points.pop(num)
+        #     num += 1
+        #     prev_point = e[0]
         new_sorted_points = sorted(sorted_points, key=lambda point: point[0])
         sorted_peak_centers = array.array('d', [])
         sorted_n_electrons = array.array('d', [])
