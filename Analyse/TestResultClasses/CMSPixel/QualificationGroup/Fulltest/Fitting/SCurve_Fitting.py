@@ -8,7 +8,7 @@ import time
 class SCurve_Fitting():
     nCols = 52
     nRows = 80
-    def __init__(self, refit = True, HistoDict = None, chi2Limit = 2.0, ePerVcal = 65.0, verbose = False):
+    def __init__(self, refit = True, HistoDict = None, chi2Limit = 2.0, ePerVcal = 50.0, verbose = False):
         print 'SCURVE Fitting'
         ROOT.gStyle
         self.verbose = verbose

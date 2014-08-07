@@ -10,7 +10,7 @@ from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResu
 import AbstractClasses.Helper.hasher as hasher
 import argparse
 # from AbstractClasses import Helper
-import TestResultClasses.CMSPixel.QualificationGroup.TestResult
+import TestResultClasses.CMSPixel.QualificationGroup.QualificationGroup
 import os, time,shutil, sys
 # import errno
 import ConfigParser
@@ -170,7 +170,7 @@ def GetModuleTestResult(TestResultEnvironment,FinalModuleResultsPath,ModuleInfor
             }
     if ModuleInformation.has_key('TestType'):
         newModuleInformation['TestType'] =  ModuleInformation['TestType']
-    return TestResultClasses.CMSPixel.QualificationGroup.TestResult.TestResult(
+    return TestResultClasses.CMSPixel.QualificationGroup.QualificationGroup.TestResult(
             TestResultEnvironmentInstance,
             ParentObject = None,
             InitialModulePath = 'TestResultClasses.CMSPixel.QualificationGroup',
@@ -190,7 +190,8 @@ def CreateApacheWebserverConfiguration(FinalResultsPath):
     f.close()
 
 def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
-    global FinalResultDirectory
+    print 'AnalyseTestData',ModuleInformationRaw,ModuleFolder
+    global final_result_directory
     print ModuleInformationRaw, ModuleFolder
     #,ModuleInformation
     ModuleInformation = extractModuleInformation(ModuleInformationRaw)
