@@ -768,7 +768,7 @@ class GeneralTestResult:
 
         for i in TestResultObject.ResultData['KeyList']:
             if not TestResultObject.ResultData['KeyValueDictPairs'].has_key(i):
-                warnings.warn('Cannot find Key: %s' % i)
+                warnings.warn('Cannot find Key: {Key}'.format(Key=i))
                 continue
             if not TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Unit'):
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['Unit'] = ''
