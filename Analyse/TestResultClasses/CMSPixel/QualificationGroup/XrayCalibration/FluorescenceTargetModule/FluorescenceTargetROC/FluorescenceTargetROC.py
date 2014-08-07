@@ -188,9 +188,9 @@ class TestResult(GeneralTestResult):
 
         # Limit on the constant part; it should be positive, and below the y-average
         # because the y-average is biased above the noise by the signal peak
-        myfit.SetParLimits(0, 0, y_avg)
+        myfit.SetParLimits(0, 0, 2*y_avg)
         if self.verbose:
-            print 'SetParameterLimits0: ', 0, y_avg
+            print 'SetParameterLimits0: ', 0, 2*y_avg
 
         #Initial guess of the linear part is flat
         myfit.SetParameter(1, 0)
@@ -198,9 +198,9 @@ class TestResult(GeneralTestResult):
             print 'SetParameter1: ', myfit.GetParameter(1)
 
         #Limits on the linear part, from the hardcoded value above
-        myfit.SetParLimits(1, -1 * param1limit, param1limit)
+        myfit.SetParLimits(1, -4 * param1limit, 4 * param1limit)
         if self.verbose:
-            print 'SetParameterLimits1: ', -1 * param1limit, param1limit
+            print 'SetParameterLimits1: ', -4 * param1limit, 4 * param1limit
 
         #Initial guess for the size of the signal is the maximum of the histogram
         myfit.SetParameter(2, maximum)
@@ -228,20 +228,20 @@ class TestResult(GeneralTestResult):
         if self.verbose:
             print 'SetParameter4: ', myfit.GetParameter(4)
 
-        myfit.SetParLimits(4, signalSigma - 5, signalSigma + 5)
+        myfit.SetParLimits(4, signalSigma - 10, signalSigma + 10)
         if self.verbose:
-            print 'SetParameterLimits4: ', signalSigma - 5, signalSigma + 5
+            print 'SetParameterLimits4: ', signalSigma - 10, signalSigma + 10
 
         #Initial guess for the size of the guassian noise to be half of the overall y-average (other half is the constant term)
-        myfit.SetParameter(5, y_avg / 2)
+        myfit.SetParameter(5, y_avg*10)
 
         if self.verbose:
             print 'SetParameter5: ', myfit.GetParameter(5)
         # Limits on the amount of gaussian noise, should be below y-average
         # but above 0 for the same reasons as listed for Par0
-        myfit.SetParLimits(5, 0, y_avg)
+        myfit.SetParLimits(5, 0, y_avg*20)
         if self.verbose:
-            print 'SetParameterLimits4: ', 0, y_avg
+            print 'SetParameterLimits4: ', 0, y_avg*20
 
         #Initial guess for gaussian noise at the mean of the histogram
         myfit.SetParameter(6, mean)
@@ -256,12 +256,13 @@ class TestResult(GeneralTestResult):
         #Initial guess for the turn on is at the hardcorded trimvalue
         myfit.SetParameter(8, trimvalue)
         #Limits on where the turn on occurs are guessed at +-10 away from the given trim value
-        myfit.SetParLimits(8, trimvalue - 30, trimvalue + 30)
+        #goes to very low values, but doesn't seem to affect the fit too much. Maybe a lower bound can be set to e-5
+        myfit.SetParLimits(8, 0, trimvalue + 30)
 
         #Initial guess for the turn on speed is set to 5
         myfit.SetParameter(9, 5)
         #Limit on turn on speed between 0.1 and 10. This value should be positive and shouldn't be much more below 0.1 otherwise it will affect the rest of the fit
-        myfit.SetParLimits(9, 0.01, 10)
+        myfit.SetParLimits(9, 0.01, 20)
 
         histo.Fit(myfit, self.Attributes['fitOption'])
         if self.verbose:
