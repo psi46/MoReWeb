@@ -52,6 +52,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             center = all_targets[i].ResultData['KeyValueDictPairs']['Center']
             n_electrons = all_targets[i].ResultData['KeyValueDictPairs']['TargetNElectrons']
             energy = all_targets[i].ResultData['KeyValueDictPairs']['TargetEnergy']
+            chi2   = all_targets[i].ResultData['KeyValueDictPairs']['Chi2PerNDF']
             break
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
@@ -68,5 +69,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
 
 
-        self.ResultData['KeyList'] = ['Center', 'TargetEnergy', 'TargetNElectrons']
-        self.ResultData['KeyValueDictPairs'] = {'Center': center,'TargetEnergy': energy, 'TargetNElectrons': n_electrons}
+        self.ResultData['KeyList'] = ['Center', 'TargetEnergy', 'TargetNElectrons','Chi2PerNDF']
+        self.ResultData['KeyValueDictPairs'] = {'Center': center,'TargetEnergy': energy, 'TargetNElectrons': n_electrons,'Chi2PerNDF':chi2}
