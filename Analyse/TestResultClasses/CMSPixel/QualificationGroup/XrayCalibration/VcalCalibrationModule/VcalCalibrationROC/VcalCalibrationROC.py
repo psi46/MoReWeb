@@ -1,4 +1,5 @@
 import AbstractClasses
+import warnings
 import ROOT
 import array
 
@@ -37,11 +38,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         peak_errors = array.array('d', [])
         n_electrons = array.array('d', [])
         top_parent = self.ParentObject.ParentObject
+        trimming = []
         for test in top_parent.ResultData['SubTestResults']:
             if not "FluorescenceTargetModule" in test:
                 continue
             module_results = top_parent.ResultData['SubTestResults'][test].ResultData['SubTestResults']
             roc_results = module_results['FluorescenceTarget_C%i' % (self.Attributes["ChipNo"])]
+            trim = roc_results.Attributes['TrimValue']
+            trimming.append(trim)
             key_value_pairs = roc_results.ResultData['KeyValueDictPairs']
             if self.verbose:
                 print test, key_value_pairs['Center']['Value'], key_value_pairs['TargetNElectrons']['Value']
@@ -50,16 +54,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             n_electrons.append(key_value_pairs['TargetNElectrons']['Value'])
         point_pairs = zip(peak_centers, n_electrons, peak_errors)
         sorted_points = sorted(point_pairs, key=lambda point: point[1])
-        print sorted_points
-        prev_point = sorted_points[0][0]
-        num = 0
-        # for e in sorted_points:
-        #     if e[0] < prev_point:
-        #         if self.verbose:
-        #             print "Error: Lower VCal for higher energy...possible fit error. Point in question: ", e
-        #         sorted_points.pop(num)
-        #     num += 1
-        #     prev_point = e[0]
+        print sorted_points,trimming
+        for e in sorted_points:
+            num = sorted_points.index(e)
+            trim = trimming[num]
+            if e[0] <= trim:
+                sorted_points.pop(num)
+                warnings.warn('Removing Datapoint #{num}, Vcal: {Vcal}, Energy: {Energy}'.format(num=num,
+                                                                                                 Vcal = e[0],
+                                                                                                 Energy = e[1]))
+
         new_sorted_points = sorted(sorted_points, key=lambda point: point[0])
         sorted_peak_centers = array.array('d', [])
         sorted_n_electrons = array.array('d', [])

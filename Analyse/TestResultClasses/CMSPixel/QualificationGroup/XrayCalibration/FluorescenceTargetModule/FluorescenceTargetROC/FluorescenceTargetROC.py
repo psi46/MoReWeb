@@ -56,6 +56,7 @@ class TestResult(GeneralTestResult):
         pass
 
     def OpenFileHandle(self):
+        self.get_trim_configuration()
         if self.verbose: print self.RawTestSessionDataPath
         fileHandleName = self.RawTestSessionDataPath + '/commander_XraySpectrum.root'
         fileHandleName = os.path.abspath(fileHandleName)
@@ -119,6 +120,10 @@ class TestResult(GeneralTestResult):
             else:
                 print 'There exist no ROOT file in "%s"' % self.RawTestSessionDataPath
 
+
+    def get_trim_configuration(self):
+        self.Attributes['TrimValue'] = 40
+
     # Hard coded initial guess for signal position based on element name
     def GetInitialEnergyGuess(self, elementName):
         if self.HistoDict.has_option(self.version, 'InitalXrayEnergyVcalFit'):
@@ -179,7 +184,7 @@ class TestResult(GeneralTestResult):
         noiseSigma = 30
 
         #Hard coded trimvalue for the Erf turn on
-        trimvalue = 40
+        trimvalue = self.Attributes['TrimValue']
 
         #Initial guess of constant part is half of the overall y-average
         myfit.SetParameter(0, y_avg / 2)
