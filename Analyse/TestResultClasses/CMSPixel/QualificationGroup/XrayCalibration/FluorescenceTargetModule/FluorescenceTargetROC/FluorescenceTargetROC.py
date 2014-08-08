@@ -265,6 +265,18 @@ class TestResult(GeneralTestResult):
         myfit.SetParLimits(9, 0.01, 20)
 
         histo.Fit(myfit, self.Attributes['fitOption'])
+        backgroundFit = TF1(name, "([0]+[1]*x+gaus(2))*(1+TMath::Erf((x-[5])/[6]))/2", xmin, xmax)
+        backgroundFit.FixParameter(0,myfit.GetParameter(0))
+        backgroundFit.FixParameter(1,myfit.GetParameter(1))
+        backgroundFit.FixParameter(2,myfit.GetParameter(5))
+        backgroundFit.FixParameter(3,myfit.GetParameter(6))
+        backgroundFit.FixParameter(4,myfit.GetParameter(7))
+        backgroundFit.FixParameter(5,myfit.GetParameter(8))
+        backgroundFit.FixParameter(6,myfit.GetParameter(9))
+        backgroundFit.SetLineColor(ROOT.kRed)
+        backgroundFit.SetLineStyle(2)
+        histo.Fit(backgroundFit,"+Q")
+
         if self.verbose:
             for i in range(10):
                 a = ROOT.Double(0)
