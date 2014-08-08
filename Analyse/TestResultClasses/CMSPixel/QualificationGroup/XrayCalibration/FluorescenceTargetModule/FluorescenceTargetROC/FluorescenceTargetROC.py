@@ -222,8 +222,8 @@ class TestResult(GeneralTestResult):
 
         low = maxbin - 2 * signalSigma
 
-        if low < trimvalue:
-            low = trimvalue
+        #if low < trimvalue:
+        #    low = trimvalue/2
         myfit.SetParLimits(3, low, maxbin + 2 * signalSigma)
         if self.verbose:
             print 'SetParameterLimits3: ', maxbin + 2 * signalSigma
