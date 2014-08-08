@@ -38,14 +38,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print target
         target = filter(lambda x: x.endswith('C' + str(self.chipNo)), target)
 
+        slope = None
+        offset = None
+        chi2 = None
         for i in target:
             id = self.GetUniqueID()
             if self.verbose:
                 print target
                 print all_targets[i].ResultData['Plot']['ROOTObject']
             self.ResultData['Plot']['ROOTObject'] = all_targets[i].ResultData['Plot']['ROOTObject'].Clone(id)
+            print all_targets[i].ResultData['KeyValueDictPairs'].keys()
             slope = all_targets[i].ResultData['KeyValueDictPairs']['Slope']
             offset = all_targets[i].ResultData['KeyValueDictPairs']['Offset']
+            chi2 =   all_targets[i].ResultData['KeyValueDictPairs']['chi2']
             break
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
@@ -62,4 +67,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
 
         self.ResultData['KeyList'] = ['Slope', 'Offset']
-        self.ResultData['KeyValueDictPairs'] = {'Slope': slope,'Offset': offset}
+        self.ResultData['KeyValueDictPairs'] = {'Slope': slope,'Offset': offset,'chi2': chi2}
