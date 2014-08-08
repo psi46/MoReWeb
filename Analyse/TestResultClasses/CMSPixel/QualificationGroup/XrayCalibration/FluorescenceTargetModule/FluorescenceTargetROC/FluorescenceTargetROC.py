@@ -496,6 +496,10 @@ class TestResult(GeneralTestResult):
             minX = 0
             maxX = 255
             if self.Attributes['Method'] == 'Spectrum':
+                #todo define rebin condition in extrernal file
+                while histo.GetBinContent(histo.GetMaximumBin)/float(histo.GetEntries()) < .02:
+                    histo.Rebin()
+
                 self.FitHistoSpectrum(histo, minX, maxX)
             else:
                 self.FitHistoSCurve(histo, minX, maxX)
