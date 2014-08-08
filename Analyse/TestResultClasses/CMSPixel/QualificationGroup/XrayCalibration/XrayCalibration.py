@@ -1,5 +1,6 @@
 import AbstractClasses
 import copy
+import warnings
 import ROOT
 import os
 import sys
@@ -230,6 +231,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         method = self.Attributes['Method']
         comments = self.ResultData['KeyValueDictPairs'].get('comments', None)
         slope_key = 'VcalCalibrationSlope_' + method
+        offset_key = 'VcalCalibrationOffset_' + method
         try:
             avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
                 'avrgSlope']['Value']
@@ -253,7 +255,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'].keys()
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            warnings.warn(exc_type, fname, exc_tb.tb_lineno)
             avrgSlope = 0
             minSlope = 0
             maxSlope = 0
