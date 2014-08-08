@@ -301,6 +301,7 @@ class TestResult(GeneralTestResult):
             target = self.Attributes['Target']
         else:
             target = 'unknown'
+        chi2_per_ndf = myfit.GetChisquare() / max(myfit.GetNDF(),1)
         self.ResultData['KeyValueDictPairs'] = {
             'Center': {
                 'Value': round(myfit.GetParameter(3), 2),
@@ -318,9 +319,14 @@ class TestResult(GeneralTestResult):
                 'Label': 'Energy of target %s' % target,
                 'Unit': 'nElectrons',
             },
+            'Chi2PerNDF':{
+                'Value': round(chi2_per_ndf,2),
+                'Label': 'Chi^2 per NDF',
+                'Unit': ''
+                }
 
         }
-        self.ResultData['KeyList'].extend(['Center', 'TargetEnergy', 'TargetNElectrons'])
+        self.ResultData['KeyList'].extend(['Center', 'TargetEnergy', 'TargetNElectrons','Chi2PerNDF'])
         if self.verbose: print self.ResultData
         if self.verbose: print self.ResultData['KeyValueDictPairs']
 
@@ -415,7 +421,6 @@ class TestResult(GeneralTestResult):
         return myfit
 
     def FitHistoSCurve(self, histo, minX, maxX):
-        # return self.FitHistoSpectrum(histo,minX,maxX)
         if self.verbose:
             for i in range(10):
                 a = ROOT.Double(0)
@@ -449,6 +454,11 @@ class TestResult(GeneralTestResult):
             },
             'TargetNElectrons': {
                 'Value': round(targetNElectrons, 2),
+                'Label': 'Energy of target %s' % target,
+                'Unit': 'nElectrons',
+            },
+            'Chi2PerNDF':{
+                'Value': round(0, 2),
                 'Label': 'Energy of target %s' % target,
                 'Unit': 'nElectrons',
             },
@@ -497,8 +507,15 @@ class TestResult(GeneralTestResult):
             maxX = 255
             if self.Attributes['Method'] == 'Spectrum':
                 #todo define rebin condition in extrernal file
-                while histo.GetBinContent(histo.GetMaximumBin)/float(histo.GetEntries()) < .02:
-                    histo.Rebin()
+                while True:
+                    maximum = histo.GetBinContent(histo.GetMaximumBin())
+                    entries = histo.GetEntries()
+                    ratio = float(maximum) / float(entries)
+                    if ratio <.025:
+                        histo.Rebin()
+                    else:
+                        break
+                #    histo.Rebin()
 
                 self.FitHistoSpectrum(histo, minX, maxX)
             else:
