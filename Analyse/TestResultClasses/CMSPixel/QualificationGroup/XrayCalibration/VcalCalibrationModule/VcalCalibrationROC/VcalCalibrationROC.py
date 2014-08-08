@@ -62,7 +62,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             maxTrim = max(maxTrim,trim)
             if e[0] <= trim:
                 # sorted_points.pop(num)
-                warnings.warn('Datapoint #{num}, Vcal: {Vcal}, Energy: {Energy} close to Trim'.format(num=num,
+                warnings.warn('Datapoint #{num}, Vcal: {Vcal}, Energy: {Energy} close to Threshold'.format(num=num,
                                                                                                  Vcal = e[0],
                                                                                                  Energy = e[1]))
 
