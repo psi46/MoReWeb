@@ -270,9 +270,8 @@ class GeneralTestResult:
         if len(files) > 0:
             self.testSoftware = 'pyxar'
         else:
-            data = glob.glob(self.RawTestSessionDataPath + '/*pxar*.*') + \
-                   glob.glob(self.RawTestSessionDataPath + '/*/*pxar*.*')
-
+            data = glob.glob(self.RawTestSessionDataPath + '/*[p,P][x,X][a,A][r,R]*.*') + \
+                   glob.glob(self.RawTestSessionDataPath + '/*/*[p,P][x,X][a,A][r,R]*.*')
             if len(data):
                 self.testSoftware = 'pxar'
             else:
