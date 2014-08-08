@@ -230,6 +230,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         method = self.Attributes['Method']
         comments = self.ResultData['KeyValueDictPairs'].get('comments', None)
         slope_key = 'VcalCalibrationSlope_' + method
+        offset_key = 'VcalCalibrationOffset_' + method
         try:
             avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
                 'avrgSlope']['Value']
