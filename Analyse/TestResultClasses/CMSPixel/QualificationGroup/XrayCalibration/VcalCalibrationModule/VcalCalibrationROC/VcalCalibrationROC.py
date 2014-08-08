@@ -89,19 +89,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # Fitting of Slope
         maxTrim *=1.05 #todo: THink about a good value where you dont wanna fit...
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",max(maxTrim,sorted_peak_centers[0]),
+        xmin = max(maxTrim,sorted_peak_centers[0])
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])
         chi2_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
         if ndf_total > 0:
             chi2_total /= ndf_total
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", max(maxTrim,sorted_peak_centers[1]),
+        xmin =  max(maxTrim,sorted_peak_centers[1])
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])
         chi2_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
         if ndf_right > 0:
             chi2_right /= ndf_right
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", max(maxTrim,sorted_peak_centers[0]),
+        xmin = max(maxTrim,sorted_peak_centers[0])
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 2])
         chi2_left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
@@ -114,17 +117,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print '\tchi2Right ', chi2_right, ' @ NDF ', ndf_right
         if ((chi2_right < chi2_total) or (chi2_left < chi2_total)) and ndf_total > 1:
             if chi2_right < chi2_left:
-                self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", sorted_peak_centers[1],
+                xmin =  max(maxTrim,sorted_peak_centers[1])
+                self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",xmin,
                                                           sorted_peak_centers[len(sorted_peak_centers) - 1])
                 if self.verbose:
                     print "Excluding Leftmost Point because chi2Total=", chi2_total, " and chi2Right=", chi2_right
             else:
-                self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", sorted_peak_centers[0],
+                xmin =max(maxTrim,sorted_peak_centers[0])
+                self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
                                                           sorted_peak_centers[len(sorted_peak_centers) - 2])
                 if self.verbose:
                     print "Excluding Rightmost Point because chi2Total=", chi2_total, " and chi2Left=", chi2_left
         else:
-            self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", sorted_peak_centers[0],
+            xmin =  max(maxTrim,sorted_peak_centers[0])
+            self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",xmin,
                                                       sorted_peak_centers[len(sorted_peak_centers) - 1])
 
         fit = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1")
