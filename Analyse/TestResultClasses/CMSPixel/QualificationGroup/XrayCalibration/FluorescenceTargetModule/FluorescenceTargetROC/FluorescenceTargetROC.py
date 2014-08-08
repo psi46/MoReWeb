@@ -34,7 +34,7 @@ class TestResult(GeneralTestResult):
         self.check_Test_Software()
         self.ReadModuleVersion()
         if not self.verbose:
-            self.self.Attributes['fitOption'] += 'Q'
+            self.Attributes['fitOption'] += 'Q'
         if self.Attributes['ChipNo'] == 1 and 'Mo' in self.Attributes['Target']:
             # self.verbose = True
             # 'TargetEnergy': TargetEnergy,

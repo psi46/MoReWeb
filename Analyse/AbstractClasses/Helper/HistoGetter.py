@@ -1,7 +1,8 @@
 
 import ROOT
 
-def get_histo(rootfile,histoname,rocNo = None):
+def get_histo(rootfile,name,rocNo = None):
+    histoname = name
     if rocNo !=None:
         try:
             histoname = histoname%rocNo
@@ -21,7 +22,18 @@ def get_histo(rootfile,histoname,rocNo = None):
             break
     if dir == None:
         return None
-    # print dir,type(dir)
     histo = dir.Get(histoname[-1])
-    # print histo
+    if name.startswith('Xray.q_C'):
+        l = []
+        for i in dir.GetListOfKeys():
+            if i.GetName().startswith('q_'):
+                l.append(i)
+        if len(l) == 1:
+            histo = dir.Get(l[0].GetName())
+        elif len(l) > 1:
+            histo = None
+            raise NameError('Found more than one possible candidate for the Xray spectrum: {Candidates}'.format(Candidates=l))
+        else:
+            histo = None
+            raise NameError("Didn't any possible candidate for the Xray spectrum: {Name}".format(Name=name))
     return histo

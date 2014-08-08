@@ -18,7 +18,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Key':'Pedestal Spread',
                 'DataKey':'PHCalibrationPedestal', # which sub test result to take the data from
                 'DataParameterKey':'sigma', # which part of key value dict pairs
-                'DataFactor':self.TestResultEnvironmentObject.GradingParameters['Standard2ElectronConversionFactor'],
+                'DataFactor':self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor'],
                 'YLimitB':self.TestResultEnvironmentObject.GradingParameters['pedestalB'],# limit for grading
                 'MarkerColor':ROOT.kRed,
                 'LineColor':ROOT.kRed,

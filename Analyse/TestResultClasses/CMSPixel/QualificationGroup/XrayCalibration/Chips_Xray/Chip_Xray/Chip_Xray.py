@@ -19,12 +19,26 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['SubTestResultDictList'] = []
 
         methods = set()
+        order = []
         for i in self.Attributes["SubTestResultDictList"]:
             if i['Module'] == 'FluorescenceTargetModule':
                 target_key = i['InitialAttributes']['StorageKey']
+                key = 'FluorescenceTargetModule_{Target}_1_{Method}'.format(Target = i['InitialAttributes']['Target'],
+                                                                            Method = i['InitialAttributes']['Method'])
+                subresults = self.ParentObject.ParentObject.ResultData['SubTestResults'][key].ResultData['SubTestResults']
+                for j in subresults:
+                    order.append((subresults[j].Attributes['TargetEnergy'],target_key))
+                    break
+        order = map(lambda x: x[1], sorted(order))
+
+        for i in self.Attributes["SubTestResultDictList"]:
+            if i['Module'] == 'FluorescenceTargetModule':
+                target_key = i['InitialAttributes']['StorageKey']
+                position = order.index(target_key)
                 target = i['InitialAttributes']['Target']
                 key = 'Xray_Target_' + target + '_Chip' + str(self.Attributes['ChipNo'])
                 methods.add(i['InitialAttributes']['Method'])
+                # self.ParentObject.ParentObject.ResultData['SubTestResultDictList']GetEnergy(self.Attributes['Target']
                 self.ResultData['SubTestResultDictList'].append(
                     {
                         "Key": key,
@@ -39,7 +53,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             "Method":i['InitialAttributes']['Method']
                         },
                         "DisplayOptions": {
-                            "Order": 1,
+                            "Order": position,
                             "Width": 1
                         }
                     }
@@ -60,7 +74,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                 "Method":method
                             },
                             "DisplayOptions": {
-                                "Order": 1,
+                                "Order": len(self.ResultData['SubTestResultDictList'])+1,
                                 "Width": 1
                             }
                         }
