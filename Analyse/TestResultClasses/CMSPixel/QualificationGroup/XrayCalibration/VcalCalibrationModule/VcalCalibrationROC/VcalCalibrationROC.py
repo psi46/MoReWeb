@@ -55,12 +55,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         point_pairs = zip(peak_centers, n_electrons, peak_errors)
         sorted_points = sorted(point_pairs, key=lambda point: point[1])
         print sorted_points,trimming
+        maxTrim = 0
         for e in sorted_points:
             num = sorted_points.index(e)
             trim = trimming[num]
+            maxTrim = max(maxTrim,trim)
             if e[0] <= trim:
-                sorted_points.pop(num)
-                warnings.warn('Removing Datapoint #{num}, Vcal: {Vcal}, Energy: {Energy}'.format(num=num,
+                # sorted_points.pop(num)
+                warnings.warn('Datapoint #{num}, Vcal: {Vcal}, Energy: {Energy} close to Trim'.format(num=num,
                                                                                                  Vcal = e[0],
                                                                                                  Energy = e[1]))
 
@@ -86,19 +88,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # self.ResultData['Plot']['ROOTObject'].SetMarkerStyle(21)
 
         # Fitting of Slope
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", sorted_peak_centers[0],
+        maxTrim *=1.05 #todo: THink about a good value where you dont wanna fit...
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",max(maxTrim,sorted_peak_centers[0]),
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])
         chi2_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
         if ndf_total > 0:
             chi2_total /= ndf_total
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", sorted_peak_centers[1],
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", max(maxTrim,sorted_peak_centers[1]),
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])
         chi2_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
         if ndf_right > 0:
             chi2_right /= ndf_right
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", sorted_peak_centers[0],
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", max(maxTrim,sorted_peak_centers[0]),
                                                   sorted_peak_centers[len(sorted_peak_centers) - 2])
         chi2_left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
