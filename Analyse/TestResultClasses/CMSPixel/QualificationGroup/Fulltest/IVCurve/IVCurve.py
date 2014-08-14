@@ -7,7 +7,6 @@ import warnings
 import AbstractClasses.Helper.helper as helper
 import ROOT
 
-import AbstractClasses
 from AbstractClasses.GeneralTestResult import GeneralTestResult
 
 
@@ -35,7 +34,7 @@ class TestResult(GeneralTestResult):
                 'Label': 'I_rec(150 V, 17 degC))',
                 'Unit': 'μA'
             }
-        self.ResultData['KeyList'].append('recalculatedCurrentAtVoltage150V')
+            self.ResultData['KeyList'].append('recalculatedCurrentAtVoltage150V')
 
     @staticmethod
     def recalculate_current(inputCurrent, inputTemp, outputTemp):
@@ -102,7 +101,8 @@ class TestResult(GeneralTestResult):
         if self.verbose:
             print 'The varlist of the file "%s" is: "%s"' % (fileName, varlist)
         IVTuple = ROOT.TNtuple(self.GetUniqueID(), "IVTuple", varlist)  # IVTuple
-        IVTuple.ReadFile(fileName)
+        entries  = IVTuple.ReadFile(fileName)
+        print 'read {entries} Entries from file {fileName}'.format(entries=entries,fileName=fileName)
         self.ResultData['HiddenData']['IVTuple'] = IVTuple
 
     def PopulateResultData(self):
@@ -138,11 +138,14 @@ class TestResult(GeneralTestResult):
         # NoOfEntries = min(IVTuple.GetEntries(), 250)
         i = 0
         l = False
+        if self.verbose:
+            IVTuple.Print()
+            print IVTuple,type(IVTuple),IVTuple.GetEntries()
         for Entry in IVTuple:
             try:
                 voltage = Entry.Voltage
             except TypeError as e:
-                if l == False:
+                if not l:
                     text = 'Fulltest.IVCurve: {Exception}'.format(Exception=e)
                     print text
                     warnings.warn(text)
