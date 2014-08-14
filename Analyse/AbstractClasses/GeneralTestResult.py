@@ -5,7 +5,7 @@ import json
 import traceback
 import warnings
 import os
-
+import ConfigParser
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 
 
@@ -230,7 +230,7 @@ class GeneralTestResult:
             try:
                 # print 'import ',importdir,SubModule
                 f = __import__(importdir + '.' + SubModule, fromlist=[importdir + '.' + 'TestResult'])
-            except Exception as inst:
+            except ImportError as inst:
                 # print 'could not ',importdir+'.'+SubModule,SubModule
                 # print 'type',type(inst)
                 # print 'inst',inst
@@ -331,18 +331,18 @@ class GeneralTestResult:
                 config.read(fileName)
             try:
                 version = config.get('ROC', 'type')
-            except:
+            except (KeyError,ConfigParser.ConfigParser.NoOptionError):
                 warnings.warn('cannot find version name {section}'.format(section=config.sections()))
                 if 'ROC' in config.sections():
                     warnings.warn('cannot find version ROC-section {section}'.format(section=config.options('ROC')))
                 version = 'none'
             try:
                 nRocs = config.getint('Module', 'rocs')
-            except:
+            except (KeyError,ConfigParser.NoOptionError):
                 nRocs = 0
             try:
                 halfModule = config.get('Module', 'halfModule')
-            except:
+            except (KeyError,ConfigParser.NoOptionError):
                 halfModule = 0
         version = version.rstrip('\n')
         if self.verbose:
@@ -447,12 +447,14 @@ class GeneralTestResult:
     '''
         Create a unique ID for creating root histograms
     '''
+
     def GetUniqueID(self):
         return self.TestResultEnvironmentObject.GetUniqueID(self.NameSingle)
 
     '''
         Sets the storage path
     '''
+
     def SetFinalResultsStoragePath(self):
         pass
 
@@ -484,6 +486,7 @@ class GeneralTestResult:
     '''
         Generate the filename including the full path to the plot file according to the format
     '''
+
     def GetPlotFileName(self):
         Suffix = self.ResultData['Plot']['Format']
         return self.FinalResultsStoragePath + '/' + self.NameSingle + '.' + Suffix
@@ -502,6 +505,7 @@ class GeneralTestResult:
     '''
         Reads all test results and writes it to the memory
     '''
+
     def PopulateResultData(self):
         pass
 
@@ -903,6 +907,7 @@ class GeneralTestResult:
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in JSON format
         @final
     '''
+
     def GenerateDataFileJSON(self):
         data = None
         key = None
@@ -920,7 +925,7 @@ class GeneralTestResult:
             f = open(self.FinalResultsStoragePath + '/KeyValueDictPairs.json', 'w')
             f.write(json.dumps(self.ResultData['KeyValueDictPairs'], sort_keys=True, indent=4, separators=(',', ': ')))
             f.close()
-        except:
+        except (KeyError,IOError):
             if data and key in data:
                 warnings.warn(
                     'Cannot create JSON for %s, %s' % (type(data[key]['Value']), self.ResultData['KeyValueDictPairs']))

@@ -17,7 +17,7 @@ class TestResult(GeneralTestResult):
         self.check_Test_Software()
         self.ReadModuleVersion()
         self.Attributes['NumberOfChips'] = self.nRocs
-        self.Attributes["ModuleVersion"] = self.ROCtype
+        self.Attributes["ModuleVersion"] = self.version
         self.Attributes['StartChip'] = 0
         if self.verbose:
             tag = self.Name + ": Custom Init"

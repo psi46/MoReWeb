@@ -18,7 +18,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData["SubTestResultDictList"] = []
         self.check_Test_Software()
         self.nRocs = self.ParentObject.nRocs
-        self.ROCtype = self.ParentObject.ROCtype
+        self.ROCtype = self.ParentObject.version
         self.halfModule = self.ParentObject.halfModule
         # Get module information
         self.ResultData['HiddenData']['ModuleVersion'] = self.ROCtype
