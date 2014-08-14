@@ -1,26 +1,18 @@
-'''
-Program : MORE-Web
- Author : Esteban Marin - estebanmarin@gmx.ch
- Version    : 2.1
- Release Date   : 2013-05-30
-'''
-from _ast import Sub
-
-import ROOT
-import glob
 import gzip
 import sys
 import datetime
 import json
 import traceback
 import warnings
-import Helper.HistoGetter as HistoGetter
 import os
+
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
+
 
 try:
     set
 except NameError:
+    # noinspection PyShadowingBuiltins,PyDeprecation
     from sets import Set as set
 import Helper.ROOTConfiguration as ROOTConfiguration
 import glob
@@ -50,6 +42,12 @@ class GeneralTestResult:
 
         # Title displayed in HTML, etc
         self.Title = ''
+        # options which might be transfered to Attributes?
+        self.testSoftware = None
+        self.HistoDict = None
+        self.version = None
+        self.nRocs = 0
+        self.halfModule = 0
 
         if Key:
             self.Key = Key
@@ -83,7 +81,6 @@ class GeneralTestResult:
         # Path for current test result files (html, svg, etc)
         self.FinalResultsStoragePath = ''
 
-
         # File handle (might be used by sub results)
         self.FileHandle = 0
 
@@ -97,17 +94,16 @@ class GeneralTestResult:
             'GroupWithNext': False,
         }
 
-
         # Result array
         self.ResultData = {
             # Key / ValueDict (dict with {Value, Unit, Label}, if Label not specified, the key is used as label) Pairs
             # 'KeyValueDictPairs':{
             # 'MyKey':{
-            #           'Value':25,
-            #           'Unit': 'kg',
-            #           'Label': 'My Key'
-            #       }
-            #   }
+            # 'Value':25,
+            # 'Unit': 'kg',
+            # 'Label': 'My Key'
+            # }
+            # }
             'KeyValueDictPairs': {},
 
             # List of keys for sorting
@@ -118,20 +114,20 @@ class GeneralTestResult:
                 'ROOTObject': None,
                 'Caption': '',
                 'ImageFile': '',
-                'Format': self.DefaultImageFormat  #svg
+                'Format': self.DefaultImageFormat  # svg
             },
             # SubTest Results
             'SubTestResults': {},
             # List of {Key, Module} dict for sorting and special attributes
             'SubTestResultDictList': [],
             # 'SubTestResultDictList':{
-            #   {
-            #       'Key':'Noise'
-            #       'Module':'Noise',
-            #       'TestResultObject':object,
-            #       'InitialAttributes':{'StorageKey':'Blub'},
-            #       'DisplayOptions':{'Order':1, 'Width':1,'GroupWithNext':False},
-            #   }
+            # {
+            # 'Key':'Noise'
+            # 'Module':'Noise',
+            # 'TestResultObject':object,
+            # 'InitialAttributes':{'StorageKey':'Blub'},
+            # 'DisplayOptions':{'Order':1, 'Width':1,'GroupWithNext':False},
+            # }
             # }
 
             # hidden data, might be needed by other test results but is not displayed
@@ -145,15 +141,10 @@ class GeneralTestResult:
             }
 
         }
-
         # Reference to parent object
         self.ParentObject = None
-
-
-
         # Reference to the Test Result Environment
         self.TestResultEnvironmentObject = None
-
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
         self.Canvas = self.TestResultEnvironmentObject.Canvas
         self.RawTestSessionDataPath = self.TestResultEnvironmentObject.ModuleDataDirectory
@@ -171,7 +162,7 @@ class GeneralTestResult:
         if self.Attributes['TestResultSubDirectory']:
             self.RawTestSessionDataPath += '/' + self.Attributes['TestResultSubDirectory']
 
-        self.CustomInit();
+        self.CustomInit()
 
         if not self.Title:
             self.Title = self.NameSingle
@@ -235,8 +226,8 @@ class GeneralTestResult:
 
             i['DisplayOptions'] = DisplayOptions
 
+            importdir = self.ModulePath + '.' + SubModule
             try:
-                importdir = self.ModulePath + '.' + SubModule
                 # print 'import ',importdir,SubModule
                 f = __import__(importdir + '.' + SubModule, fromlist=[importdir + '.' + 'TestResult'])
             except Exception as inst:
@@ -283,8 +274,8 @@ class GeneralTestResult:
         self.HistoDict.read(fileName)
 
     def check_for_comments(self):
-        dir = os.path.abspath(self.RawTestSessionDataPath)
-        comment_files = glob.glob(dir + '/comment*')
+        dir_name = os.path.abspath(self.RawTestSessionDataPath)
+        comment_files = glob.glob(dir_name + '/comment*')
         comment = ''
         for filename in comment_files:
             comment += '{filename}:\n'.format(filename=filename.split('/')[-1])
@@ -293,10 +284,10 @@ class GeneralTestResult:
             comment += s + '\n\n'
         # if self.ResultData:
         # if not 'KeyVaueDictPairs' in self.ResultData:
-        #         self.ResultData['KeyValueDictPairs'] = {}
+        # self.ResultData['KeyValueDictPairs'] = {}
         #
-        #     if not 'KeyValueList' in self.ResultData:
-        #         self.ResultData['KeyValueList'] = []
+        # if not 'KeyValueList' in self.ResultData:
+        # self.ResultData['KeyValueList'] = []
         if self.verbose:
             print 'checking', self.RawTestSessionDataPath, comment_files
         if comment != '':
@@ -311,9 +302,12 @@ class GeneralTestResult:
         if self.verbose:
             print 'Read configParameters'
         self.check_Test_Software()
-        format = self.HistoDict.get('ConfigParameters', 'configFormat')
+        config_format = self.HistoDict.get('ConfigParameters', 'configFormat')
         fileNames = self.HistoDict.get('ConfigParameters', 'configParameters').split(',')
-        if format == 'dat':
+        version = 'none'
+        nRocs = 0
+        halfModule = 0
+        if config_format == 'dat':
             lines = []
             for filename in fileNames:
                 fileName = '%s/%s' % (self.RawTestSessionDataPath, filename)
@@ -330,7 +324,7 @@ class GeneralTestResult:
                 elif line.strip().startswith('halfModule'):
                     halfModule = int(line.split(' ')[-1])
                     if self.verbose: print '\thalfModule: %s' % halfModule
-        elif format == 'cfg':
+        elif config_format == 'cfg':
             config = BetterConfigParser()
             for filename in fileNames:
                 fileName = '%s/%s' % (self.RawTestSessionDataPath, filename)
@@ -358,7 +352,7 @@ class GeneralTestResult:
         self.version = version
         self.nRocs = nRocs
         self.halfModule = halfModule
-        return (version, nRocs, halfModule)
+        return version, nRocs, halfModule
 
     '''
         Populates all necessary data
@@ -366,7 +360,7 @@ class GeneralTestResult:
     '''
 
     def PopulateAllData(self):
-        self.OpenFileHandle();
+        self.OpenFileHandle()
         for i in self.ResultData['SubTestResultDictList']:
             if i['TestResultObject'].Enabled:
                 self.SetCanvasSize()
@@ -450,18 +444,15 @@ class GeneralTestResult:
     def OpenFileHandle(self):
         pass
 
-
     '''
         Create a unique ID for creating root histograms
     '''
-
     def GetUniqueID(self):
         return self.TestResultEnvironmentObject.GetUniqueID(self.NameSingle)
 
     '''
         Sets the storage path
     '''
-
     def SetFinalResultsStoragePath(self):
         pass
 
@@ -484,17 +475,15 @@ class GeneralTestResult:
 
         # self.Canvas.SetCanvasSize(
 
-    #             self.DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'],
-    #             self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight']
-    #         )
-    #         self.Canvas.Draw()
-    #         self.Canvas.Update()
-
+    # self.DisplayOptions['Width']*self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasWidth'],
+    # self.TestResultEnvironmentObject.Configuration['DefaultValues']['CanvasHeight']
+    # )
+    # self.Canvas.Draw()
+    # self.Canvas.Update()
 
     '''
         Generate the filename including the full path to the plot file according to the format
     '''
-
     def GetPlotFileName(self):
         Suffix = self.ResultData['Plot']['Format']
         return self.FinalResultsStoragePath + '/' + self.NameSingle + '.' + Suffix
@@ -510,11 +499,9 @@ class GeneralTestResult:
             key=lambda i: i['DisplayOptions']['Order']
         )
 
-
     '''
         Reads all test results and writes it to the memory
     '''
-
     def PopulateResultData(self):
         pass
 
@@ -573,9 +560,7 @@ class GeneralTestResult:
             ''
         )
 
-
         # Clickpath
-
         ClickPathEntries = []
         ClickPathEntryTemplate = HtmlParser.getSubpart(HTMLTemplate, '###CLICKPATH_ENTRY###')
 
@@ -613,7 +598,7 @@ class GeneralTestResult:
 
         CSSClasses = ''
 
-        #Result Data
+        # Result Data
         FinalHTML = HtmlParser.substituteSubpartArray(
             FinalHTML,
             {
@@ -633,7 +618,6 @@ class GeneralTestResult:
         f = open(self.FinalResultsStoragePath + '/' + HTMLFileName, 'w')
         f.write(FinalHTML)
         f.close()
-
 
     '''
         Generate Result Data HTML for usage in HTML files
@@ -656,13 +640,13 @@ class GeneralTestResult:
         RecursionRelativePath = ''
         if RecursionLevel > 0:
             PathParts = TestResultObject.FinalResultsStoragePath.split('/')
-            #print PathParts
+            # print PathParts
             RecursionRelativePath = PathParts[-1] + '/'
 
         # Title
         if not TestResultObject.Title:
             TestResultObject.Title = TestResultObject.NameSingle
-        MyObjectTestDate = '';
+        MyObjectTestDate = ''
         if RecursionLevel == 0 and TestResultObject.Attributes['TestDate']:
             MyObjectTestDate = 'Test Date: ' + datetime.datetime.fromtimestamp(
                 float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%m")
@@ -756,12 +740,12 @@ class GeneralTestResult:
             except TypeError:
                 print TestResultObject.Name, '_', TestResultObject.Key
                 raise TypeError('Canntot convert, ' + str(TestResultObject.Name) + str(TestResultObject.Key))
-            #PlotHTML = HtmlParser.substituteSubpart(PlotHTML, '###PLOT_IMAGE_'+i+'###', PlotImageHTML)
+            # PlotHTML = HtmlParser.substituteSubpart(PlotHTML, '###PLOT_IMAGE_'+i+'###', PlotImageHTML)
             PlotHTML = HtmlParser.substituteSubpart(PlotHTML, '###PLOT_IMAGE###', PlotImageHTML)
 
         ResultDataHTML = HtmlParser.substituteSubpart(ResultDataHTML, '###PLOT###', PlotHTML)
 
-        #Key Value Dict Pairs
+        # Key Value Dict Pairs
         KeyValueDictPairsRowHTMLTemplate = HtmlParser.getSubpart(HTMLTemplate, '###KEYVALUEDICTPAIRS_ROW###')
         KeyValueDictPairsRows = ''
 
@@ -802,7 +786,7 @@ class GeneralTestResult:
                                                       '###KEYVALUEDICTPAIRS_ROW###',
                                                       KeyValueDictPairsRows)
 
-        #Table
+        # Table
         TableHTML = ''
         if RecursionLevel == 0 or True:
             TableHTMLTemplate = HtmlParser.getSubpart(HTMLTemplate, '###TABLE###')
@@ -854,8 +838,6 @@ class GeneralTestResult:
                         SubTestResultListHTML += HtmlParser.getSubpart(HTMLTemplate, '###SUBTESTRESULTGROUP_END###')
 
                     GroupWithNext = i['DisplayOptions']['GroupWithNext']
-
-
 
             # if the last element was in a group, close the group
             if GroupWithNext:
@@ -917,29 +899,33 @@ class GeneralTestResult:
         )
         return ResultDataHTML
 
-
     '''
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in JSON format
         @final
     '''
-
     def GenerateDataFileJSON(self):
+        data = None
+        key = None
         try:
             data = self.ResultData['KeyValueDictPairs']
             for key in data:
-                #{'NotAlivePixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'MaskDefects': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'NoisyPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'DeadPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'InefficentPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}}
+                # {'NotAlivePixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'MaskDefects': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'NoisyPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'DeadPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'InefficentPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}}
                 if data[key].has_key('Value'):
                     value = data[key]['Value']
                     if type(value) == set:
                         value = list(value)
                         data[key]['Value'] = value
                 pass
-            #self.ResultData['KeyValueDictPairs']
+            # self.ResultData['KeyValueDictPairs']
             f = open(self.FinalResultsStoragePath + '/KeyValueDictPairs.json', 'w')
             f.write(json.dumps(self.ResultData['KeyValueDictPairs'], sort_keys=True, indent=4, separators=(',', ': ')))
             f.close()
         except:
-            print 'Cannot create JSON for %s, %s' % (type(data[key]['Value']), self.ResultData['KeyValueDictPairs'])
+            if data and key in data:
+                warnings.warn(
+                    'Cannot create JSON for %s, %s' % (type(data[key]['Value']), self.ResultData['KeyValueDictPairs']))
+            else:
+                warnings.warn('Cannot create JSON for %s, %s' % (type(data), self.ResultData['KeyValueDictPairs']))
 
     '''
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in ASCII format
@@ -963,7 +949,7 @@ class GeneralTestResult:
                 self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
             except Exception as inst:
                 print 'Error in subtest (write to database)', self.ResultData['SubTestResults'][i].ModulePath, \
-                self.ResultData['SubTestResults'][i].FinalResultsStoragePath
+                    self.ResultData['SubTestResults'][i].FinalResultsStoragePath
                 print inst
                 print inst.args
                 print sys.exc_info()[0]
