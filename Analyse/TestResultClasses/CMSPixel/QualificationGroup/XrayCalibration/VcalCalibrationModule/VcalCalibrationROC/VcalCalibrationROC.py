@@ -2,28 +2,21 @@ import AbstractClasses
 import warnings
 import ROOT
 import array
+from AbstractClasses.GeneralTestResult import GeneralTestResult
 
 
-class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+class TestResult(GeneralTestResult):
     def CustomInit(self):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibration_{Method}".format(Method=self.Attributes['Method'])
         self.Name += "_VcalCalibrationModule_VcalCalibrationROC_TestResult"
         self.NameSingle = "VcalCalibrationROC"
         self.Title = "Vcal Calibration ROC {ROC} - Method {Method}".format(ROC=self.Attributes['ChipNo'],
                                                                            Method=self.Attributes['Method'])
-        self.ChipNo = self.Attributes['ChipNo']
-        self.Method = self.Attributes['Method']
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
             print tag
         self.Attributes['TestedObjectType'] = 'VcalCalibrationROC'
-
-    def PopulateResultData(self):
-        if self.verbose:
-            tag = self.Name + ": Populate"
-            print "".ljust(len(tag), '=')
-            print tag
 
     def PopulateResultData(self):
         if self.verbose:
@@ -54,17 +47,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             n_electrons.append(key_value_pairs['TargetNElectrons']['Value'])
         point_pairs = zip(peak_centers, n_electrons, peak_errors)
         sorted_points = sorted(point_pairs, key=lambda point: point[1])
-        print sorted_points,trimming
+        print sorted_points, trimming
         maxTrim = 0
         for e in sorted_points:
             num = sorted_points.index(e)
             trim = trimming[num]
-            maxTrim = max(maxTrim,trim)
+            maxTrim = max(maxTrim, trim)
             if e[0] <= trim:
                 # sorted_points.pop(num)
                 warnings.warn('Datapoint #{num}, Vcal: {Vcal}, Energy: {Energy} close to Threshold'.format(num=num,
-                                                                                                 Vcal = e[0],
-                                                                                                 Energy = e[1]))
+                                                                                                           Vcal=e[0],
+                                                                                                           Energy=e[1]))
 
         new_sorted_points = sorted(sorted_points, key=lambda point: point[0])
         sorted_peak_centers = array.array('d', [])
@@ -88,22 +81,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # self.ResultData['Plot']['ROOTObject'].SetMarkerStyle(21)
 
         # Fitting of Slope
-        maxTrim *=1.05 #todo: THink about a good value where you dont wanna fit...
-        xmin = max(maxTrim,sorted_peak_centers[0])
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",xmin,
+        maxTrim *= 1.05  # todo: THink about a good value where you dont wanna fit...
+        xmin = max(maxTrim, sorted_peak_centers[0])
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])
         chi2_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
         if ndf_total > 0:
             chi2_total /= ndf_total
-        xmin =  max(maxTrim,sorted_peak_centers[1])
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",xmin,
+        xmin = max(maxTrim, sorted_peak_centers[1])
+        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])
         chi2_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
         ndf_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
         if ndf_right > 0:
             chi2_right /= ndf_right
-        xmin = max(maxTrim,sorted_peak_centers[0])
+        xmin = max(maxTrim, sorted_peak_centers[0])
         self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 2])
         chi2_left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
@@ -117,24 +110,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print '\tchi2Right ', chi2_right, ' @ NDF ', ndf_right
         if ((chi2_right < chi2_total) or (chi2_left < chi2_total)) and ndf_total > 1:
             if chi2_right < chi2_left:
-                xmin =  max(maxTrim,sorted_peak_centers[1])
-                self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",xmin,
+                xmin = max(maxTrim, sorted_peak_centers[1])
+                self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
                                                           sorted_peak_centers[len(sorted_peak_centers) - 1])
                 if self.verbose:
                     print "Excluding Leftmost Point because chi2Total=", chi2_total, " and chi2Right=", chi2_right
             else:
-                xmin =max(maxTrim,sorted_peak_centers[0])
+                xmin = max(maxTrim, sorted_peak_centers[0])
                 self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
                                                           sorted_peak_centers[len(sorted_peak_centers) - 2])
                 if self.verbose:
                     print "Excluding Rightmost Point because chi2Total=", chi2_total, " and chi2Left=", chi2_left
         else:
-            xmin =  max(maxTrim,sorted_peak_centers[0])
-            self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME",xmin,
+            xmin = max(maxTrim, sorted_peak_centers[0])
+            self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
                                                       sorted_peak_centers[len(sorted_peak_centers) - 1])
 
         fit = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1")
-        name = 'linFit_{Method}_C{ChipNo}'.format(Method=self.Method, ChipNo=self.ChipNo)
+        name = 'linFit_{Method}_C{ChipNo}'.format(Method=self.Attributes['Method'], ChipNo=self.Attributes['ChipNo'])
         self.ResultData['Plot']['ROOTObject'].GetListOfFunctions().Add(fit.Clone(name))
         self.ResultData['Plot']['ROOTObject'].GetFunction(name).SetRange(0, 255)
         self.ResultData['Plot']['ROOTObject'].GetFunction(name).SetLineStyle(2)

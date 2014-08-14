@@ -1,5 +1,8 @@
-from  AbstractClasses.GeneralTestResult import GeneralTestResult
+import warnings
+
 import ROOT
+
+from  AbstractClasses.GeneralTestResult import GeneralTestResult
 
 
 class TestResult(GeneralTestResult):
@@ -29,7 +32,7 @@ class TestResult(GeneralTestResult):
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')
             print tag
-        self.Attributes['nRocs']= self.ParentObject.nRocs
+        self.Attributes['nRocs'] = self.ParentObject.nRocs
         slopes = []
         error_slopes = []
         for roc in range(self.Attributes['nRocs']):
@@ -72,8 +75,9 @@ class TestResult(GeneralTestResult):
         median_array = self.median(filtered_array)
         average_array = reduce(lambda x, y: x + y, filtered_array) / len(filtered_array)
         if not 'MinY' in Parameters or not 'MaxY' in Parameters:
-            print 'Cannot find Key in Parameters: ', Parameters.keys()
-            raw_input()
+            warnings.warn('Cannot find Key in Parameters: {Paras}'.format(Paras=Parameters.keys()))
+            if self.verbose:
+                raw_input()
         if invalid_filter:
             ymin = min_array
             ymax = max_array

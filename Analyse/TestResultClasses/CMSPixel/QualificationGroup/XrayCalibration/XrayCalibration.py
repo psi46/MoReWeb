@@ -5,16 +5,17 @@ import ROOT
 import os
 import sys
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
+from AbstractClasses.GeneralTestResult import GeneralTestResult
 
 
-class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+class TestResult(GeneralTestResult):
     def CustomInit(self):
         # self.verbose = True
         self.Name = "CMSPixel_QualificationGroup_XrayCalibrationSpectrum_TestResult"
         self.NameSingle = "XrayCalibration"
         self.Title = "X-ray Calibration - {Method}".format(Method=self.Attributes['Method'])
         self.check_Test_Software()
-        self.ROCtype, self.nRocs, self.halfModule = self.ReadModuleVersion()
+        self.ReadModuleVersion()
         self.Attributes['NumberOfChips'] = self.nRocs
         self.Attributes["ModuleVersion"] = self.ROCtype
         self.Attributes['StartChip'] = 0
@@ -23,7 +24,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print "".ljust(len(tag), '=')
             print tag
         target_list = copy.deepcopy(self.Attributes["SubTestResultDictList"])
-        items = len(target_list)
+        # items = len(target_list)
         start_position = 7
         if self.verbose:
             print 'subtestresultdict list:', self.ResultData["SubTestResultDictList"]
@@ -66,7 +67,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             }
         )
-
 
     def add_calibration_method(self, target_test_list):
         if len(target_test_list) == 0:
@@ -132,7 +132,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             }
         )
         # print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
-        #     self.ResultData["SubTestResultDictList"][-1]['Key']
+        # self.ResultData["SubTestResultDictList"][-1]['Key']
         self.ResultData["SubTestResultDictList"].append(
             {
                 "Key": "VcalCalibrationOffset_" + self.Attributes['Method'],
@@ -196,7 +196,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         )
 
         if self.verbose:
-            print_list = map(lambda i: [i["DisplayOptions"]['Order'], i['Key']],
+            print_list = map(lambda l: [l["DisplayOptions"]['Order'], l['Key']],
                              self.ResultData["SubTestResultDictList"])
             for i in sorted(print_list):
                 print i[0], i[1]
@@ -204,17 +204,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.check_Test_Software()
         self.Attributes['TestedObjectType'] = 'XrayCalibration'
 
-
     def PopulateResultData(self):
         if self.verbose:
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')
             print tag
-        slope_key = 'VcalCalibrationSlope_' +  self.Attributes['Method']
+        method = self.Attributes['Method']
+        slope_key = 'VcalCalibrationSlope_' + method
         try:
-            avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs']['avrgSlope']['Value']
-        except:
+            avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs']['avrgSlope'][
+                'Value']
+        except KeyError:
             avrgSlope = None
+            warnings.warn('Cannot find key avrg Slope in  {slopeKey}'.format(slopeKey=slope_key))
             print self.ResultData['SubTestResults'].keys()
         self.ResultData['KeyValueDictPairs'] = {
             'Slope': {
@@ -249,8 +251,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'maxOffset']['Value']
             Offsets = self.ResultData['SubTestResults'][offset_key].ResultData['KeyValueDictPairs'][
                 'Offsets']['Value']
-        except:
-            print self.ResultData['SubTestResults'].keys()
+        except KeyError, e:
+            print self.ResultData['SubTestResults'].keys(), e
             if slope_key in self.ResultData['SubTestResults']:
                 print self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'].keys()
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -330,7 +332,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print "--------------------"
             pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
 
-            if (pp is None):
+            if pp is None:
                 print "INSERTION FAILED!"
                 sys.exit(31)
 
