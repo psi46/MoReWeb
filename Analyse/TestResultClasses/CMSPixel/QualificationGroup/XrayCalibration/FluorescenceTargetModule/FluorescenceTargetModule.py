@@ -1,8 +1,8 @@
 import AbstractClasses
 import ROOT
+from AbstractClasses.GeneralTestResult import GeneralTestResult
 
-
-class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+class TestResult(GeneralTestResult):
     def CustomInit(self):
         method = self.Attributes['Method']
         self.Name = "CMSPixel_QualificationGroup_XrayCalibration_" + method + "_FluorescenceTargetModule_" + \
@@ -17,11 +17,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print tag
         self.ResultData["SubTestResultDictList"] = []
         self.check_Test_Software()
-        self.nRocs = self.ParentObject.nRocs
-        self.ROCtype = self.ParentObject.version
-        self.halfModule = self.ParentObject.halfModule
+        # self.nRocs = self.ParentObject.nRocs
+        # self.ROCtype = self.ParentObject.version
+        # self.halfModule = self.ParentObject.halfModule
         # Get module information
-        self.ResultData['HiddenData']['ModuleVersion'] = self.ROCtype
+        self.ResultData['HiddenData']['ModuleVersion'] = self.version
         self.ResultData['HiddenData']['nRocs'] = self.nRocs
         self.ResultData['HiddenData']['halfModule'] = self.halfModule
         for roc in range(self.nRocs):
@@ -51,7 +51,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             )
         # TODO: @ Esteban - Explain what is the TestedObjectType for?
         self.Attributes['TestedObjectType'] = 'FluorescenceTargetModule'
-
 
     def PopulateResultData(self):
         if self.verbose:
