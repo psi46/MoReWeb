@@ -23,11 +23,15 @@ def get_histo(rootfile,name,rocNo = None):
     if dir == None:
         return None
     histo = dir.Get(histoname[-1])
-    if name.startswith('Xray.q_C'):
+    if name.startswith('Xray.q_'):
         l = []
         for i in dir.GetListOfKeys():
             if i.GetName().startswith('q_'):
                 l.append(i)
+        if rocNo == None:
+            rocNo = 0
+        else:
+            l = filter(lambda x: 'C{ROC}'.format(ROC=rocNo) in x, l)
         if len(l) == 1:
             histo = dir.Get(l[0].GetName())
         elif len(l) > 1:
