@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-'''
-    Program: X-Ray Fluorescence Target Results
-    Author: Paul Turner - pturne7@uic.edu
-    Version: 1.0
-    Release Date: 2013-07-18
-'''
 import ROOT
 import os.path
 
@@ -92,6 +86,7 @@ class TestResult(GeneralTestResult):
                         i = files.index(self.HistoDict.get('RootFile', 'filename'))
                         print 'rootfile exists: index ', i
                 while i < 0 or i >= len(files):
+                    rawInput = ''
                     try:
                         # TODO: How to continue when it happens in automatic processing...
 
@@ -106,7 +101,8 @@ class TestResult(GeneralTestResult):
                         else:
                             i = 0
 
-                    except:
+                    except (ValueError,TypeError) as e:
+                        print e
                         print '%s is not an integer, please enter a valid integer' % rawInput
                 fileHandlePath = self.RawTestSessionDataPath + '/' + files[i]
                 print "open '%s'" % fileHandlePath
@@ -119,7 +115,6 @@ class TestResult(GeneralTestResult):
                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
             else:
                 print 'There exist no ROOT file in "%s"' % self.RawTestSessionDataPath
-
 
     def get_trim_configuration(self):
         self.Attributes['TrimValue'] = 40
@@ -149,13 +144,13 @@ class TestResult(GeneralTestResult):
     # *    [1]           Linear background
     # *    [2]           Height of the SIGNAL guassian
     # *    [3]           Center of the SIGNAL gaussian
-    #    *    [4]           Sigma of the SIGNAL gaussian
-    #    *    [5]           Height of the NOISE guassian
-    #    *    [6]           Center of the NOISE guassian
-    #    *    [7]           Sigma of the NOISE gaussian
-    #    *    [8]           Turn on point
-    #    *    [9]           Turn on speed (sigma of the integrated gaussian)
-    #'''
+    # *    [4]           Sigma of the SIGNAL gaussian
+    # *    [5]           Height of the NOISE guassian
+    # *    [6]           Center of the NOISE guassian
+    # *    [7]           Sigma of the NOISE gaussian
+    # *    [8]           Turn on point
+    # *    [9]           Turn on speed (sigma of the integrated gaussian)
+    # '''
     def FitHistoSpectrum(self, histo, xmin, xmax):
         name = "fit_{0}".format(histo.GetName())
         gausfit = self.FitGaus(histo)
@@ -167,14 +162,14 @@ class TestResult(GeneralTestResult):
 
         myfit = TF1(name, "([0]+[1]*x+gaus(2)+gaus(5))*(1+TMath::Erf((x-[8])/[9]))/2", xmin, xmax)
 
-        #Find the overall average in the y-direction to define some good starting parameters
+        # Find the overall average in the y-direction to define some good starting parameters
         y_avg = histo.Integral() / histo.GetNbinsX()
 
         maxbin = gaus1
         maximum = gaus0
         signalSigma = gaus2
 
-        #Find the overall mean
+        # Find the overall mean
         mean = histo.GetMean()
 
         #Hard coded limit on the slope of the linear part
@@ -193,9 +188,9 @@ class TestResult(GeneralTestResult):
 
         # Limit on the constant part; it should be positive, and below the y-average
         # because the y-average is biased above the noise by the signal peak
-        myfit.SetParLimits(0, 0, 2*y_avg)
+        myfit.SetParLimits(0, 0, 2 * y_avg)
         if self.verbose:
-            print 'SetParameterLimits0: ', 0, 2*y_avg
+            print 'SetParameterLimits0: ', 0, 2 * y_avg
 
         #Initial guess of the linear part is flat
         myfit.SetParameter(1, 0)
@@ -238,15 +233,15 @@ class TestResult(GeneralTestResult):
             print 'SetParameterLimits4: ', signalSigma - 10, signalSigma + 10
 
         #Initial guess for the size of the guassian noise to be half of the overall y-average (other half is the constant term)
-        myfit.SetParameter(5, y_avg*10)
+        myfit.SetParameter(5, y_avg * 10)
 
         if self.verbose:
             print 'SetParameter5: ', myfit.GetParameter(5)
         # Limits on the amount of gaussian noise, should be below y-average
         # but above 0 for the same reasons as listed for Par0
-        myfit.SetParLimits(5, 0, y_avg*20)
+        myfit.SetParLimits(5, 0, y_avg * 20)
         if self.verbose:
-            print 'SetParameterLimits4: ', 0, y_avg*20
+            print 'SetParameterLimits4: ', 0, y_avg * 20
 
         #Initial guess for gaussian noise at the mean of the histogram
         myfit.SetParameter(6, mean)
@@ -271,16 +266,16 @@ class TestResult(GeneralTestResult):
 
         histo.Fit(myfit, self.Attributes['fitOption'])
         backgroundFit = TF1(name, "([0]+[1]*x+gaus(2))*(1+TMath::Erf((x-[5])/[6]))/2", xmin, xmax)
-        backgroundFit.FixParameter(0,myfit.GetParameter(0))
-        backgroundFit.FixParameter(1,myfit.GetParameter(1))
-        backgroundFit.FixParameter(2,myfit.GetParameter(5))
-        backgroundFit.FixParameter(3,myfit.GetParameter(6))
-        backgroundFit.FixParameter(4,myfit.GetParameter(7))
-        backgroundFit.FixParameter(5,myfit.GetParameter(8))
-        backgroundFit.FixParameter(6,myfit.GetParameter(9))
+        backgroundFit.FixParameter(0, myfit.GetParameter(0))
+        backgroundFit.FixParameter(1, myfit.GetParameter(1))
+        backgroundFit.FixParameter(2, myfit.GetParameter(5))
+        backgroundFit.FixParameter(3, myfit.GetParameter(6))
+        backgroundFit.FixParameter(4, myfit.GetParameter(7))
+        backgroundFit.FixParameter(5, myfit.GetParameter(8))
+        backgroundFit.FixParameter(6, myfit.GetParameter(9))
         backgroundFit.SetLineColor(ROOT.kRed)
         backgroundFit.SetLineStyle(2)
-        histo.Fit(backgroundFit,"+Q")
+        histo.Fit(backgroundFit, "+Q")
 
         if self.verbose:
             for i in range(10):
@@ -301,7 +296,7 @@ class TestResult(GeneralTestResult):
             target = self.Attributes['Target']
         else:
             target = 'unknown'
-        chi2_per_ndf = myfit.GetChisquare() / max(myfit.GetNDF(),1)
+        chi2_per_ndf = myfit.GetChisquare() / max(myfit.GetNDF(), 1)
         self.ResultData['KeyValueDictPairs'] = {
             'Center': {
                 'Value': round(myfit.GetParameter(3), 2),
@@ -319,21 +314,28 @@ class TestResult(GeneralTestResult):
                 'Label': 'Energy of target %s' % target,
                 'Unit': 'nElectrons',
             },
-            'Chi2PerNDF':{
-                'Value': round(chi2_per_ndf,2),
+            'Chi2PerNDF': {
+                'Value': round(chi2_per_ndf, 2),
                 'Label': 'Chi^2 per NDF',
                 'Unit': ''
-                }
+            }
 
         }
-        self.ResultData['KeyList'].extend(['Center', 'TargetEnergy', 'TargetNElectrons','Chi2PerNDF'])
+        self.ResultData['KeyList'].extend(['Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF'])
         if self.verbose: print self.ResultData
         if self.verbose: print self.ResultData['KeyValueDictPairs']
 
+        if self.verbose:
+            print 'fitted parameters of SCurve fit:'
+            for i in range(10):
+                a = ROOT.Double(0)
+                b = ROOT.Double(0)
+                myfit.GetParLimits(i, a, b)
+                print 'Par %2d:\t' % i, '%8.2f [%6.2f,%6.2f]' % (myfit.GetParameter(i), a, b)
         return myfit
 
-    #'''
-    #    * Function that attempts to fit a simple gaussian to a spectra
+    # '''
+    # * Function that attempts to fit a simple gaussian to a spectra
     #    *
     #    * Used to find initial guess for signal in other fits
     #'''
@@ -421,13 +423,6 @@ class TestResult(GeneralTestResult):
         return myfit
 
     def FitHistoSCurve(self, histo, minX, maxX):
-        if self.verbose:
-            for i in range(10):
-                a = ROOT.Double(0)
-                b = ROOT.Double(0)
-                myfit.GetParLimits(i, a, b)
-                print i, '%8.2f [%6.2f,%6.2f]' % (myfit.GetParameter(i), a, b)
-
         if self.Attributes.has_key('TargetEnergy'):
             targetEnergy = self.Attributes['TargetEnergy']
         else:
@@ -457,7 +452,7 @@ class TestResult(GeneralTestResult):
                 'Label': 'Energy of target %s' % target,
                 'Unit': 'nElectrons',
             },
-            'Chi2PerNDF':{
+            'Chi2PerNDF': {
                 'Value': round(0, 2),
                 'Label': 'Energy of target %s' % target,
                 'Unit': 'nElectrons',
@@ -486,18 +481,18 @@ class TestResult(GeneralTestResult):
                 for i in HistoDict.options(self.NameSingle):
                     print i, HistoDict.get(self.NameSingle, i)
             raise e
-        object = HistoGetter.get_histo(self.FileHandle, histname, rocNo=self.Attributes["ChipNo"])
-        if not object:
+        my_object = HistoGetter.get_histo(self.FileHandle, histname, rocNo=self.Attributes["ChipNo"])
+        if not my_object:
             if self.verbose:
                 print "couldn't find histname %s" % histname
             histname = HistoDict.get(self.NameSingle, self.Attributes['Method'])
             #'PH_Calibration_ROC')
             if self.verbose:
                 print ' try to find histname %s' % histname
-            object = HistoGetter.get_histo(self.FileHandle, histname, rocNo=self.Attributes["ChipNo"])
-        if not object:
+            my_object = HistoGetter.get_histo(self.FileHandle, histname, rocNo=self.Attributes["ChipNo"])
+        if not my_object:
             raise KeyError("couldn't find histname %s" % histname)
-        self.ResultData['Plot']['ROOTObject'] = object.Clone(self.GetUniqueID())
+        self.ResultData['Plot']['ROOTObject'] = my_object.Clone(self.GetUniqueID())
 
         if self.ResultData['Plot']['ROOTObject']:
             histo = self.ResultData['Plot']['ROOTObject']
@@ -511,7 +506,7 @@ class TestResult(GeneralTestResult):
                     maximum = histo.GetBinContent(histo.GetMaximumBin())
                     entries = histo.GetEntries()
                     ratio = float(maximum) / float(entries)
-                    if ratio <.025:
+                    if ratio < .025:
                         histo.Rebin()
                     else:
                         break
@@ -526,11 +521,11 @@ class TestResult(GeneralTestResult):
             #            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0*self.ResultData['Plot']['ROOTObject'].GetMaximum());
             #            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold difference");
             #            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
-            bin = self.ResultData['Plot']['ROOTObject'].FindLastBinAbove(0)
-            bin *= 1.2
-            bin = int(bin)
-            bin = min([bin, self.ResultData['Plot']['ROOTObject'].GetNbinsX()])
-            xmax = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetBinUpEdge(bin)
+            first_bin = self.ResultData['Plot']['ROOTObject'].FindLastBinAbove(0)
+            first_bin *= 1.2
+            first_bin = int(first_bin)
+            first_bin = min([first_bin, self.ResultData['Plot']['ROOTObject'].GetNbinsX()])
+            xmax = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetBinUpEdge(first_bin)
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, xmax)
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle('Pulseheight / Vcal')
@@ -570,17 +565,17 @@ class TestResult(GeneralTestResult):
 #
 #
 # Directory = self.RawTestSessionDataPath
-#		# originally: phCalibrationFit_C
-#		PHCalibrationFitFileName = "{Directory}/phCalibrationFit_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
-#		PHCalibrationFitFile = open(PHCalibrationFitFileName, "r")
-#		self.FileHandle = PHCalibrationFitFile #needed in summary
+# # originally: phCalibrationFit_C
+# PHCalibrationFitFileName = "{Directory}/phCalibrationFit_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
+# PHCalibrationFitFile = open(PHCalibrationFitFileName, "r")
+# self.FileHandle = PHCalibrationFitFile #needed in summary
 #
-#		#PHCalibrationFitFile.seek(2*200) # omit the first 400 bytes
+# #PHCalibrationFitFile.seek(2*200) # omit the first 400 bytes
 #
-#		if PHCalibrationFitFile:
-#			# for (int i = 0 i < 2 i++) fgets(string, 200, phLinearFile)
-#			for i in range(4):
-#				Line = PHCalibrationFitFile.readline() # Omit first four lines
+# if PHCalibrationFitFile:
+# # for (int i = 0 i < 2 i++) fgets(string, 200, phLinearFile)
+# for i in range(4):
+# Line = PHCalibrationFitFile.readline() # Omit first four lines
 #
 #			for i in range(52): #Columns
 #				for j in range(80): #Rows
