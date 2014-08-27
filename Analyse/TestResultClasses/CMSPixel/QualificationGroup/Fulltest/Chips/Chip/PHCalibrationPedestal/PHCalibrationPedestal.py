@@ -12,7 +12,7 @@ class TestResult(GeneralTestResult):
 
     def PopulateResultData(self):
 
-        ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogy(1)
         self.ResultData['Plot']['ROOTObject_hPedestal'] = \
             self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['Plot'][
                 'ROOTObject_hPedestal']
@@ -148,3 +148,4 @@ class TestResult(GeneralTestResult):
         if over:
             self.ResultData['KeyValueDictPairs']['over'] = {'Value': '{0:1.2f}'.format(over), 'Label': '>='}
             self.ResultData['KeyList'].append('over')
+        ROOT.gPad.SetLogy(0)
