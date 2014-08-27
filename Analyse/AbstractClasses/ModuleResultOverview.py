@@ -1,9 +1,3 @@
-'''
-Program : MORE-Web
- Author : Esteban Marin - estebanmarin@gmx.ch
- Version    : 2.1
- Release Date   : 2013-05-30
-'''
 import AbstractClasses.Helper.HtmlParser
 import datetime
 import os
