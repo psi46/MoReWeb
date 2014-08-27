@@ -1,4 +1,3 @@
-import AbstractClasses
 import ROOT
 from AbstractClasses.GeneralTestResult import GeneralTestResult
 

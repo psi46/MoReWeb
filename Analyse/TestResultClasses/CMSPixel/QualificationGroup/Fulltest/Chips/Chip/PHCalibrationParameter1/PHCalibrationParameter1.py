@@ -20,8 +20,9 @@ class TestResult(GeneralTestResult):
             print "".ljust(len(tag), '=')
             print tag
         ROOT.gPad.SetLogy(1)
-        self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData['Plot'][
-                                                'ROOTObject'].Clone(self.GetUniqueID())
+        self.ResultData['Plot']['ROOTObject'] = \
+            self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData['Plot'][
+                'ROOTObject'].Clone(self.GetUniqueID())
         self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
         self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.2)
         self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
@@ -61,4 +62,4 @@ class TestResult(GeneralTestResult):
         if self.verbose:
             tag = self.Name + ": Done"
             print tag
-            print "".ljust(len(tag), '=')+'\n'
+            print "".ljust(len(tag), '=') + '\n'

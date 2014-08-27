@@ -1,9 +1,9 @@
-import AbstractClasses
 import math
-import ROOT
+
+from AbstractClasses.GeneralTestResult import GeneralTestResult
 
 
-class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+class TestResult(GeneralTestResult):
     def CustomInit(self):
         self.Name = "CMSPixel_QualificationGroup_XrayCalibration_{Method}_VcalCalibrationModule_TestResult".format(
             Method=self.Attributes['Method'])
@@ -76,13 +76,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             error_slopes.append(roc_results['KeyValueDictPairs']['Slope']['Sigma'])
             error_offsets.append(roc_results['KeyValueDictPairs']['Offset']['Sigma'])
 
-        for roc in range (self.nRocs):
-            table_line = []
-            table_line.append(roc)
-            table_line.append("%.1f e- / Vcal" % (slopes[roc]))
-            table_line.append("%.1f e- / Vcal" % (error_slopes[roc]))
-            table_line.append("%.1f e-" % (offsets[roc]))
-            table_line.append("%.1f e-" % (error_offsets[roc]))
+        for roc in range(self.nRocs):
+            table_line = [roc, "%.1f e- / Vcal" % (slopes[roc]), "%.1f e- / Vcal" % (error_slopes[roc]),
+                          "%.1f e-" % (offsets[roc]), "%.1f e-" % (error_offsets[roc])]
             self.ResultData['Table']['BODY'].append(table_line)
         if self.verbose:
             print self.nRocs
@@ -103,12 +99,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             sigma_offset = math.sqrt(
                 reduce(lambda x, y: x + y, map(lambda x: x ** 2, offsets)) / self.nRocs - average_offset ** 2)
 
-        table_line = []
-        table_line.append("Average")
-        table_line.append("%.1f e- / Vcal" % (average_slope))
-        table_line.append("")
-        table_line.append("%.1f e-" % (average_offset))
-        table_line.append("")
+        table_line = ["Average", "%.1f e- / Vcal" % average_slope, "", "%.1f e-" % average_offset, ""]
         self.ResultData['Table']['FOOTER'].append(table_line)
 
         slopes.sort()
@@ -116,12 +107,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         median_slope = slopes[self.nRocs / 2]
         median_offset = offsets[self.nRocs / 2]
 
-        table_line = []
-        table_line.append("Median")
-        table_line.append("%.1f e- / Vcal" % (median_slope))
-        table_line.append("")
-        table_line.append("%.1f e-" % (median_offset))
-        table_line.append("")
+        table_line = ["Median", "%.1f e- / Vcal" % median_slope, "", "%.1f e-" % median_offset, ""]
         self.ResultData['Table']['FOOTER'].append(table_line)
 
         self.ResultData['KeyValueDictPairs'] = {

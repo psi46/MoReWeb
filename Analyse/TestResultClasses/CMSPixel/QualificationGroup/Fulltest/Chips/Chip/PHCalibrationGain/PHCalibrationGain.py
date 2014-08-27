@@ -158,29 +158,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if over:
                 self.ResultData['KeyValueDictPairs']['over'] = {'Value': '{0:1.2f}'.format(over), 'Label': '>='}
                 self.ResultData['KeyList'].append('over')
-            # if self.ParentObject.Attributes['ModuleVersion'] == 1:
-            #     # self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData['Plot'][
-            #     #     'ROOTObject'].SetLineColor(ROOT.kBlue)
-            #     # self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData['Plot'][
-            #     #     'ROOTObject'].Draw('same')
-            #     self.ResultData['KeyValueDictPairs'].update({
-            #         'Par1N': {
-            #             'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData[
-            #                 'KeyValueDictPairs']['N']['Value'],
-            #             'Label': 'Par1 N'
-            #         },
-            #         'Par1mu': {
-            #             'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData[
-            #                 'KeyValueDictPairs']['mu']['Value'],
-            #             'Label': 'Par1 μ'
-            #         },
-            #         'Par1sigma': {
-            #             'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData[
-            #                 'KeyValueDictPairs']['sigma']['Value'],
-            #             'Label': 'Par1 σ'
-            #         }
-            #     })
-            #     self.ResultData['KeyList'] += ['Par1N', 'Par1mu', 'Par1sigma']
             if self.SavePlotFile:
                 self.Canvas.SaveAs(self.GetPlotFileName())
             self.ResultData['Plot']['Enabled'] = 1
