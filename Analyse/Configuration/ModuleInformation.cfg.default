@@ -5,3 +5,6 @@ ModuleVersion = 1
 #TestType = FullQualification
 #TestType = 2TempQualification
 TestType = automatic
+
+[Fitting]
+refit = False
