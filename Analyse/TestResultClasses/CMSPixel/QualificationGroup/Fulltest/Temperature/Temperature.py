@@ -92,9 +92,10 @@ class TestResult(GeneralTestResult):
             graph.GetYaxis().SetTitleOffset(1.5)
             graph.GetYaxis().CenterTitle()
             graph.Draw("APL")
+            print self.ParentObject.Attributes['TestTemperature']
             setPoint = \
-                self.ParentObject.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][
-                    'Value']
+                self.ParentObject.Attributes['TestTemperature']
+
             if len(temps):
                 avrgGraph = ROOT.TGraphErrors(2)
                 avrgGraph.SetTitle('')

@@ -12,10 +12,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         
     def PopulateResultData(self):
-        
+        try:
+            test_date = self.Attributes['TestDate'].split()[0]
+            test_date = datetime.datetime.fromtimestamp(float(test_date)).strftime("%Y-%m-%d")
+        except ValueError as e:
+            print 'testdate',self.Attributes['TestDate']
+            raise e
         self.ResultData['KeyValueDictPairs'] = {
             'TestDate': {
-                'Value':datetime.datetime.fromtimestamp(float(self.Attributes['TestDate'])).strftime("%Y-%m-%d"), 
+                'Value':test_date,
                 'Label':'Test Date'
             },
             'TestTime': {
