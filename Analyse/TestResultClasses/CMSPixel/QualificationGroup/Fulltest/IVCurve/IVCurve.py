@@ -101,8 +101,8 @@ class TestResult(GeneralTestResult):
         if self.verbose:
             print 'The varlist of the file "%s" is: "%s"' % (fileName, varlist)
         IVTuple = ROOT.TNtuple(self.GetUniqueID(), "IVTuple", varlist)  # IVTuple
-        entries  = IVTuple.ReadFile(fileName)
-        print 'read {entries} Entries from file {fileName}'.format(entries=entries,fileName=fileName)
+        entries = IVTuple.ReadFile(fileName)
+        print 'read {entries} Entries from file {fileName}'.format(entries=entries, fileName=fileName)
         self.ResultData['HiddenData']['IVTuple'] = IVTuple
 
     def PopulateResultData(self):
@@ -140,7 +140,7 @@ class TestResult(GeneralTestResult):
         l = False
         if self.verbose:
             IVTuple.Print()
-            print IVTuple,type(IVTuple),IVTuple.GetEntries()
+            print IVTuple, type(IVTuple), IVTuple.GetEntries()
         for Entry in IVTuple:
             try:
                 voltage = Entry.Voltage
