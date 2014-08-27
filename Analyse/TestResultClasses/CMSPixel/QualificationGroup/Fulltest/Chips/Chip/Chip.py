@@ -79,22 +79,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                 {'Key':'PHCalibrationPedestal',
                     'DisplayOptions':{
-                        'Order':12,
-                    }
-                }, # depends on PHCalibrationGain
-                {'Key':'TrimBits',
-                    'DisplayOptions':{
                         'Order':13,
                     }
+                }, # depends on PHCalibrationGain
+
+                {'Key':'PHCalibrationParameter1',
+                    'DisplayOptions':{
+                        'Order':12,
+                    }
                 },
-                {'Key':'TrimBitMap',
+                {'Key':'TrimBits',
                     'DisplayOptions':{
                         'Order':14,
                     }
                 },
-                {'Key':'PHCalibrationGainMap',
+                {'Key':'TrimBitMap',
                     'DisplayOptions':{
                         'Order':15,
+                    }
+                },
+                {'Key':'PHCalibrationGainMap',
+                    'DisplayOptions':{
+                        'Order':16,
                     }
                 },  # depends on PHCalibrationGain
 
