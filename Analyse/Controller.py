@@ -1,11 +1,5 @@
 #!/usr/bin/env python
  # -*- coding: utf-8 -*-
-'''
-Program    : MORE-Web
- Author    : Esteban Marin - estebanmarin@gmx.ch
- Version    : 2.1
- Release Date    : 2013-05-30
-'''
 from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
 import AbstractClasses.Helper.hasher as hasher
 import argparse
