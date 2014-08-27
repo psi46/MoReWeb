@@ -58,8 +58,4 @@ class TestResult(GeneralTestResult):
         self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['Caption'] = 'Parameter1'
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
-        if self.verbose:
-            tag = self.Name + ": Done"
-            print tag
-            print "".ljust(len(tag), '=') + '\n'
+        ROOT.gPad.SetLogy(0)
