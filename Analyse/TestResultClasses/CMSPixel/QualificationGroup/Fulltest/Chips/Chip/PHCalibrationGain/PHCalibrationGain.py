@@ -97,12 +97,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                                        self.nRows)  # hPedestalMap
 
         # hp
-        self.ResultData['Plot']['ROOTObject_hPedestal'] = ROOT.TH1D(self.GetUniqueID(), "", 900, -300.,
+        self.ResultData['Plot']['ROOTObject_hPedestal'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500.,
                                                                     600.)  # hPedestal
         self.ResultData['Plot']['ROOTObject_hPedestal'].StatOverflows(True)
 
         # rp
-        self.ResultData['Plot']['ROOTObject_rPedestal'] = ROOT.TH1D(self.GetUniqueID(), "", 900, -300.,
+        self.ResultData['Plot']['ROOTObject_rPedestal'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500.,
                                                                     600.)  # rPedestal
         self.ResultData['Plot']['ROOTObject_rPedestal'].StatOverflows(False)
 
@@ -163,5 +163,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['Enabled'] = 1
             self.ResultData['Plot']['Caption'] = 'PH Calibration: Gain (Vcal/ADC)'
             self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+            ROOT.gPad.SetLogy(0)
 
