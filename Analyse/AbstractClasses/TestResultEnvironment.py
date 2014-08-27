@@ -1,9 +1,3 @@
-'''
-Program : MORE-Web
- Author : Esteban Marin - estebanmarin@gmx.ch
- Version    : 2.1
- Release Date   : 2013-05-30
-'''
 import ROOT, Helper.HtmlParser, os
 class TestResultEnvironment:
     # Configuration attributes
