@@ -30,8 +30,7 @@ def get_histo(rootfile,name,rocNo = None):
                 l.append(i)
         if rocNo == None:
             rocNo = 0
-        else:
-            l = filter(lambda x: 'C{ROC}'.format(ROC=rocNo) in x, l)
+        l = filter(lambda x: 'C{ROC}'.format(ROC=rocNo) in x.GetName(), l)
         if len(l) == 1:
             histo = dir.Get(l[0].GetName())
         elif len(l) > 1:
@@ -39,5 +38,8 @@ def get_histo(rootfile,name,rocNo = None):
             raise NameError('Found more than one possible candidate for the Xray spectrum: {Candidates}'.format(Candidates=l))
         else:
             histo = None
-            raise NameError("Didn't any possible candidate for the Xray spectrum: {Name}".format(Name=name))
+            all_names = []
+            for i in dir.GetListOfKeys():
+                all_names.append(i.GetName())
+            raise NameError("Didn't found any possible candidate for the Xray spectrum: {Name} in {Names}".format(Name=name,Names=all_names))
     return histo
