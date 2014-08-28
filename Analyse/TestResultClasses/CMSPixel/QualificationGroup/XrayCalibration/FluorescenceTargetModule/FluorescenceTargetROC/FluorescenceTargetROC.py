@@ -11,8 +11,8 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(GeneralTestResult):
     def CustomInit(self):
-        self.Name = 'CMSPixel_ModuleTestGroup_Module_XRayCalibration'
-        self.Name += '_{Method}_FluorescenceTarget_{Target}_C{ChipNo}_TestResult'.format(
+        self.Name = 'CMSPixel_QualificationGroup_XRayCalibration'
+        self.Name += '_{Method}_FluorescenceTargetROC_{Target}_C{ChipNo}_TestResult'.format(
             Method=self.Attributes['Method'],
             ChipNo=self.Attributes[
                 'ChipNo'],
