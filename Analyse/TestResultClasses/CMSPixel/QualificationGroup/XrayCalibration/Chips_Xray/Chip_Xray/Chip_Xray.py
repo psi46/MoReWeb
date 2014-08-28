@@ -26,9 +26,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 key = 'FluorescenceTargetModule_{Target}_1_{Method}'.format(Target = i['InitialAttributes']['Target'],
                                                                             Method = i['InitialAttributes']['Method'])
                 subresults = self.ParentObject.ParentObject.ResultData['SubTestResults'][key].ResultData['SubTestResults']
-                for j in subresults:
-                    order.append((subresults[j].Attributes['TargetEnergy'],target_key))
-                    break
+                energy = self.ParentObject.ParentObject.ResultData['SubTestResults'][key].Attributes['TargetEnergy']
+                order.append((energy,target_key))
         order = map(lambda x: x[1], sorted(order))
 
         for i in self.Attributes["SubTestResultDictList"]:
