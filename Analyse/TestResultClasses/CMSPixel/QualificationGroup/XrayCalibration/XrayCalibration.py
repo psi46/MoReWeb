@@ -30,6 +30,7 @@ class TestResult(GeneralTestResult):
             print 'subtestresultdict list:', self.ResultData["SubTestResultDictList"]
         for i in target_list:
             i['InitialAttributes']['Method'] = self.Attributes['Method']
+            i['InitialAttributes']['NumberOfChips'] = self.Attributes['NumberOfChips']
             i['InitialAttributes']['StorageKey'] = i['InitialAttributes']['StorageKey'] + '_' + self.Attributes[
                 'Method']
             i['Key'] = i['Key'] + '_' + self.Attributes['Method']
