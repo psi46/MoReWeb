@@ -24,10 +24,10 @@ class TestResult(GeneralTestResult):
         self.ResultData['HiddenData']['ModuleVersion'] = self.version
         self.ResultData['HiddenData']['nRocs'] = self.nRocs
         self.ResultData['HiddenData']['halfModule'] = self.halfModule
-        for roc in range(self.nRocs):
+        self.Attributes['TargetEnergy'] = self.GetEnergy(self.Attributes['Target'])
+        for roc in range(self.Attributes['NumberOfChips']):
             key = "FluorescenceTarget_C{ROC}".format(ROC=roc)
-            self.ResultData["SubTestResultDictList"].append(
-                {
+            subtest = {
                     "Key": key,
                     "Module": "FluorescenceTargetROC",
                     "InitialAttributes": {
@@ -47,10 +47,19 @@ class TestResult(GeneralTestResult):
                         "Order": roc + 1,
                         "Width": 1
                     }
-                }
-            )
+            }
+            self.ResultData["SubTestResultDictList"].append(subtest)
         # TODO: @ Esteban - Explain what is the TestedObjectType for?
         self.Attributes['TestedObjectType'] = 'FluorescenceTargetModule'
+
+    def GetEnergy(self, elementName):
+        keys = self.HistoDict.options('XrayTargetEnergies')
+        energy = 0
+        for target in keys:
+            if target in elementName:
+                energy = self.HistoDict.getfloat('XrayTargetEnergies', target)
+                return energy
+        return energy
 
     def PopulateResultData(self):
         if self.verbose:
