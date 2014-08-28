@@ -36,7 +36,12 @@ class TestResult(GeneralTestResult):
             if not "FluorescenceTargetModule" in test:
                 continue
             module_results = top_parent.ResultData['SubTestResults'][test].ResultData['SubTestResults']
-            roc_results = module_results['FluorescenceTarget_C%i' % (self.Attributes["ChipNo"])]
+
+            try:
+                roc_results = module_results['FluorescenceTarget_C%i' % (self.Attributes["ChipNo"])]
+            except KeyError as e:
+                print module_results.keys()
+                raise e
             trim = roc_results.Attributes['TrimValue']
             trimming.append(trim)
             key_value_pairs = roc_results.ResultData['KeyValueDictPairs']
