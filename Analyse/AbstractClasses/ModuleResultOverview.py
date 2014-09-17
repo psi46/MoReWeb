@@ -90,6 +90,10 @@ class ModuleResultOverview:
                 'DBColumnName':'CurrentAtVoltage150'
              },
              {
+                'Label':'I_rec(150V)',
+                'DBColumnName':'RecalculatedVoltage'
+             },
+             {
                 'Label':'IV Slope',
                 'DBColumnName':'IVSlope'
              },
