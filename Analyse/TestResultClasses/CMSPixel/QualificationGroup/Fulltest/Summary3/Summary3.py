@@ -119,7 +119,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V_ORIG']['Label'] = 'I_orig(150V) @ %s °C'%self.ParentObject.Attributes['TestTemperature']
                 self.ResultData['KeyList'].append('CurrentAtVoltage150V_ORIG')
             else:
-                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'] = result['KeyValueDictPairs']['CurrentAtVoltage150']
+                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'] = result['KeyValueDictPairs']['CurrentAtVoltage150V']
             self.ResultData['KeyList'].append('CurrentVariation')
             self.ResultData['KeyValueDictPairs']['CurrentVariation'] = result['KeyValueDictPairs']['Variation']
             
