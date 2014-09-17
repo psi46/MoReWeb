@@ -110,16 +110,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         }
         self.ResultData['KeyList'] = ['Noise','NoiseROCs','VcalThrWidth','VcalThrWidthROCs','RelGainWidth','RelGainWidthROCs','PedestalSpread','PedestalSpreadROCs','Parameter1','Parameter1ROCs']
         if self.ParentObject.ResultData['SubTestResults'].has_key('IVCurve'):
-            self.ResultData['KeyList'].append('CurrentAtVoltage150')
+            self.ResultData['KeyList'].append('CurrentAtVoltage150V')
             result = self.ParentObject.ResultData['SubTestResults']['IVCurve'].ResultData
             if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
-                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150'] = result['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']
-                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Label'] = 'I_rec(150 V) @ %s°C'%self.ParentObject.Attributes['recalculateCurrentTo']
-                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150_ORIG'] = result['KeyValueDictPairs']['CurrentAtVoltage150']
-                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150_ORIG']['Label'] = 'I_orig(150V) @ %s °C'%self.ParentObject.Attributes['TestTemperature']
-                self.ResultData['KeyList'].append('CurrentAtVoltage150_ORIG')
+                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'] = result['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']
+                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Label'] = 'I_rec(150 V) @ %s°C'%self.ParentObject.Attributes['recalculateCurrentTo']
+                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V_ORIG'] = result['KeyValueDictPairs']['CurrentAtVoltage150']
+                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V_ORIG']['Label'] = 'I_orig(150V) @ %s °C'%self.ParentObject.Attributes['TestTemperature']
+                self.ResultData['KeyList'].append('CurrentAtVoltage150V_ORIG')
             else:
-                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150'] = result['KeyValueDictPairs']['CurrentAtVoltage150']
+                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'] = result['KeyValueDictPairs']['CurrentAtVoltage150']
             self.ResultData['KeyList'].append('CurrentVariation')
             self.ResultData['KeyValueDictPairs']['CurrentVariation'] = result['KeyValueDictPairs']['Variation']
             

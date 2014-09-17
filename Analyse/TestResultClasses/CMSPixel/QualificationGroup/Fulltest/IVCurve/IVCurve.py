@@ -16,7 +16,7 @@ class TestResult(GeneralTestResult):
         self.NameSingle = 'IVCurve'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.ResultData['KeyValueDictPairs'] = {
-            'CurrentAtVoltage150': {
+            'CurrentAtVoltage150V': {
                 'Value': '{0:1.2f}'.format(0),
                 'Label': 'I(150 V)',
                 'Unit': 'μA'
@@ -26,7 +26,7 @@ class TestResult(GeneralTestResult):
                 'Label': 'I(150 V) / I(100 V)'
             }
         }
-        self.ResultData['KeyList'] = ['CurrentAtVoltage150', 'Variation']
+        self.ResultData['KeyList'] = ['CurrentAtVoltage150V', 'Variation']
 
         if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
             self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V'] = {
@@ -202,7 +202,7 @@ class TestResult(GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'].Draw("aC")
 
         CurrentAtVoltage150 *= self.ResultData['HiddenData']['FactorI'] * 1e6
-        self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'] = '{0:1.2f}'.format(CurrentAtVoltage150)
+        self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'] = '{0:1.2f}'.format(CurrentAtVoltage150)
         self.ResultData['KeyValueDictPairs']['Variation']['Value'] = '{0:1.2f}'.format(Variation)
 
         if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):

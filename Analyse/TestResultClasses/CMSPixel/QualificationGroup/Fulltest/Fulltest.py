@@ -233,7 +233,7 @@ class TestResult(GeneralTestResult):
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key(
                     'CurrentAtVoltage150V'):
                 CurrentAtVoltage150 = float(
-                    self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150'][
+                    self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'][
                         'Value'])
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key(
                     'recalculatedCurrentAtVoltage150V'):
@@ -263,7 +263,7 @@ class TestResult(GeneralTestResult):
                 'Value'],
             'PHCalibration':
                 self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
-            'CurrentAtVoltage150': CurrentAtVoltage150,
+            'CurrentAtVoltage150V': CurrentAtVoltage150,
             'RecalculatedVoltage': RecalculatedVoltage,
             'IVSlope': IVSlope,
             'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][

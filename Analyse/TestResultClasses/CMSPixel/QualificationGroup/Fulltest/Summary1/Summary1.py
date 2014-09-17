@@ -98,7 +98,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         CurrentVariation = 0
         if self.ParentObject.ResultData['SubTestResults'].has_key('IVCurve'):
             IVTestResult = self.ParentObject.ResultData['SubTestResults']['IVCurve']    
-            CurrentAtVoltage150 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150']['Value'])
+            CurrentAtVoltage150 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
             CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
         else:
             pass
