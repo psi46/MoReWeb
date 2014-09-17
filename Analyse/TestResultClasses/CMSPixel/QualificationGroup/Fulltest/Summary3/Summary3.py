@@ -115,7 +115,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
                 self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'] = result['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']
                 self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Label'] = 'I_rec(150 V) @ %s°C'%self.ParentObject.Attributes['recalculateCurrentTo']
-                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V_ORIG'] = result['KeyValueDictPairs']['CurrentAtVoltage150']
+                self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V_ORIG'] = result['KeyValueDictPairs']['CurrentAtVoltage150V']
                 self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V_ORIG']['Label'] = 'I_orig(150V) @ %s °C'%self.ParentObject.Attributes['TestTemperature']
                 self.ResultData['KeyList'].append('CurrentAtVoltage150V_ORIG')
             else:
