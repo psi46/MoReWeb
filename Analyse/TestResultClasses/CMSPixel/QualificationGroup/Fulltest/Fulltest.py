@@ -223,16 +223,16 @@ class TestResult(GeneralTestResult):
     def CustomWriteToDatabase(self, ParentID):
         if self.verbose:
             print 'Write to DB: ',ParentID
-        CurrentAtVoltage150 = -1
+        CurrentAtVoltage150V = -1
         RecalculatedVoltage = -1
         IVSlope = 0
         if self.ResultData['SubTestResults'].has_key('IVCurve'):
-            CurrentAtVoltage150 = 0
+            CurrentAtVoltage150V = 0
             RecalculatedVoltage = 0
             #Check weather there is a recalculated current`
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key(
                     'CurrentAtVoltage150V'):
-                CurrentAtVoltage150 = float(
+                CurrentAtVoltage150V = float(
                     self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'][
                         'Value'])
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key(
@@ -241,7 +241,7 @@ class TestResult(GeneralTestResult):
                     self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'][
                         'recalculatedCurrentAtVoltage150V']['Value'])
             else:
-                RecalculatedVoltage = CurrentAtVoltage150
+                RecalculatedVoltage = CurrentAtVoltage150V
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key('Variation'):
                 IVSlope = float(
                     self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['Variation']['Value'])
@@ -263,7 +263,7 @@ class TestResult(GeneralTestResult):
                 'Value'],
             'PHCalibration':
                 self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
-            'CurrentAtVoltage150V': CurrentAtVoltage150,
+            'CurrentAtVoltage150V': CurrentAtVoltage150V,
             'RecalculatedVoltage': RecalculatedVoltage,
             'IVSlope': IVSlope,
             'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][
@@ -405,7 +405,7 @@ class TestResult(GeneralTestResult):
                         Noise,
                         Trimming,
                         PHCalibration,
-                        CurrentAtVoltage150,
+                        CurrentAtVoltage150V,
                         RecalculatedVoltage,
                         IVSlope,
                         Temperature,
@@ -428,7 +428,7 @@ class TestResult(GeneralTestResult):
                         :Noise,
                         :Trimming,
                         :PHCalibration,
-                        :CurrentAtVoltage150,
+                        :CurrentAtVoltage150V,
                         :RecalculatedVoltage,
                         :IVSlope,
                         :Temperature,

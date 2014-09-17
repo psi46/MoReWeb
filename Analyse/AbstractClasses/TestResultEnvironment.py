@@ -173,7 +173,7 @@ class TestResultEnvironment:
                         Noise INT,
                         Trimming INT,
                         PHCalibration INT,
-                        CurrentAtVoltage150 FLOAT,
+                        CurrentAtVoltage150V FLOAT,
                         RecalculatedVoltage FLOAT,
                         IVSlope FLOAT,
                         Temperature TEXT,

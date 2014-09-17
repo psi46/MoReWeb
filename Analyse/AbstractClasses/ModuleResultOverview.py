@@ -87,7 +87,7 @@ class ModuleResultOverview:
              },
              {
                 'Label':'I(150V)',
-                'DBColumnName':'CurrentAtVoltage150'
+                'DBColumnName':'CurrentAtVoltage150V'
              },
              {
                 'Label':'I_rec(150V)',

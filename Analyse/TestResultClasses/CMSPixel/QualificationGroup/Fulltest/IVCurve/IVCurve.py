@@ -132,8 +132,8 @@ class TestResult(GeneralTestResult):
 
         Voltage_List = array.array('d', [])
         Current_List = array.array('d', [])
-        CurrentAtVoltage100 = 0
-        CurrentAtVoltage150 = 0
+        CurrentAtVoltage100V = 0
+        CurrentAtVoltage150V = 0
         recalculatedCurrentAtVoltage150V = 0
         # NoOfEntries = min(IVTuple.GetEntries(), 250)
         i = 0
@@ -162,22 +162,22 @@ class TestResult(GeneralTestResult):
                 if i > 0:
 
                     if Voltage_List[i] >= 100. >= Voltage_List[i - 1]:
-                        CurrentAtVoltage100 = Current_List[i - 1] + (100. - Voltage_List[i - 1]) * (
+                        CurrentAtVoltage100V = Current_List[i - 1] + (100. - Voltage_List[i - 1]) * (
                             Current_List[i] - Current_List[i - 1]) / (Voltage_List[i] - Voltage_List[i - 1])
 
                     if Voltage_List[i] >= 150. >= Voltage_List[i - 1]:
-                        CurrentAtVoltage150 = Current_List[i - 1] + (150. - Voltage_List[i - 1]) * (
+                        CurrentAtVoltage150V = Current_List[i - 1] + (150. - Voltage_List[i - 1]) * (
                             Current_List[i] - Current_List[i - 1]) / (Voltage_List[i] - Voltage_List[i - 1])
                 i += 1
 
         IVCurveFile.close()
 
-        if CurrentAtVoltage100 != 0.:
-            Variation = CurrentAtVoltage150 / CurrentAtVoltage100
+        if CurrentAtVoltage100V != 0.:
+            Variation = CurrentAtVoltage150V / CurrentAtVoltage100V
         else:
             Variation = 0
         if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
-            recalculatedCurrentAtVoltage150V = self.recalculate_current(CurrentAtVoltage150,
+            recalculatedCurrentAtVoltage150V = self.recalculate_current(CurrentAtVoltage150V,
                                                                         self.ParentObject.Attributes['TestTemperature'],
                                                                         self.ParentObject.Attributes[
                                                                             'recalculateCurrentTo'])
@@ -201,8 +201,8 @@ class TestResult(GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
         self.ResultData['Plot']['ROOTObject'].Draw("aC")
 
-        CurrentAtVoltage150 *= self.ResultData['HiddenData']['FactorI'] * 1e6
-        self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'] = '{0:1.2f}'.format(CurrentAtVoltage150)
+        CurrentAtVoltage150V *= self.ResultData['HiddenData']['FactorI'] * 1e6
+        self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'] = '{0:1.2f}'.format(CurrentAtVoltage150V)
         self.ResultData['KeyValueDictPairs']['Variation']['Value'] = '{0:1.2f}'.format(Variation)
 
         if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):

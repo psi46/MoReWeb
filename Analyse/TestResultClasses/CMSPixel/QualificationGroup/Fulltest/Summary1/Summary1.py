@@ -94,11 +94,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 '''
 #             print '%s: %s'%(i,subgrading)
             subgradings[i] = subgrading
-        CurrentAtVoltage150 = 0
+        CurrentAtVoltage150V = 0
         CurrentVariation = 0
         if self.ParentObject.ResultData['SubTestResults'].has_key('IVCurve'):
             IVTestResult = self.ParentObject.ResultData['SubTestResults']['IVCurve']    
-            CurrentAtVoltage150 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
+            CurrentAtVoltage150V = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
             CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
         else:
             pass
@@ -114,7 +114,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # Grading
             if Grade == 1 and BadRocs > 1:
                 Grade = 2
-            if Grade == 1 and CurrentAtVoltage150 > self.TestResultEnvironmentObject.GradingParameters['currentB']:
+            if Grade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentB']:
                     
                 Grade = 2;
             if Grade == 1   and CurrentVariation >  self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
@@ -122,7 +122,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grade = 2
             if BadRocs > 2:
                 Grade = 3
-            if CurrentAtVoltage150 > self.TestResultEnvironmentObject.GradingParameters['currentC']:
+            if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
                 Grade = 3; 
 
             '''
@@ -135,13 +135,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # Grading
             if Grade == 1 and BadRocs > 1:
                 Grade = 2
-            if Grade == 1 and CurrentAtVoltage150 > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
+            if Grade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
                 Grade = 2
             if Grade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
                 Grade = 2
             if BadRocs > 2:
                 Grade = 3
-            if CurrentAtVoltage150 > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
+            if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
                 Grade = 3
                 
             '''
