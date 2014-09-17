@@ -169,7 +169,12 @@ class ModuleResultOverview:
 
                 RowDict = FinalModuleRowsDict[Identificator]
                 for Key in TableColumnList:
-                    RowDict[Key] = RowTuple[Key]
+                    try:
+                        RowDict[Key] = RowTuple[Key]
+                    except IndexError as e:
+                        print 'searched Key:  ',Key
+                        print 'existing Keys: ',RowTuple.keys()
+                        raise e
 
                 ResultHTMLFileName = 'TestResult.html'
                 QualificationGroupSubfolder = 'QualificationGroup'
