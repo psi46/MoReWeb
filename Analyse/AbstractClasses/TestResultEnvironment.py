@@ -174,6 +174,7 @@ class TestResultEnvironment:
                         Trimming INT,
                         PHCalibration INT,
                         CurrentAtVoltage150 FLOAT,
+                        RecalculatedVoltage FLOAT,
                         IVSlope FLOAT,
                         Temperature TEXT,
                         RelativeModuleFinalResultsPath TEXT,
