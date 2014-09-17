@@ -334,7 +334,7 @@ class GeneralTestResult:
             except (KeyError,ConfigParser.ConfigParser.NoOptionError):
                 warnings.warn('cannot find version name {section}'.format(section=config.sections()))
                 if 'ROC' in config.sections():
-                    warnings.warn('cannot find version ROC-section {section}'.format(section=config.options('ROC')))
+                    warnings.warn('cannot find type in  ROC-section: {options}'.format(options=config.options('ROC')))
                 version = 'none'
             try:
                 nRocs = config.getint('Module', 'rocs')
