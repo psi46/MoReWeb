@@ -122,19 +122,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 	SubGradings = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGradings']
         
+        # needed in summary3 and in fulltest db upload
         for i in SubGradings:
             for Grade in GradeMapping:
                 key = i+'Grade'+GradeMapping[Grade]+"ROCs"
-                try:
-                    nRocs = self.ParentObject.ResultData['SubTestResults']['Grading'].getNumberOfRocsWithGrade('%d'%Grade,SubGradings[i])
-                except:
-                    nRocs = -1
-                entry = {
-                    'Value': nRocs,
-                    'Label': '%s Grade %s ROCs'%(i,GradeMapping[Grade])
-                }
-                print key, entry
-                self.ResultData['KeyValueDictPairs'][key] = entry
+                self.ResultData['KeyValueDictPairs'][key] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'][key]
                 
                 # the following line would enable these subgradings in the summary table
 		#self.ResultData['KeyList'].append(key)      

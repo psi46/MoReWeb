@@ -169,4 +169,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #self.ResultData['HiddenData']['nPixelDefectsGradeC'] = nPixelDefectsGradeC
         
         self.ResultData['KeyList'] = ['Module','ModuleGrade','BadRocs']
+        
+        
+        # needed in summary1
+        for i in SubGradings:
+            for Grade in GradeMapping:
+                key = i+'Grade'+GradeMapping[Grade]+"ROCs"
+                try:
+                    nRocs = self.getNumberOfRocsWithGrade('%d'%Grade,SubGradings[i])
+                except:
+                    nRocs = -1
+                entry = {
+                    'Value': nRocs,
+                    'Label': '%s Grade %s ROCs'%(i,GradeMapping[Grade])
+                }
+                print key, entry
+                self.ResultData['KeyValueDictPairs'][key] = entry
+                
+
 
