@@ -47,6 +47,30 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 },
             ]
+        elif self.Attributes['TestType'] == 'bareModuletest':
+            print 'add bareModuletest subTestResults'
+            self.ResultData['SubTestResultDictList'] = [
+                {
+                    'Key': 'bareModuletest',
+                    'Module': 'BareModuleTest',
+                    'InitialAttributes': {
+                        'StorageKey': 'BareModule_p17_1',
+                        'TestResultSubDirectory': '.',
+                        'IncludeIVCurve': False,
+                        'IVCurveSubDirectory': '',
+                        'ModuleID': self.Attributes['ModuleID'],
+                        'ModuleVersion': self.Attributes['ModuleVersion'],
+                        'ModuleType': self.Attributes['ModuleType'],
+                        'TestType': 'p17',
+                        'TestTemperature': 17,
+                        'ChipNo': 0,
+                    },
+                    'DisplayOptions': {
+                        'Order': 1
+                    }
+                },     
+            ]
+
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
 
     def appendOperationDetails(self, testlist):
