@@ -13,17 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         l = [i for i in GradeList if i == Grade]
         return len(l)
         
-    def GetSingleChipGrade(self, CurrentGrade, TestResultObject, Value, nValue):
-    	ChipGrade = CurrentGrade
-	if ChipGrade == 1 and Value > TestResultObject.ResultData['HiddenData']['LimitB']:
-		ChipGrade = 2
-	if Value > TestResultObject.ResultData['HiddenData']['LimitC']:
-		ChipGrade = 3
-	if ChipGrade == 1 and nValue < (8*self.nCols - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
-		ChipGrade = 2
-	if nValue < (8*self.nCols - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
-		ChipGrade = 3
-	return ChipGrade
+    
 	
     def PopulateResultData(self):
         SubGradings = {}
@@ -47,17 +37,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 continue
             TestResultObject = self.ParentObject.ResultData['SubTestResults'][i]
             SubGrading = []
-            for j in range(self.ParentObject.Attributes['NumberOfChips']-self.ParentObject.Attributes['StartChip']):
+            ChipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
+            for j in ChipResults:
+            	ChipGradingTestResultObject = j['TestResultObject'].ResultData['SubTestResults']['Grading']
             
-                Value= TestResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(j+1) 
-                nValue = TestResultObject.ResultData['Plot']['ROOTObject_h2'].GetBinContent(j+1) 
+                #Value= TestResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(j+1) 
+                #nValue = TestResultObject.ResultData['Plot']['ROOTObject_h2'].GetBinContent(j+1) 
                 
                 
                 # Grading 
-                ChipGrade = self.GetSingleChipGrade(1, TestResultObject, Value, nValue)
+                ChipGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(TestResultObject.Attributes['SpecialPopulateDataParameters'],1)
                 SubGrading.append('%d'%ChipGrade)
                
-               	ModuleGrade = self.GetSingleChipGrade(ModuleGrade, TestResultObject, Value, nValue)
+               	ModuleGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(TestResultObject.Attributes['SpecialPopulateDataParameters'],ModuleGrade)
                 
                 '''
                 # Failures reasons...

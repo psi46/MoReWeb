@@ -26,7 +26,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['TotalList'] = set()
         self.isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
 
-
+    def GetSingleChipSubtestGrade(self, SpecialPopulateDataParameters, CurrentGrade):
+	Value = float(self.ParentObject.ResultData['SubTestResults'][SpecialPopulateDataParameters['DataKey']].ResultData['KeyValueDictPairs'][SpecialPopulateDataParameters['DataParameterKey']]['Value'])
+	nValue = float(self.ParentObject.ResultData['SubTestResults'][SpecialPopulateDataParameters['DataKey']].ResultData['KeyValueDictPairs']['N']['Value'])
+	
+	if SpecialPopulateDataParameters.has_key('DataFactor'):
+		Value = Value*SpecialPopulateDataParameters['DataFactor']
+	if SpecialPopulateDataParameters.has_key('CalcFunction'):
+		Value = SpecialPopulateDataParameters['CalcFunction'](Value, self.ParentObject.ResultData['SubTestResults'][SpecialPopulateDataParameters['DataKey']].ResultData['KeyValueDictPairs'])
+	
+	Value = float(Value)
+	ChipGrade = CurrentGrade
+	
+	if ChipGrade == 1 and Value > SpecialPopulateDataParameters['YLimitB']:
+		ChipGrade = 2
+	if Value > SpecialPopulateDataParameters['YLimitC']:
+		ChipGrade = 3
+	if ChipGrade == 1 and nValue < (8*self.nCols - self.TestResultEnvironmentObject.GradingParameters['defectsB']):
+		ChipGrade = 2
+	if nValue < (8*self.nCols - self.TestResultEnvironmentObject.GradingParameters['defectsC']):
+		ChipGrade = 3
+	return ChipGrade
+	
 #     def HasBumpBondingProblems(self,column,row,threshold):
 #         binContent = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
 #         if self.isDigitalROC:
