@@ -1,6 +1,7 @@
 import ROOT
 import AbstractClasses
 import ROOT
+import math
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_VcalThreshold_TestResult'
@@ -51,15 +52,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if self.ResultData['Plot']['ROOTObject'].GetMinimum() > mThresholdMin:
                 mThresholdMin = self.ResultData['Plot']['ROOTObject'].GetMinimum();
             
-            SortedValueList = ValueList.sort()
-            LowerIndex = floor(len(SortedValueList)*0.05)
-            UpperIndex = floor(len(SortedValueList)*0.95)
+            SortedValueList = sorted(ValueList)
+            LowerIndex = int(math.floor(len(SortedValueList)*0.05))
+            UpperIndex = int(math.floor(len(SortedValueList)*0.95))
             LowerValueList = SortedValueList[0:LowerIndex-1]
             UpperValueList = SortedValueList[UpperIndex:]
             if SortedValueList[LowerIndex] > 5.*sum(LowerValueList)/float(len(LowerValueList)):
-            	mThresholdMin = SortedValueList[LowerIndex]
+            	mThresholdMin = SortedValueList[LowerIndex]*0.1
             if SortedValueList[UpperIndex]*5. < sum(UpperValueList)/float(len(UpperValueList)):
-            	mThresholdMax = SortedValueList[UpperIndex]
+            	mThresholdMax = SortedValueList[UpperIndex]*1.1
+            	
             
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");

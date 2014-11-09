@@ -34,7 +34,13 @@ class TestResult(GeneralTestResult):
                 'Label': 'I_rec(150 V, 17 degC))',
                 'Unit': 'μA'
             }
+            self.ResultData['KeyList'].append('recalculatedCurrentVariation')
+            self.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation'] = {
+                'Value': '{0:1.2f}'.format(0),
+                'Label': 'I_rec(150 V, 17 degC)) / I(100 V)',
+            }
             self.ResultData['KeyList'].append('recalculatedCurrentAtVoltage150V')
+            self.ResultData['KeyList'].append('recalculatedCurrentVariation')
 
     @staticmethod
     def recalculate_current(inputCurrent, inputTemp, outputTemp):
