@@ -63,10 +63,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             
         CurrentAtVoltage150V = 0
+        RecalculatedCurrentAtVoltage150V = 0
         CurrentVariation = 0
         if self.ParentObject.ResultData['SubTestResults'].has_key('IVCurve'):
             IVTestResult = self.ParentObject.ResultData['SubTestResults']['IVCurve']    
             CurrentAtVoltage150V = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
+            if IVTestResult.ResultData['KeyValueDictPairs'].has_key('recalculatedCurrentAtVoltage150V'):
+            	RecalculatedCurrentAtVoltage150V = float(IVTestResult.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']['Value'])
+            	RecalculatedCurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation']['Value'])
+            
+            
             CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
         else:
             pass
@@ -106,13 +112,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # Grading
             if ModuleGrade == 1 and BadRocs > 1:
                 ModuleGrade = 2
-            if ModuleGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
+            if ModuleGrade == 1 and RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
                 ModuleGrade = 2
-            if ModuleGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
+            if ModuleGrade == 1 and RecalculatedCurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
                 ModuleGrade = 2
             if BadRocs > 2:
                 ModuleGrade = 3
-            if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
+            if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
                 ModuleGrade = 3
                 
             '''

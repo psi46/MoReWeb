@@ -185,6 +185,7 @@ class TestResult(GeneralTestResult):
                                                                         self.ParentObject.Attributes[
                                                                             'recalculateCurrentTo'])
             recalculatedCurrentAtVoltage150V *= self.ResultData['HiddenData']['FactorI'] * 1e6
+            recalculatedCurrentVariation = recalculatedCurrentAtVoltage150V / CurrentAtVoltage100V
         if len(Voltage_List) == 0:
             self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph()
         else:
@@ -211,6 +212,8 @@ class TestResult(GeneralTestResult):
         if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
             self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']['Value'] = '{0:1.2f}'.format(
                 recalculatedCurrentAtVoltage150V)
+            self.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation']['Value'] = '{0:1.2f}'.format(
+                recalculatedCurrentVariation)
         if self.SavePlotFile:
             self.Canvas.SaveAs(self.GetPlotFileName())
         self.ResultData['Plot']['Enabled'] = 1
