@@ -153,12 +153,15 @@ class TestResult(GeneralTestResult):
                 continue
                 pass
             if voltage <= 0:
-                Voltage_List.append(-1. * voltage)
-                Current_List.append(
-                    self.TestResultEnvironmentObject.GradingParameters['IVCurrentFactor'] * Entry.Current)
-
-                if Entry.Current > -1e-10:
+            	if Entry.Current > -1e-10:
                     continue
+                Voltage_List.append(-1. * voltage)
+                Current = self.TestResultEnvironmentObject.GradingParameters['IVCurrentFactor'] * Entry.Current
+                Current_List.append(
+                		Current
+                    )
+
+                
                 if i > 0:
 
                     if Voltage_List[i] >= 100. >= Voltage_List[i - 1]:
