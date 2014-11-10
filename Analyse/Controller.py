@@ -14,6 +14,11 @@ parser = argparse.ArgumentParser(description='MORE web Controller: an analysis s
 parser.add_argument('-FT','--singleFulltest',dest='singleFulltestPath',metavar='PATH',
                      help='option which can be used to analyse a single Fulltest, as the second argument needs the path where the single fulltest data are stored',
                      default='')
+parser.add_argument('-BT','--bareModuletest',dest='bareModuletestPath',metavar='PATH',
+                     help='option which can be used to analyse a bare Module Test, as the second argument needs the path where the single fulltest data are stored',
+                     default='')
+
+
 parser.add_argument('-FQ','--singleQualification',dest='singleQualificationPath',metavar='PATH',
                     help='option which activates an analysis of a single Qualification',
                     default='')
@@ -283,10 +288,43 @@ def AnalyseSingleFullTest(singleFulltestPath):
     ModuleTestResult.GenerateFinalOutput()
     pass
 
+def AnalyseBareModuleTest(bareModuletestPath):
+    print 'analysing a single Fulltest at destination: "%s"' % args.bareModuletestPath
+    TestResultEnvironmentInstance.ModuleDataDirectory  = args.bareModuletestPath
+    TestResultEnvironmentInstance.FinalModuleResultsPath = args.bareModuletestPath
+    ModuleID = args.bareModuletestPath.split('/')[-1]
+    TestDate = '%s'%int(time.time())
+    TestType = 'bareModuletest'
+    ModuleInformation = {
+        'ModuleID': ModuleID,
+        'TestDate': TestDate,
+        'QualificationType': 'BareModuletest',
+        'TestType': 'bareModuletest'
+    }
+    FinalResultsPath = args.bareModuletestPath+'/BareFinalResults'+RevisionString
+    ModuleTestResult = GetModuleTestResult(TestResultEnvironment, FinalResultsPath, ModuleInformation)
+    print 'ModuleTestResult',ModuleTestResult
+                # add apache webserver configuration for compressed svg images
+    CreateApacheWebserverConfiguration(FinalResultsPath)
+    print 'Working on: ',ModuleInformation
+    print ' -- '
+
+    print '    Populating Data'
+    ModuleTestResult.PopulateAllData()
+    if args.DBUpload:
+        ModuleTestResult.WriteToDatabase() # needed before final output
+
+    print '    Generating Final Output'
+    ModuleTestResult.GenerateFinalOutput()
+    pass
+
+
 if not args.singleFulltestPath=='':
     AnalyseSingleFullTest(args.singleFulltestPath)
 elif not args.singleQualificationPath=='':
     AnalyseSingleQualification(args.singleQualificationPath)
+elif not args.bareModuletestPath=='':
+    AnalyseBareModuleTest(args.bareModuletestPath)
 elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
     AnalyseAllTestDataInDirectory(GlobalDataDirectory)
 

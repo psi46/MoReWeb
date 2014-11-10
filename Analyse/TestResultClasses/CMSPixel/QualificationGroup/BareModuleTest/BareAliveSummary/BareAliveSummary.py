@@ -1,0 +1,103 @@
+import ROOT
+import AbstractClasses
+import ROOT
+class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+    def CustomInit(self):
+        self.Name='CMSPixel_QualificationGroup_BareModuleTest_Chips_Chip_BarePixelMap_TestResult'
+        self.NameSingle='BarePixelMap'
+        self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
+        self.Title = 'Bare AliveMap'
+
+
+    def PopulateResultData(self):
+
+
+        ROOT.gStyle.SetOptStat(0);
+        ROOT.gPad.SetLogy(0);
+
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", 8*self.nCols, 0., 8*self.nCols, 2*self.nRows, 0., 2*self.nRows); # mThreshold
+
+        for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+            ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+            histo = ChipTestResultObject.ResultData['SubTestResults']['BarePixelMap'].ResultData['Plot']['ROOTObject']
+            #print 'histo name inside BareBBSumary: ', histo.GetName()
+
+            if not histo:
+                print 'BarePixelMap Histogram does not exist for ChipNo ', self.ParentObject.Attributes['ChipNo']
+                continue
+        
+            else:
+                for col in range(self.nCols): # Columns
+                    for row in range(self.nRows): # Rows
+                        if ChipTestResultObject.Attributes['ChipNo'] < 8:
+                            tmpCol = 8*self.nCols-(ChipTestResultObject.Attributes['ChipNo']*self.nCols+col)
+                            tmpRow = 2*self.nRows-row
+                        else:
+                            tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*self.nCols+col)+1
+                            tmpRow = row+1
+                            if ChipTestResultObject.Attributes['ChipNo'] < 8:
+                        #tmpRow += self.nRows
+                                pass
+                        # Get the data from the chip sub test result VcalThresholdUntrimmed
+
+                        self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, histo.GetBinContent(col + 1, row + 1))
+                            
+
+        if self.ResultData['Plot']['ROOTObject']:
+            mThresholdMin = 0.
+            mThresholdMax = 255.
+
+            #self.Canvas.SetLinx();
+            #self.Canvas.SetLinY;
+
+            if  self.ResultData['Plot']['ROOTObject'].GetMaximum() < mThresholdMax:
+                mThresholdMax = self.ResultData['Plot']['ROOTObject'].GetMaximum();
+
+            if self.ResultData['Plot']['ROOTObject'].GetMinimum() > mThresholdMin:
+                mThresholdMin = self.ResultData['Plot']['ROOTObject'].GetMinimum();
+
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax);
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
+            #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetLinY();
+            #self.ResultData['Plot']['ROOTObject'].GetXaxis().SetLinX();
+            self.ResultData['Plot']['ROOTObject'].Draw('colz');
+
+
+        boxes = []
+        startChip = self.ParentObject.Attributes['StartChip']
+        endChip = self.ParentObject.Attributes['NumberOfChips'] + startChip - 1
+        if self.verbose:
+            print 'Used chips: %2d -%2d' % (startChip, endChip)
+        for i in range(0, 16):
+            if i < startChip or endChip < i:
+                if i < 8:
+                    j = 15 - i
+                else:
+                    j = i - 8
+                beginX = (j % 8) * self.nCols
+                endX = beginX + self.nCols
+                beginY = int(j / 8) * self.nRows
+                endY = beginY + self.nRows
+                if self.verbose:
+                    print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
+                newBox = ROOT.TPaveText(beginX, beginY, endX, endY)
+#                 newBox.AddText('%2d' % i)
+                newBox.SetFillColor(29)
+                newBox.SetLineColor(29)
+                newBox.SetFillStyle(3004)
+                newBox.SetShadowColor(0)
+                newBox.SetBorderSize(1)
+                newBox.Draw()
+                boxes.append(newBox)
+
+        self.ResultData['Plot']['Format'] = 'png'
+
+        if self.SavePlotFile:
+            self.Canvas.SaveAs(self.GetPlotFileName())
+        self.ResultData['Plot']['Enabled'] = 1
+        self.ResultData['Plot']['Caption'] = 'bare BBmap'
+        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
