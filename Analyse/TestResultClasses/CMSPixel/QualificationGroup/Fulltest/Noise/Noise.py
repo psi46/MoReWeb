@@ -7,24 +7,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Noise_TestResult'
         self.NameSingle='Noise'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-        
+        self.Attributes['SpecialPopulateDataParameters'] = {
+                'Key':'Noise',
+                'DataKey':'SCurveWidths', # which sub test result to take the data from
+                'DataParameterKey':'mu', # which part of key value dict pairs
+                'YLimitB':self.TestResultEnvironmentObject.GradingParameters['noiseB'],# limit for grading
+                'YLimitC':self.TestResultEnvironmentObject.GradingParameters['noiseC'],# limit for grading
+                'MarkerColor':ROOT.kPink,
+                'LineColor':ROOT.kPink,
+                'MarkerStyle':21,
+                'YaxisTitle':'Noise [e]',
+                
+        }
 
         
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0);
         self.ResultData['HiddenData']['LimitB'] = self.TestResultEnvironmentObject.GradingParameters['noiseB']
         self.ResultData['HiddenData']['LimitC'] = self.TestResultEnvironmentObject.GradingParameters['noiseC']
-        self.SpecialPopulateData(self, {
-                'Key':'Noise',
-                'DataKey':'SCurveWidths', # which sub test result to take the data from
-                'DataParameterKey':'mu', # which part of key value dict pairs
-                'YLimitB':self.TestResultEnvironmentObject.GradingParameters['noiseB'],# limit for grading
-                'MarkerColor':ROOT.kPink,
-                'LineColor':ROOT.kPink,
-                'MarkerStyle':21,
-                'YaxisTitle':'Noise [e]',
-                
-        })
+        self.SpecialPopulateData(self, self.Attributes['SpecialPopulateDataParameters'])
         
     
     def SpecialPopulateData(self,TestResultObject, Parameters):

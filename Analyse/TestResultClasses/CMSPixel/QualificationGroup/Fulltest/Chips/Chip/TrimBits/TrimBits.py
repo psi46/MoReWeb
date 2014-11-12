@@ -2,13 +2,30 @@
 import ROOT
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 from AbstractClasses.GeneralTestResult import GeneralTestResult
-
+import os
 
 class TestResult(GeneralTestResult):
     def CustomInit(self):
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_TrimBits_TestResult'
         self.NameSingle = 'TrimBits'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        Directory = self.RawTestSessionDataPath
+        for i in ['']+range(10,100,10):
+        		TrimParametersFileName = "{Directory}/TrimParameters{TrimValue}_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'],TrimValue=str(i))
+        		if os.path.isfile(TrimParametersFileName):
+        	        	        	TrimParametersFile = open(TrimParametersFileName, "r")
+        	        	        	if TrimParametersFile:
+        	        	        		self.ResultData['SubTestResultDictList'] += [
+        	        	        		{
+        	        	        			'Key':'TrimBitParameters'+str(i),
+        	        	        			'Module': 'TrimBitParameters',
+        	        	        			'InitialAttributes': {
+        	        	        				'TrimParametersFile':TrimParametersFile,
+        	        	        				'TrimBitValue':str(i)
+        	        	        			},
+        	        	        		},
+        	        	        	]
+
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0)

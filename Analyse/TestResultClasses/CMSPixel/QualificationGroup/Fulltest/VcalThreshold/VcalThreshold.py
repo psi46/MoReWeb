@@ -1,6 +1,7 @@
 import ROOT
 import AbstractClasses
 import ROOT
+import math
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_VcalThreshold_TestResult'
@@ -21,6 +22,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if not histo:
                 print 'cannot get VcalThresholdUntrimmed histo for chip ',ChipTestResultObject.Attributes['ChipNo']
                 continue
+            ValueList = []
+            
             for col in range(self.nCols): # Columns
                 for row in range(self.nRows): # Rows
                     if ChipTestResultObject.Attributes['ChipNo'] < 8:
@@ -33,8 +36,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         #tmpRow += self.nRows
                         pass
                     # Get the data from the chip sub test result VcalThresholdUntrimmed
-
-                    self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, histo.GetBinContent(col + 1, row + 1))
+                    Value = histo.GetBinContent(col + 1, row + 1)
+                    ValueList.append(Value)
+                    self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, Value)
 
 
 
@@ -47,7 +51,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             if self.ResultData['Plot']['ROOTObject'].GetMinimum() > mThresholdMin:
                 mThresholdMin = self.ResultData['Plot']['ROOTObject'].GetMinimum();
-
+            
+            SortedValueList = sorted(ValueList)
+            LowerIndex = int(math.floor(len(SortedValueList)*0.05))
+            UpperIndex = int(math.floor(len(SortedValueList)*0.95))
+            LowerValueList = SortedValueList[0:LowerIndex-1]
+            UpperValueList = SortedValueList[UpperIndex:]
+            if SortedValueList[LowerIndex] > 5.*sum(LowerValueList)/float(len(LowerValueList)):
+            	mThresholdMin = SortedValueList[LowerIndex]*0.1
+            if SortedValueList[UpperIndex]*5. < sum(UpperValueList)/float(len(UpperValueList)):
+            	mThresholdMax = SortedValueList[UpperIndex]*1.1
+            	
+            
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
