@@ -53,7 +53,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 {
                     'Key': 'bareModuletest',
                     'Module': 'BareModuleTest',
-                    'BasedOnModule':'Fulltest',
                     'InitialAttributes': {
                         'StorageKey': 'BareModule_p17_1',
                         'TestResultSubDirectory': '.',

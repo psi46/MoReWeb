@@ -18,7 +18,7 @@ import Helper.ROOTConfiguration as ROOTConfiguration
 import glob
 
 
-class GeneralTestResult:
+class GeneralTestResult(object):
     nRows = 80
     nCols = 52
     nTotalChips = 16
@@ -170,9 +170,6 @@ class GeneralTestResult:
         # Module Path
         self.ModulePath = self.NameSingle
         
-        # Module Path to inherit from
-        self.BaseModulePath = ''
-        
         
         if InitialModulePath:
             self.ModulePath = InitialModulePath
@@ -231,14 +228,6 @@ class GeneralTestResult:
             i['DisplayOptions'] = DisplayOptions
            
             importdir = self.ModulePath + '.' + SubModule
-            if i.has_key('BasedOnModule'):
-                BaseImportPath = self.ModulePath + '.' + i['BasedOnModule']
-                try:
-                    BaseModule = __import__(BaseImportPath + '.' + SubModule, fromlist=[BaseImportPath + '.' + 'TestResult'])
-                except ImportError as inst:
-                    BaseModule = __import__(BaseImportPath + '.TestResult', fromlist=[''])
-                    print 'imported', f, 'please change name of file'
-                
             try:
                 # print 'import ',importdir,SubModule
                 f = __import__(importdir + '.' + SubModule, fromlist=[importdir + '.' + 'TestResult'])
@@ -249,7 +238,7 @@ class GeneralTestResult:
                 f = __import__(importdir + '.TestResult', fromlist=[''])
                 print 'imported', f, 'please change name of file'
             pass
-
+		
             self.ResultData['SubTestResults'][i['Key']] = f.TestResult(
                 self.TestResultEnvironmentObject,
                 self,
