@@ -121,7 +121,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':8,
                     }
                 },
-
+                {'Key':'DacParameterOverview',
+                    'DisplayOptions':{
+                        
+                    }
+                },
 
             ]
 
