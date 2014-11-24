@@ -146,7 +146,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             elif 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
                 print '\t-> appendXraySpectrum'
                 tests, test, index = self.appendXrayCalibration(tests, test, index)
-            elif 'HighRateTest' in test.testname or 'HighRatePixelMap' in test.testname or 'HighRateEfficiency' in test.testname:
+            elif 'highratetest' in test.testname.lower() or \
+                 'highratepixelmap' in test.testname.lower() or \
+                 'highrateefficiency' in test.testname.lower():
                 # Accept all tests with names 'HighRateTest', 'HighRatePixelMap', and 'HighRateEfficiency' as high rate tests
                 # The distinction of the tests is made within the 'appendHighRateTest' function.
                 print '\t-> appendHighRateTest'
