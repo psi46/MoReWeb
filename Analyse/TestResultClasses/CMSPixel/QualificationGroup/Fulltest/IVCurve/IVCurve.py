@@ -34,12 +34,10 @@ class TestResult(GeneralTestResult):
                 'Label': 'I_rec(150 V, 17 degC))',
                 'Unit': 'μA'
             }
-            self.ResultData['KeyList'].append('recalculatedCurrentVariation')
             self.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation'] = {
                 'Value': '{0:1.2f}'.format(0),
-                'Label': 'I_rec(150 V, 17 degC)) / I(100 V)',
+                'Label': 'I_rec(150 V) / I_rec(100 V)'
             }
-            self.ResultData['KeyList'].append('recalculatedCurrentAtVoltage150V')
             self.ResultData['KeyList'].append('recalculatedCurrentVariation')
 
     @staticmethod
@@ -159,15 +157,12 @@ class TestResult(GeneralTestResult):
                 continue
                 pass
             if voltage <= 0:
-            	if Entry.Current > -1e-10:
-                    continue
                 Voltage_List.append(-1. * voltage)
-                Current = self.TestResultEnvironmentObject.GradingParameters['IVCurrentFactor'] * Entry.Current
                 Current_List.append(
-                		Current
-                    )
+                    self.TestResultEnvironmentObject.GradingParameters['IVCurrentFactor'] * Entry.Current)
 
-                
+                if Entry.Current > -1e-10:
+                    continue
                 if i > 0:
 
                     if Voltage_List[i] >= 100. >= Voltage_List[i - 1]:
@@ -190,12 +185,17 @@ class TestResult(GeneralTestResult):
                                                                         self.ParentObject.Attributes['TestTemperature'],
                                                                         self.ParentObject.Attributes[
                                                                             'recalculateCurrentTo'])
+
             recalculatedCurrentAtVoltage100V = self.recalculate_current(CurrentAtVoltage100V,
                                                                         self.ParentObject.Attributes['TestTemperature'],
                                                                         self.ParentObject.Attributes[
                                                                             'recalculateCurrentTo'])
-            recalculatedCurrentAtVoltage150V *= self.ResultData['HiddenData']['FactorI'] * 1e6
-            recalculatedCurrentVariation = recalculatedCurrentAtVoltage150V / recalculatedCurrentAtVoltage100V
+            recalculatedCurrentAtVoltage100V *= self.ResultData['HiddenData']['FactorI'] * 1e6
+            recalculatedCurrentVariation = 0
+            if recalculatedCurrentAtVoltage100V != 0:
+                recalculatedCurrentVariation = recalculatedCurrentAtVoltage150V / recalculatedCurrentAtVoltage100V
+            else:
+                recalculatedCurrentVariation = 0
         if len(Voltage_List) == 0:
             self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph()
         else:
