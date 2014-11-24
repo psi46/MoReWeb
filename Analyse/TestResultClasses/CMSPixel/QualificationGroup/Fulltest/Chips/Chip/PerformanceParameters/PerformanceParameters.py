@@ -129,10 +129,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'TrimBits_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['TrimBits'].ResultData['KeyValueDictPairs']['sigma']['Value'],
                 'Label': 'TrimBits σ',
-            },
-            'empty':{
-                'Value': '',
-                'Label': ''
             }
         }
         # self.ResultData['KeyList'] = ['Total', 'nDeadPixel', 'nMaskDefect', 'nDeadBumps', 'nDeadTrimbits', 'nAddressProblems', 'empty',
