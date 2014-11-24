@@ -45,9 +45,9 @@ class TestResult(GeneralTestResult):
 
         ChipNo = self.ParentObject.Attributes['ChipNo']
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
-            histname = HistoDict.get(self.NameSingle, 'TrimBits')
-            root_object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo=ChipNo)
-            # self.ResultData['Plot']['ROOTObject'] = root_object.Clone(self.GetUniqueID())
+        histname = HistoDict.get(self.NameSingle, 'TrimBits')
+        root_object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo=ChipNo)
+        # self.ResultData['Plot']['ROOTObject'] = root_object.Clone(self.GetUniqueID())
         else:
             histname = HistoDict.get(self.NameSingle, 'TrimBitMap')
             root_object2 = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo=ChipNo)
