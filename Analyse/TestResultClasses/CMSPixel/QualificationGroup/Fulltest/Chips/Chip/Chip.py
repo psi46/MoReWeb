@@ -124,6 +124,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 {'Key':'DacParameterOverview',
                     'DisplayOptions':{
                         
+                    }#depends on TrimBits
+                },
+                {'Key':'PerformanceParameters',
+                    'DisplayOptions':{
                     }
                 },
 
