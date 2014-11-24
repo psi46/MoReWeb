@@ -1,9 +1,12 @@
 import ROOT
 import AbstractClasses
-import AbstractClasses.Helper.HistoGetter as HistoGetter
-import CMSPixel.QualificationGroup.Fulltest.Chips.Chip.AddressLevels.PopulateResultData as PopulateResultData
-class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+import TestResultClasses
+import TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.AddressLevels.AddressLevels
+class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.AddressLevels.AddressLevels.TestResult):
     def CustomInit(self):
+    	# Call Overridden CustomInit()
+    	super(TestResult, self).CustomInit()
+    	
         self.Name='CMSPixel_QualificationGroup_BareModuleTest_Chips_Chip_AddressLevels_TestResult'
         self.NameSingle='AddressLevels'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_BareModuleTest_ROC'

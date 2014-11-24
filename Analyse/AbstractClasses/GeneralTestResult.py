@@ -18,7 +18,7 @@ import Helper.ROOTConfiguration as ROOTConfiguration
 import glob
 
 
-class GeneralTestResult:
+class GeneralTestResult(object):
     nRows = 80
     nCols = 52
     nTotalChips = 16
@@ -169,7 +169,8 @@ class GeneralTestResult:
 
         # Module Path
         self.ModulePath = self.NameSingle
-
+        
+        
         if InitialModulePath:
             self.ModulePath = InitialModulePath
 
@@ -225,7 +226,7 @@ class GeneralTestResult:
                 DisplayOptions.update(i['DisplayOptions'])
 
             i['DisplayOptions'] = DisplayOptions
-
+           
             importdir = self.ModulePath + '.' + SubModule
             try:
                 # print 'import ',importdir,SubModule
@@ -237,7 +238,7 @@ class GeneralTestResult:
                 f = __import__(importdir + '.TestResult', fromlist=[''])
                 print 'imported', f, 'please change name of file'
             pass
-
+		
             self.ResultData['SubTestResults'][i['Key']] = f.TestResult(
                 self.TestResultEnvironmentObject,
                 self,
