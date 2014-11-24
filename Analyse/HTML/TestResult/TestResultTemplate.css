@@ -50,6 +50,12 @@
 		padding-left:0px;
 		padding-right:0px;
 	}
+	#Page #ContentWrap #Content .ResultData .MainTestResult:after
+	{
+		content:'';
+		clear:both;
+		display:block;
+	}
 	#Page #ContentWrap #Content .SubTestResults .ResultData .Title
 	{
 		font-size:15px;

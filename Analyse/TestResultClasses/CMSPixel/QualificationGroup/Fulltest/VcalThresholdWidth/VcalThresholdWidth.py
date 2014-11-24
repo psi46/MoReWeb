@@ -7,7 +7,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='VcalThresholdWidth'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = 'Vcal Threshold Width'
-
+        self.Attributes['SpecialPopulateDataParameters'] = {
+                'Key':'Vcal Threshold Width',
+                'DataKey':'VcalThresholdTrimmed', # which sub test result to take the data from
+                'DataParameterKey':'sigma', # which part of key value dict pairs
+                'DataFactor':self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor'],
+                'YLimitB':self.TestResultEnvironmentObject.GradingParameters['trimmingB'],# limit for grading
+                'YLimitC':self.TestResultEnvironmentObject.GradingParameters['trimmingC'],# limit for grading
+                'MarkerColor':ROOT.kGreen,
+                'LineColor':ROOT.kGreen,
+                'MarkerStyle':21,
+                'YaxisTitle':'Width of Vcal Threshold',
+        }
 
     def PopulateResultData(self):
 
@@ -15,16 +26,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['HiddenData']['LimitB'] = self.TestResultEnvironmentObject.GradingParameters['trimmingB']
         self.ResultData['HiddenData']['LimitC'] = self.TestResultEnvironmentObject.GradingParameters['trimmingC']
-        self.ParentObject.ResultData['SubTestResults']['Noise'].SpecialPopulateData(self,
-                {
-                'Key':'Vcal Threshold Width',
-                'DataKey':'VcalThresholdTrimmed', # which sub test result to take the data from
-                'DataParameterKey':'sigma', # which part of key value dict pairs
-                'DataFactor':self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor'],
-                'YLimitB':self.TestResultEnvironmentObject.GradingParameters['trimmingB'],# limit for grading
-                'MarkerColor':ROOT.kGreen,
-                'LineColor':ROOT.kGreen,
-                'MarkerStyle':21,
-                'YaxisTitle':'Width of Vcal Threshold',
-                }
-                                                                                    )
+        self.ParentObject.ResultData['SubTestResults']['Noise'].SpecialPopulateData(self,self.Attributes['SpecialPopulateDataParameters'])

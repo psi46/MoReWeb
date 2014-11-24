@@ -111,6 +111,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     }
                 },
                 #{'Key':'TemperatureCalibration'},
+                {'Key':'Grading',
+                    'DisplayOptions':{
+                        'Show':False,
+                    }
+                },
                 {'Key':'Summary',
                     'DisplayOptions':{
                         'Order':8,
