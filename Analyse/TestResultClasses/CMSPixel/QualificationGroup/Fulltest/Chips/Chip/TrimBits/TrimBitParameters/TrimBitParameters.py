@@ -4,8 +4,8 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_TrimBits_TrimBitParameters'+str(self.Attributes['TrimBitValue'])+'_TestResult'
-        self.NameSingle='TrimBitParameters'+str(self.Attributes['TrimBitValue'])
+        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_TrimBits_TrimBitParameters'+str(self.Attributes['TrimValue'])+'_TestResult'
+        self.NameSingle='TrimBitParameters'+str(self.Attributes['TrimValue'])
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
     def PopulateResultData(self):
@@ -13,7 +13,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         ChipNo=self.ParentObject.ParentObject.Attributes['ChipNo']
         TrimBitParametersFile = self.Attributes['TrimParametersFile']
-        
         if not TrimBitParametersFile:
             raise Exception('Cannot find TrimBitParametersFile')
         else:
@@ -55,12 +54,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'sigma': {
                 'Value': '{0:1.2f}'.format(rms),
                 'Label': 'σ'
+            },
+            'trimValue': {
+                'Value': '{0}'.format(self.Attributes['TrimValue']),
+                'Label': 'TrimValue'
             }
         }
         self.ResultData['KeyList'] = ['mu', 'sigma']
-
         if self.SavePlotFile:
             self.Canvas.SaveAs(self.GetPlotFileName())
         self.ResultData['Plot']['Enabled'] = 1
-        self.Title = 'Trim Bits '+self.Attributes['TrimBitValue']
+        self.Title = 'Trim Bits - Trim '+self.Attributes['TrimValue']
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
