@@ -44,7 +44,7 @@ class TestResult(GeneralTestResult):
             try:
                 roc_results = module_results['FluorescenceTarget_C%i' % (self.Attributes["ChipNo"])]
             except KeyError as e:
-                print 'Cannot find key FluorescenceTarget_C%i in %s'%self.Attributes['ChipNo'],module_results.keys())
+                print 'Cannot find key FluorescenceTarget_C%i in %s'%(self.Attributes['ChipNo'],module_results.keys())
                 raise e
             trim = roc_results.Attributes['TrimValue']
             trimming.append(trim)
