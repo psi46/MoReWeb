@@ -121,7 +121,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':8,
                     }
                 },
-
+                {'Key':'DacParameterOverview',
+                    'DisplayOptions':{
+                        
+                    }#depends on TrimBits
+                },
+                {'Key':'PerformanceParameters',
+                    'DisplayOptions':{
+                    }
+                },
 
             ]
 
