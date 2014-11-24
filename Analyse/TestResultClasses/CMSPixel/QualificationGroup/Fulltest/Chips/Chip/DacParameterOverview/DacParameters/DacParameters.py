@@ -3,9 +3,13 @@ import AbstractClasses
 import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_DacParameterOverview_DacParameters_TrimBitParameters'+str(self.Attributes['DacParameterSetValue'])+'_TestResult'
-        self.NameSingle='DacParameters'+str(self.Attributes['DacParameterSetValue'])
+        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_DacParameterOverview_DacParameters_TrimBitParameters'+str(self.Attributes['DacParameterTrimValue'])+'_TestResult'
+        self.NameSingle='DacParameters'+str(self.Attributes['DacParameterTrimValue'])
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        if self.Attributes['DacParameterTrimValue'] != '':
+            self.Title = 'DacParameters - Trim '+str(self.Attributes['DacParameterTrimValue'])
+        else:
+            self.Title = 'DacParameters - Raw'
 
     def PopulateResultData(self):
         ChipNo=self.ParentObject.ParentObject.Attributes['ChipNo']
@@ -14,12 +18,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if not DacParametersFile:
             raise Exception('Cannot find DacParametersFile')
         else:
+            trim = self.Attributes['DacParameterTrimValue']
+            if trim =='':
+                trim = -1
+            self.ResultData['KeyValueDictPairs']['TrimValue'] = {
+                        'Value': '{0:}'.format(trim),
+                        'Label': 'TrimValue'
+                }
+            self.ResultData['KeyList'] += ['TrimValue']
             for Line in DacParametersFile:
-		LineArray = Line.strip().split()
-		DacParameterName = LineArray[1]
-		DacParameterValue = int(LineArray[2])
-		self.ResultData['KeyValueDictPairs'][DacParameterName] = {
-				'Value': '{0:1.0f}'.format(DacParameterValue),
-				'Label': DacParameterName
-		}
-		self.ResultData['KeyList'] += [DacParameterName]
+                LineArray = Line.strip().split()
+                DacParameterName = LineArray[1]
+
+                DacParameterValue = int(LineArray[2])
+                self.ResultData['KeyValueDictPairs'][DacParameterName] = {
+                        'Value': '{0:1.0f}'.format(DacParameterValue),
+                        'Label': DacParameterName
+                }
+                self.ResultData['KeyList'] += [DacParameterName]
