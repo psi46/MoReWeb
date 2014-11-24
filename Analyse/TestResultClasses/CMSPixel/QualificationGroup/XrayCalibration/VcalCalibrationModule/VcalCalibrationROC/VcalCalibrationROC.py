@@ -7,6 +7,7 @@ from AbstractClasses.GeneralTestResult import GeneralTestResult
 
 class TestResult(GeneralTestResult):
     def CustomInit(self):
+        #self.verbose = True
         self.Name = "CMSPixel_QualificationGroup_XrayCalibration_{Method}".format(Method=self.Attributes['Method'])
         self.Name += "_VcalCalibrationModule_VcalCalibrationROC_TestResult"
         self.NameSingle = "VcalCalibrationROC"
@@ -17,6 +18,7 @@ class TestResult(GeneralTestResult):
             print "".ljust(len(tag), '=')
             print tag
         self.Attributes['TestedObjectType'] = 'VcalCalibrationROC'
+        self.check_Test_Software()
 
     def PopulateResultData(self):
         if self.verbose:
@@ -32,6 +34,8 @@ class TestResult(GeneralTestResult):
         n_electrons = array.array('d', [])
         top_parent = self.ParentObject.ParentObject
         trimming = []
+        ignored_targets = map(lambda x: x.strip(),self.HistoDict.get('XrayTargetEnergies','IgnoredTarges').split(','))
+        print 'Ignoring the following targets: ',ignored_targets
         for test in top_parent.ResultData['SubTestResults']:
             if not "FluorescenceTargetModule" in test:
                 continue
@@ -40,13 +44,18 @@ class TestResult(GeneralTestResult):
             try:
                 roc_results = module_results['FluorescenceTarget_C%i' % (self.Attributes["ChipNo"])]
             except KeyError as e:
-                print module_results.keys()
+                print 'Cannot find key FluorescenceTarget_C%i in %s'%self.Attributes['ChipNo'],module_results.keys())
                 raise e
             trim = roc_results.Attributes['TrimValue']
             trimming.append(trim)
             key_value_pairs = roc_results.ResultData['KeyValueDictPairs']
+            target =  key_value_pairs['Target']['Value']
+            if target in ignored_targets:
+                print 'ignoring Target: ', target
+                continue
             if self.verbose:
-                print test, key_value_pairs['Center']['Value'], key_value_pairs['TargetNElectrons']['Value']
+                print test, trim, key_value_pairs['Center']['Value'], key_value_pairs['TargetNElectrons']['Value']
+                print key_value_pairs.keys()
             peak_centers.append(key_value_pairs['Center']['Value'])
             peak_errors.append(key_value_pairs['Center']['Sigma'])
             n_electrons.append(key_value_pairs['TargetNElectrons']['Value'])
@@ -113,7 +122,7 @@ class TestResult(GeneralTestResult):
             print '\tchi2Total ', chi2_total, ' @ NDF ', ndf_total
             print '\tchi2Left  ', chi2_left, ' @ NDF ', ndf_left
             print '\tchi2Right ', chi2_right, ' @ NDF ', ndf_right
-        if ((chi2_right < chi2_total) or (chi2_left < chi2_total)) and ndf_total > 1:
+        if ((chi2_right < chi2_total) or (chi2_left < chi2_total)) and ndf_total > 1 and self.HistoDict.get('XrayTargetEnergies','FitOption') != 'all':
             if chi2_right < chi2_left:
                 xmin = max(maxTrim, sorted_peak_centers[1])
                 self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,

@@ -318,10 +318,14 @@ class TestResult(GeneralTestResult):
                 'Value': round(chi2_per_ndf, 2),
                 'Label': 'Chi^2 per NDF',
                 'Unit': ''
+            },
+            'Target': {
+                'Value': target,
+                'Label': 'Target',
+                'Unit': ''
             }
-
         }
-        self.ResultData['KeyList'].extend(['Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF'])
+        self.ResultData['KeyList'].extend(['Target','Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF'])
         if self.verbose: print self.ResultData
         if self.verbose: print self.ResultData['KeyValueDictPairs']
 
