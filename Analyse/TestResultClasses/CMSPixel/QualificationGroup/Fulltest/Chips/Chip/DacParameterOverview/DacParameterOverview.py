@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-import ROOT
-import AbstractClasses.Helper.HistoGetter as HistoGetter
-from AbstractClasses.GeneralTestResult import GeneralTestResult
 import os
 import glob
+
+from AbstractClasses.GeneralTestResult import GeneralTestResult
 
 
 class TestResult(GeneralTestResult):
@@ -11,23 +10,7 @@ class TestResult(GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_DacParameterOverview_TestResult'
         self.NameSingle = 'DacParameterOverview'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
-        Directory = self.RawTestSessionDataPath
-        for i in [''] + range(10, 100, 10):
-            DacParametersFileName = "{Directory}/DacParameters{DacParameterSetValue}_C{ChipNo}.dat".format(
-                Directory=Directory, ChipNo=self.ParentObject.Attributes['ChipNo'], DacParameterSetValue=str(i))
-            if os.path.isfile(DacParametersFileName):
-                DacParametersFile = open(DacParametersFileName, "r")
-                if DacParametersFile:
-                    self.ResultData['SubTestResultDictList'] += [
-                        {
-                        'Key': 'DacParameters' + str(i),
-                        'Module': 'DacParameters',
-                        'InitialAttributes': {
-                        'DacParametersFile': DacParametersFile,
-                        'DacParameterTrimValue': str(i)
-                        },
-                        },
-                    ]
+        self.AddDacParameterSets()
 
     def AddDacParameterSets(self):
         Directory = self.RawTestSessionDataPath
@@ -37,7 +20,7 @@ class TestResult(GeneralTestResult):
             # print file
             f = file.split('/')[-1].split('.')[0].lower()
             # print f
-            f = f.replace('trimparameters', '')
+            f = f.replace('dacparameters', '')
             # print f
             f = f.split('_')
             # print f
@@ -45,11 +28,11 @@ class TestResult(GeneralTestResult):
                 DacParametersFile = open(file, "r")
                 self.ResultData['SubTestResultDictList'] += [
                     {
-                    'Key': 'DacParameters' + str(f[0]),
-                    'Module': 'DacParameters',
-                    'InitialAttributes': {
-                        'DacParametersFile': DacParametersFile,
-                        'DacParameterTrimValue': str(f[0])
+                        'Key': 'DacParameters' + str(f[0]),
+                        'Module': 'DacParameters',
+                        'InitialAttributes': {
+                            'DacParametersFile': DacParametersFile,
+                            'DacParameterTrimValue': str(f[0])
                         },
                     },
                 ]
