@@ -378,20 +378,46 @@ class TestResult(GeneralTestResult):
             # try and speak directly with PixelDB
             #
 
-            pdb = PixelDBInterface(operator="tommaso", center="pisa")
-            pdb.connectToDB()
-            OPERATOR = os.environ['PIXEL_OPERATOR']
-            CENTER = os.environ['PIXEL_CENTER']
-            s = Session(CENTER, OPERATOR)
-            pdb.insertSession(s)
-            print "--------------------"
-            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
-            print "--------------------"
-            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
+            fake = os.environ.get('FAKE',1),
 
-            if pp is None:
-                print "INSERTION FAILED!"
-                sys.exit(31)
+            if (fake == 1):
+                pdb = PixelDBInterface(operator="tommaso", center="pisa")
+                pdb.connectToDB()
+                OPERATOR = os.environ['PIXEL_OPERATOR']
+                CENTER = os.environ['PIXEL_CENTER']
+                s = Session(CENTER, OPERATOR)
+                pdb.insertSession(s)
+                print "--------------------"
+                print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
+                print "--------------------"
+                pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
+                
+                if pp is None:
+                    print "INSERTION FAILED!"
+                    sys.exit(31)
+#
+# also insert dac parameters
+#
+#
+#                you can access it via self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']['Chip'+int(ChipNo)].ResultData['SubTestResults']['DacParameterOverview'].ResultData['SubTestResults']['DacParameters'+int(TrimValue)].ResultData['KeyValueDictPairs']
+
+            #        
+                    
+            print "HERE"
+            for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+                print "HERE2"
+                ChipTestResultObject = self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                ChipNo = ChipTestResultObject.Attributes['ChipNo']
+                print "CHIPNO", ChipNo
+                DacParameterOverviewTestResultObject =  ChipTestResultObject.ResultData['SubTestResults']['DacParameterOverview']
+                print "HERE ESTEBAN", DacParameterOverviewTestResultObject.ResultData['SubTestResults']
+
+                for i in DacParameterOverviewTestResultObject.ResultData['SubTestResults']:
+                    DacParameterTestResultObject = DacParameterOverviewTestResultObject.ResultData['SubTestResults'][i]
+                    DacParameters = DacParameterTestResultObject.ResultData['KeyValueDictPairs']
+                    print "CHIP",ChipNo, DacParameters
+
+
 
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
