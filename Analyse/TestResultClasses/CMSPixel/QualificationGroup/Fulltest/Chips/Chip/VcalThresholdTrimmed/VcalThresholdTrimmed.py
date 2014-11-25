@@ -20,8 +20,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         histname = HistoDict.get(self.NameSingle, 'ThresholdDist')
         object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
-        self.ResultData['Plot']['ROOTObject'] = object.Clone(self.GetUniqueID())
-
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1F(self.GetUniqueID(),'ThresholdDist',256,-.5,255.5)
+        for bin in range(0,object.GetNbinsX()+1):
+            x = object.GetXaxis().GetBinLowEdge(bin)
+            content = object.GetBinContent(bin)
+            # print x, content
+            self.ResultData['Plot']['ROOTObject'].Fill(x,content)
+        self.ResultData['Plot']['ROOTObject'].SetEntries(object.GetEntries())
+        bin_min = self.ResultData['Plot']['ROOTObject'].FindFirstBinAbove()
+        bin_max = self.ResultData['Plot']['ROOTObject'].FindLastBinAbove()
+        self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(bin_min-1,bin_max+1)
+        # print self.ParentObject.ParentObject.FileHandle
+        # print object.GetNbinsX(),object.GetXaxis().GetXmin(),object.GetXaxis().GetXmax()
         histname = HistoDict.get(self.NameSingle, 'ThresholdMap')
         object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
         self.ResultData['Plot']['ROOTObject_Map'] = object.Clone(self.GetUniqueID())
