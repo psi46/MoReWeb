@@ -7,6 +7,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_SCurveWidths_TestResult'
         self.NameSingle='SCurveWidths'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        self.ResultData['KeyValueDictPairs'] = {
+            'N': {
+                'Value':'{0:1.0f}'.format(-1),
+                'Label':'N'
+            },
+            'mu': {
+                'Value':'{0:1.2f}'.format(-999),
+                'Label':'μ'
+            },
+            'sigma':{
+                'Value':'{0:1.2f}'.format(-1),
+                'Label':'σ'
+            }
+        }
+
+        self.ResultData['HiddenData']['htmax'] = 255.;
+        self.ResultData['HiddenData']['htmin'] = 0.
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(1)
@@ -23,6 +40,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ChipNo=self.ParentObject.Attributes['ChipNo']
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
+        self.ResultData['Plot']['ROOTObject_h2'] = None
         if HistoDict.has_option(self.NameSingle,'Analog'):
             histname = HistoDict.get(self.NameSingle,'Analog')
             object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
@@ -30,12 +48,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
 
 
-        if not self.ResultData['Plot'].has_key('ROOTObject_h2'):
+        if not self.ResultData['Plot']['ROOTObject_h2']:
             isDigitalROC = True
             histname = HistoDict.get(self.NameSingle,'Digital')
             object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
-            self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
-
+            if object != None:
+                self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
+        if not self.ResultData['Plot']['ROOTObject_h2']:
+            print 'Cannot find Histogram ',HistoDict.get(self.NameSingle,'Digital'),HistoDict.has_option(self.NameSingle,'Analog')
+            print[x.GetName() for x in self.ParentObject.ParentObject.FileHandle.GetListOfKeys()]
+            print 'NameSingle: ', self.NameSingle
+            raise KeyError('SCurveWidth: Cannot Find Histogram in ROOT File')
         Directory = self.RawTestSessionDataPath
         SCurveFileName = "{Directory}/SCurve_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         SCurveFile = open(SCurveFileName, "r")
@@ -74,8 +97,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print 'Entries: ', self.ResultData['Plot']['ROOTObject'].GetEntries(), self.ResultData['Plot']['ROOTObject'].GetMean(), self.ResultData['Plot']['ROOTObject'].GetRMS()
                 raw_input()
 
-        self.ResultData['HiddenData']['htmax'] = 255.;
-        self.ResultData['HiddenData']['htmin'] = 0.
 
         if self.ResultData['Plot']['ROOTObject_ht'].GetMaximum() < self.ResultData['HiddenData']['htmax']:
             self.ResultData['HiddenData']['htmax'] = self.ResultData['Plot']['ROOTObject_ht'].GetMaximum();
@@ -108,21 +129,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         under = self.ResultData['Plot']['ROOTObject'].GetBinContent(0)
         over = self.ResultData['Plot']['ROOTObject'].GetBinContent(self.ResultData['Plot']['ROOTObject_hd'].GetNbinsX()+1)
 
-
-        self.ResultData['KeyValueDictPairs'] = {
-            'N': {
-                'Value':'{0:1.0f}'.format(IntegralSCurve),
-                'Label':'N'
-            },
-            'mu': {
-                'Value':'{0:1.2f}'.format(MeanSCurve),
-                'Label':'μ'
-            },
-            'sigma':{
-                'Value':'{0:1.2f}'.format(RMSSCurve),
-                'Label':'σ'
-            }
-        }
+        self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(IntegralSCurve)
+        self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(MeanSCurve)
+        self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMSSCurve)
 
         self.ResultData['KeyList'] = ['N','mu','sigma']
         if under:
