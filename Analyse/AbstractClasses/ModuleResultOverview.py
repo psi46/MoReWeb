@@ -215,7 +215,7 @@ class ModuleResultOverview:
                 except TypeError as e:
                     print e,'\nerror',type(RowTuple['TestDate']),RowTuple['TestDate']
                     RowDict['TestDate'] = datetime.datetime.fromtimestamp(1).strftime("%Y-%m-%d %H:%m")
-                    raw_input()
+                    raise e
 
             else:
 #                TestType

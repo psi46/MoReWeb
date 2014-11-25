@@ -163,7 +163,7 @@ class TestResult(GeneralTestResult):
                 Current_List.append(
                     self.TestResultEnvironmentObject.GradingParameters['IVCurrentFactor'] * Entry.Current)
 
-
+                
                 if i > 0:
 
                     if Voltage_List[i] >= 100. >= Voltage_List[i - 1]:
