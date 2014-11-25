@@ -74,6 +74,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
                 ChipNo = ChipTestResultObject.Attributes['ChipNo']
                 ChipPosition = ChipNo + 1
+                strValue = ''
                 try:
                     strValue = ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData[
                         'KeyValueDictPairs'][Parameters['DataParameterKey']]['Value']
