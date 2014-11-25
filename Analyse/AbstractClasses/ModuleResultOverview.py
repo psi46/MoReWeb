@@ -1,4 +1,5 @@
 import AbstractClasses.Helper.HtmlParser
+import re
 import datetime
 import os
 class ModuleResultOverview:
@@ -205,7 +206,17 @@ class ModuleResultOverview:
 
 
                 # Parse the date
-                RowDict['TestDate'] = datetime.datetime.fromtimestamp(RowTuple['TestDate']).strftime("%Y-%m-%d %H:%m")
+                try:
+                    if  type(RowTuple['TestDate']) == str:
+                        time = int(re.match(r'\d+', RowTuple['TestDate']).group())
+                    else:
+                        time = RowTuple['TestDate']
+                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(time).strftime("%Y-%m-%d %H:%m")
+                except TypeError as e:
+                    print e,'\nerror',type(RowTuple['TestDate']),RowTuple['TestDate']
+                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(1).strftime("%Y-%m-%d %H:%m")
+                    raw_input()
+
             else:
 #                TestType
                  FinalModuleRowsDict[Identificator]['TestType'] += ' & %s'%RowTuple['TestType']
