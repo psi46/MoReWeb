@@ -37,7 +37,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Value': '{0:1.0f}'.format(DacParameterValue),
                     'Label': DacParameterName
                 }
-                self.ResultData['KeyList'] += [DacParameterName]
+                self.ResultData['KeyList'] += [DacParameterName.lower()]
             key = 'TrimBitParameters' + self.Attributes['DacParameterTrimValue']
             object = \
                 self.ParentObject.ParentObject.ResultData['SubTestResults']['TrimBits'].ResultData['SubTestResults'][
