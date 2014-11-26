@@ -33,7 +33,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 DacParameterName = LineArray[1]
 
                 DacParameterValue = int(LineArray[2])
-                self.ResultData['KeyValueDictPairs'][DacParameterName] = {
+                self.ResultData['KeyValueDictPairs'][DacParameterName.lower()] = {
                     'Value': '{0:1.0f}'.format(DacParameterValue),
                     'Label': DacParameterName
                 }
