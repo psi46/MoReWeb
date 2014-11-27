@@ -425,27 +425,26 @@ class TestResult(GeneralTestResult):
 
                         dacparam = Test_DacParameters(
                             ROC_POS= ChipNo,
-                            DACPARAMETERS = j,
+                            TRIM_VALUE= DacParameters['TrimValue']['Value'], #DACPARAMETERS = j,
                             FULLMODULEANALYSISTEST_ID = insertedID,   ## NOT SURE!!!!! this seems to be an analysis!!!!
-                            VDIG = DacParameters['Vdig']['Value'],
-                            VANA = DacParameters['Vana']['Value'], 
-                            VSF = DacParameters['Vsf']['Value'],
-                            VCOMP = DacParameters['Vcomp']['Value'],
-                            VWLLPR = DacParameters['VwllPr']['Value'],
-                            VWLLSH = DacParameters['VwllSh']['Value'],
-                            VTRIM = DacParameters['Vtrim']['Value'],
-                            VTHRCOMP = DacParameters['VthrComp']['Value'],
-                            VHLDDEL = DacParameters['VhldDel']['Value'],
-                            VIBIAS_BUS = DacParameters['VIBias_Bus']['Value'],
-                            VOFFSET_R0 = DacParameters['VOffsetR0']['Value'],
-                            VIBIAS_PH = DacParameters['VIbias_PH']['Value'],
-                            # MISSING
-                            VIREF_ADC = DacParameters['Ibias_DAC']['Value'],
+                            VDIG = DacParameters['vdig']['Value'],
+                            VANA = DacParameters['vana']['Value'], 
+                            VSH = DacParameters['vsh']['Value'],
+                            VCOMP = DacParameters['vcomp']['Value'],
+                            VWLLPR = DacParameters['vwllpr']['Value'],
+                            VWLLSH = DacParameters['vwllsh']['Value'],
+                            VTRIM = DacParameters['vtrim']['Value'],
+                            VTHRCOMP = DacParameters['vthrcomp']['Value'],
+                            VHLDDEL = DacParameters['vhlddel']['Value'],
+                            VIBIAS_BUS = DacParameters['vibias_bus']['Value'],
+                            PHOFFSET = DacParameters['phoffset']['Value'],
+                            VCOMP_ADC = DacParameters['vcomp_adc']['Value'],
+                            PHSCALE = DacParameters['phscale']['Value'],
                             #
-                            VICOLOR = DacParameters['VIColOr']['Value'],
-                            CALDEL = DacParameters['CalDel']['Value'],
-                            CTRLREG = DacParameters['CtrlReg']['Value'],
-                            WBC = DacParameters['WBC']['Value'])
+                            VICOLOR = DacParameters['vicolor']['Value'],
+                            CALDEL = DacParameters['caldel']['Value'],
+                            CTRLREG = DacParameters['ctrlreg']['Value'],
+                            WBC = DacParameters['wbc']['Value'])
                         pdb.insertTestDac(dacparam)
                         print "DAC TEST INSERTED FOR", ChipNo, insertedID, j
 
