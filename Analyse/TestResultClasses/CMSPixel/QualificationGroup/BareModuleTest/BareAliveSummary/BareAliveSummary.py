@@ -19,7 +19,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            histo = ChipTestResultObject.ResultData['SubTestResults']['BarePixelMap'].ResultData['Plot']['ROOTObject']
+            #print 'AQUI ',  self.ParentObject.testSoftware
+            if self.ParentObject.testSoftware=='pxar':
+                histo = ChipTestResultObject.ResultData['SubTestResults']['PixelMap'].ResultData['Plot']['ROOTObject']
+            else:
+                histo = ChipTestResultObject.ResultData['SubTestResults']['BarePixelMap'].ResultData['Plot']['ROOTObject']
             #print 'histo name inside BareBBSumary: ', histo.GetName()
 
             if not histo:

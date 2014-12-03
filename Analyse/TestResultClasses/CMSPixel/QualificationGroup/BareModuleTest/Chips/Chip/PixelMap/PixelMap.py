@@ -9,6 +9,6 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Ch
     	
         #ROOTConfiguration.initialise_ROOT()
         self.Name='CMSPixel_QualificationGroup_BareModuleTest_Chips_Chip_PixelMapNew_TestResult'
-        self.NameSingle='PixelMapNew'
+        self.NameSingle='PixelMap'
 
     # PopulateResultData is inherited
