@@ -7,7 +7,7 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Ch
     	# Call Overridden CustomInit()
     	super(TestResult, self).CustomInit()
     	
-        ROOTConfiguration.initialise_ROOT()
+        #ROOTConfiguration.initialise_ROOT()
         self.Name='CMSPixel_QualificationGroup_BareModuleTest_Chips_Chip_PixelMapNew_TestResult'
         self.NameSingle='PixelMapNew'
 
