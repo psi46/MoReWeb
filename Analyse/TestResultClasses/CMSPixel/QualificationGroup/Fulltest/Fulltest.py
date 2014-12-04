@@ -378,21 +378,138 @@ class TestResult(GeneralTestResult):
             # try and speak directly with PixelDB
             #
 
+#            fake = int(os.environ.get('FAKE',1))
+
+#            insertedID=7
             pdb = PixelDBInterface(operator="tommaso", center="pisa")
             pdb.connectToDB()
-            OPERATOR = os.environ['PIXEL_OPERATOR']
-            CENTER = os.environ['PIXEL_CENTER']
-            s = Session(CENTER, OPERATOR)
-            pdb.insertSession(s)
-            print "--------------------"
-            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
-            print "--------------------"
-            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
+            
+            if (0 == 0):
+                OPERATOR = os.environ['PIXEL_OPERATOR']
+                CENTER = os.environ['PIXEL_CENTER']
+                s = Session(CENTER, OPERATOR)
+                pdb.insertSession(s)
+                print "--------------------"
+                print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
+                print "--------------------"
+                pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
+                
+                if pp is None:
+                    print "INSERTION FAILED!"
+                    sys.exit(31)
 
-            if pp is None:
-                print "INSERTION FAILED!"
-                sys.exit(31)
+                insertedID=pp.TEST_ID
 
+#
+# also insert dac parameters
+#
+#
+#                you can access it via self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']['Chip'+int(ChipNo)].ResultData['SubTestResults']['DacParameterOverview'].ResultData['SubTestResults']['DacParameters'+int(TrimValue)].ResultData['KeyValueDictPairs']
+
+            #        
+                    
+            if (0==0):
+                for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+                    ChipTestResultObject = self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                    ChipNo = ChipTestResultObject.Attributes['ChipNo']
+                    DacParameterOverviewTestResultObject =  ChipTestResultObject.ResultData['SubTestResults']['DacParameterOverview']
+                    
+                    for j in DacParameterOverviewTestResultObject.ResultData['SubTestResults']:
+                        DacParameterTestResultObject = DacParameterOverviewTestResultObject.ResultData['SubTestResults'][j]
+                        DacParameters = DacParameterTestResultObject.ResultData['KeyValueDictPairs']
+
+#CHIP 5 {'VIon': {'Value': '130', 'Label': 'VIon'}, 'VwllSh': {'Value': '35', 'Label': 'VwllSh'}, 'Vcal': {'Value': '199', 'Label': 'Vcal'}, 'VhldDel': {'Value': '160', 'Label': 'VhldDel'}, 'Vtrim': {'Value': '7', 'Label': 'Vtrim'}, 'VthrComp': {'Value': '92', 'Label': 'VthrComp'}, 'VrgPr': {'Value': '0', 'Label': 'VrgPr'}, 'Vleak_comp': {'Value': '0', 'Label': 'Vleak_comp'}, 'Vbias_sf': {'Value': '10', 'Label': 'Vbias_sf'}, 'Vana': {'Value': '128', 'Label': 'Vana'}, 'Vdig': {'Value': '6', 'Label': 'Vdig'}, 'RangeTemp': {'Value': '0', 'Label': 'RangeTemp'}, 'VIbias_PH': {'Value': '220', 'Label': 'VIbias_PH'}, 'VIbias_roc': {'Value': '220', 'Label': 'VIbias_roc'}, 'TrimBits_mu': {'Value': '15.00', 'Label': 'TrimBit Mean'}, 'VIColOr': {'Value': '99', 'Label': 'VIColOr'}, 'VOffsetR0': {'Value': '120', 'Label': 'VOffsetR0'}, 'CalDel': {'Value': '85', 'Label': 'CalDel'}, 'TrimValue': {'Value': '-1', 'Label': 'TrimValue'}, 'VrgSh': {'Value': '0', 'Label': 'VrgSh'}, 'VSumCol': {'Value': '0', 'Label': 'VSumCol'}, 'TrimBits_sigma': {'Value': '0.00', 'Label': 'TrimBit sigma'}, 'VwllPr': {'Value': '35', 'Label': 'VwllPr'}, 'CtrlReg': {'Value': '0', 'Label': 'CtrlReg'}, 'Vnpix': {'Value': '0', 'Label': 'Vnpix'}, 'VIbiasOp': {'Value': '50', 'Label': 'VIbiasOp'}, 'Vcomp': {'Value': '10', 'Label': 'Vcomp'}, 'VIBias_Bus': {'Value': '30', 'Label': 'VIBias_Bus'}, 'Ibias_DAC': {'Value': '36', 'Label': 'Ibias_DAC'}, 'Vsf': {'Value': '150', 'Label': 'Vsf'}, 'VoffsetOp': {'Value': '92', 'Label': 'VoffsetOp'}, 'WBC': {'Value': '100', 'Label': 'WBC'}}
+
+#                        print"PIPPONE",i,j
+                        print "INPUT", DacParameters
+
+                        dacparam = Test_DacParameters(
+                            ROC_POS= ChipNo,
+                            TRIM_VALUE= DacParameters['TrimValue']['Value'], #DACPARAMETERS = j,
+                            FULLMODULEANALYSISTEST_ID = insertedID,   ## NOT SURE!!!!! this seems to be an analysis!!!!
+                            VDIG = DacParameters['vdig']['Value'],
+                            VANA = DacParameters['vana']['Value'], 
+                            VSH = DacParameters['vsh']['Value'],
+                            VCOMP = DacParameters['vcomp']['Value'],
+                            VWLLPR = DacParameters['vwllpr']['Value'],
+                            VWLLSH = DacParameters['vwllsh']['Value'],
+                            VTRIM = DacParameters['vtrim']['Value'],
+                            VTHRCOMP = DacParameters['vthrcomp']['Value'],
+                            VHLDDEL = DacParameters['vhlddel']['Value'],
+                            VIBIAS_BUS = DacParameters['vibias_bus']['Value'],
+                            PHOFFSET = DacParameters['phoffset']['Value'],
+                            VCOMP_ADC = DacParameters['vcomp_adc']['Value'],
+                            PHSCALE = DacParameters['phscale']['Value'],
+                            #
+                            VICOLOR = DacParameters['vicolor']['Value'],
+                            CALDEL = DacParameters['caldel']['Value'],
+                            CTRLREG = DacParameters['ctrlreg']['Value'],
+                            WBC = DacParameters['wbc']['Value'])
+                        pdb.insertTestDac(dacparam)
+                        print "DAC TEST INSERTED FOR", ChipNo, insertedID, j
+
+
+            if (0 ==0):
+
+                for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+                    ChipTestResultObject = self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                    ChipNo = ChipTestResultObject.Attributes['ChipNo']
+#                    print "PIPPO!!!!!",ChipNo
+                # print ChipTestResultObject.ResultData['SubTestResults'].keys()
+                    PerformanceParametersTestResultObject =  ChipTestResultObject.ResultData['SubTestResults']['PerformanceParameters']
+                    PerformanceParameters = PerformanceParametersTestResultObject.ResultData['KeyValueDictPairs']
+#                    print "PAYLOAD ", PerformanceParameters
+
+
+#PAYLOAD  {'nDeadTrimbits': {'Value': '0', 'Label': ' - Dead Trimbits'}, 'PHCalibrationPedestal_mu': {'Value': '96.65', 'Label': 'PHCalibrationPedestal \xce\xbc'}, 'nDeadPixel': {'Value': '0', 'Label': ' - Dead Pixels'}, 'PHCalibrationPar1_sigma': {'Value': '0.06', 'Label': 'PHCalibrationParameter1 \xcf\x83'}, 'BumpBonding_mu': {'Value': -16.800000000000001, 'Label': 'BumpBonding \xce\xbc'}, 'BumpBonding_threshold': {'Value': -6.1200000000000001, 'Label': 'BumpBonding Threshold'}, 'nMaskDefect': {'Value': '0', 'Label': ' - Mask Defects'}, 'nDeadBumps': {'Value': '0', 'Label': ' - Dead Bumps'}, 'PHCalibrationGain_mu': {'Value': '0.58', 'Label': 'PHCalibrationGain \xce\xbc'}, 'nNoisy1Pixel': {'Value': '0', 'Label': 'Noisy Pixels 1'}, 'nPedDefect': {'Value': '0', 'Label': 'PH Pedestal defects'}, 'BumpBonding_sigma': {'Value': 2.1400000000000001, 'Label': 'BumpBonding \xcf\x83'}, 'ThresholdTrimmed_mu': {'Value': '60.10', 'Label': 'ThresholdTrimmed \xce\xbc'}, 'PHCalibrationGain_sigma': {'Value': '0.02', 'Label': 'PHCalibrationGain \xcf\x83'}, 'PHCalibrationPedestal_sigma': {'Value': '33.73', 'Label': 'PHCalibrationPedestal \xcf\x83'}, 'nPar1Defect': {'Value': '0', 'Label': 'PH Parameter1 Defects'}, 'TrimBits_sigma': {'Value': '1.77', 'Label': 'TrimBits \xcf\x83'}, 'SCurveWidth_mu': {'Value': '121.67', 'Label': 'SCurveWidth \xce\xbc'}, 'TrimBits_mu': {'Value': '9.36', 'Label': 'TrimBits \xce\xbc'}, 'PixelDefectsGrade': {'Value': '1', 'Label': 'Pixel Defects Grade ROC'}, 'ThresholdTrimmed_sigma': {'Value': '1.37', 'Label': 'ThresholdTrimmed \xcf\x83'}, 'PHCalibrationPar1_mu': {'Value': '0.81', 'Label': 'PHCalibrationParameter1 \xce\xbc'}, 'nAddressProblems': {'Value': '0', 'Label': ' - Address Problems'}, 'SCurveWidth_sigma': {'Value': '11.86', 'Label': 'SCurveWidth \xcf\x83'}, 'nNoisy2Pixel': {'Value': '0', 'Label': 'Noisy Pixels 2'}, 'Total': {'Value': '0', 'Label': 'Total'}, 'nThrDefect': {'Value': '0', 'Label': 'Trim Problems'}, 'nGainDefect': {'Value': '0', 'Label': 'PH Gain defects'}}
+                    
+                    test = Test_PerformanceParameters(
+                        FULLMODULEANALYSISTEST_ID = insertedID, #### beware this is an analysis!
+                        ROC_POS = ChipNo,
+                        Total = PerformanceParameters['Total']['Value'], 
+                        nDeadPixel  = PerformanceParameters['nDeadPixel']['Value'],
+                        nMaskDefect  = PerformanceParameters['nMaskDefect']['Value'],
+                        nDeadBumps  = PerformanceParameters['nDeadBumps']['Value'],
+                        nDeadTrimbits  = PerformanceParameters['nDeadTrimbits']['Value'],
+                        nAddressProblems  = PerformanceParameters['nAddressProblems']['Value'],
+                        nNoisy1Pixel  = PerformanceParameters['nNoisy1Pixel']['Value'],
+                        nNoisy2Pixel  = PerformanceParameters['nNoisy2Pixel']['Value'],
+                        nThrDefect  = PerformanceParameters['nThrDefect']['Value'],
+                        nGainDefect  = PerformanceParameters['nGainDefect']['Value'],
+                        nPedDefect  = PerformanceParameters['nPedDefect']['Value'],
+                        nPar1Defect  = PerformanceParameters['nPar1Defect']['Value'],
+                        PixelDefectsGrade  = PerformanceParameters['PixelDefectsGrade']['Value'],
+                        SCurveWidth_mu = PerformanceParameters['SCurveWidth_mu']['Value'],  
+                        SCurveWidth_sigma= PerformanceParameters['SCurveWidth_sigma']['Value'],
+                        ThresholdTrimmed_mu= PerformanceParameters['ThresholdTrimmed_mu']['Value'],
+                        ThresholdTrimmed_sigma= PerformanceParameters['ThresholdTrimmed_sigma']['Value'],
+                        BumpBonding_mu= PerformanceParameters['BumpBonding_mu']['Value'],
+                        BumpBonding_sigma= PerformanceParameters['BumpBonding_sigma']['Value'],
+                        BumpBonding_threshold= PerformanceParameters['BumpBonding_threshold']['Value'],
+                        PHCalibrationGain_mu= PerformanceParameters['PHCalibrationGain_mu']['Value'],
+                        PHCalibrationGain_sigma= PerformanceParameters['PHCalibrationGain_sigma']['Value'],
+                        PHCalibrationPar1_mu= PerformanceParameters['PHCalibrationPar1_mu']['Value'],
+                        PHCalibrationPar1_sigma= PerformanceParameters['PHCalibrationPar1_sigma']['Value'],
+                        PHCalibrationPedestal_mu= PerformanceParameters['PHCalibrationPedestal_mu']['Value'],
+                        PHCalibrationPedestal_sigma= PerformanceParameters['PHCalibrationPedestal_sigma']['Value'],
+                        TrimBits_mu= PerformanceParameters['TrimBits_mu']['Value'],
+                        TrimBits_sigma= PerformanceParameters['TrimBits_sigma']['Value'])
+                    pdb.insertTestPerformance(test)
+                    print "PERFORMANCE TEST INSERTED FOR", ChipNo, insertedID
+
+
+#                    for i in PerformanceParameters:
+#                        print '\t',ChipNo, i,PerformanceParameters[i]['Value']
+
+
+
+#
+# insert performance parameters
+#                    
+
+
+
+                    
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
