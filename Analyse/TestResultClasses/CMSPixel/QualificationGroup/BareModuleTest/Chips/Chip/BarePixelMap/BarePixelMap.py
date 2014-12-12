@@ -6,11 +6,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         if self.ParentObject.ParentObject.ParentObject.testSoftware=='pxar':
             print 'using Fulltest code'
-            self.Name='CMSPixel_QualificationGroup_BareModuleTest_Chips_Chip_BarePixelMap_TestResult'
-            self.NameSingle='PixelMap'
-            self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_BareModuleTest_ROC'
-            self.AddressProblemList = set()
-            self.chipNo = self.ParentObject.Attributes['ChipNo']
+            #self.Name='CMSPixel_QualificationGroup_BareModuleTest_Chips_Chip_BarePixelMap_TestResult'
+            #self.NameSingle='PixelMap'
+            #self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_BareModuleTest_ROC'
+            #self.AddressProblemList = set()
+            #self.chipNo = self.ParentObject.Attributes['ChipNo']
         else:
             self.Name='CMSPixel_QualificationGroup_BareModuleTest_Chips_Chip_BarePixelMap_TestResult'
             self.NameSingle='BarePixelMap'
