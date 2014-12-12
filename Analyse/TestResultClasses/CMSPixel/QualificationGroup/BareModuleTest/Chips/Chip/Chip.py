@@ -28,12 +28,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':16,
                         }
                  },
-                {
-                    'Key':'BarePixelMap',
-                    'DisplayOptions':{
-                        'Order':2,
-                        }
-                    },
+#                {
+#                    'Key':'BarePixelMap',
+#                    'DisplayOptions':{
+#                        'Order':2,
+#                        }
+#                    },
                 {'Key':'BumpBonding',
                     'DisplayOptions':{
                         'Order':6,
