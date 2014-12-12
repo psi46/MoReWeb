@@ -26,14 +26,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         }
         BadRocs = 0
         chipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
+        print 'Subgrading, PixelDefects:',chipResults
+        SubGrading = []
         for i in chipResults:
             if int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
                 'Total']['Value']) > 0.01 * self.nCols * self.nRows:
                 BadRocs += 1
-            SubGradings['PixelDefects'] = [
+            SubGrading.append([
                 i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
-                    'PixelDefectsGrade']['Value'] for i in chipResults]
-
+                    'PixelDefectsGrade']['Value'] for i in chipResults])
+        SubGradings['PixelDefects'] = SubGrading
         # Grading
 
         for i in ['Noise', 'VcalThresholdWidth', 'RelativeGainWidth', 'PedestalSpread', 'Parameter1']:
@@ -46,7 +48,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 ChipGradingTestResultObject = j['TestResultObject'].ResultData['SubTestResults']['Grading']
 
                 # Value= TestResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(j+1)
-                #nValue = TestResultObject.ResultData['Plot']['ROOTObject_h2'].GetBinContent(j+1) 
+                # nValue = TestResultObject.ResultData['Plot']['ROOTObject_h2'].GetBinContent(j+1)
 
 
                 # Grading 
@@ -64,7 +66,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if Value > criteriaC[i]:
                     fitsProblemC[i]++
                 '''
-            # print '%s: %s'%(i,SubGrading)
+            if self.verbose:
+                print '%s: %s'%(i,SubGrading)
             SubGradings[i] = SubGrading
 
         CurrentAtVoltage150V = 0
@@ -85,13 +88,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             pass
 
-        for i in SubGradings:
-            print '%s: %s/%s/%s' % (
-            i, self.getNumberOfRocsWithGrade('1', SubGradings[i]), self.getNumberOfRocsWithGrade('2', SubGradings[i]),
-            self.getNumberOfRocsWithGrade('3', SubGradings[i]))
+        if self.verbose or True:
+            print 'SubGradings:'
+            for i in SubGradings:
+                print '%s: %s/%s/%s' % (
+                    i, self.getNumberOfRocsWithGrade('1', SubGradings[i]),
+                    self.getNumberOfRocsWithGrade('2', SubGradings[i]),
+                    self.getNumberOfRocsWithGrade('3', SubGradings[i]))
 
-            # print 'PixelDefects: %s'%SubGradings['PixelDefects']
-        #         print 'A:',self.getNumberOfRocsWithGrade('1',SubGradings['PixelDefects'])
+                # print 'PixelDefects: %s'%SubGradings['PixelDefects']
+        # print 'A:',self.getNumberOfRocsWithGrade('1',SubGradings['PixelDefects'])
         #         print 'B:',self.getNumberOfRocsWithGrade('2',SubGradings['PixelDefects'])
         #         print 'C:',self.getNumberOfRocsWithGrade('3',SubGradings['PixelDefects'])
         # TODO
@@ -140,9 +146,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             '''
 
         nPixelDefectsTotal = 0
-        nPixelDefectsGradeA = self.getNumberOfRocsWithGrade('1', SubGradings['PixelDefects'])
-        nPixelDefectsGradeB = self.getNumberOfRocsWithGrade('2', SubGradings['PixelDefects'])
-        nPixelDefectsGradeC = self.getNumberOfRocsWithGrade('3', SubGradings['PixelDefects'])
+        try:
+            nPixelDefectsGradeA = self.getNumberOfRocsWithGrade('1', SubGradings['PixelDefects'])
+            nPixelDefectsGradeB = self.getNumberOfRocsWithGrade('2', SubGradings['PixelDefects'])
+            nPixelDefectsGradeC = self.getNumberOfRocsWithGrade('3', SubGradings['PixelDefects'])
+        except KeyError as e:
+            print 'Errror', e
+            print SubGradings.keys()
+            raise e
 
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -179,6 +190,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         # needed in summary1
+        if self.verbose:
+            print 'SubGradings of ROCs:'
         for i in SubGradings:
             for Grade in GradeMapping:
                 key = i + 'Grade' + GradeMapping[Grade] + "ROCs"
@@ -190,8 +203,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Value': nRocs,
                     'Label': '%s Grade %s ROCs' % (i, GradeMapping[Grade])
                 }
-                print key, entry
+                if self.verbose:
+                    print key, entry
                 self.ResultData['KeyValueDictPairs'][key] = entry
-                
+
 
 
