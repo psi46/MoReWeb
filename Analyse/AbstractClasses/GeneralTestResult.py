@@ -332,18 +332,18 @@ class GeneralTestResult(object):
                 config.read(fileName)
             try:
                 version = config.get('ROC', 'type')
-            except (KeyError,ConfigParser.ConfigParser.NoOptionError):
+            except (KeyError,ConfigParser.NoOptionError,ConfigParser.NoSectionError):
                 warnings.warn('cannot find version name {section}'.format(section=config.sections()))
                 if 'ROC' in config.sections():
                     warnings.warn('cannot find type in  ROC-section: {options}'.format(options=config.options('ROC')))
                 version = 'none'
             try:
                 nRocs = config.getint('Module', 'rocs')
-            except (KeyError,ConfigParser.NoOptionError):
+            except (KeyError,ConfigParser.NoOptionError,ConfigParser.NoSectionError):
                 nRocs = 0
             try:
                 halfModule = config.get('Module', 'halfModule')
-            except (KeyError,ConfigParser.NoOptionError):
+            except (KeyError,ConfigParser.NoOptionError,ConfigParser.NoSectionError):
                 halfModule = 0
         version = version.rstrip('\n')
         if self.verbose:
