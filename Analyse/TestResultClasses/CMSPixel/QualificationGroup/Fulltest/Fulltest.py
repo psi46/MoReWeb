@@ -6,7 +6,7 @@ import AbstractClasses
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 
 from AbstractClasses.GeneralTestResult import GeneralTestResult
-
+import subprocess
 
 class TestResult(GeneralTestResult):
     def CustomInit(self):
@@ -15,6 +15,7 @@ class TestResult(GeneralTestResult):
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Attributes['NumberOfChips'] = self.nTotalChips
+        self.MergePyxarData()
 
         if self.Attributes['ModuleVersion'] == 1:
             if self.Attributes['ModuleType'] == 'a':
@@ -172,6 +173,14 @@ class TestResult(GeneralTestResult):
             },
         ]
 
+    def MergePyxarData(self):
+        self.check_Test_Software()
+        # raw_input(self.testSoftware)
+        if self.testSoftware != 'pyxar':
+            return
+        print 'You are using pyxar. Trying to merge the subdirectories into one single root file.'
+        subprocess.call(['../scripts/merge_pyxar_output.sh',self.RawTestSessionDataPath])
+
     def OpenFileHandle(self):
         self.check_Test_Software()
         fileHandlePath = self.RawTestSessionDataPath + '/commander_Fulltest.root'
@@ -229,12 +238,24 @@ class TestResult(GeneralTestResult):
     def CustomWriteToDatabase(self, ParentID):
         if self.verbose:
             print 'Write to DB: ',ParentID
+
+        ####
+        for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+            ChipTestResultObject = self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+            ChipNo = ChipTestResultObject.Attributes['ChipNo']
+            # print ChipTestResultObject.ResultData['SubTestResults'].keys()
+            PerformanceParametersTestResultObject =  ChipTestResultObject.ResultData['SubTestResults']['PerformanceParameters']
+            PerformanceParameters = PerformanceParametersTestResultObject.ResultData['KeyValueDictPairs']
+            if self.verbose:
+                for i in PerformanceParameters:
+                    print '\t',ChipNo, i,PerformanceParameters[i]['Value']
+        ####
         CurrentAtVoltage150V = -1
         RecalculatedVoltage = -1
         IVSlope = 0
         if self.ResultData['SubTestResults'].has_key('IVCurve'):
             CurrentAtVoltage150V = 0
-            RecalculatedVoltage = 0
+            # RecalculatedVoltage = 0
             #Check weather there is a recalculated current`
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key(
                     'CurrentAtVoltage150V'):
@@ -252,13 +273,18 @@ class TestResult(GeneralTestResult):
                 IVSlope = float(
                     self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['Variation']['Value'])
         initialCurrent = 0
+
+        try:
+            grade = self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Grade']['Value']
+        except KeyError:
+            grade = 'None'
         print 'fill row'
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
-            'Grade': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Grade']['Value'],
+            'Grade': grade,
             'PixelDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadPixels'][
                 'Value'],
             'ROCsMoreThanOnePercent':
