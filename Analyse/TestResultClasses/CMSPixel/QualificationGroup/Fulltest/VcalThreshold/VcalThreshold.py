@@ -15,14 +15,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ROOT.gStyle.SetOptStat(0);
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", 8*self.nCols, 0., 8*self.nCols, 2*self.nRows, 0., 2*self.nRows); # mThreshold
-
+        ValueList = []
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
             histo = ChipTestResultObject.ResultData['SubTestResults']['VcalThresholdUntrimmed'].ResultData['Plot']['ROOTObject']
             if not histo:
                 print 'cannot get VcalThresholdUntrimmed histo for chip ',ChipTestResultObject.Attributes['ChipNo']
                 continue
-            ValueList = []
+            # ValueList = []
             
             for col in range(self.nCols): # Columns
                 for row in range(self.nRows): # Rows
@@ -47,22 +47,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             mThresholdMax = 255.
 
             if  self.ResultData['Plot']['ROOTObject'].GetMaximum() < mThresholdMax:
-                mThresholdMax = self.ResultData['Plot']['ROOTObject'].GetMaximum();
+                mThresholdMax = self.ResultData['Plot']['ROOTObject'].GetMaximum()
 
             if self.ResultData['Plot']['ROOTObject'].GetMinimum() > mThresholdMin:
-                mThresholdMin = self.ResultData['Plot']['ROOTObject'].GetMinimum();
-            
-            SortedValueList = sorted(ValueList)
-            LowerIndex = int(math.floor(len(SortedValueList)*0.05))
-            UpperIndex = int(math.floor(len(SortedValueList)*0.95))
-            LowerValueList = SortedValueList[0:LowerIndex-1]
-            UpperValueList = SortedValueList[UpperIndex:]
-            if SortedValueList[LowerIndex] > 5.*sum(LowerValueList)/float(len(LowerValueList)):
-            	mThresholdMin = SortedValueList[LowerIndex]*0.1
-            if SortedValueList[UpperIndex]*5. < sum(UpperValueList)/float(len(UpperValueList)):
-            	mThresholdMax = SortedValueList[UpperIndex]*1.1
-            	
-            
+                mThresholdMin = self.ResultData['Plot']['ROOTObject'].GetMinimum()
+            if len(ValueList) > 0:
+                SortedValueList = sorted(ValueList)
+                LowerIndex = int(math.floor(len(SortedValueList)*0.05))
+                UpperIndex = int(math.floor(len(SortedValueList)*0.95))
+                LowerValueList = SortedValueList[0:LowerIndex-1]
+                UpperValueList = SortedValueList[UpperIndex:]
+                if SortedValueList[LowerIndex] > 5.*sum(LowerValueList)/float(len(LowerValueList)):
+                    mThresholdMin = SortedValueList[LowerIndex]*0.1
+                if SortedValueList[UpperIndex]*5. < sum(UpperValueList)/float(len(UpperValueList)):
+                    mThresholdMax = SortedValueList[UpperIndex]*1.1
+
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
