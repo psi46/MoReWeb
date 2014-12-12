@@ -15,7 +15,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         xBins = 8 * self.nCols + 1
         yBins = 2 * self.nRows + 1
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins);  # mBumps
-
+        isDigital = False
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
             isDigital = ChipTestResultObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs'].has_key('Threshold')
