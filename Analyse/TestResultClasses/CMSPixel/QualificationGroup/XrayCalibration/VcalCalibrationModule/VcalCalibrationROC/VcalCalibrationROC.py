@@ -34,7 +34,10 @@ class TestResult(GeneralTestResult):
         n_electrons = array.array('d', [])
         top_parent = self.ParentObject.ParentObject
         trimming = []
-        ignored_targets = map(lambda x: x.strip(),self.HistoDict.get('XrayTargetEnergies','IgnoredTarges').split(','))
+        if self.HistoDict.has_option('XrayTargetEnergies','IgnoredTarges'):
+            ignored_targets = map(lambda x: x.strip().lower(),self.HistoDict.get('XrayTargetEnergies','IgnoredTarges').split(','))
+        else:
+            ignored_targets = []
         print 'Ignoring the following targets: ',ignored_targets
         for test in top_parent.ResultData['SubTestResults']:
             if not "FluorescenceTargetModule" in test:
@@ -49,8 +52,8 @@ class TestResult(GeneralTestResult):
             trim = roc_results.Attributes['TrimValue']
             trimming.append(trim)
             key_value_pairs = roc_results.ResultData['KeyValueDictPairs']
-            target =  key_value_pairs['Target']['Value']
-            if target in ignored_targets:
+            target = key_value_pairs['Target']['Value']
+            if target.lower() in ignored_targets:
                 print 'ignoring Target: ', target
                 continue
             if self.verbose:
