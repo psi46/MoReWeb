@@ -18,10 +18,10 @@ class PH_Fitting():
 
     def __init__(self,fitMode,refit=True,HistoDict = None):
         self.k = 0
-        ROOT.gStyle
+        # ROOT.gStyle
         self.verbose = False
         self.fitMode = fitMode
-        self.refit = refit
+        self.refit = True#refit
         self.DrawHistos = False
         self.vcal = [50,100,150,200,250,30,50,70,90,200];
         self.vcalLow = self.vcal
@@ -32,6 +32,7 @@ class PH_Fitting():
                 self.vcalLow[i] *= self.rangeConversion
         self.InitFit()
         self.InitResultHistos()
+
 
     def getUniqueID(self, name):
         ts = int(time.time() * 1e3)
@@ -211,6 +212,11 @@ class PH_Fitting():
         if self.verbose:
             print '\tLength of Dataset: %s'%len(dataSet)
         # remove header
+        header = dataSet[:4]
+        low_range = [int(i) for i in header[1].strip('\n').split(':')[1].strip().split()]
+        high_range = [int(i) for i in header[2].strip('\n').split(':')[1].strip().split()]
+        high_range_in_low_range = [i* self.rangeConversion for i in high_range]
+        low_range.extend(high_range_in_low_range)
         dataSet = dataSet[4:]
 
         outputFile = open(outputFileName, "w")
@@ -226,13 +232,14 @@ class PH_Fitting():
         for data in dataSet:
             #   2  12  19  29  38  30  62  94 127 232    Pix  0  0
                 calibration = data.split() #dataSet[iCol*self.nRows+iRow].split()
+
             #   [2,12,19,29,38,30,62,94,127,232,Pix,0,0]
-                if len(calibration) != 2*self.vcalSteps +3:
-                    raise Exception ('Length of PHCalibration file does not fit! %s' % calibration)
                 row = int(calibration[-1])
                 column = int(calibration[-2])
-                calibration = calibration [:-3]
+                calibration = calibration[:-3]
                 calibration = [self.convertStringToPH(i) for i in calibration]
+                if len(calibration) != len(low_range):
+                    raise Exception ('Length of PHCalibration file does not fit! %s' % calibration)
                 if self.verbose:
                     print '\t',chip, column,row,":",calibration
                 fitResult = self.Fit(calibration)
