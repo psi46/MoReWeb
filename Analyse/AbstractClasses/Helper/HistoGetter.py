@@ -30,7 +30,7 @@ def get_histo(rootfile,name,rocNo = None):
                 l.append(i)
         if rocNo == None:
             rocNo = 0
-        l = filter(lambda x: 'C{ROC}'.format(ROC=rocNo) in x.GetName(), l)
+        l = filter(lambda x: 'C{ROC}_'.format(ROC=rocNo) in x.GetName(), l)
         if len(l) == 1:
             histo = dir.Get(l[0].GetName())
         elif len(l) > 1:
