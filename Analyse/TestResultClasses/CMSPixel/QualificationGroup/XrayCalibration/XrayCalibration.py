@@ -235,6 +235,9 @@ class TestResult(GeneralTestResult):
         comments = self.ResultData['KeyValueDictPairs'].get('comments', None)
         slope_key = 'VcalCalibrationSlope_' + method
         offset_key = 'VcalCalibrationOffset_' + method
+        chi2_key = 'VcalCalibrationChi2_' + method
+
+
         try:
             avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
                 'avrgSlope']['Value']
@@ -252,6 +255,8 @@ class TestResult(GeneralTestResult):
                 'maxOffset']['Value']
             Offsets = self.ResultData['SubTestResults'][offset_key].ResultData['KeyValueDictPairs'][
                 'Offsets']['Value']
+            Chi2 =self.ResultData['SubTestResults'][chi2_key].ResultData['KeyValueDictPairs'][
+                'chi2']['Value']
         except KeyError, e:
             print self.ResultData['SubTestResults'].keys(), e
             if slope_key in self.ResultData['SubTestResults']:
@@ -267,6 +272,7 @@ class TestResult(GeneralTestResult):
             minOffset = 0
             maxOffset = 0
             Offsets = []
+            Chi2 = []
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
