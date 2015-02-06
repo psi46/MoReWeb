@@ -431,8 +431,7 @@ class TestResult(GeneralTestResult):
 #
 #
 #                you can access it via self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']['Chip'+int(ChipNo)].ResultData['SubTestResults']['DacParameterOverview'].ResultData['SubTestResults']['DacParameters'+int(TrimValue)].ResultData['KeyValueDictPairs']
-
-            #        
+            #
                     
             if (0==0):
                 for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
@@ -445,7 +444,6 @@ class TestResult(GeneralTestResult):
                         DacParameters = DacParameterTestResultObject.ResultData['KeyValueDictPairs']
 
 #CHIP 5 {'VIon': {'Value': '130', 'Label': 'VIon'}, 'VwllSh': {'Value': '35', 'Label': 'VwllSh'}, 'Vcal': {'Value': '199', 'Label': 'Vcal'}, 'VhldDel': {'Value': '160', 'Label': 'VhldDel'}, 'Vtrim': {'Value': '7', 'Label': 'Vtrim'}, 'VthrComp': {'Value': '92', 'Label': 'VthrComp'}, 'VrgPr': {'Value': '0', 'Label': 'VrgPr'}, 'Vleak_comp': {'Value': '0', 'Label': 'Vleak_comp'}, 'Vbias_sf': {'Value': '10', 'Label': 'Vbias_sf'}, 'Vana': {'Value': '128', 'Label': 'Vana'}, 'Vdig': {'Value': '6', 'Label': 'Vdig'}, 'RangeTemp': {'Value': '0', 'Label': 'RangeTemp'}, 'VIbias_PH': {'Value': '220', 'Label': 'VIbias_PH'}, 'VIbias_roc': {'Value': '220', 'Label': 'VIbias_roc'}, 'TrimBits_mu': {'Value': '15.00', 'Label': 'TrimBit Mean'}, 'VIColOr': {'Value': '99', 'Label': 'VIColOr'}, 'VOffsetR0': {'Value': '120', 'Label': 'VOffsetR0'}, 'CalDel': {'Value': '85', 'Label': 'CalDel'}, 'TrimValue': {'Value': '-1', 'Label': 'TrimValue'}, 'VrgSh': {'Value': '0', 'Label': 'VrgSh'}, 'VSumCol': {'Value': '0', 'Label': 'VSumCol'}, 'TrimBits_sigma': {'Value': '0.00', 'Label': 'TrimBit sigma'}, 'VwllPr': {'Value': '35', 'Label': 'VwllPr'}, 'CtrlReg': {'Value': '0', 'Label': 'CtrlReg'}, 'Vnpix': {'Value': '0', 'Label': 'Vnpix'}, 'VIbiasOp': {'Value': '50', 'Label': 'VIbiasOp'}, 'Vcomp': {'Value': '10', 'Label': 'Vcomp'}, 'VIBias_Bus': {'Value': '30', 'Label': 'VIBias_Bus'}, 'Ibias_DAC': {'Value': '36', 'Label': 'Ibias_DAC'}, 'Vsf': {'Value': '150', 'Label': 'Vsf'}, 'VoffsetOp': {'Value': '92', 'Label': 'VoffsetOp'}, 'WBC': {'Value': '100', 'Label': 'WBC'}}
-
 #                        print"PIPPONE",i,j
                         print "INPUT", DacParameters
 
@@ -474,9 +472,7 @@ class TestResult(GeneralTestResult):
                         pdb.insertTestDac(dacparam)
                         print "DAC TEST INSERTED FOR", ChipNo, insertedID, j
 
-
             if (0 ==0):
-
                 for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
                     ChipTestResultObject = self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
                     ChipNo = ChipTestResultObject.Attributes['ChipNo']
@@ -485,8 +481,6 @@ class TestResult(GeneralTestResult):
                     PerformanceParametersTestResultObject =  ChipTestResultObject.ResultData['SubTestResults']['PerformanceParameters']
                     PerformanceParameters = PerformanceParametersTestResultObject.ResultData['KeyValueDictPairs']
 #                    print "PAYLOAD ", PerformanceParameters
-
-
 #PAYLOAD  {'nDeadTrimbits': {'Value': '0', 'Label': ' - Dead Trimbits'}, 'PHCalibrationPedestal_mu': {'Value': '96.65', 'Label': 'PHCalibrationPedestal \xce\xbc'}, 'nDeadPixel': {'Value': '0', 'Label': ' - Dead Pixels'}, 'PHCalibrationPar1_sigma': {'Value': '0.06', 'Label': 'PHCalibrationParameter1 \xcf\x83'}, 'BumpBonding_mu': {'Value': -16.800000000000001, 'Label': 'BumpBonding \xce\xbc'}, 'BumpBonding_threshold': {'Value': -6.1200000000000001, 'Label': 'BumpBonding Threshold'}, 'nMaskDefect': {'Value': '0', 'Label': ' - Mask Defects'}, 'nDeadBumps': {'Value': '0', 'Label': ' - Dead Bumps'}, 'PHCalibrationGain_mu': {'Value': '0.58', 'Label': 'PHCalibrationGain \xce\xbc'}, 'nNoisy1Pixel': {'Value': '0', 'Label': 'Noisy Pixels 1'}, 'nPedDefect': {'Value': '0', 'Label': 'PH Pedestal defects'}, 'BumpBonding_sigma': {'Value': 2.1400000000000001, 'Label': 'BumpBonding \xcf\x83'}, 'ThresholdTrimmed_mu': {'Value': '60.10', 'Label': 'ThresholdTrimmed \xce\xbc'}, 'PHCalibrationGain_sigma': {'Value': '0.02', 'Label': 'PHCalibrationGain \xcf\x83'}, 'PHCalibrationPedestal_sigma': {'Value': '33.73', 'Label': 'PHCalibrationPedestal \xcf\x83'}, 'nPar1Defect': {'Value': '0', 'Label': 'PH Parameter1 Defects'}, 'TrimBits_sigma': {'Value': '1.77', 'Label': 'TrimBits \xcf\x83'}, 'SCurveWidth_mu': {'Value': '121.67', 'Label': 'SCurveWidth \xce\xbc'}, 'TrimBits_mu': {'Value': '9.36', 'Label': 'TrimBits \xce\xbc'}, 'PixelDefectsGrade': {'Value': '1', 'Label': 'Pixel Defects Grade ROC'}, 'ThresholdTrimmed_sigma': {'Value': '1.37', 'Label': 'ThresholdTrimmed \xcf\x83'}, 'PHCalibrationPar1_mu': {'Value': '0.81', 'Label': 'PHCalibrationParameter1 \xce\xbc'}, 'nAddressProblems': {'Value': '0', 'Label': ' - Address Problems'}, 'SCurveWidth_sigma': {'Value': '11.86', 'Label': 'SCurveWidth \xcf\x83'}, 'nNoisy2Pixel': {'Value': '0', 'Label': 'Noisy Pixels 2'}, 'Total': {'Value': '0', 'Label': 'Total'}, 'nThrDefect': {'Value': '0', 'Label': 'Trim Problems'}, 'nGainDefect': {'Value': '0', 'Label': 'PH Gain defects'}}
                     
                     test = Test_PerformanceParameters(
@@ -522,20 +516,12 @@ class TestResult(GeneralTestResult):
                         TrimBits_sigma= PerformanceParameters['TrimBits_sigma']['Value'])
                     pdb.insertTestPerformance(test)
                     print "PERFORMANCE TEST INSERTED FOR", ChipNo, insertedID
-
-
 #                    for i in PerformanceParameters:
 #                        print '\t',ChipNo, i,PerformanceParameters[i]['Value']
-
-
-
 #
 # insert performance parameters
 #                    
 
-
-
-                    
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
