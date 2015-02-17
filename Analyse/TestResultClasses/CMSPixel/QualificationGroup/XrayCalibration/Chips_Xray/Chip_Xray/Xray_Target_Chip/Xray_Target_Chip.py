@@ -7,6 +7,7 @@ from AbstractClasses.GeneralTestResult import GeneralTestResult
 
 class TestResult(GeneralTestResult):
     def CustomInit(self):
+        self.verbose = False
         self.Attributes['ChipNo'] = self.ParentObject.Attributes['ChipNo']
         self.Name = "CMSPixel_QualificationGroup_XrayCalibration_{Method}_Chips_Chip_{ChipNo}_{Target}_Calibration_TestResult".format(
             ChipNo=self.Attributes['ChipNo'],
@@ -51,6 +52,10 @@ class TestResult(GeneralTestResult):
                 print all_targets[i].ResultData['Plot']['ROOTObject']
                 print uniqueID
             self.ResultData['Plot']['ROOTObject'] = all_targets[i].ResultData['Plot']['ROOTObject'].Clone(uniqueID)
+            # print  all_targets[i].ResultData['KeyValueDictPairs'].keys()
+            nhits =  all_targets[i].ResultData['KeyValueDictPairs']['NHits']
+            ntrig =  all_targets[i].ResultData['KeyValueDictPairs']['NTrig']
+            rate =  all_targets[i].ResultData['KeyValueDictPairs']['Rate']
             center = all_targets[i].ResultData['KeyValueDictPairs']['Center']
             n_electrons = all_targets[i].ResultData['KeyValueDictPairs']['TargetNElectrons']
             energy = all_targets[i].ResultData['KeyValueDictPairs']['TargetEnergy']
@@ -69,6 +74,10 @@ class TestResult(GeneralTestResult):
             self.Canvas.SaveAs(self.GetPlotFileName())
         self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-        self.ResultData['KeyList'] = ['Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF']
+        self.ResultData['KeyList'] = ['Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF','Rate','NHits','NTrig']
         self.ResultData['KeyValueDictPairs'] = {'Center': center, 'TargetEnergy': energy,
-                                                'TargetNElectrons': n_electrons, 'Chi2PerNDF': chi2}
+                                                'TargetNElectrons': n_electrons, 'Chi2PerNDF': chi2,'Rate':rate,
+                                                'NHits':nhits,'NTrig':ntrig}
+        if self.verbose:
+            tag = self.Name + ": Done"
+            print "".ljust(len(tag), '=')

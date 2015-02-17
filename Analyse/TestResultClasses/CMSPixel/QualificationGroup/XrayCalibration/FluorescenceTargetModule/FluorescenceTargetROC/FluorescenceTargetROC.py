@@ -297,34 +297,36 @@ class TestResult(GeneralTestResult):
         else:
             target = 'unknown'
         chi2_per_ndf = myfit.GetChisquare() / max(myfit.GetNDF(), 1)
-        self.ResultData['KeyValueDictPairs'] = {
-            'Center': {
-                'Value': round(myfit.GetParameter(3), 2),
-                'Label': 'Center of Peak',
-                'Unit': 'Vcal',
-                'Sigma': round(myfit.GetParError(3), 2),
-            },
-            'TargetEnergy': {
-                'Value': round(targetEnergy, 2),
-                'Label': 'Energy of target %s' % target,
-                'Unit': 'eV',
-            },
-            'TargetNElectrons': {
-                'Value': round(targetNElectrons, 2),
-                'Label': 'Energy of target %s' % target,
-                'Unit': 'nElectrons',
-            },
-            'Chi2PerNDF': {
-                'Value': round(chi2_per_ndf, 2),
-                'Label': 'Chi^2 per NDF',
-                'Unit': ''
-            },
-            'Target': {
-                'Value': target,
-                'Label': 'Target',
-                'Unit': ''
+        self.ResultData['KeyValueDictPairs'].update(
+            {
+                'Center': {
+                    'Value': round(myfit.GetParameter(3), 2),
+                    'Label': 'Center of Peak',
+                    'Unit': 'Vcal',
+                    'Sigma': round(myfit.GetParError(3), 2),
+                },
+                'TargetEnergy': {
+                    'Value': round(targetEnergy, 2),
+                    'Label': 'Energy of target %s' % target,
+                    'Unit': 'eV',
+                },
+                'TargetNElectrons': {
+                    'Value': round(targetNElectrons, 2),
+                    'Label': 'Energy of target %s' % target,
+                    'Unit': 'nElectrons',
+                },
+                'Chi2PerNDF': {
+                    'Value': round(chi2_per_ndf, 2),
+                    'Label': 'Chi^2 per NDF',
+                    'Unit': ''
+                },
+                'Target': {
+                    'Value': target,
+                    'Label': 'Target',
+                    'Unit': ''
+                }
             }
-        }
+        )
         self.ResultData['KeyList'].extend(['Target','Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF'])
         if self.verbose: print self.ResultData
         if self.verbose: print self.ResultData['KeyValueDictPairs']
@@ -439,30 +441,32 @@ class TestResult(GeneralTestResult):
             target = self.Attributes['Target']
         else:
             target = 'unknown'
-        self.ResultData['KeyValueDictPairs'] = {
-            'Center': {
-                'Value': round(histo.GetXaxis().GetBinCenter(histo.GetMaximumBin()), 2),
-                'Label': 'Center of Peak',
-                'Unit': 'Vcal',
-                'Sigma': round(histo.GetRMS(), 2),
-            },
-            'TargetEnergy': {
-                'Value': round(targetEnergy, 2),
-                'Label': 'Energy of target %s' % target,
-                'Unit': 'eV',
-            },
-            'TargetNElectrons': {
-                'Value': round(targetNElectrons, 2),
-                'Label': 'Energy of target %s' % target,
-                'Unit': 'nElectrons',
-            },
-            'Chi2PerNDF': {
-                'Value': round(0, 2),
-                'Label': 'Energy of target %s' % target,
-                'Unit': 'nElectrons',
-            },
+        self.ResultData['KeyValueDictPairs'].update(
+            {
+                'Center': {
+                    'Value': round(histo.GetXaxis().GetBinCenter(histo.GetMaximumBin()), 2),
+                    'Label': 'Center of Peak',
+                    'Unit': 'Vcal',
+                    'Sigma': round(histo.GetRMS(), 2),
+                },
+                'TargetEnergy': {
+                    'Value': round(targetEnergy, 2),
+                    'Label': 'Energy of target %s' % target,
+                    'Unit': 'eV',
+                },
+                'TargetNElectrons': {
+                    'Value': round(targetNElectrons, 2),
+                    'Label': 'Energy of target %s' % target,
+                    'Unit': 'nElectrons',
+                },
+                'Chi2PerNDF': {
+                    'Value': round(0, 2),
+                    'Label': 'Energy of target %s' % target,
+                    'Unit': 'nElectrons',
+                },
 
-        }
+            }
+        )
         self.ResultData['KeyList'].extend(['Center', 'TargetEnergy', 'TargetNElectrons'])
         if self.verbose: print self.ResultData
         if self.verbose: print self.ResultData['KeyValueDictPairs']
@@ -497,7 +501,41 @@ class TestResult(GeneralTestResult):
         if not my_object:
             raise KeyError("couldn't find histname %s" % histname)
         self.ResultData['Plot']['ROOTObject'] = my_object.Clone(self.GetUniqueID())
-
+        #Get Xray Hit Map
+        try:
+            if self.verbose: print '\nget Xray Hit Map'
+            histname = HistoDict.get(self.NameSingle, 'XrayHitMap')
+            if self.verbose: print histname
+            my_object = HistoGetter.get_histo(self.FileHandle, histname, rocNo=self.Attributes["ChipNo"])
+            if self.verbose: print my_object.GetName()
+            if not my_object:
+                raise KeyError("couldn't find histname %s" % histname)
+            self.ResultData['Plot']['ROOTObjectHitMap'] = my_object.Clone(self.GetUniqueID())
+            nhits = self.ResultData['Plot']['ROOTObjectHitMap'].GetEntries()
+            self.ResultData['KeyValueDictPairs']['NHits'] = {'Value':'{0:1.2f}'.format(nhits), 'Label':'N Trig'}
+            self.ResultData['KeyList'].append('NHits')
+            if self.verbose: print self.ResultData['Plot']['ROOTObjectHitMap']
+        except Exception as e:
+            raise e
+        try:
+            # if self.verbose:
+            # print '\nget Xray number of triggers'
+            histname = HistoDict.get(self.NameSingle, 'XrayNtrig')
+            # if self.verbose:
+            my_object = HistoGetter.get_histo(self.FileHandle, histname)
+            if self.verbose: print my_object.GetName()
+            if not my_object:
+                raise KeyError("couldn't find histname %s" % histname)
+            ntrig = my_object.Integral()
+            self.ResultData['KeyValueDictPairs']['NTrig'] = {'Value':'{0:1.2f}'.format(ntrig), 'Label':'N Trig'}
+            self.ResultData['KeyList'].append('NTrig')
+        except Exception as e:
+            raise e
+        if self.ResultData['KeyValueDictPairs'].has_key('NTrig') and self.ResultData['KeyValueDictPairs'].has_key('NHits'):
+            area = HistoDict.getfloat('XrayCalibration','AreaPerROC')
+            rate = nhits/(ntrig*25e-9*area)
+            self.ResultData['KeyValueDictPairs']['Rate'] = {'Value':'{0:1.2f}'.format(rate), 'Label':'Rate','Unit': 'Hz'}
+            self.ResultData['KeyList'].append('Rate')
         if self.ResultData['Plot']['ROOTObject']:
             histo = self.ResultData['Plot']['ROOTObject']
             if self.verbose:
@@ -514,7 +552,6 @@ class TestResult(GeneralTestResult):
                         histo.Rebin()
                     else:
                         break
-                #    histo.Rebin()
 
                 self.FitHistoSpectrum(histo, minX, maxX)
             else:
@@ -549,6 +586,9 @@ class TestResult(GeneralTestResult):
         pass
         if self.verbose:
             print 'done'
+        # print self.ResultData['KeyValueDictPairs']
+        # print self.ResultData['KeyList']
+        # raw_input()
 
 # '''
 # #hg
