@@ -511,12 +511,10 @@ class TestResult(GeneralTestResult):
             if not my_object:
                 raise KeyError("couldn't find histname %s" % histname)
             self.ResultData['Plot']['ROOTObjectHitMap'] = my_object.Clone(self.GetUniqueID())
-            nhits = self.ResultData['Plot']['ROOTObjectHitMap'].GetEntries()
-            self.ResultData['KeyValueDictPairs']['NHits'] = {'Value':'{0:1.2f}'.format(nhits), 'Label':'N Trig'}
-            self.ResultData['KeyList'].append('NHits')
+            nhits = int(self.ResultData['Plot']['ROOTObjectHitMap'].GetEntries())
             if self.verbose: print self.ResultData['Plot']['ROOTObjectHitMap']
         except Exception as e:
-            raise e
+            nhits = 0
         try:
             # if self.verbose:
             # print '\nget Xray number of triggers'
@@ -526,16 +524,9 @@ class TestResult(GeneralTestResult):
             if self.verbose: print my_object.GetName()
             if not my_object:
                 raise KeyError("couldn't find histname %s" % histname)
-            ntrig = my_object.Integral()
-            self.ResultData['KeyValueDictPairs']['NTrig'] = {'Value':'{0:1.2f}'.format(ntrig), 'Label':'N Trig'}
-            self.ResultData['KeyList'].append('NTrig')
+            ntrig = int(my_object.Integral())
         except Exception as e:
-            raise e
-        if self.ResultData['KeyValueDictPairs'].has_key('NTrig') and self.ResultData['KeyValueDictPairs'].has_key('NHits'):
-            area = HistoDict.getfloat('XrayCalibration','AreaPerROC')
-            rate = nhits/(ntrig*25e-9*area)
-            self.ResultData['KeyValueDictPairs']['Rate'] = {'Value':'{0:1.2f}'.format(rate), 'Label':'Rate','Unit': 'Hz'}
-            self.ResultData['KeyList'].append('Rate')
+            ntrig = 0
         if self.ResultData['Plot']['ROOTObject']:
             histo = self.ResultData['Plot']['ROOTObject']
             if self.verbose:
@@ -557,6 +548,18 @@ class TestResult(GeneralTestResult):
             else:
                 self.FitHistoSCurve(histo, minX, maxX)
                 pass
+
+            self.ResultData['KeyValueDictPairs']['NHits'] = {'Value':'{0:d}'.format(nhits), 'Label':'N Hits','Unit':'Hits'}
+            self.ResultData['KeyList'].append('NHits')
+            self.ResultData['KeyValueDictPairs']['NTrig'] = {'Value':'{0:d}'.format(ntrig), 'Label':'N Trig','Unit':'Trigger'}
+            self.ResultData['KeyList'].append('NTrig')
+            area = HistoDict.getfloat('XrayCalibration','AreaPerROC')
+            if area ==0 or ntrig == 0:
+                rate = -1
+            else:
+                rate = nhits/(ntrig*25e-9*area)
+            self.ResultData['KeyValueDictPairs']['Rate'] = {'Value':'{0:1.2f}'.format(rate), 'Label':'Rate','Unit': 'Hz'}
+            self.ResultData['KeyList'].append('Rate')
             #            self.ResultData['Plot']['ROOTObject'].SetTitle("");
             #            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
             #            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0*self.ResultData['Plot']['ROOTObject'].GetMaximum());
