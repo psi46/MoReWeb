@@ -18,26 +18,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print histname
             object = HistoGetter.get_histo(self.ParentObject.FileHandle, histname)
             print object
-            self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ResultData['SubTestResults']['DigitalCurrent'].get_Current_Graph(object)
-            print 'BLA', self.ResultData['Plot']['ROOTObject']
-            self.ResultData['Plot']['Graph'] = object.Clone(self.GetUniqueID())
-            print self.ResultData['Plot']['ROOTObject']
-
-            if self.ResultData['Plot']['ROOTObject']:
-                self.Canvas.Clear()
-                self.ResultData['Plot']['ROOTObject'].SetTitle("")
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Time / s")
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("analog current / A")
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
-                self.ResultData['Plot']['ROOTObject'].Draw('APL')
-            if self.SavePlotFile:
-                print 'SavePlotFile', self.SavePlotFile
-                self.Canvas.SaveAs(self.GetPlotFileName())
-            self.ResultData['Plot']['Enabled'] = 1
-            self.Title = 'Analog Current'
-            self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-            print self.GetPlotFileName()
+            self.ResultData['Plot']['ROOTHisto'] = object
         except Exception as e:
             print e
+            raise e
+        self.ParentObject.ResultData['SubTestResults']['DigitalCurrent'].SpecialPopulateResultData(self,{'name':'Analog Current'})
