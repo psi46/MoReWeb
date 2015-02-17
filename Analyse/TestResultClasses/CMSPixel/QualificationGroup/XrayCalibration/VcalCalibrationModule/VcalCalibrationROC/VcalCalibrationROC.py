@@ -38,7 +38,7 @@ class TestResult(GeneralTestResult):
             ignored_targets = map(lambda x: x.strip().lower(),self.HistoDict.get('XrayCalibration','IgnoredTarges').split(','))
         else:
             ignored_targets = []
-        print 'Ignoring the following targets: ',ignored_targets
+        # print 'Ignoring the following targets: ',ignored_targets
         for test in top_parent.ResultData['SubTestResults']:
             if not "FluorescenceTargetModule" in test:
                 continue
@@ -64,7 +64,7 @@ class TestResult(GeneralTestResult):
             n_electrons.append(key_value_pairs['TargetNElectrons']['Value'])
         point_pairs = zip(peak_centers, n_electrons, peak_errors)
         sorted_points = sorted(point_pairs, key=lambda point: point[1])
-        print sorted_points, trimming
+        # print sorted_points, trimming
         maxTrim = 0
         for e in sorted_points:
             num = sorted_points.index(e)
