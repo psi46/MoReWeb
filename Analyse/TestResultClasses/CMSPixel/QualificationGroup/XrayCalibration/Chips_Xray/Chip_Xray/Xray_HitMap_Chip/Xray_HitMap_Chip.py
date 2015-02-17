@@ -40,8 +40,8 @@ class TestResult(GeneralTestResult):
         if self.verbose:
             print 'Targetlist: ',target
         target = filter(lambda x: x.endswith('C' + str(self.Attributes['ChipNo'])), target)
-        if self.verbose:
-            print 'Target: ',target
+        # if self.verbose:
+        # print 'Target: ',target,len(target)
         for i in target:
             uniqueID = self.GetUniqueID()
             if self.verbose:
@@ -52,6 +52,11 @@ class TestResult(GeneralTestResult):
                 print uniqueID
                 print all_targets[i].ResultData['Plot'].keys()
             self.ResultData['Plot']['ROOTObject'] = all_targets[i].ResultData['Plot']['ROOTObjectHitMap'].Clone(uniqueID)
+            # print i
+            # print all_targets[i].ResultData['KeyValueDictPairs'].keys()
+            rate = all_targets[i].ResultData['KeyValueDictPairs']['Rate']
+            nhits = all_targets[i].ResultData['KeyValueDictPairs']['NHits']
+            ntrigs = all_targets[i].ResultData['KeyValueDictPairs']['NTrig']
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
@@ -68,6 +73,5 @@ class TestResult(GeneralTestResult):
         if self.verbose:
             tag = self.Name + ": Done"
             print "".ljust(len(tag), '=')+'\n'
-        # self.ResultData['KeyList'] = ['Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF']
-        # self.ResultData['KeyValueDictPairs'] = {'Center': center, 'TargetEnergy': energy,
-        #                                         'TargetNElectrons': n_electrons, 'Chi2PerNDF': chi2}
+        self.ResultData['KeyList'] = ['Rate', 'NTrigs', 'NHits']
+        self.ResultData['KeyValueDictPairs'] = {'Rate': rate, 'NTrigs': ntrigs,'NHits':nhits}
