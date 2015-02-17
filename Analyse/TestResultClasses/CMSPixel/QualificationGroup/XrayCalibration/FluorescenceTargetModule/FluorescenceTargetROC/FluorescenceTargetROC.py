@@ -7,6 +7,7 @@ from AbstractClasses.GeneralTestResult import GeneralTestResult
 from ROOT import TFile, TF1, TH1F
 import ConfigParser
 import AbstractClasses.Helper.HistoGetter as HistoGetter
+import math
 
 
 class TestResult(GeneralTestResult):
@@ -550,15 +551,27 @@ class TestResult(GeneralTestResult):
                 pass
 
             self.ResultData['KeyValueDictPairs']['NHits'] = {'Value':'{0:d}'.format(nhits), 'Label':'N Hits','Unit':'Hits'}
-            self.ResultData['KeyList'].append('NHits')
+            # self.ResultData['KeyList'].append('NHits')
             self.ResultData['KeyValueDictPairs']['NTrig'] = {'Value':'{0:d}'.format(ntrig), 'Label':'N Trig','Unit':'Trigger'}
-            self.ResultData['KeyList'].append('NTrig')
+            # self.ResultData['KeyList'].append('NTrig')
             area = HistoDict.getfloat('XrayCalibration','AreaPerROC')
             if area ==0 or ntrig == 0:
                 rate = -1
             else:
                 rate = nhits/(ntrig*25e-9*area)
-            self.ResultData['KeyValueDictPairs']['Rate'] = {'Value':'{0:1.2f}'.format(rate), 'Label':'Rate','Unit': 'Hz'}
+            order = min(int(math.log10(rate))/3,3)
+            rate_divider =  10**(3*order)
+            rate2 = round(rate/rate_divider,1)
+            if order == 0:
+                unit = 'Hz'
+            elif order == 1:
+                unit = 'kHz'
+            elif order == 2:
+                unit = 'MHz'
+            elif order == 3:
+                unit = 'GHz'
+            unit+='/cm^2'
+            self.ResultData['KeyValueDictPairs']['Rate'] = {'Value':'{0:1.2f}'.format(rate2), 'Label':'Rate','Unit': unit}
             self.ResultData['KeyList'].append('Rate')
             #            self.ResultData['Plot']['ROOTObject'].SetTitle("");
             #            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);

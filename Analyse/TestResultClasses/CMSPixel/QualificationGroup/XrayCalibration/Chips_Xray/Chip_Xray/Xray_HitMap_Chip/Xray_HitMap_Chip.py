@@ -59,6 +59,7 @@ class TestResult(GeneralTestResult):
             ntrigs = all_targets[i].ResultData['KeyValueDictPairs']['NTrig']
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
+            self.ResultData['Plot']['ROOTObject'].SetStats(False)
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
             # self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Pulseheight / Vcal")
             # self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("number of entries")

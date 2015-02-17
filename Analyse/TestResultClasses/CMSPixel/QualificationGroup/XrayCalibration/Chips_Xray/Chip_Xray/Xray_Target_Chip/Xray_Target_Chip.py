@@ -74,7 +74,7 @@ class TestResult(GeneralTestResult):
             self.Canvas.SaveAs(self.GetPlotFileName())
         self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-        self.ResultData['KeyList'] = ['Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF','Rate','NHits','NTrig']
+        self.ResultData['KeyList'] = ['Center', 'TargetEnergy', 'TargetNElectrons', 'Chi2PerNDF','Rate']
         self.ResultData['KeyValueDictPairs'] = {'Center': center, 'TargetEnergy': energy,
                                                 'TargetNElectrons': n_electrons, 'Chi2PerNDF': chi2,'Rate':rate,
                                                 'NHits':nhits,'NTrig':ntrig}
