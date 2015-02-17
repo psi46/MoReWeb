@@ -256,7 +256,7 @@ class TestResult(GeneralTestResult):
             Offsets = self.ResultData['SubTestResults'][offset_key].ResultData['KeyValueDictPairs'][
                 'Offsets']['Value']
             Chi2 =self.ResultData['SubTestResults'][chi2_key].ResultData['KeyValueDictPairs'][
-                'chi2']['Value']
+                'chi2s']['Value']
             target_energies = []
         except KeyError, e:
             print self.ResultData['SubTestResults'].keys(), e
