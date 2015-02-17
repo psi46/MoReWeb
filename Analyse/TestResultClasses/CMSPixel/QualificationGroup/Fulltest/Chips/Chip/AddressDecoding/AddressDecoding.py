@@ -20,7 +20,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         histname = self.ParentObject.ParentObject.ParentObject.HistoDict.get(self.NameSingle,'AddressDecoding')
         self.ResultData['Plot']['ROOTObject'] =  HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle,histname,rocNo=ChipNo).Clone(self.GetUniqueID())
 
-
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
