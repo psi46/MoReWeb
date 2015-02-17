@@ -29,8 +29,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def SpecialPopulateResultData(TestResultObject,Parameters):
         try:
             ROOTObject =  TestResultObject.ResultData['Plot']['ROOTHisto']
-            print 'get_Current_Graph'
-            print 'type:',type(ROOTObject)
             times = []
             currents = []
             title = ROOTObject.GetTitle()
