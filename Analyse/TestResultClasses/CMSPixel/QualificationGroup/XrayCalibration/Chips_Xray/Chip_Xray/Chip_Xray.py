@@ -29,7 +29,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 energy = self.ParentObject.ParentObject.ResultData['SubTestResults'][key].Attributes['TargetEnergy']
                 order.append((energy,target_key))
         order = map(lambda x: x[1], sorted(order))
-
+        ntargets = len(filter(lambda i: i['Module'] == 'FluorescenceTargetModule',self.Attributes["SubTestResultDictList"]))
         for i in self.Attributes["SubTestResultDictList"]:
             if i['Module'] == 'FluorescenceTargetModule':
                 target_key = i['InitialAttributes']['StorageKey']
@@ -72,7 +72,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             "Method":i['InitialAttributes']['Method']
                         },
                         "DisplayOptions": {
-                            "Order": len(self.ResultData['SubTestResultDictList'])+2+position,
+                            "Order": ntargets+2+position,
                             "Width": 1
                         }
                     }
@@ -94,7 +94,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                 "Method":method
                             },
                             "DisplayOptions": {
-                                "Order": len(self.ResultData['SubTestResultDictList'])+1,
+                                "Order": ntargets+1,
                                 "Width": 1
                             }
                         }
