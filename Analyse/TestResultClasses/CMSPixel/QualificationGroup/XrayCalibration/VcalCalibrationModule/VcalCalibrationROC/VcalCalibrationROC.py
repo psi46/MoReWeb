@@ -34,8 +34,8 @@ class TestResult(GeneralTestResult):
         n_electrons = array.array('d', [])
         top_parent = self.ParentObject.ParentObject
         trimming = []
-        if self.HistoDict.has_option('XrayTargetEnergies','IgnoredTarges'):
-            ignored_targets = map(lambda x: x.strip().lower(),self.HistoDict.get('XrayTargetEnergies','IgnoredTarges').split(','))
+        if self.HistoDict.has_option('XrayCalibration','IgnoredTarges'):
+            ignored_targets = map(lambda x: x.strip().lower(),self.HistoDict.get('XrayCalibration','IgnoredTarges').split(','))
         else:
             ignored_targets = []
         print 'Ignoring the following targets: ',ignored_targets
@@ -125,7 +125,7 @@ class TestResult(GeneralTestResult):
             print '\tchi2Total ', chi2_total, ' @ NDF ', ndf_total
             print '\tchi2Left  ', chi2_left, ' @ NDF ', ndf_left
             print '\tchi2Right ', chi2_right, ' @ NDF ', ndf_right
-        if ((chi2_right < chi2_total) or (chi2_left < chi2_total)) and ndf_total > 1 and self.HistoDict.get('XrayTargetEnergies','FitOption') != 'all':
+        if ((chi2_right < chi2_total) or (chi2_left < chi2_total)) and ndf_total > 1 and self.HistoDict.get('XrayCalibration','FitOption') != 'all':
             if chi2_right < chi2_left:
                 xmin = max(maxTrim, sorted_peak_centers[1])
                 self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,

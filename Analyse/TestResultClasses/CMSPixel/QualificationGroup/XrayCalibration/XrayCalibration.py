@@ -257,6 +257,7 @@ class TestResult(GeneralTestResult):
                 'Offsets']['Value']
             Chi2 =self.ResultData['SubTestResults'][chi2_key].ResultData['KeyValueDictPairs'][
                 'chi2']['Value']
+            target_energies = []
         except KeyError, e:
             print self.ResultData['SubTestResults'].keys(), e
             if slope_key in self.ResultData['SubTestResults']:
@@ -273,6 +274,7 @@ class TestResult(GeneralTestResult):
             maxOffset = 0
             Offsets = []
             Chi2 = []
+            target_energies = []
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
