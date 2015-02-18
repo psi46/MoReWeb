@@ -42,6 +42,20 @@ class TestResult(GeneralTestResult):
 
         self.ResultData['SubTestResultDictList'] = [
             {
+                'Key': 'DigitalCurrent',
+                'DisplayOptions': {
+                    'Order': 20,
+                    'Width': 2
+                }
+            },
+            {
+                'Key': 'AnalogCurrent',
+                'DisplayOptions': {
+                    'Order': 21,
+                    'Width': 2
+                }
+            },
+            {
                 'Key': 'Fitting',
                 'DisplayOptions': {
                     'GroupWithNext': False,
@@ -57,7 +71,7 @@ class TestResult(GeneralTestResult):
                 'DisplayOptions': {
                     'GroupWithNext': False,
                     'Width': 2,
-                    'Order': 20,
+                    'Order': 25,
                 },
             },
             {
@@ -78,7 +92,6 @@ class TestResult(GeneralTestResult):
                     'Order': 5,
                 }
             },
-
             {
                 'Key': 'VcalThreshold',
                 'DisplayOptions': {
