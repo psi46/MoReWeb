@@ -369,9 +369,9 @@ class TestResult(GeneralTestResult):
 
             ##
             for ChipNo in range(self.nRocs):
-                Key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
+                Key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=ChipNo)
                 VcalChipTestResultObject = \
-                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['SubTestResults'][i]
+                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['SubTestResults'][Key]
                 VcalParameters = VcalChipTestResultObject.ResultData['KeyValueDictPairs']
                 VcalSlope = VcalParameters['Slope']['Value']
                 VcalOffest = VcalParameters['Offset']['Value']
