@@ -369,10 +369,11 @@ class TestResult(GeneralTestResult):
 
             ##
             for ChipNo in range(self.nRocs):
-                Key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
-                VcalChipTestResultObject = \
-                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['SubTestResults'][i]
-                VcalParameters = VcalChipTestResultObject.ResultData['KeyValueDictPairs']
+                # print 'ChipNo',ChipNo
+                key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=ChipNo)
+                VcalTargetROCTestResult = \
+                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['SubTestResults'][key]
+                VcalParameters = VcalTargetROCTestResult.ResultData['KeyValueDictPairs']
                 VcalSlope = VcalParameters['Slope']['Value']
                 VcalOffest = VcalParameters['Offset']['Value']
                 VcalChi2 = VcalParameters['chi2']['Value']
@@ -381,15 +382,22 @@ class TestResult(GeneralTestResult):
                 VcalTargetData = {}
                 ROCTargetKey = "FluorescenceTarget_C{ROC}".format(ROC=ChipNo)
                 for j in self.ResultData['SubTestResultDictList']:
+                    # print j
                     if j['Module'] == 'FluorescenceTargetModule':
                         if j['TestResultObject'].ResultData['SubTestResults'].has_key(ROCTargetKey):
-                            VcalTargetROCTestResult = j['TestResultObject'].ResultData['SubTestResults'][ROCTargetKey]
-                            VcalTargetData[VcalTargetROCTestResult.Attributes['Target']] = {
-                                'Center': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center'],
-                                #Center of Peak [Vcal],
-                                'Rate': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Rate']
-                                #Measured target hit rate [Vcal],
-                            }
+                            try:
+                                # print '\tTArget',ChipNo,VcalTargetROCTestResult.Attributes['Target']
+                                VcalTargetROCTestResult = j['TestResultObject'].ResultData['SubTestResults'][ROCTargetKey]
+                                VcalTargetData[VcalTargetROCTestResult.Attributes['Target']] = {
+                                    'Center': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center'],
+                                    #Center of Peak [Vcal],
+                                    'Rate': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Rate']
+                                    #Measured target hit rate [Vcal],
+                                }
+                            except Exception as e:
+                                print '\nERROR',e
+                                raw_input()
+                                raise e
                             #test = Test_PerformanceParameters(
                             #    FULLMODULEANALYSISTEST_ID = insertedID, #### beware this is an analysis!
                             #    ROC_POS = ChipNo,
