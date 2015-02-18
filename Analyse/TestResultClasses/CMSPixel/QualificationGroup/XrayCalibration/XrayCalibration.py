@@ -387,7 +387,7 @@ class TestResult(GeneralTestResult):
                             VcalTargetData[VcalTargetROCTestResult.Attributes['Target']] = {
                                 'Center': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center'],
                                 #Center of Peak [Vcal],
-                                'Rate': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center']
+                                'Rate': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Rate']
                                 #Measured target hit rate [Vcal],
                             }
                             #test = Test_PerformanceParameters(
