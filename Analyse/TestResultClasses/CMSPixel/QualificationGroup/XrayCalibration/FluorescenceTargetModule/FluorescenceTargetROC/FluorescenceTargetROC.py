@@ -549,7 +549,6 @@ class TestResult(GeneralTestResult):
             else:
                 self.FitHistoSCurve(histo, minX, maxX)
                 pass
-
             self.ResultData['KeyValueDictPairs']['NHits'] = {'Value':'{0:d}'.format(nhits), 'Label':'N Hits','Unit':'Hits'}
             # self.ResultData['KeyList'].append('NHits')
             self.ResultData['KeyValueDictPairs']['NTrig'] = {'Value':'{0:d}'.format(ntrig), 'Label':'N Trig','Unit':'Trigger'}
@@ -570,7 +569,7 @@ class TestResult(GeneralTestResult):
                 unit = 'MHz'
             elif order == 3:
                 unit = 'GHz'
-            unit+='/cm^2'
+            unit+='/cm²'
             self.ResultData['KeyValueDictPairs']['Rate'] = {'Value':'{0:1.2f}'.format(rate2), 'Label':'Rate','Unit': unit}
             self.ResultData['KeyList'].append('Rate')
             #            self.ResultData['Plot']['ROOTObject'].SetTitle("");
