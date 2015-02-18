@@ -20,7 +20,7 @@ class TestResult(GeneralTestResult):
         self.Attributes["ModuleVersion"] = self.version
         self.Attributes['StartChip'] = 0
         self.Attributes['TargetNames'] = []
-        
+
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')
@@ -161,7 +161,7 @@ class TestResult(GeneralTestResult):
             }
         )
         # print self.ResultData["SubTestResultDictList"][-1]["DisplayOptions"]['Order'], \
-        #     self.ResultData["SubTestResultDictList"][-1]['Key']
+        # self.ResultData["SubTestResultDictList"][-1]['Key']
         self.ResultData["SubTestResultDictList"].append(
             {
                 "Key": "VcalCalibrationChi2_" + self.Attributes['Method'],
@@ -240,7 +240,6 @@ class TestResult(GeneralTestResult):
         offset_key = 'VcalCalibrationOffset_' + method
         chi2_key = 'VcalCalibrationChi2_' + method
 
-
         try:
             avrgSlope = self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'][
                 'avrgSlope']['Value']
@@ -258,7 +257,7 @@ class TestResult(GeneralTestResult):
                 'maxOffset']['Value']
             Offsets = self.ResultData['SubTestResults'][offset_key].ResultData['KeyValueDictPairs'][
                 'Offsets']['Value']
-            Chi2 =self.ResultData['SubTestResults'][chi2_key].ResultData['KeyValueDictPairs'][
+            Chi2 = self.ResultData['SubTestResults'][chi2_key].ResultData['KeyValueDictPairs'][
                 'chi2s']['Value']
             target_energies = []
         except KeyError, e:
@@ -316,15 +315,19 @@ class TestResult(GeneralTestResult):
             'nCycles': None,
             'CycleTempLow': None,
             'CycleTempHigh': None,
-            
-            #Vcalibration Module
-            'Vcal_Slope_Module':self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['KeyValueDictPairs']['avrg_Slope']['Value'],
-            'Vcal_Offset_Module':self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['KeyValueDictPairs']['avrg_Slope']['Value']
+
+            # Vcalibration Module
+            'Vcal_Slope_Module':
+                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['KeyValueDictPairs'][
+                    'avrg_Slope']['Value'],
+            'Vcal_Offset_Module':
+                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['KeyValueDictPairs'][
+                    'avrg_Slope']['Value'],
             #'Grade':self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Grade']['Value']
             ##TODO: target hit rates, grade
-            
+
             #
-            
+
 
             # added by Tommaso
             'TestCenter': self.Attributes['TestCenter'],
@@ -332,17 +335,15 @@ class TestResult(GeneralTestResult):
             'Operator': self.Attributes['Operator'],
             #
         }
-        
-        #VCal target hit rates
+
+        # VCal target hit rates
         VcalTargetData = {}
-            for j in self.ResultData['SubTestResultDictList']:
-                if j['Module'] == 'FluorescenceTargetModule':
-                        VcalTargetTestResult = j['TestResultObject']
-                        VcalTargetData[VcalTargetTestResult.Attributes['Target']] = {
-                            #'Rate':VcalTargetTestResult.ResultData['KeyValueDictPairs']['Rate'] #Measured target hit rate [Vcal],
-                        }
-            
-        
+        for j in self.ResultData['SubTestResultDictList']:
+            if j['Module'] == 'FluorescenceTargetModule':
+                VcalTargetTestResult = j['TestResultObject']
+                VcalTargetData[VcalTargetTestResult.Attributes['Target']] = {
+                    #'Rate':VcalTargetTestResult.ResultData['KeyValueDictPairs']['Rate'] #Measured target hit rate [Vcal],
+                }
 
         print 'fill row end'
         # TODO: Please check if uplaod to DB is ok in this way...
@@ -363,39 +364,41 @@ class TestResult(GeneralTestResult):
             print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
             print "--------------------"
             pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
-            insertedID=pp.TEST_ID
-            
-            
+            insertedID = pp.TEST_ID
+
+
             ##
             for ChipNo in range(self.nRocs):
-                    Key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
-                    VcalChipTestResultObject = self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['SubTestResults'][i]
-                    VcalParameters = VcalChipTestResultObject.ResultData['KeyValueDictPairs']
-                    VcalSlope = VcalParameters['Slope']['Value']
-                    VcalOffest = VcalParameters['Offset']['Value']
-                    VcalChi2 = VcalParameters['chi2']['Value']
-                    ROCGrade = -1
-                    
-                    VcalTargetData = {}
-                    ROCTargetKey = "FluorescenceTarget_C{ROC}".format(ROC=ChipNo)
-                    for j in self.ResultData['SubTestResultDictList']:
-                        if j['Module'] == 'FluorescenceTargetModule':
-                            if j['TestResultObject'].ResultData['SubTestResults'].has_key(ROCTargetKey):
-                                VcalTargetROCTestResult = j['TestResultObject'].ResultData['SubTestResults'][ROCTargetKey]
-                                VcalTargetData[VcalTargetROCTestResult.Attributes['Target']] = {
-                                    'Center':VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center'] #Center of Peak [Vcal],
-                                    'Rate':VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center'] #Measured target hit rate [Vcal],
-                                }
-                    
-                    #test = Test_PerformanceParameters(
-                    #    FULLMODULEANALYSISTEST_ID = insertedID, #### beware this is an analysis!
-                    #    ROC_POS = ChipNo,
-                    #    Total = PerformanceParameters['Total']['Value'], 
-                    #    nDeadPixel  = PerformanceParameters['nDeadPixel']['Value'],
-                    #    )
-                    #pdb.insertTestPerformance(test)
-                    #print "PERFORMANCE TEST INSERTED FOR", ChipNo, insertedID
-            
+                Key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
+                VcalChipTestResultObject = \
+                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['SubTestResults'][i]
+                VcalParameters = VcalChipTestResultObject.ResultData['KeyValueDictPairs']
+                VcalSlope = VcalParameters['Slope']['Value']
+                VcalOffest = VcalParameters['Offset']['Value']
+                VcalChi2 = VcalParameters['chi2']['Value']
+                ROCGrade = -1
+
+                VcalTargetData = {}
+                ROCTargetKey = "FluorescenceTarget_C{ROC}".format(ROC=ChipNo)
+                for j in self.ResultData['SubTestResultDictList']:
+                    if j['Module'] == 'FluorescenceTargetModule':
+                        if j['TestResultObject'].ResultData['SubTestResults'].has_key(ROCTargetKey):
+                            VcalTargetROCTestResult = j['TestResultObject'].ResultData['SubTestResults'][ROCTargetKey]
+                            VcalTargetData[VcalTargetROCTestResult.Attributes['Target']] = {
+                                'Center': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center'],
+                                #Center of Peak [Vcal],
+                                'Rate': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center']
+                                #Measured target hit rate [Vcal],
+                            }
+                            #test = Test_PerformanceParameters(
+                            #    FULLMODULEANALYSISTEST_ID = insertedID, #### beware this is an analysis!
+                            #    ROC_POS = ChipNo,
+                            #    Total = PerformanceParameters['Total']['Value'],
+                            #    nDeadPixel  = PerformanceParameters['nDeadPixel']['Value'],
+                            #    )
+                            #pdb.insertTestPerformance(test)
+                            #print "PERFORMANCE TEST INSERTED FOR", ChipNo, insertedID
+
             if pp is None:
                 print "INSERTION FAILED!"
                 sys.exit(31)
