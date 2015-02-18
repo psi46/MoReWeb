@@ -347,7 +347,8 @@ class TestResult(GeneralTestResult):
 
         print 'fill row end'
         # TODO: Please check if uplaod to DB is ok in this way...
-        if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal'] and False:
+        if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
+	    print "Global DB"
             from PixelDB import *
             # modified by Tommaso
             #
@@ -361,23 +362,27 @@ class TestResult(GeneralTestResult):
             s = Session(CENTER, OPERATOR)
             pdb.insertSession(s)
             print "--------------------"
-            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
+            print "INSERTING XRAY INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
             print "--------------------"
-            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
-            insertedID = pp.TEST_ID
+            anai = pdb.insertTestXRayVCal(s.SESSION_ID, Row)
+            if anai is None:
+		  print "INSERTION of MODULE PART FAILED!"
+  	          sys.exit(33)
+ 
+            insertedID =anai.TEST_ID
+            procID =anai.PROCESSING_ID
+            insertedFMID =anai.FULLMODULETEST_ID
 
 
             ##
             for ChipNo in range(self.nRocs):
-                Key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
-                VcalChipTestResultObject = \
-                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['SubTestResults'][i]
+                Key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=ChipNo)
+                VcalChipTestResultObject = self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['SubTestResults'][Key]
                 VcalParameters = VcalChipTestResultObject.ResultData['KeyValueDictPairs']
                 VcalSlope = VcalParameters['Slope']['Value']
                 VcalOffest = VcalParameters['Offset']['Value']
                 VcalChi2 = VcalParameters['chi2']['Value']
                 ROCGrade = -1
-
                 VcalTargetData = {}
                 ROCTargetKey = "FluorescenceTarget_C{ROC}".format(ROC=ChipNo)
                 for j in self.ResultData['SubTestResultDictList']:
@@ -387,19 +392,32 @@ class TestResult(GeneralTestResult):
                             VcalTargetData[VcalTargetROCTestResult.Attributes['Target']] = {
                                 'Center': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center'],
                                 #Center of Peak [Vcal],
-                                'Rate': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center']
+                                'Rate': VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Rate']
                                 #Measured target hit rate [Vcal],
                             }
-                            #test = Test_PerformanceParameters(
-                            #    FULLMODULEANALYSISTEST_ID = insertedID, #### beware this is an analysis!
-                            #    ROC_POS = ChipNo,
-                            #    Total = PerformanceParameters['Total']['Value'],
-                            #    nDeadPixel  = PerformanceParameters['nDeadPixel']['Value'],
-                            #    )
-                            #pdb.insertTestPerformance(test)
-                            #print "PERFORMANCE TEST INSERTED FOR", ChipNo, insertedID
+			    print "target",VcalTargetROCTestResult.Attributes['Target']
+			    print VcalSlope,VcalOffest,VcalChi2,VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Rate'],VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center'],ROCGrade,ChipNo
+			    test = Test_FullModule_XRay_Vcal_Roc_Analysis(
+			    		SESSION_ID=s.SESSION_ID,
+			   	 	FULLMODULETEST_ID=insertedFMID,
+			    		DATA_ID=0,
+			    		TARGET=VcalTargetROCTestResult.Attributes['Target'],
+					PROCESSING_ID=procID,
+					MACRO_VERSION=Row["MacroVersion"], 
+					SLOPE=VcalSlope,
+					OFFSET=VcalOffest,
+					CHi2NDF=VcalChi2,
+					TARGET_HIT_RATE= VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Rate']['Value'],
+					TARGET_PEAK_ENERGY=VcalTargetROCTestResult.ResultData['KeyValueDictPairs']['Center']['Value'],
+					GRADE=ROCGrade,
+					ROC_POS=ChipNo,
+					TEST_XRAY_VCAL_MODULE_ID=insertedID,
+		            		COMMENT="")
 
-            if pp is None:
+                            ti=pdb.insertObject(test)
+                            print "XRAY VCAL per ROC INSERTED FOR", ChipNo, ti.TEST_ID
+
+            if anai is None:
                 print "INSERTION FAILED!"
                 sys.exit(31)
 
