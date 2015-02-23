@@ -468,7 +468,7 @@ class TestResult(GeneralTestResult):
                             VANA = DacParameters['vana']['Value'], 
                             VSH = DacParameters['vsh']['Value'],
                             VCOMP = DacParameters['vcomp']['Value'],
-                            VCAL = DacParameters['Vcal']['Value'],
+                            VCAL = DacParameters['vcal']['Value'],
                             VWLLPR = DacParameters['vwllpr']['Value'],
                             VWLLSH = DacParameters['vwllsh']['Value'],
                             VTRIM = DacParameters['vtrim']['Value'],
