@@ -359,7 +359,7 @@ class TestResult(GeneralTestResult):
             pdb.connectToDB()
             OPERATOR = os.environ['PIXEL_OPERATOR']
             CENTER = os.environ['PIXEL_CENTER']
-            s = Session(CENTER, OPERATOR)
+	    s = Session(CENTER, OPERATOR,DATE=datetime.fromtimestamp(float(Row["TestDate"])))
             pdb.insertSession(s)
             print "--------------------"
             print "INSERTING XRAY INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
