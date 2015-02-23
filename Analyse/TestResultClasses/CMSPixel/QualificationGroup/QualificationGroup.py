@@ -290,10 +290,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.appendOperationDetails(tests[-1]['InitialAttributes']['SubTestResultDictList'])
         xray_test = copy.deepcopy(tests[-1])
         xray_test2 = copy.deepcopy(tests[-1])
-        tests[-1] = self.set_analysis_method(xray_test,'Spectrum')
+        self.check_Test_Software()
+        if self.HistoDict.getboolean('XrayCalibration','SpectrumMethod'):
+            tests[-1] = self.set_analysis_method(xray_test,'Spectrum')
         self.check_Test_Software()
         print 'softwareVersion:',self.testSoftware
-        if self.testSoftware == 'pxar':
+        if self.testSoftware == 'pxar' and self.HistoDict.getboolean('XrayCalibration','SCurveMethod'):
             xray_test2 = self.set_analysis_method(xray_test2,'SCurve')
             tests.append(xray_test2)
         for i in tests:

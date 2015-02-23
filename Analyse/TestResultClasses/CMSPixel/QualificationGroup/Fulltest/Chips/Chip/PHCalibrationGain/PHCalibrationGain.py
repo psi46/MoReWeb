@@ -12,6 +12,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_PHCalibrationGain_TestResult'
         self.NameSingle = 'PHCalibrationGain'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        self.verbose = False
 
     def fill_histograms(self):
         Directory = self.RawTestSessionDataPath
@@ -24,6 +25,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # PHCalibrationFitFile.seek(2*200) # omit the first 400 bytes
         if not PHCalibrationFitFile:
+            warnings.warn('Cannot find File')
             return False
 
         # for (int i = 0 i < 2 i++) fgets(string, 200, phLinearFile)
@@ -56,6 +58,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     col = int(Parameters[-2])
                     par2 = float(Parameters[2])
                     par3 = float(Parameters[3])
+                    if self.verbose:
+                        print '%2d %2d: %5f %5f '%(row,col,par2,par3)
                     if abs(par2) < 1e-10:  # dead pixels have par2 == 0.
                         n_dead_pixels += 1
                     else:

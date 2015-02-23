@@ -1,6 +1,6 @@
 
 import ROOT
-
+verbose = False
 def get_histo(rootfile,name,rocNo = None):
     histoname = name
     if rocNo !=None:
@@ -15,7 +15,7 @@ def get_histo(rootfile,name,rocNo = None):
         raise TypeError('Cannot use %s as a ROOT TFile'%type(rootfile))
     dir = rootfile
     for  i in histoname:
-        if histoname.index(i)==len(histoname)-1:
+        if histoname.index(i) == len(histoname) - 1:
             break
         dir = dir.Get(i)
         if dir==None:
@@ -23,14 +23,23 @@ def get_histo(rootfile,name,rocNo = None):
     if dir == None:
         return None
     histo = dir.Get(histoname[-1])
-    if name.startswith('Xray.q_'):
+    if not histo:
+        if verbose and 'Xray.' not in name:
+            dir.GetListOfKeys().Print()
+            raw_input('Cannot find key: %s'%histoname)
+    if name.startswith('Xray.q_') or not histo:
         l = []
+        if verbose: print 'FIND: ',name,histoname
+        l = []
+        key = histoname[-1].split('_')[0]+'_'
+        if verbose: print 'KEY: ',key
         for i in dir.GetListOfKeys():
-            if i.GetName().startswith('q_'):
+            if i.GetName().startswith(key):
                 l.append(i)
-        if rocNo == None:
-            rocNo = 0
-        l = filter(lambda x: 'C{ROC}'.format(ROC=rocNo) in x.GetName(), l)
+        if verbose: print l
+        if rocNo != None:
+            # rocNo = 0
+            l = filter(lambda x: 'C{ROC}_'.format(ROC=rocNo) in x.GetName(), l)
         if len(l) == 1:
             histo = dir.Get(l[0].GetName())
         elif len(l) > 1:

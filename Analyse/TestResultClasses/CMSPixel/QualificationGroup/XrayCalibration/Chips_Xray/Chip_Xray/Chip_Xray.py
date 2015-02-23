@@ -29,7 +29,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 energy = self.ParentObject.ParentObject.ResultData['SubTestResults'][key].Attributes['TargetEnergy']
                 order.append((energy,target_key))
         order = map(lambda x: x[1], sorted(order))
-
+        ntargets = len(filter(lambda i: i['Module'] == 'FluorescenceTargetModule',self.Attributes["SubTestResultDictList"]))
         for i in self.Attributes["SubTestResultDictList"]:
             if i['Module'] == 'FluorescenceTargetModule':
                 target_key = i['InitialAttributes']['StorageKey']
@@ -57,6 +57,26 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         }
                     }
                 )
+                key = 'Xray_HitMap_{Method}_Chip{Chip}'.format(Method = i['InitialAttributes']['Method'], Chip = self.Attributes['ChipNo'] )
+                self.ResultData['SubTestResultDictList'].append(
+                    {
+                        "Key": key,
+                        "Module": "Xray_HitMap_Chip",
+                        "InitialAttributes": {
+                            "StorageKey": key,
+                            "TestResultSubDirectory": ".",
+                            "IncludeIVCurve": False,
+                            "ModuleVersion": self.Attributes["ModuleVersion"],
+                            'target_key': target_key,
+                            "Target": target,
+                            "Method":i['InitialAttributes']['Method']
+                        },
+                        "DisplayOptions": {
+                            "Order": ntargets+2+position,
+                            "Width": 1
+                        }
+                    }
+                )
         for method in methods:
             key = 'Xray_Calibration_{Method}_Chip{Chip}'.format(Method = method, Chip = self.Attributes['ChipNo'] )
             target_key = 'VcalCalibrationModule'
@@ -70,10 +90,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                 "IncludeIVCurve": False,
                                 "ModuleVersion": self.Attributes["ModuleVersion"],
                                 'target_key': target_key,
+                                "Target": target,
                                 "Method":method
                             },
                             "DisplayOptions": {
-                                "Order": len(self.ResultData['SubTestResultDictList'])+1,
+                                "Order": ntargets+1,
                                 "Width": 1
                             }
                         }

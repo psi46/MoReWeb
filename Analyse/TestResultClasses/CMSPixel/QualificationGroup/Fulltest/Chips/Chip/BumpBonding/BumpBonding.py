@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import ROOT
-
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 
@@ -19,7 +18,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['nSigma'] = {'Value': -1, 'Label': 'σ'}
             self.ResultData['KeyValueDictPairs']['nBumpBondingProblems'] = {'Value': round(-1, 0),
                                                                             'Label': 'N BumpProblems'}
-
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0)
