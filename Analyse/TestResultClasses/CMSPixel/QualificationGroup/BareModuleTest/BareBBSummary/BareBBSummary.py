@@ -26,33 +26,26 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print '---------------------',ChipTestResultObject.Attributes['ChipNo']
             for col in range(self.nCols): # Columns
                 for row in range(self.nRows): # Rows
-                    roc = ChipTestResultObject.Attributes['ChipNo'];
-                    mcol = 52*(roc%8) + col;
-                    mrow = row;
+                    #roc = ChipTestResultObject.Attributes['ChipNo'];
+                    #mcol = 52*(roc%8) + col;
+                    #mrow = row;
+                    #
+                    #if ChipTestResultObject.Attributes['ChipNo'] > 7:
+                    #    mcol = 415 - mcol;
+                    #    mrow = 159 - row;
+                    #
+                    #self.ResultData['Plot']['ROOTObject'].SetBinContent(mcol+1, mrow+1, histo.GetBinContent(col + 1, row + 1))
+                    if ChipTestResultObject.Attributes['ChipNo'] < 8:
+                        tmpCol = 8*self.nCols-(ChipTestResultObject.Attributes['ChipNo']*self.nCols+col)
+                        tmpRow = 2*self.nRows-row
+                    else:
+                        tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*self.nCols+col)+1
+                        tmpRow = row+1
+                    if ChipTestResultObject.Attributes['ChipNo'] < 8:
+                        #tmpRow += self.nRows
+                        pass
+                    self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, histo.GetBinContent(col + 1, row + 1))
                     
-                    if ChipTestResultObject.Attributes['ChipNo'] > 7:
-                        mcol = 415 - mcol;
-                        mrow = 159 - row;
-
-                    #if ChipTestResultObject.Attributes['ChipNo'] == 15:
-                    #print '',col,row,mcol+1,mrow+1,histo.GetBinContent(col + 1, row + 1);
-
-
-                    self.ResultData['Plot']['ROOTObject'].SetBinContent(mcol+1, mrow+1, histo.GetBinContent(col + 1, row + 1))
-                    #if ChipTestResultObject.Attributes['ChipNo'] < 8:
-                    #    tmpCol = 8*self.nCols-(ChipTestResultObject.Attributes['ChipNo']*self.nCols+col)
-                    #    tmpRow = 2*self.nRows-row
-                    #else:
-                    #    tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*self.nCols+col)+1
-                    #    tmpRow = row+1
-                    #if ChipTestResultObject.Attributes['ChipNo'] < 8:
-                    #    #tmpRow += self.nRows
-                    #    pass
-                    ## Get the data from the chip sub test result VcalThresholdUntrimmed
-
-                    #self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, histo.GetBinContent(col + 1, row + 1))
-                    
-
 
         if self.ResultData['Plot']['ROOTObject']:
             mThresholdMin = 0.
