@@ -1,6 +1,8 @@
 import ROOT
+import json
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 import AbstractClasses
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_BareModuleTest_Chips_Chip_BareBBMap_TestResult'
@@ -11,7 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #self.DeadBumpList = set()
         #self.AddressProblemList = set()
         self.chipNo = self.ParentObject.Attributes['ChipNo']
-
+        self.myBumpDict = {}
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0);
@@ -76,12 +78,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             if iBegin == 0:
                                 iBegin = ybin; # begin of plateau
                         
-                    if iEnd - iBegin < 33: #hard-coded CUT
+                    if iEnd - iBegin < 35: #hard-coded CUT
                         ++nMissing;
                         print 'Missing Bump at raw col:', int(ibinCenter/80), int(ibinCenter%80);
                         # with weight 2 to draw it as red
                         self.ResultData['Plot']['ROOTObject'].SetBinContent( int(ibinCenter/80)+1, int(ibinCenter%80)+1, 2. );
-                        self.MissingBumpList.add((self.chipNo,int(ibinCenter/80)+1,int(ibinCenter%80)+1));
+                        self.MissingBumpList.add((self.chipNo,int(ibinCenter/80),int(ibinCenter%80)));
                         #self.ResultData['Plot']['ROOTObject'].SetBinContent( int(ibinCenter/80)+1, int(ibinCenter%80)+1, int(iEnd-iBegin) );
                         #print 'Content?',self.ResultData['Plot']['ROOTObject'].GetBinContent( int(ibinCenter/80), int(ibinCenter%80) );
 
@@ -100,12 +102,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0.,2.);
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
-            self.ResultData['KeyValueDictPairs']['DeadBumps'] = { 'Value':self.DeadBumpList, 'Label':'Dead Bumps'}
+            self.ResultData['KeyValueDictPairs']['DeadBumps'] = { 'Value':self.DeadBumpList, 'Label':'Dead Bumps'}            
             self.ResultData['KeyValueDictPairs']['NDeadBumps'] = { 'Value':len(self.DeadBumpList), 'Label':'N Dead Bumps'}
-            self.ResultData['KeyList'].append('NDeadBumps')
-            self.ResultData['KeyValueDictPairs']['MissingBumps'] = { 'Value':self.MissingBumpList, 'Label':'Missing Bumps'}
+            self.ResultData['KeyList'].append('NDeadBumps')            
+            self.ResultData['KeyValueDictPairs']['MissingBumps'] = { 'Value':self.MissingBumpList, 'Label':'Missing Bumps'}            
             self.ResultData['KeyValueDictPairs']['NMissingBumps'] = { 'Value':len(self.MissingBumpList), 'Label':'N Missing Bumps'}
             self.ResultData['KeyList'].append('NMissingBumps')
+
             #print 'Binning: ',self.nCols,self.nRows
             #for column in range(self.nCols): #Column
             #    for row in range(self.nRows): #Row
