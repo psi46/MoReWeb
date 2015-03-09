@@ -391,6 +391,7 @@ class GeneralTestResult(object):
         self.SetCanvasSize()
         try:
             self.PopulateResultData()
+            self.SaveCanvas()
             self.check_for_comments()
         except Exception as inst:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -485,11 +486,20 @@ class GeneralTestResult(object):
     # self.Canvas.Update()
 
     '''
+        Saving the Canvas
+    '''
+    def SaveCanvas(self):
+        if self.SavePlotFile:
+            if self.Canvas:
+                self.Canvas.SaveAs(self.GetPlotFileName())
+                self.Canvas.SaveAs(self.GetPlotFileName('root'))
+    '''
         Generate the filename including the full path to the plot file according to the format
     '''
 
-    def GetPlotFileName(self):
-        Suffix = self.ResultData['Plot']['Format']
+    def GetPlotFileName(self,Suffix=''):
+        if Suffix = '':
+            Suffix = self.ResultData['Plot']['Format']
         return self.FinalResultsStoragePath + '/' + self.NameSingle + '.' + Suffix
 
     '''
