@@ -498,7 +498,7 @@ class GeneralTestResult(object):
     '''
 
     def GetPlotFileName(self,Suffix=''):
-        if Suffix = '':
+        if Suffix == '':
             Suffix = self.ResultData['Plot']['Format']
         return self.FinalResultsStoragePath + '/' + self.NameSingle + '.' + Suffix
 
