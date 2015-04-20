@@ -79,7 +79,13 @@ else:
     GlobalFinalResultsPath = ''
 print 'GlobalFinalResultsPath: "%s"'%GlobalFinalResultsPath
 if GlobalFinalResultsPath!= '' and not os.path.exists(GlobalFinalResultsPath):
-    os.makedirs(GlobalFinalResultsPath)
+    try :
+	    os.makedirs(GlobalFinalResultsPath)
+    except: #it could be created by another instance running in parallel
+	    if not os.path.exists(GlobalFinalResultsPath) :
+			raise
+	    else :
+		print "Kind of magic, they made the dir for me while I was checking" 
 
 SQLiteDBPath = GlobalOverviewPath + '/ModuleResultDB.sqlite'
 ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
