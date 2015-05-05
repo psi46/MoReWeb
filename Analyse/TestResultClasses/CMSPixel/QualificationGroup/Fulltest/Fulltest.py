@@ -265,6 +265,7 @@ class TestResult(GeneralTestResult):
         ####
         IVCurveData = {
         	'CurrentAtVoltage150V':-1,
+        	'CurrentAtVoltage100V':-1,
         	'RecalculatedVoltage':-1,
         	'IVSlope':0,
         	'IVCurveFilePath':'',
@@ -280,6 +281,11 @@ class TestResult(GeneralTestResult):
                     'CurrentAtVoltage150V'):
                 IVCurveData['CurrentAtVoltage150V'] = float(
                     IVCurveTestResultData['KeyValueDictPairs']['CurrentAtVoltage150V'][
+                        'Value'])
+            if IVCurveTestResultData['KeyValueDictPairs'].has_key(
+                    'CurrentAtVoltage100V'):
+                IVCurveData['CurrentAtVoltage100V'] = float(
+                    IVCurveTestResultData['KeyValueDictPairs']['CurrentAtVoltage100V'][
                         'Value'])
             if IVCurveTestResultData['KeyValueDictPairs'].has_key(
                     'recalculatedCurrentAtVoltage150V'):
