@@ -504,7 +504,7 @@ class GeneralTestResult(object):
                 for Suffix in self.ResultData['Plot']['AdditionalFormats']:
                 	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
                 	if Suffix == 'pdf':
-                		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName()
+                		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName(Suffix)
                 self.ResultData['Plot']['Enabled'] = 1
                 self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''
