@@ -181,7 +181,7 @@ class TestResult(GeneralTestResult):
                 i += 1
 
         IVCurveFile.close()
-        self.ResultData['HiddenData']['IVData'] = {
+        self.ResultData['HiddenData']['IVCurveData'] = {
         	'VoltageList':Voltage_List,
         	'CurrentList':Current_List
         }
