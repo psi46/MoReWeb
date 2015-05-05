@@ -70,15 +70,18 @@ class GeneralTestResult(object):
         self.Enabled = True
         self.SavePlotFile = True
         self.GzipSVG = TestResultEnvironmentObject.Configuration['GzipSVG']
+        
         self.DefaultImageFormat = TestResultEnvironmentObject.Configuration['DefaultImageFormat'].strip().lower()
         if TestResultEnvironmentObject.Configuration.has_key('AdditionalImageFormats'):
             self.AdditionalImageFormats = TestResultEnvironmentObject.Configuration['AdditionalImageFormats'].strip().lower().split(',')
         else:
         	self.AdditionalImageFormats = ['root', 'pdf']
+        	
         if TestResultEnvironmentObject.Configuration.has_key('OverviewHTMLLink'):
             self.OverviewHTMLLink = TestResultEnvironmentObject.Configuration['OverviewHTMLLink']
         else:
             self.OverviewHTMLLink = None
+            
         # Path for current test to folder with root-files
         self.RawTestSessionDataPath = ''
 
