@@ -10,8 +10,7 @@ You can find further information on the Twiki Page
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/MoReWeb
 
 
-Contributors
-==
+## Contributors
 * Felix Bachmair
 * Esteban Marín
 * Philip Eller
