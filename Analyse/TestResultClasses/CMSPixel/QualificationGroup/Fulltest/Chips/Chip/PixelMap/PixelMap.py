@@ -65,12 +65,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Pixel Map: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+        
     def CheckPixelAlive(self):
         for column in range(self.nCols): #Column
             for row in range(self.nRows): #Row

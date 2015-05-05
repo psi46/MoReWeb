@@ -39,8 +39,6 @@ class TestResult(GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Trim Bit Map'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        

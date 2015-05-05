@@ -115,6 +115,7 @@ class GeneralTestResult(object):
                 'Caption': '',
                 'ImageFile': '',
                 'Format': self.DefaultImageFormat  # svg
+                'AdditionalFormats':['root','pdf'],
             },
             # SubTest Results
             'SubTestResults': {},
@@ -492,7 +493,10 @@ class GeneralTestResult(object):
         if self.SavePlotFile:
             if self.Canvas:
                 self.Canvas.SaveAs(self.GetPlotFileName())
-                self.Canvas.SaveAs(self.GetPlotFileName('root'))
+                for Suffix in self.ResultData['Plot']['AdditionalFormats']:
+                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
+                self.ResultData['Plot']['Enabled'] = 1
+                self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''
         Generate the filename including the full path to the plot file according to the format
     '''

@@ -27,6 +27,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             PlotContent = f.write(PlotContent)
             f.close()
             
-        self.ResultData['Plot']['Enabled'] = 1
         self.Title = 'Address Levels: C{ChipNo}'.format(ChipNo=self.Attributes['ChipNo'])
+        self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()

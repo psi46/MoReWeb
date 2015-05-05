@@ -66,11 +66,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
 
-            if self.SavePlotFile:
-                self.Canvas.SaveAs(self.GetPlotFileName())
-                self.ResultData['Plot']['Enabled'] = 1
-                self.Title = 'Bare BBWidth: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-                self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+            self.Title = 'Bare BBWidth: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+            self.SaveCanvas()
 #        self.ResultData['KeyValueDictPairs']['AddressDecodingProblems'] = {'Value':self.AddressProblemList, 'Label':'Address Decoding Problems', }
 #        self.ResultData['KeyValueDictPairs']['NAddressDecodingProblems'] = {'Value':len(self.AddressProblemList), 'Label':'N Address DecodingProblems', }
 #        self.ResultData['KeyList'].append('NAddressDecodingProblems')

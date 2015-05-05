@@ -72,12 +72,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].SaveAs(self.GetPlotFileName() + '.cpp')
 
         self.ResultData['Plot']['ROOTObject2'] = self.ResultData['Plot']['ROOTObject'].Clone(self.GetUniqueID())
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
+        self.SaveCanvas()
 
-        self.ResultData['Plot']['Enabled'] = 1
         self.Title = 'Bump Bonding Problems: C{ChipNo}'.format(ChipNo=self.chipNo)
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
         self.ResultData['KeyValueDictPairs']['DeadBumps']['Value'] = self.DeadBumpList
         self.ResultData['KeyValueDictPairs']['NDeadBumps']['Value'] = len(self.DeadBumpList)
         self.ResultData['KeyList'].append('NDeadBumps')

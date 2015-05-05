@@ -40,12 +40,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             #            for column in range(self.nCols): #Column
             #                for row in range(self.nRows): #Row
             #                    self.HasAddressDecodingProblem(column, row)
-
-        
-            if self.SavePlotFile:
-                self.ResultData['Plot']['Format'] = 'png'
-                self.Canvas.SaveAs(self.GetPlotFileName())
-                self.ResultData['Plot']['Enabled'] = 1
-                self.Title = 'Bare BBScan: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-                self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+            
+            self.Title = 'Bare BBScan: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+                
+            
+			self.ResultData['Plot']['Format'] = 'png'
+			self.SaveCanvas()
+			
 

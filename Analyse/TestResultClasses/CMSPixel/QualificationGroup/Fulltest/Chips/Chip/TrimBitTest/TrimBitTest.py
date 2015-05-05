@@ -61,8 +61,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Legend.Draw()
 
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Trim Bit Test'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        

@@ -162,10 +162,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if over:
                 self.ResultData['KeyValueDictPairs']['over'] = {'Value': '{0:1.2f}'.format(over), 'Label': '>='}
                 self.ResultData['KeyList'].append('over')
-            if self.SavePlotFile:
-                self.Canvas.SaveAs(self.GetPlotFileName())
-            self.ResultData['Plot']['Enabled'] = 1
-            self.ResultData['Plot']['Caption'] = 'PH Calibration: Gain (Vcal/ADC)'
-            self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+                
+            self.SaveCanvas()
+			self.ResultData['Plot']['Caption'] = 'PH Calibration: Gain (Vcal/ADC)'
             ROOT.gPad.SetLogy(0)
 

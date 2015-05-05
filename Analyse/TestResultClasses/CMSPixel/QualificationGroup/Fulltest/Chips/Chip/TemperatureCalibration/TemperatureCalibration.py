@@ -28,12 +28,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw("A*");
 
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Address Levels: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+        
     def analyse(self, directoryName, chipId)
         tl = ROOT.TLatex()
 

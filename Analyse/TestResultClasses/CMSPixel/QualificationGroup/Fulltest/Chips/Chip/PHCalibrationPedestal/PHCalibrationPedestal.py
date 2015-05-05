@@ -110,12 +110,9 @@ class TestResult(GeneralTestResult):
         line2.SetLineWidth(3)
         line2.SetLineStyle(2)
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'PH Calibration: Pedestal (Vcal)'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+        
         self.ResultData['KeyValueDictPairs'] = {
             'N': {
                 'Value': '{0:1.0f}'.format(IntegralPedestal),

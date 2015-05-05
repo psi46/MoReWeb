@@ -260,9 +260,6 @@ class TestResult(GeneralTestResult):
         }
         self.ResultData['KeyList'] = ['Temperature', 'Duration']
         self.createTemperaturePlot()
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Temperature'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+        

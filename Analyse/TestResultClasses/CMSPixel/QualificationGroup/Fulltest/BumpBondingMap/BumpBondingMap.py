@@ -90,13 +90,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['Format'] = 'png'
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        #self.Canvas.SaveAs(self.GetPlotFileName()+'.root')
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Bump Bonding Map'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+        
     def UpdatePlot(self, chipNo, col, row, value):
         result = value
         if chipNo < 8:

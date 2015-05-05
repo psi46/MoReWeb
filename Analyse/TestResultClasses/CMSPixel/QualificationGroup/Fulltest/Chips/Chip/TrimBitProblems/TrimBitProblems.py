@@ -46,11 +46,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
 
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Trim Bit Problems'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
         self.ResultData['KeyValueDictPairs'] = {
             'DeadTrimbits': {
                 'Value':self.DeadTrimbitsList,

@@ -57,11 +57,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
         self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
         self.ResultData['Plot']['ROOTObject'].Draw()
-        if self.SavePlotFile:
-             self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+        self.SaveCanvas()
+        
         #self.ResultData["KeyValueDictPairs"] = {
         #    "Rate" : {
         #        "Value" : 0,

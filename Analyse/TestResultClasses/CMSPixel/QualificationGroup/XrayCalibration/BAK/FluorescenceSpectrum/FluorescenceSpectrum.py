@@ -309,16 +309,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle('number of entries #')
             self.ResultData['Plot']['ROOTObject'].Draw();
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         if self.Attributes.has_key('Target'):
             self.Title = 'Fluorescence Spectrum for %s'%(self.Attributes['Target'])
         else:
             self.Title = 'Fluorescence Spectrum'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-        pass
-
+        
 #        '''
 #		#hg
 #		self.ResultData['Plot']['ROOTObject_hGain'] = ROOT.TH1D(self.GetUniqueID(), "", 300, -2.0, 5.5)  # hGain
