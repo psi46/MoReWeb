@@ -71,6 +71,10 @@ class GeneralTestResult(object):
         self.SavePlotFile = True
         self.GzipSVG = TestResultEnvironmentObject.Configuration['GzipSVG']
         self.DefaultImageFormat = TestResultEnvironmentObject.Configuration['DefaultImageFormat'].strip().lower()
+        if TestResultEnvironmentObject.Configuration.has_key('AdditionalImageFormats'):
+            self.AdditionalImageFormats = TestResultEnvironmentObject.Configuration['AdditionalImageFormats'].strip().lower().split(',')
+        else:
+        	self.AdditionalImageFormats = ['root', 'pdf']
         if TestResultEnvironmentObject.Configuration.has_key('OverviewHTMLLink'):
             self.OverviewHTMLLink = TestResultEnvironmentObject.Configuration['OverviewHTMLLink']
         else:
@@ -115,7 +119,8 @@ class GeneralTestResult(object):
                 'Caption': '',
                 'ImageFile': '',
                 'Format': self.DefaultImageFormat,
-                'AdditionalFormats':['root','pdf'],
+                'AdditionalFormats':self.AdditionalImageFormats,
+                'ImageFilePDF':'',
             },
             # SubTest Results
             'SubTestResults': {},
@@ -495,6 +500,8 @@ class GeneralTestResult(object):
                 self.Canvas.SaveAs(self.GetPlotFileName())
                 for Suffix in self.ResultData['Plot']['AdditionalFormats']:
                 	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
+                	if Suffix == 'pdf':
+                		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName()
                 self.ResultData['Plot']['Enabled'] = 1
                 self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''
@@ -743,6 +750,8 @@ class GeneralTestResult(object):
                     {
                         '###FILENAME###': HtmlParser.MaskHTML(
                             RecursionRelativePath + os.path.basename(TestResultObject.ResultData['Plot']['ImageFile'])),
+                        '###PDFFILENAME###': HtmlParser.MaskHTML(
+                            RecursionRelativePath + os.path.basename(TestResultObject.ResultData['Plot']['ImageFilePDF'])),
                         '###IMAGELARGECONTAINERID###': HtmlParser.MaskHTML(
                             TestResultObject.Name + '_' + TestResultObject.Key),
                         '###MARGIN_TOP###': str(int(-800. / float(
