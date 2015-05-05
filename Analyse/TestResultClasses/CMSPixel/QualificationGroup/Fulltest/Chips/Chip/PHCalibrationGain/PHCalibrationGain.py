@@ -164,6 +164,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['KeyList'].append('over')
                 
             self.SaveCanvas()
-			self.ResultData['Plot']['Caption'] = 'PH Calibration: Gain (Vcal/ADC)'
+            self.ResultData['Plot']['Caption'] = 'PH Calibration: Gain (Vcal/ADC)'
             ROOT.gPad.SetLogy(0)
 

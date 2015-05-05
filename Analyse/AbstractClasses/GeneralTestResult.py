@@ -114,7 +114,7 @@ class GeneralTestResult(object):
                 'ROOTObject': None,
                 'Caption': '',
                 'ImageFile': '',
-                'Format': self.DefaultImageFormat  # svg
+                'Format': self.DefaultImageFormat,
                 'AdditionalFormats':['root','pdf'],
             },
             # SubTest Results
