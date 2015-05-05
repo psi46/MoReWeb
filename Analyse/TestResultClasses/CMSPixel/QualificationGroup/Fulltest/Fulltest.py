@@ -272,7 +272,7 @@ class TestResult(GeneralTestResult):
         }
         
         if self.ResultData['SubTestResults'].has_key('IVCurve'):
-        	IVCurveTestResultData = self.ResultData['SubTestResults']['IVCurve'].ResultData
+            IVCurveTestResultData = self.ResultData['SubTestResults']['IVCurve'].ResultData
             IVCurveData['CurrentAtVoltage150V'] = 0
             # RecalculatedVoltage = 0
             #Check weather there is a recalculated current`
