@@ -8,3 +8,14 @@ It can analyse the output of the following readout softwares:
  
 You can find further information on the Twiki Page
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/MoReWeb
+
+
+== Contributors ==
+* Felix Bachmair
+* Esteban Marín
+* Philip Eller
+* Vittorio Tavolaro
+* Andrea Rizzi
+* Tommaso Boccali
+* Andrea Vargas Trevino
+* Martin Lipinski
