@@ -11,11 +11,11 @@ https://twiki.cern.ch/twiki/bin/viewauth/CMS/MoReWeb
 
 
 ## Contributors
-* Felix Bachmair
-* Esteban Marín
-* Philipp Eller
-* Vittorio Tavolaro
-* Andrea Rizzi
-* Tommaso Boccali
-* Andrea Vargas Trevino
-* Martin Lipinski
+* Felix Bachmair @veloxid
+* Esteban Marín @macjohnny
+* Philipp Eller @philippeller
+* Vittorio Tavolaro @vtavolar
+* Andrea Rizzi @arizzi
+* Tommaso Boccali @tommasoboccali
+* Andrea Vargas Trevino @andreavargas
+* Martin Lipinski 
