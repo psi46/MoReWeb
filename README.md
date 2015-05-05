@@ -13,7 +13,7 @@ https://twiki.cern.ch/twiki/bin/viewauth/CMS/MoReWeb
 ## Contributors
 * Felix Bachmair
 * Esteban Marín
-* Philip Eller
+* Philipp Eller
 * Vittorio Tavolaro
 * Andrea Rizzi
 * Tommaso Boccali
