@@ -270,6 +270,10 @@ class TestResult(GeneralTestResult):
         	'IVSlope':0,
         	'IVCurveFilePath':'',
         	'TestTemperature':'',
+        	'IVCurveData':{
+        		'VoltageList':[],
+        		'CurrentList':[]
+        	}
         }
         
         if self.ResultData['SubTestResults'].has_key('IVCurve'):
@@ -302,6 +306,8 @@ class TestResult(GeneralTestResult):
             	IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
             if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
             	IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
+            if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
+            	IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
             	
         initialCurrent = 0
 
@@ -329,6 +335,9 @@ class TestResult(GeneralTestResult):
             'CurrentAtVoltage150V': IVCurveData['CurrentAtVoltage150V'],
             'RecalculatedVoltage': IVCurveData['RecalculatedVoltage'],
             'IVSlope': IVCurveData['IVSlope'],
+            'CurrentAtVoltage100V':IVCurveData['CurrentAtVoltage100V'],
+        	'IVCurveFilePath':IVCurveData['IVCurveFilePath'],
+        	'TestTemperature':IVCurveData['TestTemperature'],
             'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][
                 'Value'],
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
