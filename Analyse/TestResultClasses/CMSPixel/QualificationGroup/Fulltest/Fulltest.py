@@ -263,28 +263,40 @@ class TestResult(GeneralTestResult):
                 for i in PerformanceParameters:
                     print '\t',ChipNo, i,PerformanceParameters[i]['Value']
         ####
-        CurrentAtVoltage150V = -1
-        RecalculatedVoltage = -1
-        IVSlope = 0
+        IVCurveData = {
+        	'CurrentAtVoltage150V':-1,
+        	'RecalculatedVoltage':-1,
+        	'IVSlope':0,
+        	'IVCurveFilePath':'',
+        	'TestTemperature':'',
+        }
+        
         if self.ResultData['SubTestResults'].has_key('IVCurve'):
-            CurrentAtVoltage150V = 0
+        	IVCurveTestResultData = self.ResultData['SubTestResults']['IVCurve'].ResultData
+            IVCurveData['CurrentAtVoltage150V'] = 0
             # RecalculatedVoltage = 0
             #Check weather there is a recalculated current`
-            if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key(
+            if IVCurveTestResultData['KeyValueDictPairs'].has_key(
                     'CurrentAtVoltage150V'):
-                CurrentAtVoltage150V = float(
-                    self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'][
+                IVCurveData['CurrentAtVoltage150V'] = float(
+                    IVCurveTestResultData['KeyValueDictPairs']['CurrentAtVoltage150V'][
                         'Value'])
-            if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key(
+            if IVCurveTestResultData['KeyValueDictPairs'].has_key(
                     'recalculatedCurrentAtVoltage150V'):
-                RecalculatedVoltage = float(
-                    self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'][
+                IVCurveData['RecalculatedVoltage'] = float(
+                    IVCurveTestResultData['KeyValueDictPairs'][
                         'recalculatedCurrentAtVoltage150V']['Value'])
             else:
-                RecalculatedVoltage = CurrentAtVoltage150V
-            if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key('Variation'):
-                IVSlope = float(
-                    self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['Variation']['Value'])
+                IVCurveData['RecalculatedVoltage'] = IVCurveData['CurrentAtVoltage150V']
+            if IVCurveTestResultData['KeyValueDictPairs'].has_key('Variation'):
+                IVCurveData['IVSlope'] = float(
+                    IVCurveTestResultData['KeyValueDictPairs']['Variation']['Value'])
+            
+            if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
+            	IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
+            if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
+            	IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
+            	
         initialCurrent = 0
 
         try:
@@ -308,9 +320,9 @@ class TestResult(GeneralTestResult):
                 'Value'],
             'PHCalibration':
                 self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
-            'CurrentAtVoltage150V': CurrentAtVoltage150V,
-            'RecalculatedVoltage': RecalculatedVoltage,
-            'IVSlope': IVSlope,
+            'CurrentAtVoltage150V': IVCurveData['CurrentAtVoltage150V'],
+            'RecalculatedVoltage': IVCurveData['RecalculatedVoltage'],
+            'IVSlope': IVCurveData['IVSlope'],
             'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][
                 'Value'],
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,

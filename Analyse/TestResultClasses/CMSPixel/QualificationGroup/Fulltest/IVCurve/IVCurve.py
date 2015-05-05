@@ -117,6 +117,11 @@ class TestResult(GeneralTestResult):
 
         IVCurveFileName = "{Directory}/ivCurve.log".format(Directory=Directory)
         IVCurveFile = open(IVCurveFileName, "r")
+        
+        self.ResultData['HiddenData']['IVCurveFilePath'] = IVCurveFileName
+        self.ResultData['HiddenData']['TestTemperature'] = self.ParentObject.Attributes['TestTemperature']
+        
+        
 
         lines = IVCurveFile.readlines()
         lines = [line.replace('\n', '') for line in lines]
