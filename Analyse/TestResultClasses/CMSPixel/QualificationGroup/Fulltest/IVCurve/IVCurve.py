@@ -185,6 +185,8 @@ class TestResult(GeneralTestResult):
         	'VoltageList':Voltage_List,
         	'CurrentList':Current_List
         }
+        self.ResultData['HiddenData']['CurrentAtVoltage100V'] = CurrentAtVoltage100V
+        
         if CurrentAtVoltage100V != 0.:
             Variation = CurrentAtVoltage150V / CurrentAtVoltage100V
         else:
