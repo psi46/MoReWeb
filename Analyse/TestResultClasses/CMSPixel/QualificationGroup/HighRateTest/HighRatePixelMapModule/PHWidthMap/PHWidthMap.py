@@ -58,7 +58,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # Add the histogram to the result of this test
         self.ResultData['Plot']['ROOTObject'] = hist
         self.ResultData['Plot']['ROOTObject'].Draw("colz")
-        if self.SavePlotFile:
-             self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        self.SaveCanvas()
+        

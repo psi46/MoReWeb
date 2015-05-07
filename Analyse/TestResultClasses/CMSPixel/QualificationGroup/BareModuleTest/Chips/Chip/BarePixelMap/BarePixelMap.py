@@ -74,8 +74,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['KeyValueDictPairs']['DeadPixels'] = {'Value':self.DeadPixelList, 'Label':'Dead Pixels'}
                     self.ResultData['KeyValueDictPairs']['NDeadPixels'] = { 'Value':len(self.DeadPixelList), 'Label':'N Dead Pixels'}
 
-                    if self.SavePlotFile:
-                        self.Canvas.SaveAs(self.GetPlotFileName())
-                        self.ResultData['Plot']['Enabled'] = 1
-                        self.Title = 'BarePixelMap: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-                        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+                    self.Title = 'BarePixelMap: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+                    self.SaveCanvas()

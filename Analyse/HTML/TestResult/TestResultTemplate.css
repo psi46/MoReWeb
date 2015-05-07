@@ -171,6 +171,7 @@
 	}
 	#Page #ContentWrap #Content .ResultData .Plot .LargeImageContainer .ImageTitle
 	{
+		
 		position:absolute;
 		width:100%;
 		text-align:center;
@@ -180,6 +181,17 @@
 		/*max-width:90%;
 		max-height:90%;*/
 		width:800px;
+	}
+	#Page #ContentWrap #Content .ResultData .Plot .LargeImageContainer .PDFLink
+	{
+		position:absolute;
+		display:block;
+		right:0px;
+		bottom:0px;
+		z-index:10;
+		padding:10px;
+		cursor:pointer;
+		background:#fff;
 	}
 	#Page #ContentWrap #Content .ResultData .Plot .LargeImageContainer .OpenInNewWindowLinkWrap
 	{
