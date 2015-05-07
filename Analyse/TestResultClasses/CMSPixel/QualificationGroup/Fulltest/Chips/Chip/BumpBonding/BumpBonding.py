@@ -66,11 +66,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.Cut.SetLineColor(ROOT.kRed)
             self.Cut.Draw('PL')
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Bump Bonding: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
         self.ResultData['KeyValueDictPairs']['Mean']['Value'] = round(mean, 2)
         self.ResultData['KeyList'].append('Mean')
         self.ResultData['KeyValueDictPairs']['RMS']['Value'] = round(rms, 2)

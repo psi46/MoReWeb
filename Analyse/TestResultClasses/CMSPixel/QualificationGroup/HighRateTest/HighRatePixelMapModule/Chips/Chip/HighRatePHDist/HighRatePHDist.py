@@ -40,6 +40,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(2.5)
         self.ResultData['Plot']['ROOTObject'].Draw()
         if self.SavePlotFile:
-             self.Canvas.SaveAs(self.GetPlotFileName())
+             self.SaveCanvas()
         self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()

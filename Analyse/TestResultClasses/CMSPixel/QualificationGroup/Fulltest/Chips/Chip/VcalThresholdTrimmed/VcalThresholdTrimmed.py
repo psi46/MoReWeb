@@ -114,11 +114,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 for row in range(self.nRows):  # Row
                     self.HasThresholdDefect(column, row)
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Vcal Threshold Trimmed'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
         self.ResultData['KeyValueDictPairs']['TrimProblems'] = { 'Value':self.ThrDefectList, 'Label':'Trim Problems'}
         self.ResultData['KeyValueDictPairs']['NTrimProblems'] = { 'Value':len(self.ThrDefectList), 'Label':'N Trim Problems'}
         self.ResultData['KeyList'].append('NTrimProblems')

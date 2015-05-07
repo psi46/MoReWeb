@@ -22,9 +22,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw("colz")
         else:
             raise Exception('PHCalibrationGainMap - ROOT Object does not exists!')
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'PH Calibration Gain Map'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        
 #

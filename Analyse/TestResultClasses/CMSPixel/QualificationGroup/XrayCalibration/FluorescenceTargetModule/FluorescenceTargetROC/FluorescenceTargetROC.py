@@ -590,15 +590,11 @@ class TestResult(GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle('number of entries #')
             self.ResultData['Plot']['ROOTObject'].Draw()
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         if self.Attributes.has_key('Target'):
             self.Title = '%s Spectrum ROC %i' % (self.Attributes['Target'], self.Attributes['ChipNo'])
         else:
             self.Title = 'Spectrum ROC %i' % (self.Attributes['ChipNo'])
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-        pass
         if self.verbose:
             print 'done'
         # print self.ResultData['KeyValueDictPairs']

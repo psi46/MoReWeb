@@ -52,10 +52,7 @@ class TestResult(GeneralTestResult):
         if self.verbose:
             print self.ResultData['KeyValueDictPairs']
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
+        self.SaveCanvas()
 
-        self.ResultData['Plot']['Enabled'] = 1
         self.ResultData['Plot']['Caption'] = 'Parameter1'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
         ROOT.gPad.SetLogy(0)

@@ -231,9 +231,7 @@ class TestResult(GeneralTestResult):
                 recalculatedCurrentAtVoltage150V)
             self.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation']['Value'] = '{0:1.2f}'.format(
                 recalculatedCurrentVariation)
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'I-V-Curve'
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
         if self.verbose:
