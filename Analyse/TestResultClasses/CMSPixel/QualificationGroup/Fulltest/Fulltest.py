@@ -286,6 +286,7 @@ class TestResult(GeneralTestResult):
                 IVCurveData['CurrentAtVoltage150V'] = float(
                     IVCurveTestResultData['KeyValueDictPairs']['CurrentAtVoltage150V'][
                         'Value'])
+                IVCurveData['CurrentAtVoltage150V'] *= IVCurveTestResultData['KeyValueDictPairs']['CurrentAtVoltage150V'].get('Factor',1)
             if IVCurveTestResultData['HiddenData'].has_key(
                     'CurrentAtVoltage100V'):
                 IVCurveData['CurrentAtVoltage100V'] = float(
@@ -295,6 +296,8 @@ class TestResult(GeneralTestResult):
                 IVCurveData['RecalculatedVoltage'] = float(
                     IVCurveTestResultData['KeyValueDictPairs'][
                         'recalculatedCurrentAtVoltage150V']['Value'])
+                RecalculatedVoltage *= self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V'].get('Factor',1)
+
             else:
                 IVCurveData['RecalculatedVoltage'] = IVCurveData['CurrentAtVoltage150V']
             if IVCurveTestResultData['KeyValueDictPairs'].has_key('Variation'):
