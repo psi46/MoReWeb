@@ -400,7 +400,7 @@ class GeneralTestResult(object):
         self.SetCanvasSize()
         try:
             self.PopulateResultData()
-            self.SaveCanvas()
+            #self.SaveCanvas()
             self.check_for_comments()
         except Exception as inst:
             exc_type, exc_obj, exc_tb = sys.exc_info()
