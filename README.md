@@ -18,4 +18,4 @@ https://twiki.cern.ch/twiki/bin/viewauth/CMS/MoReWeb
 * Andrea Rizzi @arizzi
 * Tommaso Boccali @tommasoboccali
 * Andrea Vargas Trevino @andreavargas
-* Martin Lipinski 
+* Martin Lipinski  @martinlip
