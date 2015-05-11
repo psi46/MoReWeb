@@ -91,7 +91,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             TestResultObject.ResultData['Plot']['ImageFile'] = TestResultObject.GetPlotFileName()
             print TestResultObject.GetPlotFileName()
             TestResultObject.Title = 'Digital Current'
-            self.SaveCanvas()
+            TestResultObject.SaveCanvas()
 
         except Exception as e:
             print e
