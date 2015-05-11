@@ -497,18 +497,16 @@ class GeneralTestResult(object):
     '''
         Saving the Canvas
     '''
-    def SaveCanvas(self, TestResultObject=None):
-    	if TestResultObject == None:
-    		TestResultObject = self
-        if TestResultObject.SavePlotFile:
-            if TestResultObject.Canvas:
-                TestResultObject.Canvas.SaveAs(self.GetPlotFileName())
-                for Suffix in TestResultObject.ResultData['Plot']['AdditionalFormats']:
-                	TestResultObject.Canvas.SaveAs(TestResultObject.GetPlotFileName(Suffix))
+    def SaveCanvas(self):
+        if self.SavePlotFile:
+            if self.Canvas:
+                self.Canvas.SaveAs(self.GetPlotFileName())
+                for Suffix in self.ResultData['Plot']['AdditionalFormats']:
+                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
                 	if Suffix == 'pdf':
-                		TestResultObject.ResultData['Plot']['ImageFilePDF'] = TestResultObject.GetPlotFileName(Suffix)
-                TestResultObject.ResultData['Plot']['Enabled'] = 1
-                TestResultObject.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+                		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName(Suffix)
+                self.ResultData['Plot']['Enabled'] = 1
+                self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''
         Generate the filename including the full path to the plot file according to the format
     '''
