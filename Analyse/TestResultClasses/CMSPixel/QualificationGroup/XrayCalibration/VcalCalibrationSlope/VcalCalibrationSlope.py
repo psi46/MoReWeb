@@ -148,7 +148,6 @@ class TestResult(GeneralTestResult):
         TestResultObject.ResultData['KeyList'].append('min%s' % Parameters['Key'])
         TestResultObject.ResultData['KeyList'].append('max%s' % Parameters['Key'])
 
-        TestResultObject.Canvas.SaveAs(TestResultObject.GetPlotFileName())
-        TestResultObject.ResultData['Plot']['Enabled'] = 1
+        TestResultObject.SaveCanvas()
         TestResultObject.ResultData['Plot']['Caption'] = Parameters['Key']
-        TestResultObject.ResultData['Plot']['ImageFile'] = TestResultObject.GetPlotFileName()
+        
