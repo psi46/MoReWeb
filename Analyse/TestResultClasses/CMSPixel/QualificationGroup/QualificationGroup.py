@@ -146,13 +146,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             elif 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
                 print '\t-> appendXraySpectrum'
                 tests, test, index = self.appendXrayCalibration(tests, test, index)
-            elif 'highratetest' in test.testname.lower() or \
-                 'highratepixelmap' in test.testname.lower() or \
-                 'highrateefficiency' in test.testname.lower():
-                # Accept all tests with names 'HighRateTest', 'HighRatePixelMap', and 'HighRateEfficiency' as high rate tests
-                # The distinction of the tests is made within the 'appendHighRateTest' function.
-                print '\t-> appendHighRateTest'
-                tests, test, index = self.appendHighRateTest(tests, test, index)
+            elif ('xrayhrqualification' in test.testname.lower()):
+                # Accept all tests with names 'XRayHRQualification'
+                print '\t-> appendXRayHighRateTest'
+                tests, test, index = self.appendXRayHighRateTest(tests, test, index)
             elif 'powercycle' in test.testname:
                 test = test.next()
             else:
@@ -361,8 +358,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     ## Creates one single test of type 'HighRateTest' when given any
     ## high rate test. Internally the actual tests are distinguished
     ## by name and made subtests to the 'HighRateTest'.
-    def appendHighRateTest(self, tests, test, index):
-        key = 'HighRateTest'
+    def appendXRayHighRateTest(self, tests, test, index):
+        key = 'XRayHRQualification'
         directory = "."
 
         # Find the index of a previously created 'HighRateTest'
@@ -376,7 +373,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if idx < 0:
             tests.append({
                 'Key': key,
-                'Module': 'HighRateTest',
+                'Module': 'XRayHRQualification',
                 'InitialAttributes': {
                     'StorageKey': key,
                     'TestResultSubDirectory': directory,
@@ -384,7 +381,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'ModuleID': self.Attributes['ModuleID'],
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                     'ModuleType': self.Attributes['ModuleType'],
-                    'TestType': 'HighRateTest',
+                    'TestType': 'XRayHRQualification',
                     'TestTemperature': test.environment.temperature,
                 },
                 'DisplayOptions': {
@@ -402,10 +399,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # - HighRatePixelMap
         # - HighRateEfficiency
         # run together with results in the same ROOT file.
-        if 'HighRateTest' in test.testname or 'HighRatePixelMap' in test.testname:
-            self.appendHighRatePixelMap(tests[idx], test, index)
-        if 'HighRateTest' in test.testname or 'HighRateEfficiency' in test.testname:
-            self.appendHighRateEfficiency(tests[idx], test, index)
+        #if 'HighRateTest' in test.testname or 'HighRatePixelMap' in test.testname:
+        #    self.appendHighRatePixelMap(tests[idx], test, index)
+        #if 'HighRateTest' in test.testname or 'HighRateEfficiency' in test.testname:
+        #    self.appendHighRateEfficiency(tests[idx], test, index)
 
         # Iterate the test chain
         test = test.next()
