@@ -303,7 +303,15 @@ class TestResult(GeneralTestResult):
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage150V'] = IVCurveData['CurrentAtVoltage150V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
-                
+            
+           	if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
+            	IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
+            if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
+            	IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
+            if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
+            	IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
+            
+            
             if IVCurveTestResultData['KeyValueDictPairs'].has_key(
                     'recalculatedCurrentAtVoltage100V'):
                 IVCurveData['RecalculatedCurrentAtVoltage100V'] = float(
@@ -319,13 +327,7 @@ class TestResult(GeneralTestResult):
                 IVCurveData['IVSlope'] = float(
                     IVCurveTestResultData['KeyValueDictPairs']['Variation']['Value'])
             
-            if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
-            	IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
-            if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
-            	IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
-            if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
-            	IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
-            	
+           	
         initialCurrent = 0
 
         try:
