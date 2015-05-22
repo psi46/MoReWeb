@@ -299,17 +299,16 @@ class TestResult(GeneralTestResult):
                     IVCurveTestResultData['KeyValueDictPairs'][
                         'recalculatedCurrentAtVoltage150V']['Value'])
                 IVCurveData['RecalculatedCurrentAtVoltage150V'] *= self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V'].get('Factor',1)
-
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage150V'] = IVCurveData['CurrentAtVoltage150V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
             
            	if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
-            	IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
+           	    IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
             if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
-            	IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
+                IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
             if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
-            	IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
+                IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
             
             
             if IVCurveTestResultData['KeyValueDictPairs'].has_key(
@@ -318,7 +317,6 @@ class TestResult(GeneralTestResult):
                     IVCurveTestResultData['KeyValueDictPairs'][
                         'recalculatedCurrentAtVoltage100V']['Value'])
                 IVCurveData['RecalculatedCurrentAtVoltage100V'] *= self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage100V'].get('Factor',1)
-
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage100V'] = IVCurveData['CurrentAtVoltage100V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
