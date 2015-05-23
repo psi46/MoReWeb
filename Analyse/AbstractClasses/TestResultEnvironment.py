@@ -63,7 +63,9 @@ class TestResultEnvironment:
         'PixelMapMaskDefectUpperThreshold': 0,
         'BumpBondingProblemsNSigma': 5
     }
-
+    XRayHRQualificationConfiguration = {
+        'Rates':[50,150]
+    }
 
     # Database connection
     GlobalDBConnection = None
@@ -117,7 +119,8 @@ class TestResultEnvironment:
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
             for i in self.GradingParameters:
                 self.GradingParameters[i] = float(Configuration.get('GradingParameters', i))
-
+            if Configuration.has_option('XRayHRQualification','Rates'):
+                self.XRayHRQualificationConfiguration = [int(x) for x in Configuration.get('XRayHRQualification','Rates').split(',').strip()]
 
         self.MainStylesheet = open('HTML/Main.css').read()
 

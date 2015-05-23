@@ -8,3 +8,6 @@ TestType = automatic
 
 [Fitting]
 refit = False
+
+[XRayHRQualification]
+Rates = 50,150

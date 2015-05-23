@@ -360,8 +360,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     ## by name and made subtests to the 'HighRateTest'.
     def appendXRayHighRateTest(self, tests, test, index):
         key = 'XRayHRQualification'
-        directory = "."
-
+        
         # Find the index of a previously created 'HighRateTest'
         idx = -1
         for i in range(len(tests)):
@@ -376,7 +375,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Module': 'XRayHRQualification',
                 'InitialAttributes': {
                     'StorageKey': key,
-                    'TestResultSubDirectory': directory,
                     'IncludeIVCurve': False,
                     'ModuleID': self.Attributes['ModuleID'],
                     'ModuleVersion': self.Attributes['ModuleVersion'],
@@ -409,96 +407,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         index += 1
 
         return tests, test, index
-
-    ## Appends a high rate pixel map test to the 'HighRateTest'
-    def appendHighRatePixelMap(self, hr_test, test, index):
-        # Generate a unique key name for the test
-        environment = test.environment
-        key = 'Module%s_%s_PixelMap' % (test.testname, test.environment.name)
-        nKeys = 1
-        try:
-            for item in hr_test['InitialAttributes']['SubTestResultDictList']:
-                if item['Key'].startswith(key):
-                    nKeys += 1
-        except KeyError:
-            pass
-        key += '_%s' % (nKeys)
-
-        # Determine the directory name where the ROOT file with the results is
-        #directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
-        directory = '%03d' % index + '_%s_p%i' % (test.testname, test.environment.temperature)
-
-        # Append the test to the 'HighRateTest'
-        if not hr_test.has_key('InitialAttributes'):
-            hr_test['InitialAttributes'] = {}
-        if not hr_test['InitialAttributes'].has_key('SubTestResultDictList'):
-            hr_test['InitialAttributes']['SubTestResultDictList'] = []
-        hr_test['InitialAttributes']['SubTestResultDictList'].append({
-            'Key': key,
-            'Module': 'HighRatePixelMapModule',
-            'InitialAttributes': {
-                'StorageKey': key,
-                'TestResultSubDirectory': directory,
-                'IncludeIVCurve': False,
-                'ModuleID': self.Attributes['ModuleID'],
-                'ModuleVersion': self.Attributes['ModuleVersion'],
-                'ModuleType': self.Attributes['ModuleType'],
-                'TestType': '%s_%s' % (test.environment.name, nKeys),
-                'TestTemperature': test.environment.temperature,
-                'Target': environment.xray_target,
-                'XrayVoltage': environment.xray_voltage,
-                'XrayCurrent': environment.xray_current
-            },
-            'DisplayOptions': {
-                'Order': len(hr_test['InitialAttributes']['SubTestResultDictList']) + 1,
-                'Width': 4
-            }
-        })
-
-    ## Appends a high rate efficiency test to the 'HighRateTest'
-    def appendHighRateEfficiency(self, hr_test, test, index):
-        # Generate a unique key name for the test
-        environment = test.environment
-        key = 'Module%s_%s_Efficiency' % (test.testname, test.environment.name)
-        nKeys = 1
-        try:
-            for item in hr_test['InitialAttributes']['SubTestResultDictList']:
-                if item['Key'].startswith(key):
-                    nKeys += 1
-        except KeyError:
-            pass
-        key += '_%s' % (nKeys)
-
-        # Determine the directory name where the ROOT file with the results is
-        #directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
-        directory = '%03d' % index + '_%s_p%i' % (test.testname, test.environment.temperature)
-
-        # Append the test to the 'HighRateTest'
-        if not hr_test.has_key('InitialAttributes'):
-            hr_test['InitialAttributes'] = {}
-        if not hr_test['InitialAttributes'].has_key('SubTestResultDictList'):
-            hr_test['InitialAttributes']['SubTestResultDictList'] = []
-        hr_test['InitialAttributes']['SubTestResultDictList'].append({
-            'Key': key,
-            'Module': 'HighRateEfficiencyModule',
-            'InitialAttributes': {
-                'StorageKey': key,
-                'TestResultSubDirectory': directory,
-                'IncludeIVCurve': False,
-                'ModuleID': self.Attributes['ModuleID'],
-                'ModuleVersion': self.Attributes['ModuleVersion'],
-                'ModuleType': self.Attributes['ModuleType'],
-                'TestType': '%s_%s' % (test.environment.name, nKeys),
-                'TestTemperature': test.environment.temperature,
-                'Target': environment.xray_target,
-                'XrayVoltage': environment.xray_voltage,
-                'XrayCurrent': environment.xray_current
-            },
-            'DisplayOptions': {
-                'Order': len(hr_test['InitialAttributes']['SubTestResultDictList']) + 1,
-                'Width': 4
-            }
-        })
 
     def PopulateResultData(self):
 

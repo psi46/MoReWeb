@@ -1,6 +1,8 @@
 import os
 import sys
 import ROOT
+import os.path
+import glob
 
 import AbstractClasses
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
@@ -39,15 +41,21 @@ class TestResult(GeneralTestResult):
             print 'Analysing Fulltest with the following Attributes:'
             for name, value in self.Attributes.items():
                 print "\t%25s:  %s" % (name, value)
+        self.Attributes['Rates'] = []
+        self.Attributes['ROOTFiles'] = {}
+        self.Attributes['SCurvePaths'] = {}
+        for Rate in self.TestResultEnvironment.XRayHRQualificationConfiguration['Rates']:
+            HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][1-9]_HREfficiency_{:d}/'.format(Rate)
+            HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][1-9]_HRData_{:d}'.format(Rate)
+            HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][1-9]_HRSCurves_{:d}'.format(Rate)    
+            if len(HREfficiencyPaths) and len(HRDataPaths) and len(HRSCurvesPaths):
+               self.Attributes['Rates'].append(Rate)
+               self.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(Rate)] = ROOT.TFile.Open(HREfficiencyPaths[0]+'/pxar.root')
+               self.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)] = ROOT.TFile.Open(HREfficiencyPaths[0]+'/pxar.root')
+               self.Attributes['SCurvePaths']['HRSCurves_{:d}'.format(Rate)] = HRSCurvesPaths[0]
+               
 
         self.ResultData['SubTestResultDictList'] = [
-            {
-                'Key': 'DigitalCurrent',
-                'DisplayOptions': {
-                    'Order': 20,
-                    'Width': 2
-                }
-            },
             {
                 'Key': 'Chips',
                 'DisplayOptions': {
@@ -59,20 +67,20 @@ class TestResult(GeneralTestResult):
                 },
             },
 
-            {
-                'Key': 'BumpBondingMap',
-                'DisplayOptions': {
-                    'Width': 4,
-                    'Order': 5,
-                }
-            },
-            {
-                'Key': 'VcalThreshold',
-                'DisplayOptions': {
-                    'Width': 4,
-                    'Order': 3,
-                }
-            },
+            # {
+                # 'Key': 'BumpBondingMap',
+                # 'DisplayOptions': {
+                    # 'Width': 4,
+                    # 'Order': 5,
+                # }
+            # },
+            # {
+                # 'Key': 'VcalThreshold',
+                # 'DisplayOptions': {
+                    # 'Width': 4,
+                    # 'Order': 3,
+                # }
+            # },
         ]
        
 
