@@ -9,15 +9,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_EfficiencyMap_TestResult'
         self.NameSingle = 'EfficiencyMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
-       
-    
+        self.ResultData['Plot']['Format'] = 'png'
+        self.AdditionalImageFormats = ['root']
+        
     def PopulateResultData(self):
         NumberOfLowEfficiencyPixels = 0;
         ChipNo = self.ParentObject.Attributes['ChipNo']
+        
         self.ResultData['Plot']['ROOTObject'] = (
-            self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(self.Attributes['Rate'])]
-            .Get("Xray.highRate_calmap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
-            .Clone(self.GetUniqueID())
+            HistoGetter.get_histo(
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(self.Attributes['Rate'])],
+                "HighRate.highRate_calmap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
+            ).Clone(self.GetUniqueID())
         )
         
         if self.ResultData['Plot']['ROOTObject']:

@@ -32,22 +32,15 @@ class TestResult(GeneralTestResult):
         elif self.Attributes['ModuleVersion'] == 3:
             self.Attributes['NumberOfChips'] = 1
             self.Attributes['StartChip'] = 0
-        ROCtype, nRocs, halfModule = self.ReadModuleVersion()
-        self.Attributes['NumberOfChips'] = nRocs
-        if halfModule:
-            self.Attributes['StartChip'] = 8
-        self.Attributes['isDigital'] = (ROCtype.find('dig') != -1)
-        if self.verbose:
-            print 'Analysing Fulltest with the following Attributes:'
-            for name, value in self.Attributes.items():
-                print "\t%25s:  %s" % (name, value)
+        
         self.Attributes['Rates'] = []
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
-        for Rate in self.TestResultEnvironment.XRayHRQualificationConfiguration['Rates']:
-            HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][1-9]_HREfficiency_{:d}/'.format(Rate)
-            HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][1-9]_HRData_{:d}'.format(Rate)
-            HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][1-9]_HRSCurves_{:d}'.format(Rate)    
+        for Rate in self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Rates']:
+            
+            HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_{:d}/'.format(Rate))
+            HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_{:d}'.format(Rate))
+            HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRScurves_{:d}'.format(Rate))
             if len(HREfficiencyPaths) and len(HRDataPaths) and len(HRSCurvesPaths):
                self.Attributes['Rates'].append(Rate)
                self.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(Rate)] = ROOT.TFile.Open(HREfficiencyPaths[0]+'/pxar.root')

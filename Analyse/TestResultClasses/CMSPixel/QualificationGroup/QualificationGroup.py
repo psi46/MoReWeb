@@ -128,14 +128,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         tests = []
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
         test = testchain.next()
+        Testnames = []
         while test:
             env = AbstractClasses.Helper.environment.environment(test.test_str, self.initParser)
             test.environment = env
             test.testname = test.test_str.split("@")[0]
+            Testnames.append(test.test_str.split("@")[0])
             test = test.next()
         index = 0
         test = testchain.next()
-        tests, test, index = self.appendTemperatureGraph(tests, test, index)
+        if not ('HREfficiency' in Testnames): 
+            tests, test, index = self.appendTemperatureGraph(tests, test, index)
+        
         while test:
             if 'fulltest' in test.testname.lower():
                 print '\t-> appendFulltest'
@@ -146,8 +150,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             elif 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
                 print '\t-> appendXraySpectrum'
                 tests, test, index = self.appendXrayCalibration(tests, test, index)
-            elif ('xrayhrqualification' in test.testname.lower()):
-                # Accept all tests with names 'XRayHRQualification'
+            elif ('hrefficiency' in test.testname.lower() and test.test_str.split("@")[1]=='50'):
+                # Accept all tests with names 'HREfficiency'
                 print '\t-> appendXRayHighRateTest'
                 tests, test, index = self.appendXRayHighRateTest(tests, test, index)
             elif 'powercycle' in test.testname:
