@@ -6,19 +6,29 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_EfficiencyMap_TestResult'
-        self.NameSingle = 'EfficiencyMap'
+        self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_BackgroundMap_TestResult'
+        self.NameSingle = 'BackgroundMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
         #self.ResultData['Plot']['Format'] = 'png'
         #self.AdditionalImageFormats = ['root']
-        
+        self.ResultData['KeyValueDictPairs'] = {
+            'NHits': {
+                'Value':'{0:1.0f}'.format(-1),
+                'Label':'NHits'
+            },
+            'RealHitrate':{
+                'Value':'{0:1.0f}'.format(-1),
+                'Label':'Real Hitrate'
+            }
+        }
     def PopulateResultData(self):
+        NumberOfLowEfficiencyPixels = 0;
         ChipNo = self.ParentObject.Attributes['ChipNo']
         
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
                 self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(self.Attributes['Rate'])],
-                "HighRate.highRate_calmap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
+                "HighRate.highRate_xraymap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
             ).Clone(self.GetUniqueID())
         )
         
@@ -35,10 +45,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
             #self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
-            
+            self.ResultData['KeyValueDictPairs']['NHits']['Value'] = '{:1.0f}'.format(self.ResultData['Plot']['ROOTObject'].GetEntries())
 
         self.SaveCanvas()
-        self.Title = 'Efficiency Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
+        
+        NTriggersROOTObject = (
+            HistoGetter.get_histo(
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)],
+                "Xray.ntrig_Ag_V0" 
+            )
+        )
+        NTriggers = float(NTriggersROOTObject.GetEntries())
+        NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
+        RealHitrate = NHits / (NTriggers*TimeConstant*Area)
+        self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.0f}'.format(RealHitrate)
+        
+        self.Title = 'Background Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         
 
 

@@ -24,16 +24,34 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     
                     },
                 },
-                # {
-                    # 'Key':'BackgroundMap_{:d}'.format(Rate),
-                    # 'Module':'BackgroundMap',
-                    # 'InitialAttributes':{
-                        # 'Rate':Rate,
-                        # 'StorageKey':'BackgroundMap_{:d}'.format(Rate),
-                    # },
-                # }
+                {
+                    'Key':'EfficiencyDistribution_{:d}'.format(Rate),
+                    'Module':'EfficiencyDistribution',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'EfficiencyDistribution_{:d}'.format(Rate),
+                    
+                    },
+                },
+                {
+                    'Key':'BackgroundMap_{:d}'.format(Rate),
+                    'Module':'BackgroundMap',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'BackgroundMap_{:d}'.format(Rate),
+                    },
+                }
             ]
 
+        self.ResultData['SubTestResultDictList'] += [
+                {
+                    'Key':'EfficiencyInterpolation',
+                    'InitialAttributes':{
+                        
+                    },
+                },
+            ]
+        print self.ResultData['SubTestResultDictList']
         
     def PopulateResultData(self):
         self.CloseSubTestResultFileHandles()

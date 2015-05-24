@@ -61,10 +61,16 @@ class TestResultEnvironment:
         'PixelMapMaxValue':10,
         'PixelMapMinValue':0,
         'PixelMapMaskDefectUpperThreshold': 0,
-        'BumpBondingProblemsNSigma': 5
+        'BumpBondingProblemsNSigma': 5,
+        'XRayHighRateEfficiency_min_allowed_efficiency_50':0,
+        'XRayHighRateEfficiency_min_allowed_efficiency_150':0,
+        'XRayHighRateEfficiency_max_allowed_loweff_A':0
+        
     }
     XRayHRQualificationConfiguration = {
-        'Rates':[50,150]
+        'Rates':[50,150],
+        'TimeConstant':1,
+        'Area':1,
     }
 
     # Database connection
@@ -120,7 +126,11 @@ class TestResultEnvironment:
             for i in self.GradingParameters:
                 self.GradingParameters[i] = float(Configuration.get('GradingParameters', i))
             if Configuration.has_option('XRayHRQualification','Rates'):
-                self.XRayHRQualificationConfiguration = [int(x) for x in Configuration.get('XRayHRQualification','Rates').split(',').strip()]
+                self.XRayHRQualificationConfiguration['Rates'] = [int(x.strip()) for x in Configuration.get('XRayHRQualification','Rates').split(',')]
+            if Configuration.has_option('XRayHRQualification','TimeConstant'):
+                self.XRayHRQualificationConfiguration['TimeConstant'] = float(Configuration.get('XRayHRQualification','TimeConstant').strip())
+            if Configuration.has_option('XRayHRQualification','Area'):
+                self.XRayHRQualificationConfiguration['Area'] = float(Configuration.get('XRayHRQualification','Area').strip())
 
         self.MainStylesheet = open('HTML/Main.css').read()
 
@@ -215,7 +225,7 @@ class TestResultEnvironment:
             self.LocalDBConnection.close()
 
     def existInDB(self,moduleID,QualificationType):
-        print 'check wheather module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
+        print 'check whether module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
         AdditionalWhere =""
         AdditionalWhere += ' AND ModuleID=:ModuleID '
         AdditionalWhere += ' AND QualificationType=:QualificationType '

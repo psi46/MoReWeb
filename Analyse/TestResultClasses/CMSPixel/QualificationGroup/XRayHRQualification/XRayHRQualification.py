@@ -44,7 +44,7 @@ class TestResult(GeneralTestResult):
             if len(HREfficiencyPaths) and len(HRDataPaths) and len(HRSCurvesPaths):
                self.Attributes['Rates'].append(Rate)
                self.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(Rate)] = ROOT.TFile.Open(HREfficiencyPaths[0]+'/pxar.root')
-               self.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)] = ROOT.TFile.Open(HREfficiencyPaths[0]+'/pxar.root')
+               self.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)] = ROOT.TFile.Open(HRDataPaths[0]+'/pxar.root')
                self.Attributes['SCurvePaths']['HRSCurves_{:d}'.format(Rate)] = HRSCurvesPaths[0]
                
 
