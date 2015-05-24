@@ -12,7 +12,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = 'Chip '+str(self.Attributes['ChipNo'])
         # order!
         self.ResultData['SubTestResultDictList'] = []
-
+        i = 0
         for Rate in self.ParentObject.ParentObject.Attributes['Rates']:
             self.ResultData['SubTestResultDictList'] += [
                 {
@@ -21,7 +21,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'InitialAttributes':{
                         'Rate':Rate,
                         'StorageKey':'EfficiencyMap_{:d}'.format(Rate),
-                    
+                    },
+                    'DisplayOptions':{
+                        'Order':10+i
                     },
                 },
                 {
@@ -30,6 +32,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'InitialAttributes':{
                         'Rate':Rate,
                         'StorageKey':'EfficiencyDistribution_{:d}'.format(Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':20+i
                     
                     },
                 },
@@ -40,15 +45,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Rate':Rate,
                         'StorageKey':'BackgroundMap_{:d}'.format(Rate),
                     },
+                    'DisplayOptions':{
+                        'Order':30+i
+                    },
                 }
             ]
+            i+=1
 
         self.ResultData['SubTestResultDictList'] += [
                 {
                     'Key':'EfficiencyInterpolation',
                     'InitialAttributes':{
-                        
                     },
+                    'DisplayOptions':{
+                        'Order':0    
+                    },
+                    
                 },
             ]
         print self.ResultData['SubTestResultDictList']
