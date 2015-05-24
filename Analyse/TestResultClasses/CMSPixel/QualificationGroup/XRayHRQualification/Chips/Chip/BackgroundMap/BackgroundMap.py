@@ -49,16 +49,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.SaveCanvas()
         
+        TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
+        Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
+            
         NTriggersROOTObject = (
             HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)],
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
                 "Xray.ntrig_Ag_V0" 
             )
         )
         NTriggers = float(NTriggersROOTObject.GetEntries())
         NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
         RealHitrate = NHits / (NTriggers*TimeConstant*Area)
-        self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.0f}'.format(RealHitrate)
+        
+        self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.2f}'.format(RealHitrate)
         
         self.Title = 'Background Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         

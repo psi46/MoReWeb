@@ -17,19 +17,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']
         if len(Rates)>=2:
             
-            TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
-            Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
             
             for Rate in Rates:
-                NTriggersROOTObject = (
-                    HistoGetter.get_histo(
-                        self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)],
-                        "Xray.ntrig_Ag_V0" 
-                    )
-                )
-                NTriggers = float(NTriggersROOTObject.GetEntries())
-                NHits = float(self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['NHits']['Value'])
-                RealHitRate = NHits / (NTriggers*TimeConstant*Area)
+                RealHitRate = float(self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value'])
                 
         
         if self.ResultData['Plot']['ROOTObject']:
