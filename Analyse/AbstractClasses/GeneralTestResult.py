@@ -70,11 +70,18 @@ class GeneralTestResult(object):
         self.Enabled = True
         self.SavePlotFile = True
         self.GzipSVG = TestResultEnvironmentObject.Configuration['GzipSVG']
+        
         self.DefaultImageFormat = TestResultEnvironmentObject.Configuration['DefaultImageFormat'].strip().lower()
+        if TestResultEnvironmentObject.Configuration.has_key('AdditionalImageFormats'):
+            self.AdditionalImageFormats = TestResultEnvironmentObject.Configuration['AdditionalImageFormats'].strip().lower().split(',')
+        else:
+        	self.AdditionalImageFormats = ['root', 'pdf']
+        	
         if TestResultEnvironmentObject.Configuration.has_key('OverviewHTMLLink'):
             self.OverviewHTMLLink = TestResultEnvironmentObject.Configuration['OverviewHTMLLink']
         else:
             self.OverviewHTMLLink = None
+            
         # Path for current test to folder with root-files
         self.RawTestSessionDataPath = ''
 
@@ -114,7 +121,9 @@ class GeneralTestResult(object):
                 'ROOTObject': None,
                 'Caption': '',
                 'ImageFile': '',
-                'Format': self.DefaultImageFormat  # svg
+                'Format': self.DefaultImageFormat,
+                'AdditionalFormats':self.AdditionalImageFormats,
+                'ImageFilePDF':'',
             },
             # SubTest Results
             'SubTestResults': {},
@@ -492,7 +501,12 @@ class GeneralTestResult(object):
         if self.SavePlotFile:
             if self.Canvas:
                 self.Canvas.SaveAs(self.GetPlotFileName())
-                self.Canvas.SaveAs(self.GetPlotFileName('root'))
+                for Suffix in self.ResultData['Plot']['AdditionalFormats']:
+                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
+                	if Suffix == 'pdf':
+                		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName(Suffix)
+                self.ResultData['Plot']['Enabled'] = 1
+                self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''
         Generate the filename including the full path to the plot file according to the format
     '''
@@ -739,6 +753,8 @@ class GeneralTestResult(object):
                     {
                         '###FILENAME###': HtmlParser.MaskHTML(
                             RecursionRelativePath + os.path.basename(TestResultObject.ResultData['Plot']['ImageFile'])),
+                        '###PDFFILENAME###': HtmlParser.MaskHTML(
+                            RecursionRelativePath + os.path.basename(TestResultObject.ResultData['Plot']['ImageFilePDF'])),
                         '###IMAGELARGECONTAINERID###': HtmlParser.MaskHTML(
                             TestResultObject.Name + '_' + TestResultObject.Key),
                         '###MARGIN_TOP###': str(int(-800. / float(

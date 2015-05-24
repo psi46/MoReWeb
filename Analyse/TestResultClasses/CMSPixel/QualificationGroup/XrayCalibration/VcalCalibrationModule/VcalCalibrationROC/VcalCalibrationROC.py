@@ -172,7 +172,5 @@ class TestResult(GeneralTestResult):
         }
         self.ResultData['KeyList'] = ['Slope', 'Offset']
         self.ResultData['Plot']['ROOTObject'].Draw("APL")
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        self.SaveCanvas()
+        

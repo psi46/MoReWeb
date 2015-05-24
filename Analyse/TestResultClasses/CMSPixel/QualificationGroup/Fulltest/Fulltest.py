@@ -275,11 +275,14 @@ class TestResult(GeneralTestResult):
                 CurrentAtVoltage150V = float(
                     self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'][
                         'Value'])
+                CurrentAtVoltage150V *= self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150V'].get('Factor',1)
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key(
                     'recalculatedCurrentAtVoltage150V'):
                 RecalculatedVoltage = float(
                     self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'][
                         'recalculatedCurrentAtVoltage150V']['Value'])
+                RecalculatedVoltage *= self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V'].get('Factor',1)
+
             else:
                 RecalculatedVoltage = CurrentAtVoltage150V
             if self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs'].has_key('Variation'):

@@ -21,7 +21,7 @@ class PH_Fitting():
         # ROOT.gStyle
         self.verbose = False
         self.fitMode = fitMode
-        self.refit = True#refit
+        self.refit = refit
         self.DrawHistos = False
         self.vcal = [50,100,150,200,250,30,50,70,90,200];
         self.vcalLow = self.vcal

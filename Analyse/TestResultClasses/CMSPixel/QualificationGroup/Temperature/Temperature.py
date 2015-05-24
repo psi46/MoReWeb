@@ -117,11 +117,8 @@ class TestResult(GeneralTestResult):
         print fileHandlePath
         self.analyseTemp(fileHandlePath + '/temperature.log')
         if self.verbose: raw_input('Press enter')
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Temperature'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+        
     def CustomWriteToDatabase(self, ParentID):
         pass
