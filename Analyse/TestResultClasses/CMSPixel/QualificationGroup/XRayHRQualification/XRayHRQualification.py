@@ -150,6 +150,11 @@ class TestResult(GeneralTestResult):
                     EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiencyMean_{Rate}'.format(Rate=Rate)]['Value']
                 )
                 
+                # Number of hot pixels (Sum over all 16 ROCs is module value)
+                HighRateData['HotPixels_Module_{Rate}'.format(Rate=Rate)] = float(
+                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['HotPixelsSum_{Rate}'.format(Rate=Rate)]['Value']
+                )
+                
             for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
                 ChipTestResultObject = self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
                 GradingTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['Grading']
@@ -197,6 +202,8 @@ class TestResult(GeneralTestResult):
                     HighRateData['Addr_HotPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = (
                         GradingTestResultObject.ResultData['HiddenData']['ListOfHotPixels_{Rate}'.format(Rate=Rate)]
                     )
+                    
+                    
                     
             
         else:

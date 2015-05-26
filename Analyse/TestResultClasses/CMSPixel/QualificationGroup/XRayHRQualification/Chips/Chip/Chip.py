@@ -81,6 +81,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                         'Order':60+i
                     },
+                },
+                {
+                    'Key':'ReadoutUniformityOverTime_{:d}'.format(Rate),
+                    'Module':'ReadoutUniformityOverTime',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'ReadoutUniformityOverTime_{:d}'.format(Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':70+i
+                    },
                 }
             ]
             i+=1
