@@ -248,6 +248,29 @@ class TestResult(GeneralTestResult):
     def PopulateResultData(self):
         self.FileHandle.Close()
 
+    def GradeIV(self, i1,i2, slope, temp):
+        grade = ''
+
+        print "GRADING FUNCTION: input is ", i1,i2, slope, temp
+        
+#
+# note I2 = 150V!
+#
+# criteria from https://twiki.cern.ch/twiki/pub/CMS/BPixDB/BPIX_IV_Upload_Specification_1.2.pdf pag 9
+
+        if i2<2e-6:
+            grade='A'
+        elif i2<10e-6:
+            grade='B'
+        else:
+            grade='C'
+            
+        if (slope>2):
+            grade='C'
+            
+        print ' GRADE FUNCTION REURNING ',grade
+        return grade
+
     def CustomWriteToDatabase(self, ParentID):
         if self.verbose:
             print 'Write to DB: ',ParentID
@@ -267,8 +290,8 @@ class TestResult(GeneralTestResult):
         	'CurrentAtVoltage150V':-1,
         	'CurrentAtVoltage100V':-1,
         	'RecalculatedCurrentAtVoltage150V':-1,
-            'RecalculatedCurrentAtVoltage100V':-1,
-            'RecalculatedToTemperature':17,
+                'RecalculatedCurrentAtVoltage100V':-1,
+                'RecalculatedToTemperature':17,
         	'IVSlope':0,
         	'IVCurveFilePath':'',
         	'TestTemperature':'',
@@ -303,7 +326,16 @@ class TestResult(GeneralTestResult):
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage150V'] = IVCurveData['CurrentAtVoltage150V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
-                
+            
+                if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
+                	IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
+
+            if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
+            	IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
+            if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
+            	IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
+            
+            
             if IVCurveTestResultData['KeyValueDictPairs'].has_key(
                     'recalculatedCurrentAtVoltage100V'):
                 IVCurveData['RecalculatedCurrentAtVoltage100V'] = float(
@@ -318,13 +350,6 @@ class TestResult(GeneralTestResult):
             if IVCurveTestResultData['KeyValueDictPairs'].has_key('Variation'):
                 IVCurveData['IVSlope'] = float(
                     IVCurveTestResultData['KeyValueDictPairs']['Variation']['Value'])
-            
-            if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
-            	IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
-            if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
-            	IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
-            if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
-            	IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
             	
         initialCurrent = 0
 
@@ -469,21 +494,88 @@ class TestResult(GeneralTestResult):
             pdb = PixelDBInterface(operator="tommaso", center="pisa")
             pdb.connectToDB()
             
-            if (0 == 0):
-                OPERATOR = os.environ['PIXEL_OPERATOR']
-                CENTER = os.environ['PIXEL_CENTER']
-                s = Session(CENTER, OPERATOR)
-                pdb.insertSession(s)
-                print "--------------------"
-                print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
-                print "--------------------"
-                pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
-                
-                if pp is None:
-                    print "INSERTION FAILED!"
-                    sys.exit(31)
+#            if (0 == 0):
+            OPERATOR = os.environ['PIXEL_OPERATOR']
+            CENTER = os.environ['PIXEL_CENTER']
+            s = Session(CENTER, OPERATOR)
+            pdb.insertSession(s)
+            print "--------------------"
+            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
+            print "--------------------"
+            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
+               
+            if pp is None:
+                print "INSERTION FAILED!"
+                sys.exit(31)
+            insertedID=pp.TEST_ID
 
-                insertedID=pp.TEST_ID
+
+#
+# if there is an IV, use it!
+#
+#
+            print "IVCURVEDATA ", IVCurveData
+            if IVCurveData['CurrentAtVoltage150V'] != -1 :
+                # extract Sensor name
+                module = pdb.getFullModule(Row['ModuleID'])
+                if module is None:
+                    print " Cannot find Module with ModuleID = ",(Row['ModuleID'])
+                    exit (32)
+                bmodule = pdb.getBareModule(module.BAREMODULE_ID)
+                if bmodule is None:
+                    print " Cannot find bareModule with bareModuleID = ",module.BAREMODULE_ID
+                    exit (33)
+                sensor_id  =bmodule.SENSOR_ID
+                ivlog_path = IVCurveData['IVCurveFilePath']
+                outDir = Row['AbsFulltestSubfolder']
+                from shutil import *
+                # copy the log file in the out test dir
+                print "copying " ,ivlog_path, " to ",outDir+"/"+os.path.basename(ivlog_path)
+                copy(ivlog_path,outDir+"/"+os.path.basename(ivlog_path))
+
+                # creata the data
+                ivdata_id = Data(PFNs = outDir+"/"+os.path.basename(ivlog_path))
+                ppiv = pdb.insertData(ivdata_id)
+                if (ppiv is None):
+                  print "Cannot insert data"
+                  exit (34)
+
+                i1 = float(IVCurveData['CurrentAtVoltage100V'])
+                i2 = float(IVCurveData['CurrentAtVoltage150V'])
+                slope = float(IVCurveData['IVSlope'])
+
+                gradeiv = self.GradeIV(
+                    float(IVCurveData['RecalculatedCurrentAtVoltage100V']),
+                    float(IVCurveData['RecalculatedCurrentAtVoltage150V']),
+                    slope, 
+                    float(IVCurveData['RecalculatedToTemperature']
+                          ))
+
+
+                iv = Test_IV(SESSION_ID=s.SESSION_ID,SENSOR_ID=sensor_id,
+                             DATA_ID = ivdata_id.DATA_ID,
+                             I1 = float(IVCurveData['CurrentAtVoltage100V']), 
+                             I2 = float(IVCurveData['CurrentAtVoltage150V']), 
+                             V1 = float(100),
+                             V2 = float(150),
+                             GRADE = gradeiv,
+                             SLOPE = float(IVCurveData['IVSlope']),
+                             TEMPERATURE = float(IVCurveData['TestTemperature']),
+                             COMMENT ="From FMT - TestID = "+ str(pp.TEST_ID),
+                             DATE = int(Row['TestDate']),
+                             TYPE = "CYC")
+  
+
+              
+                resultiv = pdb.insertIVTest(iv)
+                if resultiv is None:
+                    print" Error inserting IVTEST"
+                    exit (35)
+                else:
+			print " IVTEST INSERTED FOR ", Row['ModuleID'],sensor_id, resultiv.TEST_ID, ivdata_id.DATA_ID, gradeiv
+
+# end IV
+
 
 #
 # also insert dac parameters
