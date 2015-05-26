@@ -7,49 +7,83 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name='CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_Grading_TestResult'
         self.NameSingle='Grading'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
-        for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']:
+        self.Attributes['GradeKeys'] = ['ROCGrade','EfficiencyGrade','HotPixelsGrade','HitMapGrade','ColumnReadoutUniformityGrade']
+        Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']
+        RatesString = ('/'.join('{Rate}'.format(Rate=Rate) for Rate in Rates))
+        self.ResultData['KeyValueDictPairs']['ROCGrade'] = {
+            'Value':'',
+            'Label':'ROC Grade '+RatesString
+        }
+        self.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels'] = {
+            'Value':'',
+            'Label':'# Low Eff. Pixels '+RatesString
+        }
+        self.ResultData['KeyValueDictPairs']['NumberOfHotPixels'] = {
+            'Value':'',
+            'Label':'# Hot Pixels '+RatesString
+        }
+        self.ResultData['KeyValueDictPairs']['EfficiencyGrade'] = {
+            'Value':'',
+            'Label':'Efficiency Grade '+RatesString
+        }
+        self.ResultData['KeyValueDictPairs']['HotPixelsGrade'] = {
+            'Value':'',
+            'Label':'Hot Pixels Grade '+RatesString
+        }
+        self.ResultData['KeyValueDictPairs']['HitMapGrade'] = {
+            'Value':'',
+            'Label':'Hit Map Grade '+RatesString
+        }
+        self.ResultData['KeyValueDictPairs']['ColumnReadoutUniformityGrade'] = {
+            'Value':'',
+            'Label':'Hit Map Grade '+RatesString
+        }
+        self.ResultData['KeyList'] += [
+                'ROCGrade',
+                'NumberOfLowEfficiencyPixels',
+                'NumberOfHotPixels',
+                'EfficiencyGrade',
+                'HotPixelsGrade',
+                'HitMapGrade',
+                'ColumnReadoutUniformityGrade'
+            ]
+        for Rate in Rates:
             self.ResultData['HiddenData']['ListOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)] = []
             self.ResultData['HiddenData']['ListOfHotPixels_{Rate}'.format(Rate=Rate)] = []
             
-            self.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)] = {
-                'Value':'{:d}'.format(-1),
-                'Label':'# Low Eff. Pixels {Rate}'.format(Rate=Rate)
-            }
-            self.ResultData['KeyValueDictPairs']['NumberOfHotPixels_{Rate}'.format(Rate=Rate)] = {
-                'Value':'{:d}'.format(-1),
-                'Label':'# Hot Pixels {Rate}'.format(Rate=Rate)
-            }
-            self.ResultData['KeyValueDictPairs']['EfficiencyGrade_{Rate}'.format(Rate=Rate)] = {
-                'Value':'C',
-                'Label':'Efficiency Grade {Rate}'.format(Rate=Rate)
-            }
-            self.ResultData['KeyValueDictPairs']['HotPixelsGrade_{Rate}'.format(Rate=Rate)] = {
-                'Value':'C',
-                'Label':'Hot Pixels Grade {Rate}'.format(Rate=Rate)
-            }
-            self.ResultData['KeyList'] += [
-                'NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate),
-                'NumberOfHotPixels_{Rate}'.format(Rate=Rate),
-                'EfficiencyGrade_{Rate}'.format(Rate=Rate),
-                'HotPixelsGrade_{Rate}'.format(Rate=Rate)
-            ]
+            self.ResultData['HiddenData']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)] = -1
+            self.ResultData['HiddenData']['NumberOfHotPixels_{Rate}'.format(Rate=Rate)] = -1
+            self.ResultData['HiddenData']['EfficiencyGrade_{Rate}'.format(Rate=Rate)] = -1
+            self.ResultData['HiddenData']['HotPixelsGrade_{Rate}'.format(Rate=Rate)] = -1
+            self.ResultData['HiddenData']['HitMapGrade_{Rate}'.format(Rate=Rate)] = -1
+            self.ResultData['HiddenData']['ColumnReadoutUniformityGrade_{Rate}'] = -1
+            
 	
     def PopulateResultData(self):
         GradeMapping = {
+            -1:'N/A',
             1: 'A',
             2: 'B',
             3: 'C'
         }
+        ROCGrades = []
         
         ChipNo = self.ParentObject.Attributes['ChipNo']
         
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']:
             EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
+            EfficiencyDistributionTestResultObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyDistribution_{Rate}'.format(Rate=Rate)]
             HotPixelMapROOTObject = self.ParentObject.ResultData['SubTestResults']['HotPixelMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
+            HitMapROOTObject = self.ParentObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
+            ColumnReadoutUniformityROOTObject = self.ParentObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
             
             NumberOfLowEfficiencyPixels = 0
             NumberOfHotPixels = 0
             
+            Grades = {}
+            for GradeKey in self.Attributes['GradeKeys']:
+                Grades[GradeKey] = -1
+                
             for Row in range(self.nRows):
                 for Column in range(self.nCols):
                     PixelEfficiency = EfficiencyMapROOTObject.GetBinContent(Column+1, Row+1)
@@ -60,27 +94,62 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     
                     if PixelEfficiency < EfficiencyThreshold:
                         NumberOfLowEfficiencyPixels += 1
-                        self.ResultData['HiddenData']['ListOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)].append((ChipNo, Row, Column))
+                        self.ResultData['HiddenData']['ListOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)].append((ChipNo, Column, Row))
                     
                     HotPixelThreshold =self.TestResultEnvironmentObject.GradingParameters['XRayHighRateHotPixels_Threshold']
                     PixelIsHotPixel = HotPixelMapROOTObject.GetBinContent(Column+1, Row+1)
                     if PixelIsHotPixel > 0:
                         NumberOfHotPixels += 1
-                        self.ResultData['HiddenData']['ListOfHotPixels_{Rate}'.format(Rate=Rate)].append((ChipNo, Row, Column))
+                        self.ResultData['HiddenData']['ListOfHotPixels_{Rate}'.format(Rate=Rate)].append((ChipNo, Column, Row))
+            
+            
                     
-            EfficiencyGrade = 1
-            if NumberOfLowEfficiencyPixels > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_{Rate}'.format(Rate=Rate)]:
-                EfficiencyGrade = 2
-            if NumberOfLowEfficiencyPixels > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_{Rate}'.format(Rate=Rate)]:
-                EfficiencyGrade = 3
+                
+            MeanEfficiency = float(EfficiencyDistributionTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value'])
             
-            HotPixelsGrade = 1
+            Grades['EfficiencyGrade'] = 1
+            if( NumberOfLowEfficiencyPixels > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_{Rate}'.format(Rate=Rate)]
+                and MeanEfficiency > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_allowed_efficiency_{Rate}'.format(Rate=Rate)]
+            ):
+                Grades['EfficiencyGrade'] = 2
+            if( NumberOfLowEfficiencyPixels > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_{Rate}'.format(Rate=Rate)]
+                or MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_allowed_efficiency_{Rate}'.format(Rate=Rate)]
+            ):
+                Grades['EfficiencyGrade'] = 3
+            
+            Grades['HotPixelsGrade'] = 1
             if NumberOfHotPixels > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateHotPixels_max_allowed_hot']:
-                HotPixelsGrade = 3
+                Grades['HotPixelsGrade'] = 3
             
-            self.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)]['Value'] = '{:d}'.format(NumberOfLowEfficiencyPixels)
-            self.ResultData['KeyValueDictPairs']['NumberOfHotPixels_{Rate}'.format(Rate=Rate)]['Value'] = '{:d}'.format(NumberOfHotPixels)
+            Grades['HitMapGrade'] = 3
             
-            self.ResultData['KeyValueDictPairs']['EfficiencyGrade_{Rate}'.format(Rate=Rate)]['Value'] = GradeMapping[EfficiencyGrade]
-            self.ResultData['KeyValueDictPairs']['HotPixelsGrade_{Rate}'.format(Rate=Rate)]['Value'] = GradeMapping[HotPixelsGrade]
+            
+            Grades['ColumnReadoutUniformityGrade'] = 1            
+            ColumnReadoutUniformityMean = float(self.ParentObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
+            for Column in range(self.nCols):
+                ColumnHits = ColumnReadoutUniformityROOTObject.GetBinContent(Column+1)
+                if( ColumnHits < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low']
+                    *ColumnReadoutUniformityMean
+                    or ColumnHits > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']
+                    *ColumnReadoutUniformityMean  
+                ):
+                    Grades['ColumnReadoutUniformityGrade'] = 3
+            
+            
+            
+            self.ResultData['HiddenData']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)] = NumberOfLowEfficiencyPixels
+            self.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels']['Value'] = (self.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels']['Value']+'/{:d}'.format(NumberOfLowEfficiencyPixels)).strip('/')
+            self.ResultData['HiddenData']['NumberOfHotPixels_{Rate}'.format(Rate=Rate)] = NumberOfHotPixels
+            self.ResultData['KeyValueDictPairs']['NumberOfHotPixels']['Value'] = (self.ResultData['KeyValueDictPairs']['NumberOfHotPixels']['Value']+'/{:d}'.format(NumberOfHotPixels)).strip('/')
+            for GradeKey in self.Attributes['GradeKeys']:
+                Grades['ROCGrade'] = max(Grades['ROCGrade'], Grades[GradeKey])
+                
+            ROCGrades.append(Grades['ROCGrade'])
+            
+            for GradeKey in self.Attributes['GradeKeys']:
+                self.ResultData['HiddenData'][GradeKey+'_{Rate}'.format(Rate=Rate)] = Grades[GradeKey]
+                self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/'+GradeMapping[Grades[GradeKey]]).strip('/')
+                
+        #self.ResultData['KeyValueDictPairs']['ROCGrade']['Value'] = GradeMapping[max(ROCGrades)]
+            
             

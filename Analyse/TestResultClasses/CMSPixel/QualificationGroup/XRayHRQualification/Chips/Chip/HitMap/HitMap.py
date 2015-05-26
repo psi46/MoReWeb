@@ -9,8 +9,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_HitMap_TestResult'
         self.NameSingle = 'HitMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
-        #self.ResultData['Plot']['Format'] = 'png'
-        #self.AdditionalImageFormats = ['root']
+        self.ResultData['KeyValueDictPairs'] = {
+            'NHits': {
+                'Value':'{0:1.0f}'.format(-1),
+                'Label':'NHits'
+            },
+            'RealHitrate':{
+                'Value':'{0:1.0f}'.format(-1),
+                'Label':'Real Hitrate',
+                'Unit':'MHz/cm2'
+            },
+            'NumberOfDefectivePixels':{
+                'Value':'{:d}'.format(-1),
+                'Label':'# Defective Pixels'
+            }
+        }
+        self.ResultData['KeyList'] += ['RealHitrate','NumberOfDefectivePixels']
+        self.ResultData['HiddenData']['ListOfDefectivePixels'] = []
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
@@ -18,11 +33,36 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
                 self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
-                "HighRate.highRate_calmap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
+                "Xray.hMap_Ag_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
             ).Clone(self.GetUniqueID())
         )
-        
+        NumberOfDefectivePixels = 0
+        NumberOfHits = 0
         if self.ResultData['Plot']['ROOTObject']:
+            for Row in range(self.nRows):
+                for Column in range(self.nCols):
+                    PixelHits = self.ResultData['Plot']['ROOTObject'].GetBinContent(Column+1, Row+1)
+                    if PixelHits > 0:
+                        NumberOfHits += PixelHits
+                    else:
+                        NumberOfDefectivePixels += 1
+                        self.ResultData['HiddenData']['ListOfDefectivePixels'].append((ChipNo, Column, Row))
+                        
+            self.ResultData['KeyValueDictPairs']['NHits']['Value'] = '{:1.0f}'.format(NumberOfHits)
+            
+            NTriggersROOTObject = (
+            HistoGetter.get_histo(
+                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
+                    "Xray.ntrig_Ag_V0" 
+                )
+            )
+            TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
+            Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
+            NTriggers = float(NTriggersROOTObject.GetEntries())
+            NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
+            RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6
+            
+            
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
@@ -38,7 +78,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
 
         self.SaveCanvas()
-        self.Title = 'Efficiency Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
+        self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{:d}'.format(NumberOfDefectivePixels)
+        self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.2f}'.format(RealHitrate)
+        self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
+        
+        self.Title = 'Hit Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         
 
 

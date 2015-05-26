@@ -72,6 +72,8 @@ class TestResultEnvironment:
         'XRayHighRateEfficiency_max_allowed_loweff_B_150':20,
         'XRayHighRateHotPixels_max_allowed_hot':100,
         'XRayHighRateHotPixels_Threshold':1,
+        'XRayHighRate_factor_dcol_uniformity_low':50,
+        'XRayHighRate_factor_dcol_uniformity_high':100,
     }
     XRayHRQualificationConfiguration = {
         'Rates':[50,150],

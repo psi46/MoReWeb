@@ -59,6 +59,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                         'Order':40+i
                     },
+                },
+                {
+                    'Key':'HitMap_{:d}'.format(Rate),
+                    'Module':'HitMap',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'HitMap_{:d}'.format(Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':50+i
+                    },
+                },
+                {
+                    'Key':'ColumnReadoutUniformity_{:d}'.format(Rate),
+                    'Module':'ColumnReadoutUniformity',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'ColumnReadoutUniformity_{:d}'.format(Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':60+i
+                    },
                 }
             ]
             i+=1
