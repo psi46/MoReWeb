@@ -2,6 +2,7 @@ import AbstractClasses
 import ROOT
 import copy
 import os
+import os.path
 import AbstractClasses.Helper.BetterConfigParser
 import AbstractClasses.Helper.HtmlParser
 import AbstractClasses.Helper.environment
@@ -165,23 +166,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return tests
 
     def appendTemperatureGraph(self, tests, test, index):
-        tests.append(
-            {
-                'Key': 'Temperature',
-                'Module': 'Temperature',
-                'InitialAttributes': {
-                    'StorageKey': 'ModuleQualification_Temperature',
-                    'TestResultSubDirectory': 'logfiles',
-                    'ModuleID': self.Attributes['ModuleID'],
-                    'ModuleVersion': self.Attributes['ModuleVersion'],
-                    'ModuleType': self.Attributes['ModuleType'],
-                    'TestType': 'Temperature',
-                },
-                'DisplayOptions': {
-                    'Order': len(tests) + 1,
-                    'Width': 5,
-                }
-            })
+        if os.path.isfile(self.RawTestSessionDataPath+'/'+'temperature.log'):
+            tests.append(
+                {
+                    'Key': 'Temperature',
+                    'Module': 'Temperature',
+                    'InitialAttributes': {
+                        'StorageKey': 'ModuleQualification_Temperature',
+                        'TestResultSubDirectory': 'logfiles',
+                        'ModuleID': self.Attributes['ModuleID'],
+                        'ModuleVersion': self.Attributes['ModuleVersion'],
+                        'ModuleType': self.Attributes['ModuleType'],
+                        'TestType': 'Temperature',
+                    },
+                    'DisplayOptions': {
+                        'Order': len(tests) + 1,
+                        'Width': 5,
+                    }
+                })
         return tests, test, index
 
 
