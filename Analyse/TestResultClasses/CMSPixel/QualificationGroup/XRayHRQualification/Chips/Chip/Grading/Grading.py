@@ -21,11 +21,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             }
             self.ResultData['KeyValueDictPairs']['EfficiencyGrade_{Rate}'.format(Rate=Rate)] = {
                 'Value':'C',
-                'Label':'Efficiency Grade ROC'
+                'Label':'Efficiency Grade {Rate}'.format(Rate=Rate)
             }
             self.ResultData['KeyValueDictPairs']['HotPixelsGrade_{Rate}'.format(Rate=Rate)] = {
                 'Value':'C',
-                'Label':'Hot Pixels Grade ROC'
+                'Label':'Hot Pixels Grade {Rate}'.format(Rate=Rate)
             }
             self.ResultData['KeyList'] += [
                 'NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate),
