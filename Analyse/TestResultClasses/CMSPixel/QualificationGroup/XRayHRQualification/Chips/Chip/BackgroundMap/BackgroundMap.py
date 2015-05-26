@@ -63,7 +63,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         RealHitrate = NHits / (NTriggers*TimeConstant*Area)
         
         self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.2f}'.format(RealHitrate)
-        
+        self.ResultData['KeyList'] += ['RealHitrate']
         self.Title = 'Background Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         
 
