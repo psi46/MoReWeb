@@ -68,9 +68,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()-1
             )
             #mN
-            Mean = self.ResultData['Plot']['ROOTObject'].GetMean(2)
+            Mean = self.ResultData['Plot']['ROOTObject'].GetMean(3)
             #sN
-            RMS = self.ResultData['Plot']['ROOTObject'].GetRMS(2)
+            RMS = self.ResultData['Plot']['ROOTObject'].GetRMS(3)
             #nN
             Integral = self.ResultData['Plot']['ROOTObject'].Integral(
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst()+1,
