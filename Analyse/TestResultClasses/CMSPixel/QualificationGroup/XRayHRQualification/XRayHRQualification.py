@@ -175,7 +175,7 @@ class TestResult(GeneralTestResult):
                     
                     # Measured Efficiency
                     HighRateData['Eff_measured_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
-                        EfficiencyDistributionTestResultObject.ResultData['KeyValueDictPairs']['RealHitrate']['Value']
+                        EfficiencyDistributionTestResultObject.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue']
                     )
                     
                     # Measured Hitrate

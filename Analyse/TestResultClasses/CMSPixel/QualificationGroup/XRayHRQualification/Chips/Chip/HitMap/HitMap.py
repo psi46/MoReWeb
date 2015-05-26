@@ -6,10 +6,11 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_HotPixelMap_TestResult'
-        self.NameSingle = 'HotPixelMap'
+        self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_HitMap_TestResult'
+        self.NameSingle = 'HitMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
-        
+        #self.ResultData['Plot']['Format'] = 'png'
+        #self.AdditionalImageFormats = ['root']
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
@@ -17,7 +18,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
                 self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
-                "Xray.hitMap_hotpixels_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
+                "HighRate.highRate_calmap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
             ).Clone(self.GetUniqueID())
         )
         
@@ -25,6 +26,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
+            #self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
+            #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
+            #    'ROOTObject'].GetMaximum())
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
@@ -34,7 +38,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
 
         self.SaveCanvas()
-        self.Title = 'Hot Pixel Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
+        self.Title = 'Efficiency Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         
 
 

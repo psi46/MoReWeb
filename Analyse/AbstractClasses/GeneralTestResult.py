@@ -106,7 +106,8 @@ class GeneralTestResult(object):
             # Key / ValueDict (dict with {Value, Unit, Label}, if Label not specified, the key is used as label) Pairs
             # 'KeyValueDictPairs':{
             # 'MyKey':{
-            # 'Value':25,
+            # 'Value':'25',
+            # 'NumericValue':25,
             # 'Unit': 'kg',
             # 'Label': 'My Key'
             # }

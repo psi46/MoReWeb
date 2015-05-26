@@ -18,7 +18,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'RealHitrate':{
                 'Value':'{0:1.0f}'.format(-1),
-                'Label':'Real Hitrate'
+                'Label':'Real Hitrate',
+                'Unit':'MHz/cm2'
             }
         }
     def PopulateResultData(self):
@@ -60,9 +61,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         )
         NTriggers = float(NTriggersROOTObject.GetEntries())
         NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
-        RealHitrate = NHits / (NTriggers*TimeConstant*Area)
+        RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6
         
         self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.2f}'.format(RealHitrate)
+        self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
         self.ResultData['KeyList'] += ['RealHitrate']
         self.Title = 'Background Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         

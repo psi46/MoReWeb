@@ -28,8 +28,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         EfficiencyList = array.array('d', [100])
         ScalingFactor = 1e-6
         for Rate in Rates:
-            RealHitRate = float(self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value'])
-            RealHitrateList.append(RealHitRate*ScalingFactor)
+            RealHitRate = float(self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'])
+            RealHitrateList.append(RealHitRate)
             Efficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyDistribution_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
             EfficiencyList.append(Efficiency)
         
