@@ -63,9 +63,15 @@ class TestResultEnvironment:
         'PixelMapMaskDefectUpperThreshold': 0,
         'BumpBondingProblemsNSigma': 5,
         'XRayHighRateEfficiency_min_allowed_efficiency_50':0,
+        'XRayHighRateEfficiency_min_allowed_efficiency_edge_50':0,
         'XRayHighRateEfficiency_min_allowed_efficiency_150':0,
-        'XRayHighRateEfficiency_max_allowed_loweff_A':0
-        
+        'XRayHighRateEfficiency_min_allowed_efficiency_edge_150':0,
+        'XRayHighRateEfficiency_max_allowed_loweff_A_50':10,
+        'XRayHighRateEfficiency_max_allowed_loweff_A_150':10,
+        'XRayHighRateEfficiency_max_allowed_loweff_B_50':20,
+        'XRayHighRateEfficiency_max_allowed_loweff_B_150':20,
+        'XRayHighRateHotPixels_max_allowed_hot':100,
+        'XRayHighRateHotPixels_Threshold':1,
     }
     XRayHRQualificationConfiguration = {
         'Rates':[50,150],

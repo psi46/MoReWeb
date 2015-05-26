@@ -6,19 +6,18 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_EfficiencyMap_TestResult'
-        self.NameSingle = 'EfficiencyMap'
+        self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_HotPixelMap_TestResult'
+        self.NameSingle = 'HotPixelMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
-        #self.ResultData['Plot']['Format'] = 'png'
-        #self.AdditionalImageFormats = ['root']
+        
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(self.Attributes['Rate'])],
-                "HighRate.highRate_calmap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
+                "Xray.hitMap_hotpixels_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
             ).Clone(self.GetUniqueID())
         )
         
@@ -38,7 +37,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
 
         self.SaveCanvas()
-        self.Title = 'Efficiency Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
+        self.Title = 'Hot Pixel Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         
 
 

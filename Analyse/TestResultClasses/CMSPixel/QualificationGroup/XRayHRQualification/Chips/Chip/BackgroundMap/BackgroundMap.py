@@ -39,8 +39,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             #self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
             #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
             #    'ROOTObject'].GetMaximum())
-            #self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold difference");
-            #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column");
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();

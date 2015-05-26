@@ -91,6 +91,11 @@ class TestResult(GeneralTestResult):
             grade = self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Grade']['Value']
         except KeyError:
             grade = 'None'
+        
+        
+       
+        
+        
         print 'fill row'
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
@@ -98,8 +103,6 @@ class TestResult(GeneralTestResult):
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
             'Grade': grade,
-            'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][
-                'Value'],
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -109,45 +112,92 @@ class TestResult(GeneralTestResult):
             'AbsFulltestSubfolder': self.FinalResultsStoragePath,
             'InputTarFile': os.environ.get('TARFILE', None),
             'MacroVersion': os.environ.get('MACROVERSION', None),
-            #
-
-            'initialCurrent': initialCurrent,
-            'Comments': '',
-            'nCycles': None,
-            'CycleTempLow': None,
-            'CycleTempHigh': None,
-
-            #
-            # added by Tommaso
-            #
-            'nNoisyPixels':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'],
             
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
             'Operator': self.Attributes['Operator'],
-            #
-            # added by Felix for the new Overview Table
-            #
-            # for A/B/C sub gradings
             
-            'NoiseNGradeA':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeAROCs'][
-                    'Value'],
-            'NoiseNGradeB':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeBROCs'][
-                    'Value'],
-            'NoiseNGradeC':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeCROCs'][
-                    'Value'],
 
         }
         print 'fill row end'
         if False and self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
-            from PixelDB import *
-            pdb = PixelDBInterface(operator="tommaso", center="pisa")
-            pdb.connectToDB()
+            #from PixelDB import *
+            #pdb = PixelDBInterface(operator="tommaso", center="pisa")
+            #pdb.connectToDB()
+            HighRateData = {
+                'Rates':self.Attributes['Rates']
+            }
+            GradingTestResultObject = self.ResultData['SubTestResults']['Grading']
+            EfficiencyOverviewTestResultObject = self.ResultData['SubTestResults']['EfficiencyOverview']
             
+            for Rate in self.Attributes['Rates']:
+                # Number of pixels with efficiency below cut (Sum over all 16 ROCs is module value)
+                HighRateData['LowEffPixels_Module_{Rate}'.format(Rate=Rate)] = float(
+                    GradingTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)]['Value']
+                )
+                # Measured Efficiency (Mean of all 16 ROCs is module value)
+                HighRateData['Eff_measured_Module_{Rate}'.format(Rate=Rate)] = float(
+                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['MeasuredEfficiencyMean_{Rate}'.format(Rate=Rate)]['Value']
+                )
+                
+                # Measured Hitrate (Mean of all 16 ROCs is module value)
+                HighRateData['HRate_Eff_measured_Module_{Rate}'.format(Rate=Rate)] = float(
+                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['MeasuredHitrateMean_{Rate}'.format(Rate=Rate)]['Value']
+                )
+                
+                # Interpolated Efficiency (Mean of all 16 ROCs is module value)
+                HighRateData['Eff_Module_{Rate}'.format(Rate=Rate)] = float(
+                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiencyMean_{Rate}'.format(Rate=Rate)]['Value']
+                )
+                
+            for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+                ChipTestResultObject = self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                GradingTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['Grading']
+                EfficiencyInterpolationTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['EfficiencyInterpolation']
+                
+                ChipNo = ChipTestResultObject.Attributes['ChipNo']
+                
+                
+                for Rate in self.Attributes['Rates']:
+                    EfficiencyDistributionTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['EfficiencyDistribution_{Rate}'.format(Rate)]
+                    BackgroundMapTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['BackgroundMap_{Rate}'.format(Rate=Rate)]
+                    
+                    ## Efficiency
+                    
+                    # Number of pixels with efficiency below cut
+                    HighRateData['LowEffPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                        GradingTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)]['Value']
+                    )
+                    # Addresses of low efficiency pixels
+                    HighRateData['Addr_LowEffPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = (
+                        GradingTestResultObject.ResultData['HiddenData']['ListOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)]
+                    )
+                    
+                    # Measured Efficiency
+                    HighRateData['Eff_measured_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                        EfficiencyDistributionTestResultObject.ResultData['KeyValueDictPairs']['RealHitrate']['Value']
+                    )
+                    
+                    # Measured Hitrate
+                    HighRateData['HRate_Eff_measured_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                        BackgroundMapTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value']
+                    )
+                    
+                    # Interpolated Efficiency
+                    HighRateData['Eff_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                        EfficiencyInterpolationTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value']
+                    )
+                    
+                    ## Hot Pixels
+                    # Number of pixels with efficiency below cut
+                    HighRateData['HotPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                        GradingTestResultObject.ResultData['KeyValueDictPairs']['NumberOfHotPixels_{Rate}'.format(Rate=Rate)]['Value']
+                    )
+                    # Addresses of hot pixels
+                    HighRateData['Addr_HotPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = (
+                        GradingTestResultObject.ResultData['HiddenData']['ListOfHotPixels_{Rate}'.format(Rate=Rate)]
+                    )
+                    
             
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
@@ -162,22 +212,9 @@ class TestResult(GeneralTestResult):
                         TestType,
                         QualificationType,
                         Grade,
-                        PixelDefects,
-                        ROCsMoreThanOnePercent,
-                        Noise,
-                        Trimming,
-                        PHCalibration,
-                        CurrentAtVoltage150V,
-                        RecalculatedVoltage,
-                        IVSlope,
-                        Temperature,
                         RelativeModuleFinalResultsPath,
-                        FulltestSubfolder,
-                        initialCurrent,
-                        Comments,
-                        nCycles,
-                        CycleTempLow,
-                        CycleTempHigh
+                        FulltestSubfolder
+                        
                     )
                     VALUES (
                         :ModuleID,
@@ -185,22 +222,9 @@ class TestResult(GeneralTestResult):
                         :TestType,
                         :QualificationType,
                         :Grade,
-                        :PixelDefects,
-                        :ROCsMoreThanOnePercent,
-                        :Noise,
-                        :Trimming,
-                        :PHCalibration,
-                        :CurrentAtVoltage150V,
-                        :RecalculatedVoltage,
-                        :IVSlope,
-                        :Temperature,
                         :RelativeModuleFinalResultsPath,
-                        :FulltestSubfolder,
-                        :initialCurrent,
-                        :Comments,
-                        :nCycles,
-                        :CycleTempLow,
-                        :CycleTempHigh
+                        :FulltestSubfolder
+                        
                     )
                     ''', Row)
                 return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid

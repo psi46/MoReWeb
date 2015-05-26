@@ -12,11 +12,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs'] = {
             'InterpolatedEfficiency50': {
                 'Value':'{0:1.0f}'.format(-1),
-                'Label':'Interpolated Efficiency 50'
+                'Label':'Interpol. Efficiency 50'
             },
             'InterpolatedEfficiency150': {
                 'Value':'{0:1.0f}'.format(-1),
-                'Label':'Interpolated Efficiency 150'
+                'Label':'Interpol. Efficiency 150'
             },
         }
         
@@ -45,6 +45,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             InterpolationFunction = self.ResultData['Plot']['ROOTObject'].GetFunction('pol2')
             
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 110.);
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]");
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency [%]");
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw();
             
             line50 = ROOT.TLine().DrawLine(
@@ -63,11 +68,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
             #    'ROOTObject'].GetMaximum())
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency [%]");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
             self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency50']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(50e6*ScalingFactor))
             self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency150']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(150e6*ScalingFactor))
             self.ResultData['KeyList'] += ['InterpolatedEfficiency50','InterpolatedEfficiency150'] 

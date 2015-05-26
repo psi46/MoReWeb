@@ -48,6 +48,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                         'Order':30+i
                     },
+                },
+                {
+                    'Key':'HotPixelMap_{:d}'.format(Rate),
+                    'Module':'HotPixelMap',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'HotPixelMap_{:d}'.format(Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':40+i
+                    },
                 }
             ]
             i+=1
@@ -55,6 +66,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['SubTestResultDictList'] += [
                 {
                     'Key':'EfficiencyInterpolation',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':2    
+                    },
+                    
+                },
+                {
+                    'Key':'Grading',
                     'InitialAttributes':{
                     },
                     'DisplayOptions':{
