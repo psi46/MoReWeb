@@ -12,4 +12,4 @@ refit = False
 [XRayHRQualification]
 Rates = 50,150
 TimeConstant = 25e-9
-Area = 1
+Area = 1e4
