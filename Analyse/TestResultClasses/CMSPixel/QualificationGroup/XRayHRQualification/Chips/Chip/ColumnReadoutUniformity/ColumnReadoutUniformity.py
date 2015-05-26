@@ -47,38 +47,46 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw();
             
-            lineCLow = ROOT.TLine().DrawLine(
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
-            )
-            lineCLow.SetLineWidth(2);
-            lineCLow.SetLineStyle(2)
-            lineCLow.SetLineColor(ROOT.kRed)
             
-            lineCHigh = ROOT.TLine().DrawLine(
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'],
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
-            )
-            lineCHigh.SetLineWidth(2);
-            lineCHigh.SetLineStyle(2)
-            lineCHigh.SetLineColor(ROOT.kRed)
             
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst()+1,
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()-1
             )
+            Fit = self.ResultData['Plot']['ROOTObject'].Fit('pol0','RQ0')
             #mN
-            Mean = self.ResultData['Plot']['ROOTObject'].GetMean(3)
+            Mean = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParameter(0)
             #sN
-            RMS = self.ResultData['Plot']['ROOTObject'].GetRMS(3)
+            RMS = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParError(0)
             #nN
             Integral = self.ResultData['Plot']['ROOTObject'].Integral(
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst()+1,
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()-1
             )
             
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst()-1,
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()+1
+            )
+            
+            lineCLow = ROOT.TLine().DrawLine(
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low']*Mean,
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low']*Mean,
+            )
+            lineCLow.SetLineWidth(2);
+            lineCLow.SetLineStyle(2)
+            lineCLow.SetLineColor(ROOT.kRed)
+            
+            lineCHigh = ROOT.TLine().DrawLine(
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']*Mean,
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']*Mean,
+            )
+            lineCHigh.SetLineWidth(2);
+            lineCHigh.SetLineStyle(2)
+            lineCHigh.SetLineColor(ROOT.kRed)
+            
             self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(Integral)
-            self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(Mean)
+            self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.0f}'.format(Mean)
             self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMS)
 
             self.ResultData['KeyList'] += ['N','mu','sigma']

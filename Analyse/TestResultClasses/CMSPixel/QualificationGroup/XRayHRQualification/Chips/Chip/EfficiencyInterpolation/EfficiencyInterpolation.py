@@ -34,14 +34,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             EfficiencyList.append(Efficiency)
         
         self.Canvas.Clear()
-        print RealHitrateList
         
         self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(len(RealHitrateList),RealHitrateList,EfficiencyList)
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             
             
-            self.ResultData['Plot']['ROOTObject'].Fit('pol2')
+            self.ResultData['Plot']['ROOTObject'].Fit('pol2','Q')
             InterpolationFunction = self.ResultData['Plot']['ROOTObject'].GetFunction('pol2')
             
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 110.);

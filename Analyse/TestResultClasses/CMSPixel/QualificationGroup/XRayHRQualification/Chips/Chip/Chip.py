@@ -105,7 +105,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     
                 },
             ]
-        print self.ResultData['SubTestResultDictList']
         
     def PopulateResultData(self):
         self.CloseSubTestResultFileHandles()
