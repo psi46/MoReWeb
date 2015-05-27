@@ -66,8 +66,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.Cut.SetLineColor(ROOT.kRed)
             self.Cut.Draw('PL')
 
-        self.SaveCanvas()
         self.Title = 'Bump Bonding: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        self.SaveCanvas()
         self.ResultData['KeyValueDictPairs']['Mean']['Value'] = round(mean, 2)
         self.ResultData['KeyList'].append('Mean')
         self.ResultData['KeyValueDictPairs']['RMS']['Value'] = round(rms, 2)

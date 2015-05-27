@@ -61,6 +61,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Legend.Draw()
 
 
-        self.SaveCanvas()
         self.Title = 'Trim Bit Test'
-        
+        self.SaveCanvas()        

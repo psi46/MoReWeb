@@ -75,6 +75,7 @@ class TestResultEnvironment:
         'XRayHighRate_factor_dcol_uniformity_low':50,
         'XRayHighRate_factor_dcol_uniformity_high':100,
         'XRayHighRate_factor_readout_uniformity':5,
+        'XRayHighRate_Factor_ColEfficiency':5,
     }
     XRayHRQualificationConfiguration = {
         'Rates':[50,150],

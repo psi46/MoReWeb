@@ -33,8 +33,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
             
 
-        self.SaveCanvas()
         self.Title = 'Hot Pixel Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
-        
+        self.SaveCanvas()        
 
 

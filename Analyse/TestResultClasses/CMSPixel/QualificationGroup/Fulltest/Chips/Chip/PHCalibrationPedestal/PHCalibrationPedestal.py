@@ -110,9 +110,8 @@ class TestResult(GeneralTestResult):
         line2.SetLineWidth(3)
         line2.SetLineStyle(2)
 
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'PH Calibration: Pedestal (Vcal)'
-        
+        self.SaveCanvas()        
         self.ResultData['KeyValueDictPairs'] = {
             'N': {
                 'Value': '{0:1.0f}'.format(IntegralPedestal),

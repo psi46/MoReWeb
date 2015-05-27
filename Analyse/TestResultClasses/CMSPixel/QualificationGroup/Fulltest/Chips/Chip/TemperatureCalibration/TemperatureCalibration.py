@@ -28,9 +28,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw("A*");
 
 
-        self.SaveCanvas()
         self.Title = 'Address Levels: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        
+        self.SaveCanvas()        
     def analyse(self, directoryName, chipId)
         tl = ROOT.TLatex()
 

@@ -117,8 +117,7 @@ class TestResult(GeneralTestResult):
         print fileHandlePath
         self.analyseTemp(fileHandlePath + '/temperature.log')
         if self.verbose: raw_input('Press enter')
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Temperature'
-        
+        self.SaveCanvas()        
     def CustomWriteToDatabase(self, ParentID):
         pass

@@ -92,8 +92,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyList'] += ['N','mu','sigma']
             
 
-        self.SaveCanvas()
         self.Title = 'Col. Read. Unif. {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
-        
+        self.SaveCanvas()        
 
 

@@ -130,9 +130,14 @@ class TestResult(GeneralTestResult):
             GradingTestResultObject = self.ResultData['SubTestResults']['Grading']
             EfficiencyOverviewTestResultObject = self.ResultData['SubTestResults']['EfficiencyOverview']
             
+            # Number of columns with efficiency below cut (Sum over all 16 ROCs is module value)
+            HighRateData['LowEffColumns_Module'] = int(
+                EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyColumnsSum']['Value']
+            )
+            
             for Rate in self.Attributes['Rates']:
                 # Number of pixels with efficiency below cut (Sum over all 16 ROCs is module value)
-                HighRateData['LowEffPixels_Module_{Rate}'.format(Rate=Rate)] = float(
+                HighRateData['LowEffPixels_Module_{Rate}'.format(Rate=Rate)] = int(
                     GradingTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)]['Value']
                 )
                 # Measured Efficiency (Mean of all 16 ROCs is module value)
@@ -151,7 +156,7 @@ class TestResult(GeneralTestResult):
                 )
                 
                 # Number of hot pixels (Sum over all 16 ROCs is module value)
-                HighRateData['HotPixels_Module_{Rate}'.format(Rate=Rate)] = float(
+                HighRateData['HotPixels_Module_{Rate}'.format(Rate=Rate)] = int(
                     EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfHotPixelsSum_{Rate}'.format(Rate=Rate)]['Value']
                 )
                 
@@ -165,6 +170,8 @@ class TestResult(GeneralTestResult):
                     EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnsSum_{Rate}'.format(Rate=Rate)]['Value']
                 )
                 
+            
+                
             for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
                 ChipTestResultObject = self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
                 GradingTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['Grading']
@@ -173,6 +180,16 @@ class TestResult(GeneralTestResult):
                 
                 ChipNo = ChipTestResultObject.Attributes['ChipNo']
                 
+                ## Column Efficiency
+                # Number of columns with efficiency below cut
+                HighRateData['LowEffColumns_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
+                    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowEfficiencyColumns']
+                )
+                
+                # Number of events where a column has low efficiency
+                HighRateData['LowEffCol_Events_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
+                    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowEfficiencyColumnEvents']
+                )
                 
                 for Rate in self.Attributes['Rates']:
                     EfficiencyDistributionTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['EfficiencyDistribution_{Rate}'.format(Rate)]
@@ -181,7 +198,7 @@ class TestResult(GeneralTestResult):
                     ColumnReadoutUniformityTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)]
                     
                     
-                    ## Efficiency
+                    ## Pixel Efficiency
                     
                     # Number of pixels with efficiency below cut
                     HighRateData['LowEffPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
@@ -249,6 +266,8 @@ class TestResult(GeneralTestResult):
                     HighRateData['NonUniformEvents_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = int(
                         GradingTestResultObject.ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]
                     )
+                    
+                    
                     
             # here comes the code for pixel db upload
             pass

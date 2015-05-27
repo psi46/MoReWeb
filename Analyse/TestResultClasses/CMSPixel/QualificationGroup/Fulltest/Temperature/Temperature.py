@@ -260,6 +260,5 @@ class TestResult(GeneralTestResult):
         }
         self.ResultData['KeyList'] = ['Temperature', 'Duration']
         self.createTemperaturePlot()
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Temperature'
-        
+        self.SaveCanvas()        

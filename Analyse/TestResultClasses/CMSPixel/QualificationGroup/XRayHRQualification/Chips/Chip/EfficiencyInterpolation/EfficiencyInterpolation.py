@@ -71,8 +71,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency150']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(150e6*ScalingFactor))
             self.ResultData['KeyList'] += ['InterpolatedEfficiency50','InterpolatedEfficiency150'] 
 
-        self.SaveCanvas()
         self.Title = 'Efficiency Interpolation: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        
+        self.SaveCanvas()        
 
 

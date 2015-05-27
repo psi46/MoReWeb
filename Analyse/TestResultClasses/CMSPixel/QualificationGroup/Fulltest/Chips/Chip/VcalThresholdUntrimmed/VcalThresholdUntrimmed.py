@@ -70,6 +70,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
 
 
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Vcal Threshold Untrimmed'
-        
+        self.SaveCanvas()        

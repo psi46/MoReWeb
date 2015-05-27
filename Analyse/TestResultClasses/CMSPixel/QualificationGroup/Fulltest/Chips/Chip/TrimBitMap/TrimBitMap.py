@@ -39,6 +39,5 @@ class TestResult(GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
-        self.SaveCanvas()
         self.Title = 'Trim Bit Map'
-        
+        self.SaveCanvas()        

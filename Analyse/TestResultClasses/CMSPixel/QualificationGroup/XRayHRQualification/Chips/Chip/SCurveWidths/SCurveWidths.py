@@ -4,7 +4,7 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_SCurveWidths_TestResult'
+        self.Name='CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_SCurveWidths_TestResult'
         self.NameSingle='SCurveWidths'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.ResultData['KeyValueDictPairs'] = {
@@ -27,40 +27,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(1)
-        print 'SCurveWidth'
-        #   // -- sCurve width and noise level
-
-#         self.ParentObject.ParentObject.FileHandle.Get("AddressLevels_C{ChipNo}".format(ChipNo=self.ParentObject.Attributes['ChipNo']) )
-
-        #hw
-        self.ResultData['Plot']['ROOTObject'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) # hw
+        ChipNo=self.ParentObject.Attributes['ChipNo']
+        
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) # hw
         self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) #Noise in unbonded pixel (not displayed) # hd
         self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # ht
-        isDigitalROC = False
-
-        ChipNo=self.ParentObject.Attributes['ChipNo']
-        HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
-        self.ResultData['Plot']['ROOTObject_h2'] = None
-        if HistoDict.has_option(self.NameSingle,'Analog'):
-            histname = HistoDict.get(self.NameSingle,'Analog')
-            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
-            if object != None:
-                self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
-
-
-        if not self.ResultData['Plot']['ROOTObject_h2']:
-            isDigitalROC = True
-            histname = HistoDict.get(self.NameSingle,'Digital')
-            object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
-            if object != None:
-                self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
-        if not self.ResultData['Plot']['ROOTObject_h2']:
-            print 'Cannot find Histogram ',HistoDict.get(self.NameSingle,'Digital'),HistoDict.has_option(self.NameSingle,'Analog')
-            print[x.GetName() for x in self.ParentObject.ParentObject.FileHandle.GetListOfKeys()]
-            print 'NameSingle: ', self.NameSingle
-            raise KeyError('SCurveWidth: Cannot Find Histogram in ROOT File')
-        Directory = self.RawTestSessionDataPath
-        SCurveFileName = "{Directory}/SCurve_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
+        
+        Rate = self.Attributes['Rate']
+        Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{:d}'.format(Rate)]
+        SCurveFileName = "{Directory}/SCurveData_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         SCurveFile = open(SCurveFileName, "r")
 
         self.FileHandle = SCurveFile # needed in summary
@@ -82,20 +57,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Width = float(LineArray[1])
 #                         if self.verbose:
                         if self.verbose:  print column, row, Threshold, Width
-                        #Threshold, Sign, SomeString, a, b = Line.strip().split()
-
+                        
                         self.ResultData['Plot']['ROOTObject'].Fill(Width)
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
-                        if not isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:
-                            self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
-                        elif isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) <= self.TestResultEnvironmentObject.GradingParameters['BumpBondThr']:
-                            self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
-                    else:
-                        if self.verbose: print column, row, 'NAN'
-            if self.verbose:
-                print 'Entries: ', self.ResultData['Plot']['ROOTObject'].GetEntries(), self.ResultData['Plot']['ROOTObject'].GetMean(), self.ResultData['Plot']['ROOTObject'].GetRMS()
-                raw_input()
+                        self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
+
 
 
         if self.ResultData['Plot']['ROOTObject_ht'].GetMaximum() < self.ResultData['HiddenData']['htmax']:

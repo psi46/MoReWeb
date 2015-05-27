@@ -92,11 +92,40 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                         'Order':70+i
                     },
+                },
+                {
+                    'Key':'SCurveWidths_{:d}'.format(Rate),
+                    'Module':'SCurveWidths',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'SCurveWidths_{:d}'.format(Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':100+i
+                    },
                 }
             ]
             i+=1
 
         self.ResultData['SubTestResultDictList'] += [
+                {
+                    'Key':'ColumnEfficiencyPerColumn',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':80+i   
+                    },
+                    
+                },
+                {
+                    'Key':'ColumnEfficiencyEventsPerColumn',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':90+i   
+                    },
+                    
+                },
                 {
                     'Key':'EfficiencyInterpolation',
                     'InitialAttributes':{
