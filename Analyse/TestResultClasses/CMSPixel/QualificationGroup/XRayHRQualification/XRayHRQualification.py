@@ -152,7 +152,17 @@ class TestResult(GeneralTestResult):
                 
                 # Number of hot pixels (Sum over all 16 ROCs is module value)
                 HighRateData['HotPixels_Module_{Rate}'.format(Rate=Rate)] = float(
-                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['HotPixelsSum_{Rate}'.format(Rate=Rate)]['Value']
+                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfHotPixelsSum_{Rate}'.format(Rate=Rate)]['Value']
+                )
+                
+                # Number of pixels with no hits (Sum over all 16 ROCs is module value)
+                HighRateData['NoHitPixels_Module_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = int(
+                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfHotPixelsSum_{Rate}'.format(Rate=Rate)]['Value']
+                )
+                
+                # Number of columns with non uniform readout (Sum over all 16 ROCs is module value)
+                HighRateData['NonUniformColumns_Module_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = int(
+                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnsSum_{Rate}'.format(Rate=Rate)]['Value']
                 )
                 
             for i in self.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
@@ -160,12 +170,16 @@ class TestResult(GeneralTestResult):
                 GradingTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['Grading']
                 EfficiencyInterpolationTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['EfficiencyInterpolation']
                 
+                
                 ChipNo = ChipTestResultObject.Attributes['ChipNo']
                 
                 
                 for Rate in self.Attributes['Rates']:
                     EfficiencyDistributionTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['EfficiencyDistribution_{Rate}'.format(Rate)]
                     BackgroundMapTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['BackgroundMap_{Rate}'.format(Rate=Rate)]
+                    HitMapTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)]
+                    ColumnReadoutUniformityTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)]
+                    
                     
                     ## Efficiency
                     
@@ -195,7 +209,7 @@ class TestResult(GeneralTestResult):
                     
                     ## Hot Pixels
                     # Number of pixels with efficiency below cut
-                    HighRateData['HotPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                    HighRateData['HotPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = int(
                         GradingTestResultObject.ResultData['KeyValueDictPairs']['NumberOfHotPixels_{Rate}'.format(Rate=Rate)]['Value']
                     )
                     # Addresses of hot pixels
@@ -203,8 +217,41 @@ class TestResult(GeneralTestResult):
                         GradingTestResultObject.ResultData['HiddenData']['ListOfHotPixels_{Rate}'.format(Rate=Rate)]
                     )
                     
+                    ## No Hit Pixels
+                    # Number of pixels with no hits
+                    HighRateData['NoHitPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = int(
+                        HitMapTestResultObject.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value']
+                    )
+                    # Measured hit rate
+                    HighRateData['XRay_Hitrate_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                        HitMapTestResultObject.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue']
+                    )
+                    # Addresses of hot pixels
+                    HighRateData['Addr_NoHitPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = (
+                        HitMapTestResultObject.ResultData['HiddenData']['ListOfDefectivePixels']
+                    )
                     
+                    ## Column Readout Uniformity
+                    # Number of columns with non uniform readout
+                    HighRateData['NonUniformColumns_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = int(
+                        GradingTestResultObject.ResultData['HiddenData']['NumberOfNonUniformColumns_{Rate}'.format(Rate=Rate)]
+                    )
                     
+                    # Sigma/Mean column uniformity
+                    HighRateData['UniformColumns_RelSigma_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                        ColumnReadoutUniformityTestResultObject.ResultData['KeyValueDictPairs']['sigma']['Value']
+                    )/float(
+                        ColumnReadoutUniformityTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value']
+                    )
+                    
+                    ## Column Readout Uniformity over Time
+                    # Number of Events with non uniform readout
+                    HighRateData['NonUniformEvents_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = int(
+                        GradingTestResultObject.ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]
+                    )
+                    
+            # here comes the code for pixel db upload
+            pass
             
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
