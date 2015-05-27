@@ -24,6 +24,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['HiddenData']['htmax'] = 255.;
         self.ResultData['HiddenData']['htmin'] = 0.
+        self.ResultData['HiddenData']['NumberOfNoisyPixels'] = 0
+        self.ResultData['HiddenData']['ListOfNoisyPixels'] = []
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(1)
@@ -43,9 +45,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if not SCurveFile:
             raise Exception('Cannot find SCurveFile "%s"'%SCurveFileName)
         else:
-            #Omit the first two lines
+            #Omit the first line
             print 'read file',SCurveFileName
-            Line = SCurveFile.readline()
             Line = SCurveFile.readline()
 
             for column in range(self.nCols): #Columns
@@ -55,14 +56,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         LineArray = Line.strip().split()
                         Threshold = float(LineArray[0])
                         Width = float(LineArray[1])
-#                         if self.verbose:
-                        if self.verbose:  print column, row, Threshold, Width
                         
                         self.ResultData['Plot']['ROOTObject'].Fill(Width)
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
-
+                        if Threshold > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_{Rate}'.format(Rate=self.Attributes['Rate'])]:
+                            self.ResultData['HiddenData']['NumberOfNoisyPixels'] += 1
+                            self.ResultData['HiddenData']['ListOfNoisyPixels'].append((ChipNo, column, row))
 
 
         if self.ResultData['Plot']['ROOTObject_ht'].GetMaximum() < self.ResultData['HiddenData']['htmax']:
