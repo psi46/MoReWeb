@@ -212,17 +212,26 @@ class TestResult(GeneralTestResult):
             print 'SetParameterLimits2: ', 0.5 * maximum, 2 * maximum
 
         #Initial guess for the center of the signal to be where the maximum bin is located
+        low_edge = histo.FindLastBinAbove(maximum * 0.2)
+        high_edge = histo.FindLastBinAbove(maximum * 0.2)
+
+        histo.GetXaxis().SetRange(int(low_edge + (high_edge-low_edge) * 0.4), high_edge);
+        maxbin = histo.GetMaximumBin();
+        histo.GetXaxis().SetRange();
+
+        print "maxbin: %i"%maxbin
+
         myfit.SetParameter(3, maxbin)
         if self.verbose:
             print 'SetParameter3: ', myfit.GetParameter(3)
 
-        low = maxbin - 2 * signalSigma
+        low = maxbin - 3 * signalSigma
 
         #if low < trimvalue:
         #    low = trimvalue/2
-        myfit.SetParLimits(3, low, maxbin + 2 * signalSigma)
+        myfit.SetParLimits(3, low, maxbin + 3 * signalSigma)
         if self.verbose:
-            print 'SetParameterLimits3: ', maxbin + 2 * signalSigma
+            print 'SetParameterLimits3: ', maxbin + 3 * signalSigma
 
         #Initial guess for the sigma of the signal, from the hardcoded value above
         myfit.SetParameter(4, signalSigma)

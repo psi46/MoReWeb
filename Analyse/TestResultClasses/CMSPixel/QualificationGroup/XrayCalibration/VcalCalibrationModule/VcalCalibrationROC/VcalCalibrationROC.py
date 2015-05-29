@@ -26,7 +26,7 @@ class TestResult(GeneralTestResult):
             print "".ljust(len(tag), '=')
             print tag
 
-        fit_option = "Q"
+        fit_option = "QB"
         if not self.verbose:
             fit_option += 'Q'
         peak_centers = array.array('d', [])
@@ -100,24 +100,30 @@ class TestResult(GeneralTestResult):
         # Fitting of Slope
         maxTrim *= 1.05  # todo: THink about a good value where you dont wanna fit...
         xmin = max(maxTrim, sorted_peak_centers[0])
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
+        pol1TF1 = ROOT.TF1("pol1tf1","pol1", xmin, sorted_peak_centers[len(sorted_peak_centers) - 1]);
+        pol1TF1.SetParLimits(0, -2000, 2000);
+        pol1TF1.SetParLimits(1, 5, 500);
+        pol1TF1.SetParameter(0, 0);
+        pol1TF1.SetParameter(1, 50);
+
+        self.ResultData['Plot']['ROOTObject'].Fit(pol1TF1, fit_option, "SAME", xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])
-        chi2_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
-        ndf_total = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
+        chi2_total = pol1TF1.GetChisquare()
+        ndf_total = pol1TF1.GetNDF()
         if ndf_total > 0:
             chi2_total /= ndf_total
         xmin = max(maxTrim, sorted_peak_centers[1])
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
+        self.ResultData['Plot']['ROOTObject'].Fit(pol1TF1, fit_option, "SAME", xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])
-        chi2_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
-        ndf_right = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
+        chi2_right = pol1TF1.GetChisquare()
+        ndf_right = pol1TF1.GetNDF()
         if ndf_right > 0:
             chi2_right /= ndf_right
         xmin = max(maxTrim, sorted_peak_centers[0])
-        self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
+        self.ResultData['Plot']['ROOTObject'].Fit(pol1TF1, fit_option, "SAME", xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 2])
-        chi2_left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetChisquare()
-        ndf_left = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1").GetNDF()
+        chi2_left = pol1TF1.GetChisquare()
+        ndf_left = pol1TF1.GetNDF()
         if ndf_left > 0:
             chi2_left /= ndf_left
         if self.verbose:
@@ -128,22 +134,22 @@ class TestResult(GeneralTestResult):
         if ((chi2_right < chi2_total) or (chi2_left < chi2_total)) and ndf_total > 1 and self.HistoDict.get('XrayCalibration','FitOption') != 'all':
             if chi2_right < chi2_left:
                 xmin = max(maxTrim, sorted_peak_centers[1])
-                self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
+                self.ResultData['Plot']['ROOTObject'].Fit(pol1TF1, fit_option, "SAME", xmin,
                                                           sorted_peak_centers[len(sorted_peak_centers) - 1])
                 if self.verbose:
                     print "Excluding Leftmost Point because chi2Total=", chi2_total, " and chi2Right=", chi2_right
             else:
                 xmin = max(maxTrim, sorted_peak_centers[0])
-                self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
+                self.ResultData['Plot']['ROOTObject'].Fit(pol1TF1, fit_option, "SAME", xmin,
                                                           sorted_peak_centers[len(sorted_peak_centers) - 2])
                 if self.verbose:
                     print "Excluding Rightmost Point because chi2Total=", chi2_total, " and chi2Left=", chi2_left
         else:
             xmin = max(maxTrim, sorted_peak_centers[0])
-            self.ResultData['Plot']['ROOTObject'].Fit("pol1", fit_option, "SAME", xmin,
+            self.ResultData['Plot']['ROOTObject'].Fit(pol1TF1, fit_option, "SAME", xmin,
                                                       sorted_peak_centers[len(sorted_peak_centers) - 1])
 
-        fit = self.ResultData['Plot']['ROOTObject'].GetFunction("pol1")
+        fit = pol1TF1
         name = 'linFit_{Method}_C{ChipNo}'.format(Method=self.Attributes['Method'], ChipNo=self.Attributes['ChipNo'])
         self.ResultData['Plot']['ROOTObject'].GetListOfFunctions().Add(fit.Clone(name))
         self.ResultData['Plot']['ROOTObject'].GetFunction(name).SetRange(0, 255)
@@ -163,10 +169,10 @@ class TestResult(GeneralTestResult):
                 'Sigma': round(fit.GetParError(0), 3),
             },
             'chi2': {
-                'Value': round(fit.GetParameter(0), 3),
+                'Value': round(fit.GetChisquare() / fit.GetNDF(), 3),
                 'Label': 'Chi2',
                 'Unit': 'per NDF',
-                'Sigma': round(fit.GetChisquare() / fit.GetNDF(), 3),
+                'Sigma': 0,
             },
 
         }
