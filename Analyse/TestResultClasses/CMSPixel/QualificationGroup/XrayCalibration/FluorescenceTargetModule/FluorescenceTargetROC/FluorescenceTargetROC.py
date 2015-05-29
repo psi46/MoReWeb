@@ -154,10 +154,25 @@ class TestResult(GeneralTestResult):
     # '''
     def FitHistoSpectrum(self, histo, xmin, xmax):
         name = "fit_{0}".format(histo.GetName())
-        gausfit = self.FitGaus(histo)
-        gaus0 = gausfit.GetParameter(0)
-        gaus1 = gausfit.GetParameter(1)
-        gaus2 = gausfit.GetParameter(2)
+        gaus2fit = self.Fit2Gaus(histo)
+        maxbinabove = 0
+
+        if (abs(gaus2fit.GetParameter(1)-gaus2fit.GetParameter(4)) > 40):
+            if (gaus2fit.GetParameter(1) > gaus2fit.GetParameter(4)):
+                gaus0 = gaus2fit.GetParameter(0)
+                gaus1 = gaus2fit.GetParameter(1)
+                gaus2 = gaus2fit.GetParameter(2)
+            else:
+                gaus0 = gaus2fit.GetParameter(3)
+                gaus1 = gaus2fit.GetParameter(4)
+                gaus2 = gaus2fit.GetParameter(5)
+
+        else:
+            gausfit = self.FitGaus(histo, maxbinabove)
+            gaus0 = gausfit.GetParameter(0)
+            gaus1 = gausfit.GetParameter(1)
+            gaus2 = gausfit.GetParameter(2)
+
         if self.verbose:
             print 'Found Start parameter: ', gaus0, gaus1, gaus2
 
@@ -212,26 +227,17 @@ class TestResult(GeneralTestResult):
             print 'SetParameterLimits2: ', 0.5 * maximum, 2 * maximum
 
         #Initial guess for the center of the signal to be where the maximum bin is located
-        low_edge = histo.FindLastBinAbove(maximum * 0.2)
-        high_edge = histo.FindLastBinAbove(maximum * 0.2)
-
-        histo.GetXaxis().SetRange(int(low_edge + (high_edge-low_edge) * 0.4), high_edge);
-        maxbin = histo.GetMaximumBin();
-        histo.GetXaxis().SetRange();
-
-        print "maxbin: %i"%maxbin
-
         myfit.SetParameter(3, maxbin)
         if self.verbose:
             print 'SetParameter3: ', myfit.GetParameter(3)
 
-        low = maxbin - 3 * signalSigma
+        low = maxbin - 2 * signalSigma
 
         #if low < trimvalue:
         #    low = trimvalue/2
-        myfit.SetParLimits(3, low, maxbin + 3 * signalSigma)
+        myfit.SetParLimits(3, low, maxbin + 2 * signalSigma)
         if self.verbose:
-            print 'SetParameterLimits3: ', maxbin + 3 * signalSigma
+            print 'SetParameterLimits3: ', maxbin + 2 * signalSigma
 
         #Initial guess for the sigma of the signal, from the hardcoded value above
         myfit.SetParameter(4, signalSigma)
@@ -351,14 +357,14 @@ class TestResult(GeneralTestResult):
         return myfit
 
     # '''
-    # * Function that attempts to fit a simple gaussian to a spectra
+    # * Function that attempts to fit a sum of two gaussians to a spectra
     #    *
-    #    * Used to find initial guess for signal in other fits
+    #    * Used to check if shoulder + peak are separated or not
     #'''
-    def FitGaus(self, histo):
+    def Fit2Gaus(self, histo):
         xmin = histo.GetBinLowEdge(1)
         xmax = histo.GetBinLowEdge(histo.GetNbinsX())
-        fit = TF1("gausFit", "gaus(0)", xmin, xmax)
+        fit = TF1("gausFit", "gaus(0)+gaus(3)", xmin, xmax)
         y_avg = histo.Integral() / histo.GetNbinsX()
         #Signal peak should be have a sigma of ~10
         signalSigma = 10
@@ -384,7 +390,58 @@ class TestResult(GeneralTestResult):
         #Make sure we actually fit a 'signal like' peak, nothing too broad or narrow
         fit.SetParLimits(2, signalSigma - 5, signalSigma + 5)
 
+        fit.SetParameter(3, 0.5 * y_avg)
+        fit.SetParLimits(3, 0, histo.Integral())
+
+        fit.SetParameter(4, 50)
+        fit.SetParLimits(4, 10, 75)
+        fit.SetParameter(5, 20)
+        #broad shoulder
+        fit.SetParLimits(5, 0, 40)
+
         histo.Fit(fit, self.Attributes['fitOption'])
+        return fit
+
+    # '''
+    # * Function that attempts to fit a simple gaussian to a spectra
+    #    *
+    #    * Used to find initial guess for signal in other fits
+    #'''
+    def FitGaus(self, histo, maxbinabove = 0):
+        xmin = histo.GetBinLowEdge(1)
+        xmax = histo.GetBinLowEdge(histo.GetNbinsX())
+        fit = TF1("gausFit", "gaus(0)", xmin, xmax)
+        y_avg = histo.Integral() / histo.GetNbinsX()
+        #Signal peak should be have a sigma of ~10
+        signalSigma = 10
+        #Try to get where the peak should be
+        initguess = self.GetInitialEnergyGuess(self.Attributes["Target"])
+        left = 0
+        right = 0
+        if initguess < 0:
+            #No predefined position, so guess in the middle and put limits and lower and upper bounds and the guess at the mean value
+            initguess = histo.GetMean()
+            left = xmin
+            right = xmax
+        else:
+            left = initguess - 40
+            right = initguess + 40
+
+        fit.SetParameter(0, 0.5 * y_avg)
+        fit.SetParLimits(0, 0, histo.Integral())
+
+        fit.SetParameter(1, initguess)
+        fit.SetParLimits(1, max(left, maxbinabove), right)
+
+        fit.SetParameter(2, signalSigma)
+        #Make sure we actually fit a 'signal like' peak, nothing too broad or narrow
+        fit.SetParLimits(2, signalSigma - 5, signalSigma + 5)
+
+        if (maxbinabove > 0):
+            histo.GetXaxis().SetRange(int(max(left, maxbinabove)), int(right))
+
+        histo.Fit(fit, self.Attributes['fitOption'])
+        histo.GetXaxis().SetRange()
         return fit
 
     #'''
