@@ -39,9 +39,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             
-            
-            self.ResultData['Plot']['ROOTObject'].Fit('pol2','Q')
-            InterpolationFunction = self.ResultData['Plot']['ROOTObject'].GetFunction('pol2')
+            cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3",70,170)
+            self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'QR')
+            InterpolationFunction = cubicFit#self.ResultData['Plot']['ROOTObject'].GetFunction('pol2')
             
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 110.);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]");
