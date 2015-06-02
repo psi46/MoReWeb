@@ -6,8 +6,8 @@ import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_ColumnEfficiencyPerColumn_TestResult'
-        self.NameSingle = 'ColumnEfficiencyPerColumn'
+        self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_ColumnUniformityPerColumn_TestResult'
+        self.NameSingle = 'ColumnUniformityPerColumn'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
         self.ResultData['KeyValueDictPairs'] = {
             'mu': {
@@ -23,12 +23,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         HitROOTOBjects = {}
-        Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']
+        Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']
         for Rate in Rates:
             HitROOTOBjects[Rate] = (
                 HistoGetter.get_histo(
                         self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)],
-                        "Xray.hitsVsColumn_Ag_C{ChipNo}_V0".format(ChipNo=ChipNo) 
+                        "Xray.hitsVsColumn_Ag_C{ChipNo}_V0".format(ChipNo=ChipNo)
                     )
                 )
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(),'',self.nCols,0,self.nCols)
@@ -50,14 +50,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 else:
                     ColumnEfficiency = 0
                 self.ResultData['Plot']['ROOTObject'].SetBinContent(Column+1, ColumnEfficiency)
-                
+
             
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
             
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 1.2 * self.ResultData['Plot'][
                 'ROOTObject'].GetMaximum())
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency");
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Uniformity");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
@@ -73,8 +73,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             
             lineCLow = ROOT.TLine().DrawLine(
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_Factor_ColEfficiency']*RMS,
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_Factor_ColEfficiency']*RMS,
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_Factor_ColUniformity']*RMS,
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_Factor_ColUniformity']*RMS,
             )
             lineCLow.SetLineWidth(2);
             lineCLow.SetLineStyle(2)
@@ -86,7 +86,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyList'] += ['mu','sigma']
             
 
-        self.Title = 'Col. Efficiency: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        self.Title = 'Col. Uniformity Ratio: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         self.SaveCanvas()        
 
 

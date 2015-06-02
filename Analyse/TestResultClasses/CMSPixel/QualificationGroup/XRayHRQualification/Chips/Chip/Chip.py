@@ -13,7 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # order!
         self.ResultData['SubTestResultDictList'] = []
         i = 0
-        for Rate in self.ParentObject.ParentObject.Attributes['Rates']:
+        for Rate in self.ParentObject.ParentObject.Attributes['Rates']['HREfficiency']:
             self.ResultData['SubTestResultDictList'] += [
                 {
                     'Key':'EfficiencyMap_{:d}'.format(Rate),
@@ -49,6 +49,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':30+i
                     },
                 },
+            ]
+            i+=1
+        for Rate in self.ParentObject.ParentObject.Attributes['Rates']['HRData']:
+            self.ResultData['SubTestResultDictList'] += [
                 {
                     'Key':'HotPixelMap_{:d}'.format(Rate),
                     'Module':'HotPixelMap',
@@ -94,6 +98,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     },
                 },
                 {
+                    'Key':'ColumnUniformityEventsPerColumn',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                    },
+                    'DisplayOptions':{
+                        'Order':90+i
+                    },
+
+                },
+            ]
+            i+=1
+        for Rate in self.ParentObject.ParentObject.Attributes['Rates']['HRSCurves']:
+            self.ResultData['SubTestResultDictList'] += [
+                {
                     'Key':'SCurveWidths_{:d}'.format(Rate),
                     'Module':'SCurveWidths',
                     'InitialAttributes':{
@@ -109,20 +127,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['SubTestResultDictList'] += [
                 {
-                    'Key':'ColumnEfficiencyPerColumn',
+                    'Key':'ColumnUniformityPerColumn',
                     'InitialAttributes':{
                     },
                     'DisplayOptions':{
                         'Order':80+i   
-                    },
-                    
-                },
-                {
-                    'Key':'ColumnEfficiencyEventsPerColumn',
-                    'InitialAttributes':{
-                    },
-                    'DisplayOptions':{
-                        'Order':90+i   
                     },
                     
                 },
