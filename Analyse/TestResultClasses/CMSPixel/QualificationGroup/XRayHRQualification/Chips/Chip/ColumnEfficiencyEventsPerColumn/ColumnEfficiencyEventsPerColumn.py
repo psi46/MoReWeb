@@ -54,8 +54,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             for Column in range(self.nCols):
                 ColumnEfficiency = ColumnEfficiencyPerColumnTestResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(Column+1)
                 for EventBin in range(EventBins):
-                    Hits150 = HitsVsEventsROOTObjects[150].GetBinContent(EventBin+1,Column+1)
-                    Hits50 = HitsVsEventsROOTObjects[50].GetBinContent(EventBin+1,Column+1)
+                    Hits150 = HitsVsEventsROOTObjects[150].GetBinContent(EventBin+1, Column+1)
+                    Hits50 = HitsVsEventsROOTObjects[50].GetBinContent(EventBin+1, Column+1)
                     if Hits50>0 and RealHitrate50>0:
                         ColumnEfficiencyPerEvent = (
                             float(Hits150)
@@ -64,7 +64,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             /float(RealHitrate50)
                         )
                     else:
-                        ColumnEfficiencyPerEvent = -1
+                        ColumnEfficiencyPerEvent = 0
                     self.ResultData['Plot']['ROOTObject'].SetBinContent(EventBin+1,Column+1,ColumnEfficiencyPerEvent)
                     
             

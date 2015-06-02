@@ -38,12 +38,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             RealHitrate150 = self.ParentObject.ResultData['SubTestResults']['HitMap_150'].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue']
             RealHitrate50 = self.ParentObject.ResultData['SubTestResults']['HitMap_50'].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue']
             for Column in range(self.nCols):
-                ColumnEfficiency = (
-                    float(HitROOTOBjects[150].GetBinContent(Column+1))
-                    /float(HitROOTOBjects[50].GetBinContent(Column+1))
-                    *float(RealHitrate150)
-                    /float(RealHitrate50)
-                )
+                HitRate150 = HitROOTOBjects[150].GetBinContent(Column+1)
+                HitRate50 = HitROOTOBjects[50].GetBinContent(Column+1)
+                if HitRate50 > 0 and RealHitrate50 > 0:
+                    ColumnEfficiency = (
+                        float(HitRate150)
+                        /float(HitRate50)
+                        *float(RealHitrate150)
+                        /float(RealHitrate50)
+                    )
+                else:
+                    ColumnEfficiency = 0
                 self.ResultData['Plot']['ROOTObject'].SetBinContent(Column+1, ColumnEfficiency)
                 
             
