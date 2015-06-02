@@ -205,7 +205,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     *ReadoutUniformityOverTimeSigma
                 ):
                     NumberValues['NumberOfNonUniformEvents'] += 1
-                    Grades['ColumnReadoutUniformityGrade'] = 3
+                    Grades['ReadoutUniformityOverTimeGrade'] = 3
             
             
             for NumberKey in self.Attributes['NumberKeys']:
