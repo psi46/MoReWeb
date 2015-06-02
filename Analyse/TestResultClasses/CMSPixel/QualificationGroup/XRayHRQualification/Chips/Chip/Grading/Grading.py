@@ -195,6 +195,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['HiddenData'][GradeKey+'_{Rate}'.format(Rate=Rate)] = Grades[GradeKey]
                 self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/'+GradeMapping[Grades[GradeKey]]).strip('/')
 
+
+
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']:
             NumberValues = {}
             for NumberKey in self.Attributes['NumberKeys']['HRData']:

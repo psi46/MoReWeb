@@ -47,7 +47,8 @@ class TestResult(GeneralTestResult):
             FolderName = os.path.basename(Path)
             Rate = int(FolderName.split('_')[2])
             self.Attributes['Rates']['HREfficiency'].append(Rate)
-            self.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(Path+'/pxar.root')
+            ROOTFiles = glob.glob(Path+'/*.root')
+            self.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
 
 
         HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_*')
@@ -55,7 +56,8 @@ class TestResult(GeneralTestResult):
             FolderName = os.path.basename(Path)
             Rate = int(FolderName.split('_')[2])
             self.Attributes['Rates']['HRData'].append(Rate)
-            self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(Path+'/pxar.root')
+            ROOTFiles = glob.glob(Path+'/*.root')
+            self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
 
 
         HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRScurves_*')

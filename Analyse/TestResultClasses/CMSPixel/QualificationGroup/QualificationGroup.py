@@ -151,7 +151,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             elif 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
                 print '\t-> appendXraySpectrum'
                 tests, test, index = self.appendXrayCalibration(tests, test, index)
-            elif ('hrefficiency' in test.testname.lower()) and not HRTestAdded:
+            elif (
+                    ('hrefficiency' in test.testname.lower()
+                        or 'hrdata' in test.testname.lower()
+                        or 'hrscurves' in test.testname.lower()
+                    )
+                    and not HRTestAdded
+                ):
                 # Accept all tests with names 'HREfficiency'
                 print '\t-> appendXRayHighRateTest'
                 tests, test, index = self.appendXRayHighRateTest(tests, test, index)
