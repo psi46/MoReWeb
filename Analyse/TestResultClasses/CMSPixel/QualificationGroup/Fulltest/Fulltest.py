@@ -360,8 +360,8 @@ class TestResult(GeneralTestResult):
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
             'Grade': grade,
-            'PixelDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadPixels'][
-                'Value'],
+            'PixelDefects': '{:d}'.format(self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefects'][
+                'NumericValue']),
             'ROCsMoreThanOnePercent':
                 self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['BadRocs']['Value'],
             'Noise': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels'][
