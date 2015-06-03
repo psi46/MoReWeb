@@ -163,10 +163,10 @@ class TestResult(GeneralTestResult):
                 'Sigma': round(fit.GetParError(0), 3),
             },
             'chi2': {
-                'Value': round(fit.GetParameter(0), 3),
+                'Value': round(fit.GetChisquare() / fit.GetNDF(), 3),
                 'Label': 'Chi2',
                 'Unit': 'per NDF',
-                'Sigma': round(fit.GetChisquare() / fit.GetNDF(), 3),
+                'Sigma': 0,
             },
 
         }

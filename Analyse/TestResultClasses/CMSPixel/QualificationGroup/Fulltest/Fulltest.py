@@ -360,8 +360,8 @@ class TestResult(GeneralTestResult):
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
             'Grade': grade,
-            'PixelDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadPixels'][
-                'Value'],
+            'PixelDefects': '{PixelDefects:d}'.format(PixelDefects=self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefects'][
+                'NumericValue']),
             'ROCsMoreThanOnePercent':
                 self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['BadRocs']['Value'],
             'Noise': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels'][
@@ -557,7 +557,8 @@ class TestResult(GeneralTestResult):
                              GRADE = gradeiv,
                              SLOPE = float(IVCurveData['IVSlope']),
                              TEMPERATURE = float(IVCurveData['TestTemperature']),
-                             COMMENT ="From FMT - TestID = "+ str(pp.TEST_ID),
+                             REF_ID= pp.TEST_ID,	
+                             COMMENT ="",
                              DATE = int(Row['TestDate']),
                              TYPE = "CYC")
   
