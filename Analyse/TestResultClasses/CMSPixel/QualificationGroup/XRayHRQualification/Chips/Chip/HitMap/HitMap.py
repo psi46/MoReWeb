@@ -20,7 +20,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Unit':'MHz/cm2'
             },
             'NumberOfDefectivePixels':{
-                'Value':'{:d}'.format(-1),
+                'Value':'{Rate}'.format(Rate=-1),
                 'Label':'# Defective Pixels'
             }
         }
@@ -32,7 +32,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
                 "Xray.hMap_Ag_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
             ).Clone(self.GetUniqueID())
         )
@@ -52,7 +52,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             NTriggersROOTObject = (
             HistoGetter.get_histo(
-                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
+                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
                     "Xray.ntrig_Ag_V0" 
                 )
             )
@@ -78,7 +78,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
 
         self.SaveCanvas()
-        self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{:d}'.format(NumberOfDefectivePixels)
+        self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{Rate}'.format(Rate=NumberOfDefectivePixels)
         self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.2f}'.format(RealHitrate)
         self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
         

@@ -188,7 +188,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             for NumberKey in self.Attributes['NumberKeys']['HREfficiency']:
                 self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = NumberValues[NumberKey]
-                self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{:d}'.format(NumberValues[NumberKey])).strip('/')
+                self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{Rate}'.format(Rate=NumberValues[NumberKey])).strip('/')
 
 
             for GradeKey in self.Attributes['GradeKeys']['HREfficiency']:
@@ -257,7 +257,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             for NumberKey in self.Attributes['NumberKeys']['HRData']:
                 self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = NumberValues[NumberKey]
-                self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{:d}'.format(NumberValues[NumberKey])).strip('/')
+                self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{Rate}'.format(Rate=NumberValues[NumberKey])).strip('/')
 
 
 
@@ -288,11 +288,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['ColumnUniformityGrade'] = ColumnUniformityGrade
         self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade']['Value'] = GradeMapping[ColumnUniformityGrade]
         self.ResultData['HiddenData']['NumberOfLowUniformityColumns'] = NumberOfLowUniformityColumns
-        self.ResultData['KeyValueDictPairs']['NumberOfLowUniformityColumns']['Value'] = '{:d}'.format(NumberOfLowUniformityColumns)
+        self.ResultData['KeyValueDictPairs']['NumberOfLowUniformityColumns']['Value'] = '{Rate}'.format(Rate=NumberOfLowUniformityColumns)
         self.ResultData['HiddenData']['ColumnUniformityGrade'] = ColumnUniformityGrade
         self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade']['Value'] = GradeMapping[ColumnUniformityGrade]
         self.ResultData['HiddenData']['NumberOfLowUniformityColumnEvents'] = NumberOfLowUniformityColumnEvents
-        self.ResultData['KeyValueDictPairs']['NumberOfLowUniformityColumnEvents']['Value'] = '{:d}'.format(NumberOfLowUniformityColumnEvents)
+        self.ResultData['KeyValueDictPairs']['NumberOfLowUniformityColumnEvents']['Value'] = '{Rate}'.format(Rate=NumberOfLowUniformityColumnEvents)
         ROCGrades.append(ColumnUniformityGrade)
         ROCGrades.append(ColumnUniformityEventGrade)
         

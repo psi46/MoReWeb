@@ -31,7 +31,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Rate = self.Attributes['Rate']
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
-                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)],
+                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)],
                     "Xray.hitsVsEvtCol_Ag_C{ChipNo}_V0".format(ChipNo=ChipNo)
                 )
             )

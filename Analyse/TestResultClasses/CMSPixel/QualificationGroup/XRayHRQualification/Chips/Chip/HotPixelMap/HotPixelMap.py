@@ -16,7 +16,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
                 "Xray.hitMap_hotpixels_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
             ).Clone(self.GetUniqueID())
         )

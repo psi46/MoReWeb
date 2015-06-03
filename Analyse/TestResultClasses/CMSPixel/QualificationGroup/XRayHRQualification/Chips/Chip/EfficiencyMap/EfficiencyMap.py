@@ -17,7 +17,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(self.Attributes['Rate'])],
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])],
                 "HighRate.highRate_calmap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
             ).Clone(self.GetUniqueID())
         )

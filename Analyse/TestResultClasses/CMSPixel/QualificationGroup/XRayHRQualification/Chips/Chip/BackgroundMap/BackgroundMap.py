@@ -28,7 +28,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(self.Attributes['Rate'])],
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])],
                 "HighRate.highRate_xraymap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
             ).Clone(self.GetUniqueID())
         )
@@ -55,7 +55,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
         NTriggersROOTObject = (
             HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
+                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
                 "Xray.ntrig_Ag_V0" 
             )
         )
