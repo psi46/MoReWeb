@@ -325,9 +325,9 @@ class TestResult(GeneralTestResult):
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage150V'] = IVCurveData['CurrentAtVoltage150V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
-           	if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
-           	    IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
-
+                
+            if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
+                IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
             if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
                 IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
             if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
