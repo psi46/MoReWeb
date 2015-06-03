@@ -67,8 +67,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
             #    'ROOTObject'].GetMaximum())
-            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency50']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(50e6*ScalingFactor))
-            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency150']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(150e6*ScalingFactor))
+            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency50']['Value'] = '{InterpolatedEfficiency50:1.2f}'.format(InterpolatedEfficiency50=InterpolationFunction.Eval(50e6*ScalingFactor))
+            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency150']['Value'] = '{InterpolatedEfficiency150:1.2f}'.format(InterpolatedEfficiency150=InterpolationFunction.Eval(150e6*ScalingFactor))
             self.ResultData['KeyList'] += ['InterpolatedEfficiency50','InterpolatedEfficiency150'] 
 
         self.Title = 'Efficiency Interpolation: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])

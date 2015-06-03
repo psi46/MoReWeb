@@ -48,7 +48,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         NumberOfDefectivePixels += 1
                         self.ResultData['HiddenData']['ListOfDefectivePixels'].append((ChipNo, Column, Row))
                         
-            self.ResultData['KeyValueDictPairs']['NHits']['Value'] = '{:1.0f}'.format(NumberOfHits)
+            self.ResultData['KeyValueDictPairs']['NHits']['Value'] = '{NHits:1.0f}'.format(NHits=NumberOfHits)
             
             NTriggersROOTObject = (
             HistoGetter.get_histo(
@@ -79,7 +79,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.SaveCanvas()
         self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{Rate}'.format(Rate=NumberOfDefectivePixels)
-        self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.2f}'.format(RealHitrate)
+        self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{RealHitrate:1.2f}'.format(RealHitrate=RealHitrate)
         self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
         
         self.Title = 'Hit Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
