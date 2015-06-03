@@ -557,7 +557,8 @@ class TestResult(GeneralTestResult):
                              GRADE = gradeiv,
                              SLOPE = float(IVCurveData['IVSlope']),
                              TEMPERATURE = float(IVCurveData['TestTemperature']),
-                             COMMENT ="From FMT - TestID = "+ str(pp.TEST_ID),
+                             REF_ID= pp.TEST_ID,	
+                             COMMENT ="",
                              DATE = int(Row['TestDate']),
                              TYPE = "CYC")
   
