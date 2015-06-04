@@ -2,7 +2,7 @@
 import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
-
+import os
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -53,16 +53,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
         Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
             
-        NTriggersROOTObject = (
-            HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
-                "Xray.ntrig_Ag_V0" 
-            )
-        )
-        NTriggers = float(NTriggersROOTObject.GetEntries())
+        #NTriggersROOTObject = (
+        #    HistoGetter.get_histo(
+        #        self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
+        #        "Xray.ntrig_Ag_V0" 
+        #    )
+        #)
+
+        # total number of triggers = number of pixels * ntrig(triggers per pixel)
+        NPixels = 80*52
+        NTriggers = NPixels * self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{:d}'.format(self.Attributes['Rate'])]       
         NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
         RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6
-        
+                
         self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.2f}'.format(RealHitrate)
         self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
         self.ResultData['KeyList'] += ['RealHitrate']

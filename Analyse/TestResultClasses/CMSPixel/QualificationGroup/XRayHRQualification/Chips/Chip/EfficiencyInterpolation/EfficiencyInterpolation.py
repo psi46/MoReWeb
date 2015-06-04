@@ -32,6 +32,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             RealHitrateList.append(RealHitRate)
             Efficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyDistribution_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
             EfficiencyList.append(Efficiency)
+            #print "pair: %f %f %f"%(float(Rate), RealHitRate, Efficiency)
         
         self.Canvas.Clear()
         
@@ -39,7 +40,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             
-            cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3",70,170)
+            cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3",10,250) # fix range later when double column data is used
+            cubicFit.SetParameter(1, 100)
+            cubicFit.SetParameter(2, 5e-7)
             self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'QR')
             InterpolationFunction = cubicFit#self.ResultData['Plot']['ROOTObject'].GetFunction('pol2')
             

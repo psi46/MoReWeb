@@ -40,7 +40,7 @@ class TestResult(GeneralTestResult):
         }
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
-
+        self.Attributes['Ntrig'] = {}
             
         HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
         for Path in HREfficiencyPaths:
@@ -50,6 +50,24 @@ class TestResult(GeneralTestResult):
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
 
+            self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)] = 50 #pxar default
+            NTriggersReadFromFile = False            
+            testParametersFilename = "/".join(ROOTFiles[0].split("/")[0:-1]) + "/testParameters.dat"
+            if os.path.exists(testParametersFilename):
+                testParametersFile = open(testParametersFilename, "r")
+                if testParametersFile:
+                    testParametersSection = ""
+                    for line in testParametersFile:
+                        sline = line.strip()
+                        if sline[0:2] == "--":
+                            testParametersSection = sline[2:].strip()
+                        elements = sline.strip().split(" ")
+                        if testParametersSection.lower() == "highrate" and elements[0].lower() == "ntrig":
+                            NTriggersReadFromFile = True
+                            self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)] = float(elements[-1])
+                    testParametersFile.close()
+            if not NTriggersReadFromFile:
+                print 'WARNING: testParameters.dat file not found, using default number of triggers Ntrig = %d'%self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)]
 
         HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_*')
         for Path in HRDataPaths:

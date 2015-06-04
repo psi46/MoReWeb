@@ -44,8 +44,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     ColumnEfficiency = (
                         float(HitRate150)
                         /float(HitRate50)
-                        *float(RealHitrate150)
-                        /float(RealHitrate50)
+                        /float(RealHitrate150)
+                        *float(RealHitrate50)
                     )
                 else:
                     ColumnEfficiency = 0

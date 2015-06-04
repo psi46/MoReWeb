@@ -27,7 +27,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{:d}'.format(self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
-        MaximumValue = EfficiencyMapROOTObject.GetMaximum()
+        Ntrig = self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{:d}'.format(self.Attributes['Rate'])]
+        MaximumValue = EfficiencyMapROOTObject.GetMaximum()*100.0/float(Ntrig)
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(),'',int(MaximumValue),0,MaximumValue)
         
         if self.ResultData['Plot']['ROOTObject']:
@@ -36,7 +37,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
             for Row in range(self.nRows):
                 for Column in range(self.nCols):
-                    self.ResultData['Plot']['ROOTObject'].Fill(EfficiencyMapROOTObject.GetBinContent(Column+1, Row+1))
+                    self.ResultData['Plot']['ROOTObject'].Fill(EfficiencyMapROOTObject.GetBinContent(Column+1, Row+1)*100.0/float(Ntrig))
 
             #self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 1.2 * self.ResultData['Plot'][
