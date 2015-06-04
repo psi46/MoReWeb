@@ -513,14 +513,15 @@ class TestResult(GeneralTestResult):
             print "IVCURVEDATA ", IVCurveData
             if IVCurveData['CurrentAtVoltage150V'] != -1 :
                 # extract Sensor name
-                module = pdb.getFullModule(Row['ModuleID'])
-                if module is None:
+              module = pdb.getFullModule(Row['ModuleID'])
+              if module is None:
                     print " Cannot find Module with ModuleID = ",(Row['ModuleID'])
                     exit (32)
-                bmodule = pdb.getBareModule(module.BAREMODULE_ID)
-                if bmodule is None:
+              bmodule = pdb.getBareModule(module.BAREMODULE_ID)
+              if bmodule is None:
                     print " Cannot find bareModule with bareModuleID = ",module.BAREMODULE_ID
-                    exit (33)
+                #    exit (33)
+              else:
                 sensor_id  =bmodule.SENSOR_ID
                 ivlog_path = IVCurveData['IVCurveFilePath']
                 outDir = Row['AbsFulltestSubfolder']
