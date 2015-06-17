@@ -92,14 +92,14 @@ class TestResult(GeneralTestResult):
         leakageCurrentRecalculated = leakageCurrent * outputTemp ** 2 / inputTemp ** 2 * math.exp(exp)
 
         grade = 'A'
-        
+        # grading parameters in uA
         if self.TestResultEnvironmentObject.GradingParameters.has_key('leakageCurrentPON_B'):
             thr_B = self.TestResultEnvironmentObject.GradingParameters['leakageCurrentPON_B']
-            if abs(leakageCurrent) > abs(thr_B):
+            if abs(leakageCurrent*1.0e6) > abs(thr_B):
                 grade = 'B'
         if self.TestResultEnvironmentObject.GradingParameters.has_key('leakageCurrentPON_C'):
             thr_C = self.TestResultEnvironmentObject.GradingParameters['leakageCurrentPON_C']
-            if abs(leakageCurrent) > abs(thr_C):
+            if abs(leakageCurrent*1.0e6) > abs(thr_C):
                 grade = 'C'
 
         print 'fill row'
