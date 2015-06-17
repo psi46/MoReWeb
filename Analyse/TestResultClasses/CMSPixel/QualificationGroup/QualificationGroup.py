@@ -2,6 +2,7 @@ import AbstractClasses
 import ROOT
 import copy
 import os
+import os.path
 import AbstractClasses.Helper.BetterConfigParser
 import AbstractClasses.Helper.HtmlParser
 import AbstractClasses.Helper.environment
@@ -128,14 +129,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         tests = []
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
         test = testchain.next()
+        Testnames = []
         while test:
             env = AbstractClasses.Helper.environment.environment(test.test_str, self.initParser)
             test.environment = env
             test.testname = test.test_str.split("@")[0]
+            Testnames.append(test.test_str.split("@")[0])
             test = test.next()
         index = 0
         test = testchain.next()
-        tests, test, index = self.appendTemperatureGraph(tests, test, index)
+        if not ('HREfficiency' in Testnames): 
+            tests, test, index = self.appendTemperatureGraph(tests, test, index)
+        HRTestAdded = False
         while test:
             if 'fulltest' in test.testname.lower():
                 print '\t-> appendFulltest'
@@ -146,15 +151,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             elif 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
                 print '\t-> appendXraySpectrum'
                 tests, test, index = self.appendXrayCalibration(tests, test, index)
-            elif 'highratetest' in test.testname.lower() or \
-                 'highratepixelmap' in test.testname.lower() or \
-                 'highrateefficiency' in test.testname.lower():
-                # Accept all tests with names 'HighRateTest', 'HighRatePixelMap', and 'HighRateEfficiency' as high rate tests
-                # The distinction of the tests is made within the 'appendHighRateTest' function.
-                print '\t-> appendHighRateTest'
-                tests, test, index = self.appendHighRateTest(tests, test, index)
+            elif (
+                    ('hrefficiency' in test.testname.lower()
+                        or 'hrdata' in test.testname.lower()
+                        or 'hrscurves' in test.testname.lower()
+                    )
+                    and not HRTestAdded
+                ):
+                # Accept all tests with names 'HREfficiency'
+                print '\t-> appendXRayHighRateTest'
+                tests, test, index = self.appendXRayHighRateTest(tests, test, index)
+                HRTestAdded = True
             elif 'powercycle' in test.testname:
                 test = test.next()
+            elif 'leakagecurrentpon' in test.testname.lower():
+                print '\t-> appendLeakageCurrentPON'
+                tests, test, index = self.appendLeakageCurrentPON(tests, test, index)
             else:
                 if self.verbose:
                     print '\t-> cannot convert ', test.testname
@@ -164,23 +176,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return tests
 
     def appendTemperatureGraph(self, tests, test, index):
-        tests.append(
-            {
-                'Key': 'Temperature',
-                'Module': 'Temperature',
-                'InitialAttributes': {
-                    'StorageKey': 'ModuleQualification_Temperature',
-                    'TestResultSubDirectory': 'logfiles',
-                    'ModuleID': self.Attributes['ModuleID'],
-                    'ModuleVersion': self.Attributes['ModuleVersion'],
-                    'ModuleType': self.Attributes['ModuleType'],
-                    'TestType': 'Temperature',
-                },
-                'DisplayOptions': {
-                    'Order': len(tests) + 1,
-                    'Width': 5,
-                }
-            })
+        if os.path.isfile(self.RawTestSessionDataPath+'/'+'temperature.log'):
+            tests.append(
+                {
+                    'Key': 'Temperature',
+                    'Module': 'Temperature',
+                    'InitialAttributes': {
+                        'StorageKey': 'ModuleQualification_Temperature',
+                        'TestResultSubDirectory': 'logfiles',
+                        'ModuleID': self.Attributes['ModuleID'],
+                        'ModuleVersion': self.Attributes['ModuleVersion'],
+                        'ModuleType': self.Attributes['ModuleType'],
+                        'TestType': 'Temperature',
+                    },
+                    'DisplayOptions': {
+                        'Order': len(tests) + 1,
+                        'Width': 5,
+                    }
+                })
         return tests, test, index
 
 
@@ -361,10 +374,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     ## Creates one single test of type 'HighRateTest' when given any
     ## high rate test. Internally the actual tests are distinguished
     ## by name and made subtests to the 'HighRateTest'.
-    def appendHighRateTest(self, tests, test, index):
-        key = 'HighRateTest'
-        directory = "."
-
+    def appendXRayHighRateTest(self, tests, test, index):
+        key = 'XRayHRQualification'
+        
         # Find the index of a previously created 'HighRateTest'
         idx = -1
         for i in range(len(tests)):
@@ -376,15 +388,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if idx < 0:
             tests.append({
                 'Key': key,
-                'Module': 'HighRateTest',
+                'Module': 'XRayHRQualification',
                 'InitialAttributes': {
                     'StorageKey': key,
-                    'TestResultSubDirectory': directory,
                     'IncludeIVCurve': False,
                     'ModuleID': self.Attributes['ModuleID'],
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                     'ModuleType': self.Attributes['ModuleType'],
-                    'TestType': 'HighRateTest',
+                    'TestType': 'XRayHRQualification',
                     'TestTemperature': test.environment.temperature,
                 },
                 'DisplayOptions': {
@@ -402,10 +413,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # - HighRatePixelMap
         # - HighRateEfficiency
         # run together with results in the same ROOT file.
-        if 'HighRateTest' in test.testname or 'HighRatePixelMap' in test.testname:
-            self.appendHighRatePixelMap(tests[idx], test, index)
-        if 'HighRateTest' in test.testname or 'HighRateEfficiency' in test.testname:
-            self.appendHighRateEfficiency(tests[idx], test, index)
+        #if 'HighRateTest' in test.testname or 'HighRatePixelMap' in test.testname:
+        #    self.appendHighRatePixelMap(tests[idx], test, index)
+        #if 'HighRateTest' in test.testname or 'HighRateEfficiency' in test.testname:
+        #    self.appendHighRateEfficiency(tests[idx], test, index)
 
         # Iterate the test chain
         test = test.next()
@@ -413,95 +424,40 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         return tests, test, index
 
-    ## Appends a high rate pixel map test to the 'HighRateTest'
-    def appendHighRatePixelMap(self, hr_test, test, index):
-        # Generate a unique key name for the test
-        environment = test.environment
-        key = 'Module%s_%s_PixelMap' % (test.testname, test.environment.name)
-        nKeys = 1
-        try:
-            for item in hr_test['InitialAttributes']['SubTestResultDictList']:
-                if item['Key'].startswith(key):
-                    nKeys += 1
-        except KeyError:
-            pass
-        key += '_%s' % (nKeys)
+    def appendLeakageCurrentPON(self, tests, test, index):
+        key = 'LeakageCurrentPON'
+        idx = -1
+        for i in range(len(tests)):
+            if tests[i]["Key"] == key:
+                idx = i
+                break
 
-        # Determine the directory name where the ROOT file with the results is
-        #directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
-        directory = '%03d' % index + '_%s_p%i' % (test.testname, test.environment.temperature)
+        # If no 'LeakageCurrentPON' test exists yet, create one
+        if idx < 0:
+            tests.append({
+                'Key': key,
+                'Module': 'LeakageCurrentPON',
+                'InitialAttributes': {
+                    'StorageKey': key,
+                    'IncludeIVCurve': False,
+                    'ModuleID': self.Attributes['ModuleID'],
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                    'ModuleType': self.Attributes['ModuleType'],
+                    'TestType': 'LeakageCurrentPON',
+                    'TestTemperature': test.environment.temperature,
+                },
+                'DisplayOptions': {
+                    'Order': len(tests) + 1,
+                    'Width': 2
+                }
+            })
 
-        # Append the test to the 'HighRateTest'
-        if not hr_test.has_key('InitialAttributes'):
-            hr_test['InitialAttributes'] = {}
-        if not hr_test['InitialAttributes'].has_key('SubTestResultDictList'):
-            hr_test['InitialAttributes']['SubTestResultDictList'] = []
-        hr_test['InitialAttributes']['SubTestResultDictList'].append({
-            'Key': key,
-            'Module': 'HighRatePixelMapModule',
-            'InitialAttributes': {
-                'StorageKey': key,
-                'TestResultSubDirectory': directory,
-                'IncludeIVCurve': False,
-                'ModuleID': self.Attributes['ModuleID'],
-                'ModuleVersion': self.Attributes['ModuleVersion'],
-                'ModuleType': self.Attributes['ModuleType'],
-                'TestType': '%s_%s' % (test.environment.name, nKeys),
-                'TestTemperature': test.environment.temperature,
-                'Target': environment.xray_target,
-                'XrayVoltage': environment.xray_voltage,
-                'XrayCurrent': environment.xray_current
-            },
-            'DisplayOptions': {
-                'Order': len(hr_test['InitialAttributes']['SubTestResultDictList']) + 1,
-                'Width': 4
-            }
-        })
+            idx = len(tests) - 1
 
-    ## Appends a high rate efficiency test to the 'HighRateTest'
-    def appendHighRateEfficiency(self, hr_test, test, index):
-        # Generate a unique key name for the test
-        environment = test.environment
-        key = 'Module%s_%s_Efficiency' % (test.testname, test.environment.name)
-        nKeys = 1
-        try:
-            for item in hr_test['InitialAttributes']['SubTestResultDictList']:
-                if item['Key'].startswith(key):
-                    nKeys += 1
-        except KeyError:
-            pass
-        key += '_%s' % (nKeys)
+        test = test.next()
+        index += 1
 
-        # Determine the directory name where the ROOT file with the results is
-        #directory = '%03d'%index+'_%s_%s'%(test.testname,test.environment.name)
-        directory = '%03d' % index + '_%s_p%i' % (test.testname, test.environment.temperature)
-
-        # Append the test to the 'HighRateTest'
-        if not hr_test.has_key('InitialAttributes'):
-            hr_test['InitialAttributes'] = {}
-        if not hr_test['InitialAttributes'].has_key('SubTestResultDictList'):
-            hr_test['InitialAttributes']['SubTestResultDictList'] = []
-        hr_test['InitialAttributes']['SubTestResultDictList'].append({
-            'Key': key,
-            'Module': 'HighRateEfficiencyModule',
-            'InitialAttributes': {
-                'StorageKey': key,
-                'TestResultSubDirectory': directory,
-                'IncludeIVCurve': False,
-                'ModuleID': self.Attributes['ModuleID'],
-                'ModuleVersion': self.Attributes['ModuleVersion'],
-                'ModuleType': self.Attributes['ModuleType'],
-                'TestType': '%s_%s' % (test.environment.name, nKeys),
-                'TestTemperature': test.environment.temperature,
-                'Target': environment.xray_target,
-                'XrayVoltage': environment.xray_voltage,
-                'XrayCurrent': environment.xray_current
-            },
-            'DisplayOptions': {
-                'Order': len(hr_test['InitialAttributes']['SubTestResultDictList']) + 1,
-                'Width': 4
-            }
-        })
+        return tests, test, index
 
     def PopulateResultData(self):
 
