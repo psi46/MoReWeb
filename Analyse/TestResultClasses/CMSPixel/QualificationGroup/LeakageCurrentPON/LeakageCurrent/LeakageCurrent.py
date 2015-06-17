@@ -79,8 +79,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Module'
             },
             'LeakageCurrent': {
-                'Value': leakageCurrent*1.e6, 
-                'Label':'Leakage current [uA]'
+                'Value': leakageCurrent, 
+                'Label':'Leakage current [A]'
             },
             'Voltage': {
                 'Value': Voltage, 
