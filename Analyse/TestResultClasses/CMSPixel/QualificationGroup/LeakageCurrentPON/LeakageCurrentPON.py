@@ -1,6 +1,7 @@
 import os
 import ROOT
 import glob
+import math
 
 import AbstractClasses
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
@@ -91,8 +92,7 @@ class TestResult(GeneralTestResult):
         leakageCurrentRecalculated = leakageCurrent * outputTemp ** 2 / inputTemp ** 2 * math.exp(exp)
 
         grade = 'A'
-        print repr(self.TestResultEnvironmentObject.GradingParameters)
-
+        
         if self.TestResultEnvironmentObject.GradingParameters.has_key('leakageCurrentPON_B'):
             thr_B = self.TestResultEnvironmentObject.GradingParameters['leakageCurrentPON_B']
             if abs(leakageCurrent) > abs(thr_B):
