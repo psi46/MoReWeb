@@ -77,7 +77,10 @@ class SCurve_Fitting():
             dir = self.HistoDict.get('SCurveFitting','dir')
             filename = self.HistoDict.get('SCurveFitting','inputFileName')
             inputFileName += dir+'/'
-            inputFileName += filename%chip
+            if filename.find("{ChipNo}") > -1:
+                inputFileName += filename.format(ChipNo=chip)
+            else:
+                inputFileName += filename%chip
         else:
             inputFileName += 'SCurveData_C%i.dat'%(chip)
         inputFileName = os.path.abspath(inputFileName)
@@ -157,7 +160,7 @@ class SCurve_Fitting():
         if self.verbose:
             print 'fit Scurve data ROC %d %2d/%2d' % (chip, row, col)
         isValid, calibrationPoints = self.extractSCurveData(data)
-        if not isValid:
+        if not isValid and not self.HistoDict.has_option('SCurveFitting','ignoreValidityCheck'):
             print '\tnot Valid'
             return [[-3,chip,row,col],[]]
         graph = self.GetGraph(calibrationPoints)
