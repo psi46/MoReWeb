@@ -29,13 +29,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         EfficiencyList = array.array('d', [100])
         ScalingFactor = 1e-6
 
-        #for Rate in Rates['HREfficiency']:
-        #    RealHitRate = float(self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'])
-        #    RealHitrateList.append(RealHitRate)
-        #    Efficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyDistribution_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
-        #    EfficiencyList.append(Efficiency)
-        #    #print "pair: %f %f %f"%(float(Rate), RealHitRate, Efficiency)
-
         DoubleColumnRateList = array.array('d')
         DoubleColumnEfficiencyList = array.array('d')
 
@@ -69,7 +62,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                 # correct measured hit rate by efficiency
                 DoubleColumnRateList.append(ROOT.TMath.Mean(len(PixelRateList), PixelRateList) / DoubleColumnMeanEfficiency)
-                print "ROC %d Rate %d DC %d =>len %d, rate %f eff: %f" % (ChipNo, Rate, DoubleColumn, len(PixelRateList), ROOT.TMath.Mean(len(PixelRateList), PixelRateList) / DoubleColumnMeanEfficiency, DoubleColumnMeanEfficiency * 100)
+                
                 # in %
                 DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
 
@@ -94,27 +87,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw("ap");
 
             self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'QR')
+            self.ResultData['Plot']['ROOTObject'].SetTitle("");
             InterpolationFunction = cubicFit
             
-            line50 = ROOT.TLine().DrawLine(
-                50e6*ScalingFactor, PlotMinEfficiency,
-                50e6*ScalingFactor, 100)
-            line50.SetLineWidth(2);
-            line50.SetLineStyle(2)
-            line50.SetLineColor(ROOT.kRed)
-            line150 = ROOT.TLine().DrawLine(
-                150e6*ScalingFactor, PlotMinEfficiency,
-                150e6*ScalingFactor, 100)
-            line150.SetLineWidth(2);
-            line150.SetLineStyle(2)
-            line150.SetLineColor(ROOT.kRed)
-            self.ResultData['Plot']['ROOTObject'].SetTitle("");
-            
-            #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
-            #    'ROOTObject'].GetMaximum())
-            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency50']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(50e6*ScalingFactor))
-            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency120']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(120e6*ScalingFactor))
-            self.ResultData['KeyList'] += ['InterpolatedEfficiency50','InterpolatedEfficiency120'] 
+            for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
+                line = ROOT.TLine().DrawLine(
+                    InterpolationRate * 1e6 * ScalingFactor, PlotMinEfficiency,
+                    InterpolationRate * 1e6 * ScalingFactor, 100)
+                line.SetLineWidth(2)
+                line.SetLineStyle(2)
+                line.SetLineColor(ROOT.kRed)
+
+                self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
+                self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)] 
+
+
 
         self.Title = 'Efficiency Interpolation: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         self.SaveCanvas()        

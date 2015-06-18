@@ -6,6 +6,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='Chips'
         
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
+        
+        print "Analyze high rate data..."
         if self.verbose:
             print self.Name
             print '\tnChips', self.ParentObject.Attributes['NumberOfChips'],type(self.ParentObject.Attributes['NumberOfChips'])

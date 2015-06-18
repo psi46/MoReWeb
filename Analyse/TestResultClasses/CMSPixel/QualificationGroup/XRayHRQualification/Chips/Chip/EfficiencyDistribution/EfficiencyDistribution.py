@@ -29,7 +29,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{:d}'.format(self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
         Ntrig = self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{:d}'.format(self.Attributes['Rate'])]
         MaximumValue = EfficiencyMapROOTObject.GetMaximum()*100.0/float(Ntrig)
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(),'',int(MaximumValue),0,MaximumValue)
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(),'',int(MaximumValue+1),0,MaximumValue+1)
         
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
@@ -40,7 +40,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['Plot']['ROOTObject'].Fill(EfficiencyMapROOTObject.GetBinContent(Column+1, Row+1)*100.0/float(Ntrig))
 
             #self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 1.2 * self.ResultData['Plot'][
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.1, 1.2 * self.ResultData['Plot'][
                 'ROOTObject'].GetMaximum())
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Efficiency");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
@@ -48,16 +48,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw();
-            
-            lineB = ROOT.TLine().DrawLine(self.TestResultEnvironmentObject.GradingParameters[
-                'XRayHighRateEfficiency_min_allowed_efficiency_{:d}'.format(self.Attributes['Rate'])], 0,
-                                  self.TestResultEnvironmentObject.GradingParameters[
-                'XRayHighRateEfficiency_min_allowed_efficiency_{:d}'.format(self.Attributes['Rate'])], self.ResultData['Plot'][
-                'ROOTObject'].GetMaximum())
-            lineB.SetLineWidth(2);
-            lineB.SetLineStyle(2)
-            lineB.SetLineColor(ROOT.kRed)
-            
+
             #mN
             Mean = self.ResultData['Plot']['ROOTObject'].GetMean()
             #sN
@@ -76,6 +67,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
 
         self.Title = 'Efficiency Distr. {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
-        self.SaveCanvas()        
+        ROOT.gPad.SetLogy(1)
+        self.SaveCanvas()
+        ROOT.gPad.SetLogy(0)
 
 

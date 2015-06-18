@@ -47,7 +47,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             raise Exception('Cannot find SCurveFile "%s"'%SCurveFileName)
         else:
             #Omit the first line
-            print 'read file',SCurveFileName
+            #print 'read file',SCurveFileName
             Line = SCurveFile.readline()
 
             for column in range(self.nCols): #Columns
@@ -62,7 +62,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
-                        if Threshold > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_{Rate}'.format(Rate=self.Attributes['Rate'])]:
+                        if Threshold > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold']:
                             self.ResultData['HiddenData']['NumberOfNoisyPixels'] += 1
                             self.ResultData['HiddenData']['ListOfNoisyPixels'].append((ChipNo, column, row))
 
@@ -72,7 +72,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         if self.ResultData['Plot']['ROOTObject_ht'].GetMinimum() > self.ResultData['HiddenData']['htmin'] :
             self.ResultData['HiddenData']['htmin'] = self.ResultData['Plot']['ROOTObject_ht'].GetMinimum();
-
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Noise (e^{-})");

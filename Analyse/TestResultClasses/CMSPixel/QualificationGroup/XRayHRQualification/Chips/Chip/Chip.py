@@ -98,6 +98,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     },
                 },
                 {
+                    'Key':'ReadoutUniformityOverTimeDistribution_{:d}'.format(Rate),
+                    'Module':'ReadoutUniformityOverTimeDistribution',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'ReadoutUniformityOverTimeDistribution_{:d}'.format(Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':70+i
+                    },
+                },
+                {
                     'Key':'ColumnUniformityEventsPerColumn',
                     'InitialAttributes':{
                         'Rate':Rate,

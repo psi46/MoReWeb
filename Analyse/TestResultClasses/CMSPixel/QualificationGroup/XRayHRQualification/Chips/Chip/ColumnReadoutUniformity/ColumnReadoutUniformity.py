@@ -26,13 +26,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
-        self.ResultData['Plot']['ROOTObject'] = (
-            HistoGetter.get_histo(
-                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
-                    "Xray.hitsVsColumn_Ag_C{ChipNo}_V0".format(ChipNo=ChipNo) 
-                )
-            )
-        
+
+        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'hitsVsColumn').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])]
+        self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()

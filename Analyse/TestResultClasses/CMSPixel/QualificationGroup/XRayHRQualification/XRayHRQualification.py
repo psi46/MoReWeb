@@ -38,7 +38,11 @@ class TestResult(GeneralTestResult):
             'HRData':[],
             'HRSCurves':[]
         }
-        self.Attributes['InterpolatedEfficiencyRates'] = [50, 120]
+
+        self.Attributes['InterpolatedEfficiencyRates'] = []
+        for r in range(1, int(1 + self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_NInterpolationRates'])):
+            self.Attributes['InterpolatedEfficiencyRates'].append(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_InterpolationRate%d'%r])
+
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
         self.Attributes['Ntrig'] = {}
@@ -90,7 +94,7 @@ class TestResult(GeneralTestResult):
         HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
         if len(HRHotPixelsPaths) > 1:
                 warnings.warn("multiple MaskHotPixel tests found")
-                
+
         for Path in HRHotPixelsPaths:
             FolderName = os.path.basename(Path)
             ROOTFiles = glob.glob(Path+'/*.root')
