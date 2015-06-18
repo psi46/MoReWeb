@@ -84,7 +84,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Width = float(LineArray[1])
                         
                         self.ResultData['Plot']['ROOTObject'].Fill(Width)
-                        Width = Width / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
+                        Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
                         if Width > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold']:
@@ -99,7 +99,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['HiddenData']['htmin'] = self.ResultData['Plot']['ROOTObject_ht'].GetMinimum();
 
         if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Noise (e^{-})");
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Noise (e-)");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
