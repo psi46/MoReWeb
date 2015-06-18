@@ -38,6 +38,7 @@ class TestResult(GeneralTestResult):
             'HRData':[],
             'HRSCurves':[]
         }
+        self.Attributes['InterpolatedEfficiencyRates'] = [50, 120]
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
         self.Attributes['Ntrig'] = {}
@@ -86,8 +87,17 @@ class TestResult(GeneralTestResult):
             self.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)] = Path
 
 
-
-               
+        HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
+        if len(HRHotPixelsPaths) > 1:
+                warnings.warn("multiple MaskHotPixel tests found")
+                
+        for Path in HRHotPixelsPaths:
+            FolderName = os.path.basename(Path)
+            ROOTFiles = glob.glob(Path+'/*.root')
+            if len(ROOTFiles) > 1:
+                warnings.warn("The directory '%s' contains more than one .root file, choosing first one: '%s'"%(FolderName, ROOTFiles[0]))
+            self.Attributes['ROOTFiles']['MaskHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
+            break
 
         self.ResultData['SubTestResultDictList'] = [
             {
@@ -132,9 +142,6 @@ class TestResult(GeneralTestResult):
             grade = self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Grade']['Value']
         except KeyError:
             grade = 'None'
-        
-        
-       
         
         
         print 'fill row'
@@ -197,6 +204,13 @@ class TestResult(GeneralTestResult):
                 HighRateData['LowUniformityColumns_Module_{Rate}'.format(Rate)] = int(
                     EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyColumnsSum_{Rate}'.format(Rate=Rate)]['Value']
                 )
+
+            # Interpolated Efficiency
+            for Rate in self.Attributes['InterpolatedEfficiencyRates']:
+                HighRateData['Eff_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                    EfficiencyInterpolationTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value']
+                )
+
             for Rate in self.Attributes['Rates']['HRData']:
                 # Number of hot pixels (Sum over all 16 ROCs is module value)
                 HighRateData['HotPixels_Module_{Rate}'.format(Rate=Rate)] = int(
@@ -261,11 +275,7 @@ class TestResult(GeneralTestResult):
                     HighRateData['HRate_Eff_measured_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
                         BackgroundMapTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value']
                     )
-                    
-                    # Interpolated Efficiency
-                    HighRateData['Eff_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
-                        EfficiencyInterpolationTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value']
-                    )
+                
 
                 for Rate in self.Attributes['Rates']['HRData']:
                     HitMapTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)]

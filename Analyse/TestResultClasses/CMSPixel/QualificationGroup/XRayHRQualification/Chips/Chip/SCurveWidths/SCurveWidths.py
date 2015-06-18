@@ -37,7 +37,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         Rate = self.Attributes['Rate']
         Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{:d}'.format(Rate)]
-        SCurveFileName = "{Directory}/SCurveData_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
+        SCurveBaseName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveBaseName')
+        SCurveFileName = SCurveBaseName.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         SCurveFile = open(SCurveFileName, "r")
 
         self.FileHandle = SCurveFile # needed in summary
