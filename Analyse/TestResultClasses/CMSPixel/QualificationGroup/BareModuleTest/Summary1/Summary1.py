@@ -154,11 +154,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         allrocslist = []
         allrocs2 = {}
 
+        digCurrentList = {}
+
         for i in chipResults:
             if self.ParentObject.testSoftware == 'pxar':
+                chipNum = i['TestResultObject'].Attributes['ChipNo'];
+                digCurrentList[chipNum] = 1000.*i['TestResultObject'].ResultData['SubTestResults']['DigChipCurrent'].ResultData['KeyValueDictPairs']['MaxCurrent']['Value'];
+                #print 'chipno ',i['TestResultObject'].Attributes['ChipNo']
+                #print 'DIgCurrent! ', float(i['TestResultObject'].ResultData['SubTestResults']['DigChipCurrent'].ResultData['KeyValueDictPairs']['MaxCurrent']['Value']),i
+
                 DeadBumps = int(i['TestResultObject'].ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['NDeadBumps']['Value']);
                 totalMissingBumps = totalMissingBumps + DeadBumps;
-                print 'Inside Chips-loop:',i,totalDeadBumps
+                #print 'Inside Chips-loop:',i,totalDeadBumps
                 listDefectBumps = i['TestResultObject'].ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['DeadBumps']['Value'];
             else:
                 MissingBumps = int(i['TestResultObject'].ResultData['SubTestResults']['BareBBMap'].ResultData['KeyValueDictPairs']['NMissingBumps']['Value']);
@@ -192,10 +199,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         fdefect = open(self.FinalResultsStoragePath +'/' + bareModuleBBDBName +'/' + 'defects.json', 'w')        
         fdefect.write(json.dumps(allrocs2, separators=(',', ': ')))
         fdefect.close()
-
         
-
-
         fbbmapforDB = open(self.FinalResultsStoragePath +'/' + bareModuleBBDBName +'/' + 'Bare_module_QA_Bump.csv', 'w')
         fbbmapforDB.write('Bare_module_ID: ' +  bareModuleIDName + '\n')
         fbbmapforDB.write('Laboratory_ID: ' +  ' ' +  globalNameLab + '\n')
@@ -231,7 +235,68 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         self.ResultData['KeyList'] = ['NMissingBumps','NDeadBumps']
-
         
+        # prepare also DAC files for DB upload
+        DirectoryDac = self.RawTestSessionDataPath
+        DirectoryDacToSave = self.FinalResultsStoragePath +'/' + bareModuleBBDBName
 
-        
+        #DAQ_Parameters:    #DAQ_number DAQ_Name Value
+        #Bare_module_ROC00_setup.csv
+
+
+        #digCurrentList = {}
+        deser160val = 0
+        clkval = 0
+
+        if self.ParentObject.testSoftware == 'pxar':
+            print 'ID measurement from hd histogram'
+            deser160val = 4
+            clkval = 0
+        else:
+            deser160val = 5
+            clkval = 22
+            print 'Here: '
+        #    # get the ID measurement from log file
+            digCurrentNameFile = DirectoryDac+"/digCurrent.dat"
+            fileDigCurrent = open(digCurrentNameFile, 'r')
+            for line in fileDigCurrent:
+                #results  = line.strip().split()
+                #if len(results) == 2:
+                #    Key, ParameterValue = results
+                #    print 'quees', Key
+                #    print 'bla: ',ParameterValue
+                digCurrentList[int(line.split()[0])] = str(line.split()[1])
+            fileDigCurrent.close()
+
+
+        for i in range(0,16):            
+            dacFileName = DirectoryDac+"/dacParameters_C"+ str(i)+".dat"
+            if i < 10:
+                dacFileNameForDB =  DirectoryDacToSave+"/Bare_module_ROC0"+ str(i)+"_setup.csv"
+            else:
+                dacFileNameForDB =  DirectoryDacToSave+"/Bare_module_ROC"+ str(i)+"_setup.csv"
+            #print 'the Dac Original Name: ', dacFileName
+            #print 'the new file name: ', dacFileNameForDB
+            # create the new DAC file
+            fileDAC_DB = open(dacFileNameForDB, 'w')
+            fileDAC_DB.write('Bare_module_ID: ' +  bareModuleIDName + '\n')
+            fileDAC_DB.write('LaboratoryTest: ' +  ' ' +  globalNameLab + '\n')
+            fileDAC_DB.write('Operator_NickName: ' +  ' ' + globalOperatorName + '\n')
+            fileDAC_DB.write('Temperature: ' + globalTemp +'\n')
+            fileDAC_DB.write('RH: ' + globalRH + '\n' )
+            fileDAC_DB.write('ROC_type: psi46digv2.1respin'  +'\n')
+            fileDAC_DB.write('ROC_ID: '  + str(i) + '\n')
+            fileDAC_DB.write('IDig: '  + str(digCurrentList[i]) + '  mA' '\n')
+            fileDAC_DB.write('clk:'  + str(deser160val) + '\n')
+            fileDAC_DB.write('deser: ' + str(clkval)  +'\n')
+            fileDAC_DB.write('DAQ_Parameters: '  + u"\u0023" + 'DAQ_number DAQ_Name Value' + '\n')
+                
+            existingDacFile = open(dacFileName, 'r')
+
+            for line in existingDacFile:
+                #print line
+                fileDAC_DB.write(line.lower())
+            
+            fileDAC_DB.close()
+            existingDacFile.close()
+

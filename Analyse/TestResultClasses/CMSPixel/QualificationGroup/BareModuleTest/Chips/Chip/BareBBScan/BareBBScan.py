@@ -44,7 +44,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.Title = 'Bare BBScan: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
                 
             
-			self.ResultData['Plot']['Format'] = 'png'
-			self.SaveCanvas()
+            self.ResultData['Plot']['Format'] = 'png'
+            self.SaveCanvas()
 			
 
