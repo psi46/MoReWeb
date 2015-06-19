@@ -28,7 +28,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
 
         histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'hitsVsEvents').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])]
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate = self.Attributes['Rate'])]
         self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
 
         if self.ResultData['Plot']['ROOTObject']:

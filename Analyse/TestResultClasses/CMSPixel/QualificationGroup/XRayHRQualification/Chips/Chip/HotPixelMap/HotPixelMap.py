@@ -18,6 +18,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'HotPixelMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
 
         self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+
         
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)

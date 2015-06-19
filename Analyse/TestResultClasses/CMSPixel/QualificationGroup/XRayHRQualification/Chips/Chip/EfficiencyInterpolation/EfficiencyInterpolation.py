@@ -33,9 +33,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         DoubleColumnEfficiencyList = array.array('d')
 
         for Rate in Rates['HREfficiency']:
-            Ntrig = self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{:d}'.format(Rate)]
-            EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{:d}'.format(Rate)].ResultData['Plot']['ROOTObject']
-            BackgroundMapROOTObject = self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{:d}'.format(Rate)].ResultData['Plot']['ROOTObject']
+            Ntrig = self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)]
+            EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
+            BackgroundMapROOTObject = self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
 
             for DoubleColumn in range(1, 25):
                 PixelRateList = array.array('d')
@@ -98,12 +98,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 line.SetLineStyle(2)
                 line.SetLineColor(ROOT.kRed)
 
-                self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
+                self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
                 self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)] 
-
 
 
         self.Title = 'Efficiency Interpolation: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         self.SaveCanvas()        
-
 

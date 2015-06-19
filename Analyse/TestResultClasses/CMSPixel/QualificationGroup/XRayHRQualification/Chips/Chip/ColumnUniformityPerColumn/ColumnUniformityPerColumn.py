@@ -27,7 +27,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'hitsVsColumn').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']
         for Rate in Rates:
-            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)]
+            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)]
             HitROOTOBjects[Rate] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
 
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(),'',self.nCols,0,self.nCols)

@@ -27,7 +27,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
 
         histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'BackgroundMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(self.Attributes['Rate'])]
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]
         self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
         
         if self.ResultData['Plot']['ROOTObject']:
@@ -43,7 +43,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
-            self.ResultData['KeyValueDictPairs']['NHits']['Value'] = '{:1.0f}'.format(self.ResultData['Plot']['ROOTObject'].GetEntries())
+            self.ResultData['KeyValueDictPairs']['NHits']['Value'] = '{NHits:1.0f}'.format(NHits=self.ResultData['Plot']['ROOTObject'].GetEntries())
 
         self.SaveCanvas()
         
@@ -52,11 +52,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # total number of triggers = number of pixels * ntrig(triggers per pixel)
         NPixels = 80*52
-        NTriggers = NPixels * self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{:d}'.format(self.Attributes['Rate'])]       
+        NTriggers = NPixels * self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]       
         NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
         RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6
                 
-        self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{:1.2f}'.format(RealHitrate)
+        self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{RealHitrate:1.2f}'.format(RealHitrate=RealHitrate)
+
         self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
         self.ResultData['KeyList'] += ['RealHitrate']
         self.Title = 'Background Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])

@@ -44,7 +44,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # ht
         
         Rate = self.Attributes['Rate']
-        Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{:d}'.format(Rate)]
+        Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)]
         SCurveDataFileName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveDataFileName')
 
         print 'SCurve fitting... %s'%Directory
@@ -55,6 +55,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         HistoDict.set('SCurveFitting','dir', '')
         HistoDict.set('SCurveFitting','ignoreValidityCheck', '1')
         HistoDict.set('SCurveFitting','inputFileName', SCurveDataFileName)
+
 
         fitter = SCurve_Fitting(True, HistoDict, ePerVcal=ePerVcal)
         fitter.FitSCurve(Directory, ChipNo)
