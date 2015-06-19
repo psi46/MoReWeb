@@ -37,11 +37,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ndf = 0
             for i in range(1, distribution.GetNbinsX()+1):
                 Ei = poisson.Eval(distribution.GetBinCenter(i))
-                if Ei > 0:
+                # exclude areas < 1 events expected
+                if Ei > 0.5:
                     chi2 += (distribution.GetBinContent(i) - Ei)*(distribution.GetBinContent(i) - Ei)/Ei
                     ndf += 1
 
-            chi2ndf = chi2 / (ndf - 2)
+            chi2ndf_max = 99999
+
+            if ndf < 3:
+                chi2ndf = chi2ndf_max
+            else:
+                chi2ndf = chi2 / (ndf - 2)
+
+            if chi2ndf > chi2ndf_max:
+                chi2ndf = chi2ndf_max
 
             poisson.Draw("same")
 

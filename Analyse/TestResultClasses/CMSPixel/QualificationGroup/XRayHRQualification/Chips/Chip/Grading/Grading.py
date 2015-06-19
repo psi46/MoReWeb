@@ -204,10 +204,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             NumberValues['NumberOfNonUniformColumns'] = 0
             for Column in range(self.nCols):
                 ColumnHits = ColumnReadoutUniformityROOTObject.GetBinContent(Column+1)
+
+
                 if( ColumnHits < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low']
-                    *ColumnReadoutUniformityMean
+                    *ColumnReadoutUniformityMean*0.01
                     or ColumnHits > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']
-                    *ColumnReadoutUniformityMean  
+                    *ColumnReadoutUniformityMean*0.01
                 ):
                     NumberValues['NumberOfNonUniformColumns'] += 1
                     Grades['ColumnReadoutUniformityGrade'] = 3
