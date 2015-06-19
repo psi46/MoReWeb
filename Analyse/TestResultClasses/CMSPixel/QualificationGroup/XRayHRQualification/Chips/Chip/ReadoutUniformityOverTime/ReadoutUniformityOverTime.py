@@ -26,13 +26,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
-        self.ResultData['Plot']['ROOTObject'] = (
-            HistoGetter.get_histo(
-                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
-                    "Xray.hitsVsEvents_Ag_C{ChipNo}_V0".format(ChipNo=ChipNo) 
-                )
-            )
-        
+
+        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'hitsVsEvents').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate = self.Attributes['Rate'])]
+        self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()
@@ -84,13 +82,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             lineCHigh.SetLineWidth(2);
             lineCHigh.SetLineStyle(2)
             lineCHigh.SetLineColor(ROOT.kRed)
-            
+
+
             self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(Integral)
             self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.0f}'.format(Mean)
             self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMS)
-
             self.ResultData['KeyList'] += ['N','mu','sigma']
-            
 
         self.Title = 'Read. Unif. over Time {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         self.SaveCanvas()        

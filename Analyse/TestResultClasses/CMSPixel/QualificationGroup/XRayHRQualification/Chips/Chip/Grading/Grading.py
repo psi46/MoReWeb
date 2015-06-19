@@ -38,18 +38,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Rates':Rates,
                 'RatesString':('/'.join('{Rate}'.format(Rate=Rate) for Rate in Rates))
             }
-            
+
+        Rates = self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']
+        RateData['InterpolatedEfficiencyRates']={
+            'Rates':Rates,
+            'RatesString':('/'.join('{Rate}'.format(Rate=Rate) for Rate in Rates))
+        }
+
         self.ResultData['KeyValueDictPairs']['ROCGrade'] = {
             'Value':'',
             'Label':'Final ROC Grade'
         }
-        self.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels'] = {
-            'Value':'',
-            'Label':'# Low Eff. Pixels '+RateData['HREfficiency']['RatesString']
-        }
+        #self.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels'] = {
+        #    'Value':'',
+        #    'Label':'# Low Eff. Pixels '+RateData['HREfficiency']['RatesString']
+        #}
         self.ResultData['KeyValueDictPairs']['EfficiencyGrade'] = {
             'Value':'',
-            'Label':'Efficiency Grade '+RateData['HREfficiency']['RatesString']
+            'Label':'Efficiency Grade '+RateData['InterpolatedEfficiencyRates']['RatesString']
         }
 
         self.ResultData['KeyValueDictPairs']['NumberOfHotPixels'] = {
@@ -100,7 +106,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['KeyList'] += [
                 'ROCGrade',
-                'NumberOfLowEfficiencyPixels',
                 'NumberOfHotPixels',
                 'NumberOfNonUniformColumns',
                 'NumberOfNonUniformEvents',
@@ -139,64 +144,31 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         ChipNo = self.ParentObject.Attributes['ChipNo']
         
-        for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HREfficiency']:
+        # efficiency grading
+        NumberValues = {}
+        for NumberKey in self.Attributes['NumberKeys']['HREfficiency']:
+            NumberValues[NumberKey] = 0
 
-            NumberValues = {}
-            for NumberKey in self.Attributes['NumberKeys']['HREfficiency']:
-                NumberValues[NumberKey] = 0
+        Grades = {}
+        for GradeKey in self.Attributes['GradeKeys']['HREfficiency']:
+            Grades[GradeKey] = -1
 
-            Grades = {}
-            for GradeKey in self.Attributes['GradeKeys']['HREfficiency']:
-                Grades[GradeKey] = -1
-
-            EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
-            EfficiencyDistributionTestResultObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyDistribution_{Rate}'.format(Rate=Rate)]
-
-            
-
-                
-            for Row in range(self.nRows):
-                for Column in range(self.nCols):
-                    PixelEfficiency = EfficiencyMapROOTObject.GetBinContent(Column+1, Row+1)
-                    if Row == 0 or Row == self.nRows-1 or Column == 0 or Column == self.nCols -1:
-                        EfficiencyThreshold = self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_allowed_efficiency_edge_{Rate}'.format(Rate=Rate)]
-                    else:
-                        EfficiencyThreshold = self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_allowed_efficiency_{Rate}'.format(Rate=Rate)]
-                    
-                    if PixelEfficiency < EfficiencyThreshold:
-                        NumberValues['NumberOfLowEfficiencyPixels'] += 1
-                        self.ResultData['HiddenData']['ListOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)].append((ChipNo, Column, Row))
-                    
-
-            
-            
-                    
-            ### Efficiency Grade ###    
-            MeanEfficiency = float(EfficiencyDistributionTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value'])
-            
+        RateIndex = 1
+        for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
+            MeanEfficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(Rate)]['Value'])
             Grades['EfficiencyGrade'] = 1
-            if( NumberValues['NumberOfLowEfficiencyPixels'] > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_{Rate}'.format(Rate=Rate)]
-                and MeanEfficiency > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_allowed_efficiency_{Rate}'.format(Rate=Rate)]
-            ):
+            if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
                 Grades['EfficiencyGrade'] = 2
-            if( NumberValues['NumberOfLowEfficiencyPixels'] > self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_{Rate}'.format(Rate=Rate)]
-                or MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_allowed_efficiency_{Rate}'.format(Rate=Rate)]
-            ):
+            if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
                 Grades['EfficiencyGrade'] = 3
+            RateIndex += 1
+
+            #for NumberKey in self.Attributes['NumberKeys']['HREfficiency']:
+            #    self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = NumberValues[NumberKey]
+            #    self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{Rate}'.format(Rate=NumberValues[NumberKey])).strip('/')
 
 
-
-            for NumberKey in self.Attributes['NumberKeys']['HREfficiency']:
-                self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = NumberValues[NumberKey]
-                self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{Rate}'.format(Rate=NumberValues[NumberKey])).strip('/')
-
-
-            for GradeKey in self.Attributes['GradeKeys']['HREfficiency']:
-                self.ResultData['HiddenData'][GradeKey+'_{Rate}'.format(Rate=Rate)] = Grades[GradeKey]
-                self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/'+GradeMapping[Grades[GradeKey]]).strip('/')
-
-
-
+        # hitmap and uniformity grading
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']:
             NumberValues = {}
             for NumberKey in self.Attributes['NumberKeys']['HRData']:
@@ -233,10 +205,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             NumberValues['NumberOfNonUniformColumns'] = 0
             for Column in range(self.nCols):
                 ColumnHits = ColumnReadoutUniformityROOTObject.GetBinContent(Column+1)
+
+
                 if( ColumnHits < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low']
-                    *ColumnReadoutUniformityMean
+                    *ColumnReadoutUniformityMean*0.01
                     or ColumnHits > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']
-                    *ColumnReadoutUniformityMean  
+                    *ColumnReadoutUniformityMean*0.01
                 ):
                     NumberValues['NumberOfNonUniformColumns'] += 1
                     Grades['ColumnReadoutUniformityGrade'] = 3

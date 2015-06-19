@@ -14,14 +14,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
-        
-        self.ResultData['Plot']['ROOTObject'] = (
-            HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])],
-                "HighRate.highRate_calmap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
-            ).Clone(self.GetUniqueID())
-        )
-        
+
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]
+        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'EfficiencyMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+
+        self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()

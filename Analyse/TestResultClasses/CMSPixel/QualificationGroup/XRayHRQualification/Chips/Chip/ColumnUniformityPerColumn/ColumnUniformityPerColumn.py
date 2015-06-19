@@ -23,14 +23,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         HitROOTOBjects = {}
+        
+        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'hitsVsColumn').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']
         for Rate in Rates:
-            HitROOTOBjects[Rate] = (
-                HistoGetter.get_histo(
-                        self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)],
-                        "Xray.hitsVsColumn_Ag_C{ChipNo}_V0".format(ChipNo=ChipNo)
-                    )
-                )
+            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)]
+            HitROOTOBjects[Rate] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(),'',self.nCols,0,self.nCols)
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
@@ -44,8 +43,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     ColumnEfficiency = (
                         float(HitRate150)
                         /float(HitRate50)
-                        *float(RealHitrate150)
-                        /float(RealHitrate50)
+                        /float(RealHitrate150)
+                        *float(RealHitrate50)
                     )
                 else:
                     ColumnEfficiency = 0

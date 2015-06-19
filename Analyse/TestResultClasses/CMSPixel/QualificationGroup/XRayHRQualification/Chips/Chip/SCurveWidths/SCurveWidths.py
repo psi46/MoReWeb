@@ -2,6 +2,10 @@
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 import ROOT
+
+from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
+from TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Fitting.SCurve_Fitting import *
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_SCurveWidths_TestResult'
@@ -19,6 +23,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'sigma':{
                 'Value':'{0:1.2f}'.format(-1),
                 'Label':'σ'
+            },
+            'threshold':{
+                'Value':'{0:1.2f}'.format(-1),
+                'Label':'thr [e-]'
             }
         }
 
@@ -37,34 +45,53 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         Rate = self.Attributes['Rate']
         Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)]
-        SCurveFileName = "{Directory}/SCurveData_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
-        SCurveFile = open(SCurveFileName, "r")
+        SCurveDataFileName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveDataFileName')
 
+        print 'SCurve fitting... %s'%Directory
+        ePerVcal = 47
+        HistoDict = BetterConfigParser()
+        HistoDict.add_section('SCurveFitting')
+        HistoDict.set('SCurveFitting','nTrigs', str(100))
+        HistoDict.set('SCurveFitting','dir', '')
+        HistoDict.set('SCurveFitting','ignoreValidityCheck', '1')
+        HistoDict.set('SCurveFitting','inputFileName', SCurveDataFileName)
+
+
+        fitter = SCurve_Fitting(True, HistoDict, ePerVcal=ePerVcal)
+        fitter.FitSCurve(Directory, ChipNo)
+
+        SCurveFileName = Directory + '/' + self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveFileName').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        SCurveFile = open(SCurveFileName, "r")
         self.FileHandle = SCurveFile # needed in summary
 
         if not SCurveFile:
             raise Exception('Cannot find SCurveFile "%s"'%SCurveFileName)
         else:
-            #Omit the first line
+            #Omit the first 2 lines
             print 'read file',SCurveFileName
             Line = SCurveFile.readline()
+            Line = SCurveFile.readline()
 
+            ThresholdMean = 0
+            NPix = 0
             for column in range(self.nCols): #Columns
                 for row in range(self.nRows): #Rows
                     Line = SCurveFile.readline()
                     if Line:
                         LineArray = Line.strip().split()
                         Threshold = float(LineArray[0])
+                        ThresholdMean += Threshold
+                        NPix += 1
                         Width = float(LineArray[1])
                         
                         self.ResultData['Plot']['ROOTObject'].Fill(Width)
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
-                        if Threshold > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_{Rate}'.format(Rate=self.Attributes['Rate'])]:
+                        if Width > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold']:
                             self.ResultData['HiddenData']['NumberOfNoisyPixels'] += 1
                             self.ResultData['HiddenData']['ListOfNoisyPixels'].append((ChipNo, column, row))
-
+            ThresholdMean /= NPix
 
         if self.ResultData['Plot']['ROOTObject_ht'].GetMaximum() < self.ResultData['HiddenData']['htmax']:
             self.ResultData['HiddenData']['htmax'] = self.ResultData['Plot']['ROOTObject_ht'].GetMaximum();
@@ -72,9 +99,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['Plot']['ROOTObject_ht'].GetMinimum() > self.ResultData['HiddenData']['htmin'] :
             self.ResultData['HiddenData']['htmin'] = self.ResultData['Plot']['ROOTObject_ht'].GetMinimum();
 
-
         if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Noise (e^{-})");
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Noise (e-)");
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
@@ -100,8 +126,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(IntegralSCurve)
         self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(MeanSCurve)
         self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMSSCurve)
+        self.ResultData['KeyValueDictPairs']['threshold']['Value'] = '{0:1.2f}'.format(ThresholdMean)
 
-        self.ResultData['KeyList'] = ['N','mu','sigma']
+        self.ResultData['KeyList'] = ['N','mu','sigma','threshold']
         if under:
             self.ResultData['KeyValueDictPairs']['under'] = {'Value':'{0:1.2f}'.format(under), 'Label':'<='}
             self.ResultData['KeyList'].append('under')

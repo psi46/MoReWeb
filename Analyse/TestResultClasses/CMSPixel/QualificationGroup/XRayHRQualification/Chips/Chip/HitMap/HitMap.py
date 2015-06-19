@@ -58,7 +58,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             )
             TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
             Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
-            NTriggers = float(NTriggersROOTObject.GetEntries())
+            NTriggers = float(NTriggersROOTObject.GetBinContent(1))
             NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
             RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6
             

@@ -38,9 +38,14 @@ class TestResult(GeneralTestResult):
             'HRData':[],
             'HRSCurves':[]
         }
+
+        self.Attributes['InterpolatedEfficiencyRates'] = []
+        for r in range(1, int(1 + self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_NInterpolationRates'])):
+            self.Attributes['InterpolatedEfficiencyRates'].append(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_InterpolationRate%d'%r])
+
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
-
+        self.Attributes['Ntrig'] = {}
             
         HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
         for Path in HREfficiencyPaths:
@@ -50,6 +55,24 @@ class TestResult(GeneralTestResult):
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
 
+            self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)] = 50 #pxar default
+            NTriggersReadFromFile = False            
+            testParametersFilename = "/".join(ROOTFiles[0].split("/")[0:-1]) + "/testParameters.dat"
+            if os.path.exists(testParametersFilename):
+                testParametersFile = open(testParametersFilename, "r")
+                if testParametersFile:
+                    testParametersSection = ""
+                    for line in testParametersFile:
+                        sline = line.strip()
+                        if sline[0:2] == "--":
+                            testParametersSection = sline[2:].strip()
+                        elements = sline.strip().split(" ")
+                        if testParametersSection.lower() == "highrate" and elements[0].lower() == "ntrig":
+                            NTriggersReadFromFile = True
+                            self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)] = float(elements[-1])
+                    testParametersFile.close()
+            if not NTriggersReadFromFile:
+                print 'WARNING: testParameters.dat file not found, using default number of triggers Ntrig = %d'%self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)]
 
         HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_*')
         for Path in HRDataPaths:
@@ -68,8 +91,17 @@ class TestResult(GeneralTestResult):
             self.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)] = Path
 
 
+        HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
+        if len(HRHotPixelsPaths) > 1:
+                warnings.warn("multiple MaskHotPixel tests found")
 
-               
+        for Path in HRHotPixelsPaths:
+            FolderName = os.path.basename(Path)
+            ROOTFiles = glob.glob(Path+'/*.root')
+            if len(ROOTFiles) > 1:
+                warnings.warn("The directory '%s' contains more than one .root file, choosing first one: '%s'"%(FolderName, ROOTFiles[0]))
+            self.Attributes['ROOTFiles']['MaskHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
+            break
 
         self.ResultData['SubTestResultDictList'] = [
             {
@@ -114,9 +146,6 @@ class TestResult(GeneralTestResult):
             grade = self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Grade']['Value']
         except KeyError:
             grade = 'None'
-        
-        
-       
         
         
         print 'fill row'
@@ -179,6 +208,13 @@ class TestResult(GeneralTestResult):
                 HighRateData['LowUniformityColumns_Module_{Rate}'.format(Rate)] = int(
                     EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyColumnsSum_{Rate}'.format(Rate=Rate)]['Value']
                 )
+
+            # Interpolated Efficiency
+            for Rate in self.Attributes['InterpolatedEfficiencyRates']:
+                HighRateData['Eff_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
+                    EfficiencyInterpolationTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value']
+                )
+
             for Rate in self.Attributes['Rates']['HRData']:
                 # Number of hot pixels (Sum over all 16 ROCs is module value)
                 HighRateData['HotPixels_Module_{Rate}'.format(Rate=Rate)] = int(
@@ -243,11 +279,7 @@ class TestResult(GeneralTestResult):
                     HighRateData['HRate_Eff_measured_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
                         BackgroundMapTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value']
                     )
-                    
-                    # Interpolated Efficiency
-                    HighRateData['Eff_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
-                        EfficiencyInterpolationTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value']
-                    )
+                
 
                 for Rate in self.Attributes['Rates']['HRData']:
                     HitMapTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)]

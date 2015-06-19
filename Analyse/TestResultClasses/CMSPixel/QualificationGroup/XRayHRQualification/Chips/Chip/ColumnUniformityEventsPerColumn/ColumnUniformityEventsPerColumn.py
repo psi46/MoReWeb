@@ -29,12 +29,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         EventMin = 0
         EventMax = 0
         Rate = self.Attributes['Rate']
-        self.ResultData['Plot']['ROOTObject'] = (
-            HistoGetter.get_histo(
-                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)],
-                    "Xray.hitsVsEvtCol_Ag_C{ChipNo}_V0".format(ChipNo=ChipNo)
-                )
-            )
+
+        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'hitsVsEvtCol').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)]
+        self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+
         self.ResultData['HiddenData']['EventBins'] = max(
             self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(),EventBins)
 

@@ -2,7 +2,7 @@
 import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
-
+import os
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -25,13 +25,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         NumberOfLowEfficiencyPixels = 0;
         ChipNo = self.ParentObject.Attributes['ChipNo']
-        
-        self.ResultData['Plot']['ROOTObject'] = (
-            HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])],
-                "HighRate.highRate_xraymap_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
-            ).Clone(self.GetUniqueID())
-        )
+
+        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'BackgroundMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]
+        self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
         
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
@@ -52,18 +49,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
         Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
-            
-        NTriggersROOTObject = (
-            HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
-                "Xray.ntrig_Ag_V0" 
-            )
-        )
-        NTriggers = float(NTriggersROOTObject.GetEntries())
+
+        # total number of triggers = number of pixels * ntrig(triggers per pixel)
+        NPixels = 80*52
+        NTriggers = NPixels * self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]       
         NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
         RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6
-        
+                
         self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{RealHitrate:1.2f}'.format(RealHitrate=RealHitrate)
+
         self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
         self.ResultData['KeyList'] += ['RealHitrate']
         self.Title = 'Background Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
