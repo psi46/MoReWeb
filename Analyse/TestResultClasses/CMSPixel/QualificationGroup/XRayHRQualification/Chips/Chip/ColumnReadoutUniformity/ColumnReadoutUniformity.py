@@ -28,7 +28,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         self.ResultData['Plot']['ROOTObject'] = (
             HistoGetter.get_histo(
-                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{:d}'.format(self.Attributes['Rate'])],
+                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
                     "Xray.hitsVsColumn_Ag_C{ChipNo}_V0".format(ChipNo=ChipNo) 
                 )
             )

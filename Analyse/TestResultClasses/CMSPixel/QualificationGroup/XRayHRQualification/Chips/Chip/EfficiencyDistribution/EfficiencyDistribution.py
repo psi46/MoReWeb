@@ -26,7 +26,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
-        EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{:d}'.format(self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
+        EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
         MaximumValue = EfficiencyMapROOTObject.GetMaximum()
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(),'',int(MaximumValue),0,MaximumValue)
         
@@ -49,9 +49,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw();
             
             lineB = ROOT.TLine().DrawLine(self.TestResultEnvironmentObject.GradingParameters[
-                'XRayHighRateEfficiency_min_allowed_efficiency_{:d}'.format(self.Attributes['Rate'])], 0,
+                'XRayHighRateEfficiency_min_allowed_efficiency_{Rate}'.format(Rate=self.Attributes['Rate'])], 0,
                                   self.TestResultEnvironmentObject.GradingParameters[
-                'XRayHighRateEfficiency_min_allowed_efficiency_{:d}'.format(self.Attributes['Rate'])], self.ResultData['Plot'][
+                'XRayHighRateEfficiency_min_allowed_efficiency_{Rate}'.format(Rate=self.Attributes['Rate'])], self.ResultData['Plot'][
                 'ROOTObject'].GetMaximum())
             lineB.SetLineWidth(2);
             lineB.SetLineStyle(2)

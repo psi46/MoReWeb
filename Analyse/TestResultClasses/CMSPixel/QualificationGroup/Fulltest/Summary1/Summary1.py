@@ -86,7 +86,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'PixelDefects': {
                 'Value':'%d - %d/%d/%d'%(TotalDefects,nPixelDefectsGradeA,nPixelDefectsGradeB,nPixelDefectsGradeC),
-                'Label':'Pixel Defects - A/B/C'
+                'Label':'Pixel Defects - A/B/C',
+                'NumericValue':TotalDefects,
             },
             'MaskDefects':{
                 'Value':'{0:1.0f}'.format(MaskDefects), 

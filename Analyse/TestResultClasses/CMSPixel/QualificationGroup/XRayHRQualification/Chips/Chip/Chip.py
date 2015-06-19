@@ -13,25 +13,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # order!
         self.ResultData['SubTestResultDictList'] = []
         i = 0
-        for Rate in self.ParentObject.ParentObject.Attributes['Rates']:
+        for Rate in self.ParentObject.ParentObject.Attributes['Rates']['HREfficiency']:
             self.ResultData['SubTestResultDictList'] += [
                 {
-                    'Key':'EfficiencyMap_{:d}'.format(Rate),
+                    'Key':'EfficiencyMap_{Rate}'.format(Rate=Rate),
                     'Module':'EfficiencyMap',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'EfficiencyMap_{:d}'.format(Rate),
+                        'StorageKey':'EfficiencyMap_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':10+i
                     },
                 },
                 {
-                    'Key':'EfficiencyDistribution_{:d}'.format(Rate),
+                    'Key':'EfficiencyDistribution_{Rate}'.format(Rate=Rate),
                     'Module':'EfficiencyDistribution',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'EfficiencyDistribution_{:d}'.format(Rate),
+                        'StorageKey':'EfficiencyDistribution_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':20+i
@@ -39,66 +39,84 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     },
                 },
                 {
-                    'Key':'BackgroundMap_{:d}'.format(Rate),
+                    'Key':'BackgroundMap_{Rate}'.format(Rate=Rate),
                     'Module':'BackgroundMap',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'BackgroundMap_{:d}'.format(Rate),
+                        'StorageKey':'BackgroundMap_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':30+i
                     },
                 },
+            ]
+            i+=1
+        for Rate in self.ParentObject.ParentObject.Attributes['Rates']['HRData']:
+            self.ResultData['SubTestResultDictList'] += [
                 {
-                    'Key':'HotPixelMap_{:d}'.format(Rate),
+                    'Key':'HotPixelMap_{Rate}'.format(Rate=Rate),
                     'Module':'HotPixelMap',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'HotPixelMap_{:d}'.format(Rate),
+                        'StorageKey':'HotPixelMap_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':40+i
                     },
                 },
                 {
-                    'Key':'HitMap_{:d}'.format(Rate),
+                    'Key':'HitMap_{Rate}'.format(Rate=Rate),
                     'Module':'HitMap',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'HitMap_{:d}'.format(Rate),
+                        'StorageKey':'HitMap_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':50+i
                     },
                 },
                 {
-                    'Key':'ColumnReadoutUniformity_{:d}'.format(Rate),
+                    'Key':'ColumnReadoutUniformity_{Rate}'.format(Rate=Rate),
                     'Module':'ColumnReadoutUniformity',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'ColumnReadoutUniformity_{:d}'.format(Rate),
+                        'StorageKey':'ColumnReadoutUniformity_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':60+i
                     },
                 },
                 {
-                    'Key':'ReadoutUniformityOverTime_{:d}'.format(Rate),
+                    'Key':'ReadoutUniformityOverTime_{Rate}'.format(Rate=Rate),
                     'Module':'ReadoutUniformityOverTime',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'ReadoutUniformityOverTime_{:d}'.format(Rate),
+                        'StorageKey':'ReadoutUniformityOverTime_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':70+i
                     },
                 },
                 {
-                    'Key':'SCurveWidths_{:d}'.format(Rate),
+                    'Key':'ColumnUniformityEventsPerColumn',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                    },
+                    'DisplayOptions':{
+                        'Order':90+i
+                    },
+
+                },
+            ]
+            i+=1
+        for Rate in self.ParentObject.ParentObject.Attributes['Rates']['HRSCurves']:
+            self.ResultData['SubTestResultDictList'] += [
+                {
+                    'Key':'SCurveWidths_{Rate}'.format(Rate=Rate),
                     'Module':'SCurveWidths',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'SCurveWidths_{:d}'.format(Rate),
+                        'StorageKey':'SCurveWidths_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':100+i
@@ -109,20 +127,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['SubTestResultDictList'] += [
                 {
-                    'Key':'ColumnEfficiencyPerColumn',
+                    'Key':'ColumnUniformityPerColumn',
                     'InitialAttributes':{
                     },
                     'DisplayOptions':{
                         'Order':80+i   
-                    },
-                    
-                },
-                {
-                    'Key':'ColumnEfficiencyEventsPerColumn',
-                    'InitialAttributes':{
-                    },
-                    'DisplayOptions':{
-                        'Order':90+i   
                     },
                     
                 },

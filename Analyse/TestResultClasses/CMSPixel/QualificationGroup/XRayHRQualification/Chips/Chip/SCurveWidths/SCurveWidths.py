@@ -36,7 +36,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # ht
         
         Rate = self.Attributes['Rate']
-        Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{:d}'.format(Rate)]
+        Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)]
         SCurveFileName = "{Directory}/SCurveData_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         SCurveFile = open(SCurveFileName, "r")
 
@@ -109,5 +109,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['over'] = {'Value':'{0:1.2f}'.format(over), 'Label':'>='}
             self.ResultData['KeyList'].append('over')
 
-        self.ResultData['Plot']['Caption'] = 'S-Curve widths: Noise (e^{-})'
+        self.Title = 'S-Curve widths: Noise (e^{{-}}) C{ChipNo} {Rate}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'], Rate=self.Attributes['Rate'])
         self.SaveCanvas()        

@@ -33,19 +33,42 @@ class TestResult(GeneralTestResult):
             self.Attributes['NumberOfChips'] = 1
             self.Attributes['StartChip'] = 0
         
-        self.Attributes['Rates'] = []
+        self.Attributes['Rates'] = {
+            'HREfficiency':[],
+            'HRData':[],
+            'HRSCurves':[]
+        }
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
-        for Rate in self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Rates']:
+
             
-            HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_{:d}/'.format(Rate))
-            HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_{:d}'.format(Rate))
-            HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRScurves_{:d}'.format(Rate))
-            if len(HREfficiencyPaths) and len(HRDataPaths) and len(HRSCurvesPaths):
-               self.Attributes['Rates'].append(Rate)
-               self.Attributes['ROOTFiles']['HREfficiency_{:d}'.format(Rate)] = ROOT.TFile.Open(HREfficiencyPaths[0]+'/pxar.root')
-               self.Attributes['ROOTFiles']['HRData_{:d}'.format(Rate)] = ROOT.TFile.Open(HRDataPaths[0]+'/pxar.root')
-               self.Attributes['SCurvePaths']['HRSCurves_{:d}'.format(Rate)] = HRSCurvesPaths[0]
+        HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
+        for Path in HREfficiencyPaths:
+            FolderName = os.path.basename(Path)
+            Rate = int(FolderName.split('_')[2])
+            self.Attributes['Rates']['HREfficiency'].append(Rate)
+            ROOTFiles = glob.glob(Path+'/*.root')
+            self.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
+
+
+        HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_*')
+        for Path in HRDataPaths:
+            FolderName = os.path.basename(Path)
+            Rate = int(FolderName.split('_')[2])
+            self.Attributes['Rates']['HRData'].append(Rate)
+            ROOTFiles = glob.glob(Path+'/*.root')
+            self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
+
+
+        HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRScurves_*')
+        for Path in HRSCurvesPaths:
+            FolderName = os.path.basename(Path)
+            Rate = int(FolderName.split('_')[2])
+            self.Attributes['Rates']['HRSCurves'].append(Rate)
+            self.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)] = Path
+
+
+
                
 
         self.ResultData['SubTestResultDictList'] = [
@@ -130,12 +153,9 @@ class TestResult(GeneralTestResult):
             GradingTestResultObject = self.ResultData['SubTestResults']['Grading']
             EfficiencyOverviewTestResultObject = self.ResultData['SubTestResults']['EfficiencyOverview']
             
-            # Number of columns with efficiency below cut (Sum over all 16 ROCs is module value)
-            HighRateData['LowEffColumns_Module'] = int(
-                EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyColumnsSum']['Value']
-            )
+
             
-            for Rate in self.Attributes['Rates']:
+            for Rate in self.Attributes['Rates']['HREfficiency']:
                 # Number of pixels with efficiency below cut (Sum over all 16 ROCs is module value)
                 HighRateData['LowEffPixels_Module_{Rate}'.format(Rate=Rate)] = int(
                     GradingTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)]['Value']
@@ -154,7 +174,12 @@ class TestResult(GeneralTestResult):
                 HighRateData['Eff_Module_{Rate}'.format(Rate=Rate)] = float(
                     EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiencyMean_{Rate}'.format(Rate=Rate)]['Value']
                 )
-                
+
+                # Number of columns with efficiency below cut (Sum over all 16 ROCs is module value)
+                HighRateData['LowUniformityColumns_Module_{Rate}'.format(Rate)] = int(
+                    EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyColumnsSum_{Rate}'.format(Rate=Rate)]['Value']
+                )
+            for Rate in self.Attributes['Rates']['HRData']:
                 # Number of hot pixels (Sum over all 16 ROCs is module value)
                 HighRateData['HotPixels_Module_{Rate}'.format(Rate=Rate)] = int(
                     EfficiencyOverviewTestResultObject.ResultData['KeyValueDictPairs']['NumberOfHotPixelsSum_{Rate}'.format(Rate=Rate)]['Value']
@@ -182,21 +207,21 @@ class TestResult(GeneralTestResult):
                 
                 ## Column Efficiency
                 # Number of columns with efficiency below cut
-                HighRateData['LowEffColumns_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
-                    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowEfficiencyColumns']
+                # before: 'LowEffColumns_C{ChipNo}'
+                HighRateData['LowUniformityColumns_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
+                    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowUniformityColumns']
                 )
                 
                 # Number of events where a column has low efficiency
-                HighRateData['LowEffCol_Events_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
-                    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowEfficiencyColumnEvents']
+                # before: 'LowEffCol_Events_C{ChipNo}'
+                HighRateData['LowUniformityCol_Events_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
+                    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowUniformityColumnEvents']
                 )
                 
-                for Rate in self.Attributes['Rates']:
+                for Rate in self.Attributes['Rates']['HREfficiency']:
                     EfficiencyDistributionTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['EfficiencyDistribution_{Rate}'.format(Rate)]
                     BackgroundMapTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['BackgroundMap_{Rate}'.format(Rate=Rate)]
-                    HitMapTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)]
-                    ColumnReadoutUniformityTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)]
-                    
+
                     
                     ## Pixel Efficiency
                     
@@ -223,7 +248,11 @@ class TestResult(GeneralTestResult):
                     HighRateData['Eff_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = float(
                         EfficiencyInterpolationTestResultObject.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value']
                     )
-                    
+
+                for Rate in self.Attributes['Rates']['HRData']:
+                    HitMapTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)]
+                    ColumnReadoutUniformityTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)]
+
                     ## Hot Pixels
                     # Number of pixels with efficiency below cut
                     HighRateData['HotPixels_C{ChipNo}_{Rate}'.format(ChipNo=ChipNo, Rate=Rate)] = int(

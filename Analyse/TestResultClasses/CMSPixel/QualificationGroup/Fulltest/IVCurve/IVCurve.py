@@ -121,6 +121,11 @@ class TestResult(GeneralTestResult):
 
         IVCurveFileName = "{Directory}/ivCurve.log".format(Directory=Directory)
         IVCurveFile = open(IVCurveFileName, "r")
+        
+        self.ResultData['HiddenData']['IVCurveFilePath'] = IVCurveFileName
+        self.ResultData['HiddenData']['TestTemperature'] = self.ParentObject.Attributes['TestTemperature']
+        
+        
 
         lines = IVCurveFile.readlines()
         lines = [line.replace('\n', '') for line in lines]
@@ -137,7 +142,7 @@ class TestResult(GeneralTestResult):
             self.getIVTuple(IVCurveFileName, analyser)
 
         IVTuple = self.ResultData['HiddenData']['IVTuple']
-
+        
         Voltage_List = array.array('d', [])
         Current_List = array.array('d', [])
         CurrentAtVoltage100V = 0
@@ -181,6 +186,11 @@ class TestResult(GeneralTestResult):
 
         IVCurveFile.close()
         
+        self.ResultData['HiddenData']['IVCurveData'] = {
+        	'VoltageList':Voltage_List,
+        	'CurrentList':Current_List
+        }
+        
         if CurrentAtVoltage100V != 0.:
             Variation = CurrentAtVoltage150V / CurrentAtVoltage100V
         else:
@@ -223,6 +233,9 @@ class TestResult(GeneralTestResult):
         CurrentAtVoltage150V *= self.ResultData['HiddenData']['FactorI'] 
         CurrentAtVoltage150V *= 1./self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Factor'] #to show the value in muA and not in A
         self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'] = '{0:1.2f}'.format(CurrentAtVoltage150V)
+        
+        CurrentAtVoltage100V *= self.ResultData['HiddenData']['FactorI'] 
+        self.ResultData['HiddenData']['CurrentAtVoltage100V'] = CurrentAtVoltage100V
         self.ResultData['KeyValueDictPairs']['Variation']['Value'] = '{0:1.2f}'.format(Variation)
 
         if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):

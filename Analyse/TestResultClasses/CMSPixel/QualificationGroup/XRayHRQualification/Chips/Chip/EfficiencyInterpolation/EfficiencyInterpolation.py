@@ -27,10 +27,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         RealHitrateList = array.array('d', [0])
         EfficiencyList = array.array('d', [100])
         ScalingFactor = 1e-6
-        for Rate in Rates:
-            RealHitRate = float(self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'])
+        for Rate in Rates['HREfficiency']:
+            RealHitRate = float(self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'])
             RealHitrateList.append(RealHitRate)
-            Efficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyDistribution_{:d}'.format(Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
+            Efficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyDistribution_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
             EfficiencyList.append(Efficiency)
         
         self.Canvas.Clear()
@@ -39,9 +39,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             
-            
-            self.ResultData['Plot']['ROOTObject'].Fit('pol2','Q')
-            InterpolationFunction = self.ResultData['Plot']['ROOTObject'].GetFunction('pol2')
+            cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3",70,170)
+            self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'QR')
+            InterpolationFunction = cubicFit#self.ResultData['Plot']['ROOTObject'].GetFunction('pol2')
             
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 110.);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]");
@@ -67,8 +67,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
             #    'ROOTObject'].GetMaximum())
-            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency50']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(50e6*ScalingFactor))
-            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency150']['Value'] = '{:1.2f}'.format(InterpolationFunction.Eval(150e6*ScalingFactor))
+            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency50']['Value'] = '{InterpolatedEfficiency50:1.2f}'.format(InterpolatedEfficiency50=InterpolationFunction.Eval(50e6*ScalingFactor))
+            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency150']['Value'] = '{InterpolatedEfficiency150:1.2f}'.format(InterpolatedEfficiency150=InterpolationFunction.Eval(150e6*ScalingFactor))
             self.ResultData['KeyList'] += ['InterpolatedEfficiency50','InterpolatedEfficiency150'] 
 
         self.Title = 'Efficiency Interpolation: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])

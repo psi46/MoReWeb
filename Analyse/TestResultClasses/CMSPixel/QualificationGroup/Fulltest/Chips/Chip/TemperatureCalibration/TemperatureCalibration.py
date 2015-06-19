@@ -114,7 +114,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['HiddenData']['gADCgraph']_Measurement[chipId][itemprange].SetLineWidth(2);
                     self.ResultData['HiddenData']['gADCgraph']_Measurement[chipId][itemprange].Draw("L");
                     numGraphs+=1
-                    label = "Vref = {:3.2f}".format( vReference[itemprange])
+                    label = "Vref = {0:3.2f}".format( vReference[itemprange])
                     legendTempRanges.AddEntry(self.ResultData['HiddenData']['gADCgraph']_Measurement[chipId][itemprange], label, "l");
 
 
@@ -141,7 +141,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['HiddenData']['gADCgraph']_Calibration[chipId][itemprange].SetLineWidth(2);
                     self.ResultData['HiddenData']['gADCgraph']_Calibration[chipId][itemprange].Draw("L");
                     numGraphs+=1
-                    label = "Vref = {:3.2f}".format( vReference[itemprange])
+                    label = "Vref = {0:3.2f}".format( vReference[itemprange])
                     legendTempRanges.AddEntry(self.ResultData['HiddenData']['gADCgraph']_Calibration[chipId][itemprange], label, "l");
 
 
