@@ -76,6 +76,8 @@ class TestResultEnvironment:
         'XRayHighRate_factor_readout_uniformity':5,
         'XRayHighRate_Factor_ColUniformity':5,
         'XRayHighRate_SCurve_Noise_Threshold':400,
+        'XRayHighRate_missing_xray_pixels_B':42,
+        'XRayHighRate_missing_xray_pixels_C':168,
     }
     XRayHRQualificationConfiguration = {
         'Rates':[50,150],

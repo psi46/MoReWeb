@@ -197,7 +197,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grades['HotPixelsGrade'] = 3
             
             ### Hit Map Grade ###
-            Grades['HitMapGrade'] = 3
+            MissingHits = 0
+            for col in range(0, 52):
+                for row in range(0, 80):
+                    if HitMapROOTObject.GetBinContent(col + 1, row + 1) < 1:
+                        MissingHits += 1
+
+            Grades['HitMapGrade'] = 1
+            if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B']:
+                Grades['HitMapGrade'] = 2
+            if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
+                Grades['HitMapGrade'] = 3
             
             ### Column Readout Uniformity Grade ###
             Grades['ColumnReadoutUniformityGrade'] = 1         
