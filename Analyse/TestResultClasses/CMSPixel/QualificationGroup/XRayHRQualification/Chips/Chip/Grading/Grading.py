@@ -180,7 +180,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             HotPixelMapROOTObject = self.ParentObject.ResultData['SubTestResults']['HotPixelMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
             HitMapROOTObject = self.ParentObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
-            ColumnReadoutUniformityROOTObject = self.ParentObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
+            ColumnReadoutUniformityROOTObject = self.ParentObject.ResultData['SubTestResults']['ColumnUniformityPerColumn'].ResultData['Plot']['ROOTObject']
             ReadoutUniformityOverTimeTestResultObject = self.ParentObject.ResultData['SubTestResults']['ReadoutUniformityOverTime_{Rate}'.format(Rate=Rate)]
 
             HotPixelThreshold =self.TestResultEnvironmentObject.GradingParameters['XRayHighRateHotPixels_Threshold']
@@ -201,17 +201,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             ### Column Readout Uniformity Grade ###
             Grades['ColumnReadoutUniformityGrade'] = 1         
-            ColumnReadoutUniformityMean = float(self.ParentObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
+            
             NumberValues['NumberOfNonUniformColumns'] = 0
             for Column in range(self.nCols):
-                ColumnHits = ColumnReadoutUniformityROOTObject.GetBinContent(Column+1)
+                ColumnHitRatio = ColumnReadoutUniformityROOTObject.GetBinContent(Column+1)
 
-
-                if( ColumnHits < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low']
-                    *ColumnReadoutUniformityMean*0.01
-                    or ColumnHits > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']
-                    *ColumnReadoutUniformityMean*0.01
-                ):
+                if (ColumnHitRatio < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'] 
+                    or ColumnHitRatio > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']):
                     NumberValues['NumberOfNonUniformColumns'] += 1
                     Grades['ColumnReadoutUniformityGrade'] = 3
             

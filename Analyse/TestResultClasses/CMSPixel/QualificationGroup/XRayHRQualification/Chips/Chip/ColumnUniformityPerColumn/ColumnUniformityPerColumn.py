@@ -40,15 +40,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 HitRate150 = HitROOTOBjects[150].GetBinContent(Column+1)
                 HitRate50 = HitROOTOBjects[50].GetBinContent(Column+1)
                 if HitRate50 > 0 and RealHitrate50 > 0:
-                    ColumnEfficiency = (
+                    ColumnUniformity = (
                         float(HitRate150)
                         /float(HitRate50)
                         /float(RealHitrate150)
                         *float(RealHitrate50)
                     )
                 else:
-                    ColumnEfficiency = 0
-                self.ResultData['Plot']['ROOTObject'].SetBinContent(Column+1, ColumnEfficiency)
+                    ColumnUniformity = 0
+                self.ResultData['Plot']['ROOTObject'].SetBinContent(Column+1, ColumnUniformity)
 
             
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
