@@ -73,7 +73,7 @@ class TestResultEnvironment:
         'XRayHighRateHotPixels_Threshold':1,
         'XRayHighRate_factor_dcol_uniformity_low':50,
         'XRayHighRate_factor_dcol_uniformity_high':100,
-        'XRayHighRate_factor_readout_uniformity':5,
+        'XRayHighRate_factor_readout_uniformity':7,
         'XRayHighRate_Factor_ColUniformity':5,
         'XRayHighRate_SCurve_Noise_Threshold':400,
         'XRayHighRate_missing_xray_pixels_B':42,

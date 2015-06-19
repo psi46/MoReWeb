@@ -245,14 +245,14 @@ class TestResult(GeneralTestResult):
                 # Number of columns with efficiency below cut
                 # before: 'LowEffColumns_C{ChipNo}'
                 HighRateData['LowUniformityColumns_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
-                    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowUniformityColumns']
+                    GradingTestResultObject.ResultData['HiddenData']['NumberOfNonUniformColumns']
                 )
                 
                 # Number of events where a column has low efficiency
                 # before: 'LowEffCol_Events_C{ChipNo}'
-                HighRateData['LowUniformityCol_Events_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
-                    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowUniformityColumnEvents']
-                )
+                #HighRateData['LowUniformityCol_Events_C{ChipNo}'.format(ChipNo=ChipNo)] = int(
+                #    GradingTestResultObject.ResultData['HiddenData']['NumberOfLowUniformityColumnEvents']
+                #)
                 
                 for Rate in self.Attributes['Rates']['HREfficiency']:
                     EfficiencyDistributionTestResultObject = ChipTestResultObject.ResultData['SubTestResults']['EfficiencyDistribution_{Rate}'.format(Rate)]
