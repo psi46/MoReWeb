@@ -10,7 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_SCurveWidths_TestResult'
         self.NameSingle='SCurveWidths'
-        self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
         self.ResultData['KeyValueDictPairs'] = {
             'N': {
                 'Value':'{0:1.0f}'.format(-1),
@@ -27,7 +27,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'threshold':{
                 'Value':'{0:1.2f}'.format(-1),
                 'Label':'thr [e-]'
-            }
+            },
+            'fit_peak': {
+                'Value':'{0:1.2f}'.format(-999),
+                'Label':'μ'
+            },
+            'fit_sigma':{
+                'Value':'{0:1.2f}'.format(-1),
+                'Label':'σ'
+            },
         }
 
         self.ResultData['HiddenData']['htmax'] = 255.;
@@ -68,7 +76,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             raise Exception('Cannot find SCurveFile "%s"'%SCurveFileName)
         else:
             #Omit the first 2 lines
-            print 'read file',SCurveFileName
+            #print 'read file',SCurveFileName
             Line = SCurveFile.readline()
             Line = SCurveFile.readline()
 
@@ -94,19 +102,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ThresholdMean /= NPix
 
         if self.ResultData['Plot']['ROOTObject_ht'].GetMaximum() < self.ResultData['HiddenData']['htmax']:
-            self.ResultData['HiddenData']['htmax'] = self.ResultData['Plot']['ROOTObject_ht'].GetMaximum();
+            self.ResultData['HiddenData']['htmax'] = self.ResultData['Plot']['ROOTObject_ht'].GetMaximum()
 
-        if self.ResultData['Plot']['ROOTObject_ht'].GetMinimum() > self.ResultData['HiddenData']['htmin'] :
-            self.ResultData['HiddenData']['htmin'] = self.ResultData['Plot']['ROOTObject_ht'].GetMinimum();
+        if self.ResultData['Plot']['ROOTObject_ht'].GetMinimum() > self.ResultData['HiddenData']['htmin']:
+            self.ResultData['HiddenData']['htmin'] = self.ResultData['Plot']['ROOTObject_ht'].GetMinimum()
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Noise (e-)");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw();
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlue+2)
+            self.ResultData['Plot']['ROOTObject'].Draw()
 
+            lineCHigh = ROOT.TLine().DrawLine(
+                self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold'], self.ResultData['Plot']['ROOTObject'].GetYaxis().GetXmin(),
+                self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold'], self.ResultData['Plot']['ROOTObject'].GetMaximum()
+            )
+            lineCHigh.SetLineWidth(2)
+            lineCHigh.SetLineStyle(2)
+            lineCHigh.SetLineColor(ROOT.kRed)
 
         #mN
         MeanSCurve = self.ResultData['Plot']['ROOTObject'].GetMean()
@@ -123,10 +139,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         under = self.ResultData['Plot']['ROOTObject'].GetBinContent(0)
         over = self.ResultData['Plot']['ROOTObject'].GetBinContent(self.ResultData['Plot']['ROOTObject_hd'].GetNbinsX()+1)
 
+        #fit peak
+        GaussFitFunction = ROOT.TF1("gaussfit","gaus(0)",30,400)
+        GaussFitFunction.SetParameter(0, 250)
+        GaussFitFunction.SetParameter(1, 150)
+        GaussFitFunction.SetParameter(2, 50)
+        self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "QR")
+
         self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(IntegralSCurve)
         self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(MeanSCurve)
         self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMSSCurve)
         self.ResultData['KeyValueDictPairs']['threshold']['Value'] = '{0:1.2f}'.format(ThresholdMean)
+        self.ResultData['KeyValueDictPairs']['fit_peak']['Value'] = '{0:1.0f}'.format(GaussFitFunction.GetParameter(1))
+        self.ResultData['KeyValueDictPairs']['fit_sigma']['Value'] = '{0:1.0f}'.format(GaussFitFunction.GetParameter(2))
 
         self.ResultData['KeyList'] = ['N','mu','sigma','threshold']
         if under:

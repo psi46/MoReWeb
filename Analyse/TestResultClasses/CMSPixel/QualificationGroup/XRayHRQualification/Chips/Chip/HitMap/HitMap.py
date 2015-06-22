@@ -65,16 +65,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()
-            self.ResultData['Plot']['ROOTObject'].SetTitle("");
-            #self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.);
-            #self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
-            #    'ROOTObject'].GetMaximum())
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw('colz');
+            self.ResultData['Plot']['ROOTObject'].SetTitle("")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column")
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].Draw('colz')
             
 
         self.SaveCanvas()

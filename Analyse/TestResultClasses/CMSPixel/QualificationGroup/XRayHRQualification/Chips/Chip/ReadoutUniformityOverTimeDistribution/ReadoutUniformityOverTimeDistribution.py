@@ -2,7 +2,7 @@
 import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
-
+import math
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -14,6 +14,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value':'{0:1.0f}'.format(-1),
                 'Label':'chi2/ndf'
             },
+            'sigma':{
+                'Value':'{0:1.2f}'.format(-1),
+                'Label':'σ'
+            },
+            'sigma_th':{
+                'Value':'{0:1.2f}'.format(-1),
+                'Label':'σ_th'
+            }
         }
         
     def PopulateResultData(self):
@@ -29,10 +37,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.Canvas.Clear()
             self.ResultData['Plot']['ROOTObject'] = distribution.Clone(self.GetUniqueID())
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
-            self.ResultData['Plot']['ROOTObject'].Draw();
+            self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlue+2)
+            self.ResultData['Plot']['ROOTObject'].Draw()
 
             poisson = ROOT.TF1("poisson", "TMath::PoissonI(x,%f)*%f"%(distribution.GetMean(),float(UniformityOverTimePlot.GetNbinsX())*distribution.GetBinWidth(1)),0,EventsMaximum)
             
+            sigma = distribution.GetRMS()
+            sigma_th = math.sqrt(distribution.GetMean())
+
             chi2 = 0
             ndf = 0
             for i in range(1, distribution.GetNbinsX()+1):
@@ -55,7 +67,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             poisson.Draw("same")
 
             self.ResultData['KeyValueDictPairs']['chi2/ndf']['Value'] = '{0:1.2f}'.format(chi2ndf)
-            self.ResultData['KeyList'] += ['chi2/ndf']
+            self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(sigma)
+            self.ResultData['KeyValueDictPairs']['sigma_th']['Value'] = '{0:1.2f}'.format(sigma_th)
+
+            self.ResultData['KeyList'] += ['chi2/ndf', 'sigma', 'sigma_th']
 
         self.Title = 'Time unif. distribution {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         self.SaveCanvas() 

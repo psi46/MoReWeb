@@ -98,18 +98,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     },
                 },
                 {
-                    'Key':'ReadoutUniformityOverTimeDistribution_{:d}'.format(Rate),
+                    'Key':'ReadoutUniformityOverTimeDistribution_{Rate}'.format(Rate=Rate),
                     'Module':'ReadoutUniformityOverTimeDistribution',
                     'InitialAttributes':{
                         'Rate':Rate,
-                        'StorageKey':'ReadoutUniformityOverTimeDistribution_{:d}'.format(Rate),
+                        'StorageKey':'ReadoutUniformityOverTimeDistribution_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':70+i
                     },
                 },
                 {
-                    'Key':'ColumnUniformityEventsPerColumn',
+                    'Key':'ColumnUniformityEventsPerColumn_{Rate}'.format(Rate=Rate),
+                    'Module':'ColumnUniformityEventsPerColumn',
                     'InitialAttributes':{
                         'Rate':Rate,
                     },

@@ -1,6 +1,7 @@
 import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
+import math
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -14,19 +15,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'HRData':[
                 'HotPixelsGrade',
                 'HitMapGrade',
-                'ColumnReadoutUniformityGrade',
-                'ReadoutUniformityOverTimeGrade'
+                'ColumnUniformityGrade',
+                'ReadoutUniformityOverTimeGrade',
+                'ColumnReadoutUniformityOverTimeGrade'
             ],
             'HRSCurves':[]
         }
         self.Attributes['NumberKeys'] = {
             'HREfficiency':[
                 'NumberOfLowEfficiencyPixels',
+                'Efficiency'
             ],
             'HRData':[
                 'NumberOfHotPixels',
                 'NumberOfNonUniformColumns',
-                'NumberOfNonUniformEvents'
+                'NumberOfNonUniformEvents',
+                'NumberOfNonUniformColumnEvents',
+                'MissingHits'
             ],
             'HRSCurves':[]
         }
@@ -49,10 +54,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Value':'',
             'Label':'Final ROC Grade'
         }
-        #self.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels'] = {
-        #    'Value':'',
-        #    'Label':'# Low Eff. Pixels '+RateData['HREfficiency']['RatesString']
-        #}
+        self.ResultData['KeyValueDictPairs']['Efficiency'] = {
+            'Value':'',
+            'Label':'Efficiency '+RateData['InterpolatedEfficiencyRates']['RatesString']
+        }
         self.ResultData['KeyValueDictPairs']['EfficiencyGrade'] = {
             'Value':'',
             'Label':'Efficiency Grade '+RateData['InterpolatedEfficiencyRates']['RatesString']
@@ -68,17 +73,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         }
         self.ResultData['KeyValueDictPairs']['NumberOfNonUniformEvents'] = {
             'Value':'',
-            'Label':'# Non-Uniform Events '+RateData['HRData']['RatesString']
+            'Label':'# Non-Uniform ROC Events '+RateData['HRData']['RatesString']
         }
-        self.ResultData['KeyValueDictPairs']['NumberOfLowUniformityColumns'] = {
+        self.ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnEvents'] = {
             'Value':'',
-            'Label':'# Low Efficiency Columns'
+            'Label':'# Non-Uniform Col. Events '+RateData['HRData']['RatesString']
         }
-        self.ResultData['KeyValueDictPairs']['NumberOfLowUniformityColumnEvents'] = {
+        self.ResultData['KeyValueDictPairs']['MissingHits'] = {
             'Value':'',
-            'Label':'# Low Uniformity Col. Events'
+            'Label':'# Missing hits '+RateData['HRData']['RatesString']
         }
-
         self.ResultData['KeyValueDictPairs']['HotPixelsGrade'] = {
             'Value':'',
             'Label':'Hot Pixels Grade '+RateData['HRData']['RatesString']
@@ -87,21 +91,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Value':'',
             'Label':'Hit Map Grade '+RateData['HRData']['RatesString']
         }
-        self.ResultData['KeyValueDictPairs']['ColumnReadoutUniformityGrade'] = {
-            'Value':'',
-            'Label':'Col. Read. Unif. Grade '+RateData['HRData']['RatesString']
-        }
         self.ResultData['KeyValueDictPairs']['ReadoutUniformityOverTimeGrade'] = {
             'Value':'',
-            'Label':'Read. Unif. over t Grade '+RateData['HRData']['RatesString']
+            'Label':'ROC Read. Unif. Grade '+RateData['HRData']['RatesString']
+        }        
+        self.ResultData['KeyValueDictPairs']['ColumnReadoutUniformityOverTimeGrade'] = {
+            'Value':'',
+            'Label':'Column Read. Unif. Grade '+RateData['HRData']['RatesString']
         }
         self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade'] = {
             'Value':'',
-            'Label':'Column Efficiency Grade'
-        }
-        self.ResultData['KeyValueDictPairs']['ColumnUniformityEventGrade'] = {
-            'Value':'',
-            'Label':'Column Efficiency Event Grade'
+            'Label':'Column Uniformity Grade'
         }
 
         self.ResultData['KeyList'] += [
@@ -109,15 +109,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'NumberOfHotPixels',
                 'NumberOfNonUniformColumns',
                 'NumberOfNonUniformEvents',
-                'NumberOfLowUniformityColumns',
-                'NumberOfLowUniformityColumnEvents',
+                'NumberOfNonUniformColumnEvents',
+                'MissingHits',
+                'Efficiency',
                 'EfficiencyGrade',
                 'HotPixelsGrade',
                 'HitMapGrade',
-                'ColumnReadoutUniformityGrade',
                 'ReadoutUniformityOverTimeGrade',
+                'ColumnReadoutUniformityOverTimeGrade',
                 'ColumnUniformityGrade',
-                'ColumnUniformityEventGrade'
             ]
         for Rate in RateData['HREfficiency']['Rates']:
             self.ResultData['HiddenData']['ListOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)] = []
@@ -155,17 +155,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         RateIndex = 1
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
-            MeanEfficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(Rate)]['Value'])
+            MeanEfficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value'])
             Grades['EfficiencyGrade'] = 1
             if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
                 Grades['EfficiencyGrade'] = 2
             if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
                 Grades['EfficiencyGrade'] = 3
+            ROCGrades.append(Grades['EfficiencyGrade'])
             RateIndex += 1
 
-            #for NumberKey in self.Attributes['NumberKeys']['HREfficiency']:
-            #    self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = NumberValues[NumberKey]
-            #    self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{Rate}'.format(Rate=NumberValues[NumberKey])).strip('/')
+            self.ResultData['HiddenData']['Efficiency_{Rate}'.format(Rate=Rate)] = MeanEfficiency
+            self.ResultData['KeyValueDictPairs']['Efficiency']['Value'] = (self.ResultData['KeyValueDictPairs']['Efficiency']['Value']+'/{Value}'.format(Value=MeanEfficiency)).strip('/')
+            
+            self.ResultData['HiddenData']['EfficiencyGrade_{Rate}'.format(Rate=Rate)] = Grades['EfficiencyGrade']
+            self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value'] = (self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value']+'/{Grade}'.format(Grade=GradeMapping[Grades['EfficiencyGrade']])).strip('/')
 
 
         # hitmap and uniformity grading
@@ -180,7 +183,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             HotPixelMapROOTObject = self.ParentObject.ResultData['SubTestResults']['HotPixelMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
             HitMapROOTObject = self.ParentObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
-            ColumnReadoutUniformityROOTObject = self.ParentObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
+            ColumnReadoutUniformityROOTObject = self.ParentObject.ResultData['SubTestResults']['ColumnUniformityPerColumn'].ResultData['Plot']['ROOTObject']
+            ColumnReadoutUniformityOverTimeROOTObject = self.ParentObject.ResultData['SubTestResults']['ColumnUniformityEventsPerColumn_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
             ReadoutUniformityOverTimeTestResultObject = self.ParentObject.ResultData['SubTestResults']['ReadoutUniformityOverTime_{Rate}'.format(Rate=Rate)]
 
             HotPixelThreshold =self.TestResultEnvironmentObject.GradingParameters['XRayHighRateHotPixels_Threshold']
@@ -197,80 +201,90 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grades['HotPixelsGrade'] = 3
             
             ### Hit Map Grade ###
-            Grades['HitMapGrade'] = 3
-            
-            ### Column Readout Uniformity Grade ###
-            Grades['ColumnReadoutUniformityGrade'] = 1         
-            ColumnReadoutUniformityMean = float(self.ParentObject.ResultData['SubTestResults']['ColumnReadoutUniformity_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
-            NumberValues['NumberOfNonUniformColumns'] = 0
-            for Column in range(self.nCols):
-                ColumnHits = ColumnReadoutUniformityROOTObject.GetBinContent(Column+1)
+            MissingHits = 0
+            for col in range(0, 52):
+                for row in range(0, 80):
+                    if HitMapROOTObject.GetBinContent(col + 1, row + 1) < 1:
+                        MissingHits += 1
 
+            Grades['HitMapGrade'] = 1
+            if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B']:
+                Grades['HitMapGrade'] = 2
+            if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
+                Grades['HitMapGrade'] = 3
+            ROCGrades.append(Grades['HitMapGrade'])
 
-                if( ColumnHits < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low']
-                    *ColumnReadoutUniformityMean*0.01
-                    or ColumnHits > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']
-                    *ColumnReadoutUniformityMean*0.01
-                ):
-                    NumberValues['NumberOfNonUniformColumns'] += 1
-                    Grades['ColumnReadoutUniformityGrade'] = 3
-            
-            ### Readout Uniformity Over Time Grade ###
-            Grades['ReadoutUniformityOverTimeGrade'] = 1            
-            ReadoutUniformityOverTimeMean = float(ReadoutUniformityOverTimeTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value'])
-            ReadoutUniformityOverTimeSigma = float(ReadoutUniformityOverTimeTestResultObject.ResultData['KeyValueDictPairs']['sigma']['Value'])
+            NumberValues['MissingHits'] = MissingHits
+
+            ### ROC Readout Uniformity Over Time Grade ###
+            Grades['ReadoutUniformityOverTimeGrade'] = 1
+            FirstBin = ReadoutUniformityOverTimeTestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst()
+            LastBin = ReadoutUniformityOverTimeTestResultObject.ResultData['Plot']['ROOTObject'].FindLastBinAbove(0)
+            ReadoutUniformityOverTimeTestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(1, LastBin - 1)
+            ReadoutUniformityOverTimeMean = ReadoutUniformityOverTimeTestResultObject.ResultData['Plot']['ROOTObject'].Integral(FirstBin, LastBin) / (LastBin - FirstBin + 1)
+
+            ReadoutUniformityOverTimeSigma = math.sqrt(ReadoutUniformityOverTimeMean)
             NumberValues['NumberOfNonUniformEvents'] = 0
-            for Event in range(ReadoutUniformityOverTimeTestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()-1):
+            for Event in range(1, LastBin-1):
                 EventHits = ReadoutUniformityOverTimeTestResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(Event+1)
-                if( abs(EventHits-ReadoutUniformityOverTimeMean) < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']
+                if( abs(EventHits-ReadoutUniformityOverTimeMean) > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']
                     *ReadoutUniformityOverTimeSigma
                 ):
                     NumberValues['NumberOfNonUniformEvents'] += 1
                     Grades['ReadoutUniformityOverTimeGrade'] = 3
+                    #print "non uniform event: %d %d / %f"%(Event, EventHits, ReadoutUniformityOverTimeMean)
             
+            ### Column Readout Uniformity Over Time Grade ###
+            Grades['ColumnReadoutUniformityOverTimeGrade'] = 1
+            NumberValues['NumberOfNonUniformColumnEvents'] = 0
+            for Column in range(0, 52):
+                ColumnReadoutUniformityHistogram = ColumnReadoutUniformityOverTimeROOTObject.ProjectionX(self.GetUniqueID(), Column + 1, Column + 1)
+                NEvents = ColumnReadoutUniformityHistogram.GetNbinsX()
+                FirstBin = ColumnReadoutUniformityHistogram.GetXaxis().GetFirst()
+                LastBin = ColumnReadoutUniformityHistogram.FindLastBinAbove(0)
+                ColumnReadoutUniformityHistogram.GetXaxis().SetRange(1, LastBin - 1)
 
+                MeanHitsPerBin = ColumnReadoutUniformityHistogram.Integral(FirstBin, LastBin) / (LastBin - FirstBin + 1)
+                ReadoutUniformityOverTimeSigma = math.sqrt(MeanHitsPerBin) # poisson
+
+                #exclude last bin
+                for Event in range(0, LastBin - 1):
+                    BinHits = ColumnReadoutUniformityHistogram.GetBinContent(Event + 1)
+
+                    if( abs(BinHits-MeanHitsPerBin) > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']
+                        *ReadoutUniformityOverTimeSigma
+                    ):
+                        NumberValues['NumberOfNonUniformColumnEvents'] += 1
+                        Grades['ColumnReadoutUniformityOverTimeGrade'] = 3
+
+                ColumnReadoutUniformityHistogram.Delete()        
+
+            ### Grade/Values summary for different rates ###
             for NumberKey in self.Attributes['NumberKeys']['HRData']:
                 self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = NumberValues[NumberKey]
                 self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{Rate}'.format(Rate=NumberValues[NumberKey])).strip('/')
 
-
-
             for GradeKey in self.Attributes['GradeKeys']['HRData']:
                 self.ResultData['HiddenData'][GradeKey+'_{Rate}'.format(Rate=Rate)] = Grades[GradeKey]
                 self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/'+GradeMapping[Grades[GradeKey]]).strip('/')
-        
-        ### Column Efficiency (Event) Grade ###
-        NumberOfLowUniformityColumns = 0
-        NumberOfLowUniformityColumnEvents = 0
-        ColumnUniformityGrade = 1
-        ColumnUniformityEventGrade = 1
-        ColumnUniformityPerColumnResultObject = self.ParentObject.ResultData['SubTestResults']['ColumnUniformityPerColumn']
-        ColumnUniformityEventsPerColumnResultObject = self.ParentObject.ResultData['SubTestResults']['ColumnUniformityEventsPerColumn']
-        ColumnUniformitySigma = float(ColumnUniformityPerColumnResultObject.ResultData['KeyValueDictPairs']['sigma']['Value'])
-        ColumnUniformityEventBins = int(ColumnUniformityEventsPerColumnResultObject.ResultData['HiddenData']['EventBins'])
+       
+        ### Column Uniformity Grade ###
+        Grades['ColumnUniformityGrade'] = 1         
+        NumberValues['NumberOfNonUniformColumns'] = 0
         for Column in range(self.nCols):
-            ColumnUniformity = ColumnUniformityPerColumnResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(Column+1)
-            if ColumnUniformity < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_Factor_ColUniformity']*ColumnUniformitySigma:
-                NumberOfLowUniformityColumns += 1
-                ColumnUniformityGrade = 3
-            else:
-                for EventBin in range(ColumnUniformityEventBins):
-                    ColumnUniformityPerEvent = ColumnUniformityEventsPerColumnResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(EventBin+1,Column+1)
-                    if ColumnUniformityPerEvent < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_Factor_ColUniformity']*ColumnUniformitySigma:
-                        NumberOfLowUniformityColumnEvents += 1
-                        ColumnUniformityEventGrade = 3
-        self.ResultData['HiddenData']['ColumnUniformityGrade'] = ColumnUniformityGrade
-        self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade']['Value'] = GradeMapping[ColumnUniformityGrade]
-        self.ResultData['HiddenData']['NumberOfLowUniformityColumns'] = NumberOfLowUniformityColumns
-        self.ResultData['KeyValueDictPairs']['NumberOfLowUniformityColumns']['Value'] = '{Rate}'.format(Rate=NumberOfLowUniformityColumns)
-        self.ResultData['HiddenData']['ColumnUniformityGrade'] = ColumnUniformityGrade
-        self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade']['Value'] = GradeMapping[ColumnUniformityGrade]
-        self.ResultData['HiddenData']['NumberOfLowUniformityColumnEvents'] = NumberOfLowUniformityColumnEvents
-        self.ResultData['KeyValueDictPairs']['NumberOfLowUniformityColumnEvents']['Value'] = '{Rate}'.format(Rate=NumberOfLowUniformityColumnEvents)
-        ROCGrades.append(ColumnUniformityGrade)
-        ROCGrades.append(ColumnUniformityEventGrade)
-        
+            ColumnHitRatio = ColumnReadoutUniformityROOTObject.GetBinContent(Column+1)
+            if (ColumnHitRatio < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'] 
+                or ColumnHitRatio > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']):
+                NumberValues['NumberOfNonUniformColumns'] += 1
+                Grades['ColumnUniformityGrade'] = 3
+        self.ResultData['HiddenData']['NumberOfNonUniformColumns'] = NumberValues['NumberOfNonUniformColumns']
+        self.ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'] = '{Value}'.format(Value=NumberValues['NumberOfNonUniformColumns'])
+        self.ResultData['HiddenData']['ColumnUniformityGrade'] = Grades['ColumnUniformityGrade']
+        self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade']['Value'] = GradeMapping[Grades['ColumnUniformityGrade']]
 
+
+
+        ROCGrades.append(Grades['ColumnUniformityGrade'])        
         
         ### Final ROC Grade ###
         self.ResultData['KeyValueDictPairs']['ROCGrade']['Value'] = GradeMapping[max(ROCGrades)]
