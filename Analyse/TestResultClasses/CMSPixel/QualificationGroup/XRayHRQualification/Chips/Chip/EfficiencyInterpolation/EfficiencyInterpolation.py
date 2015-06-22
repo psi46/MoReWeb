@@ -9,16 +9,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_EfficiencyInterpolation_TestResult'
         self.NameSingle = 'EfficiencyInterpolation'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
-        self.ResultData['KeyValueDictPairs'] = {
-            'InterpolatedEfficiency50': {
+
+        self.ResultData['KeyValueDictPairs'] = {}
+        for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
+            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)] = {
                 'Value':'{0:1.0f}'.format(-1),
-                'Label':'Interpol. Efficiency 50'
-            },
-            'InterpolatedEfficiency120': {
-                'Value':'{0:1.0f}'.format(-1),
-                'Label':'Interpol. Efficiency 120'
-            },
-        }
+                'Label':'Interpol. Efficiency {Rate}'.format(Rate=Rate)
+            }
+        
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
@@ -77,17 +75,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             cubicFit.SetParameter(2, 5e-7)
             
             PlotMinEfficiency = 80
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(PlotMinEfficiency, 105.);
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, 300);
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency [%]");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw("ap");
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(PlotMinEfficiency, 105.)
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, 300)
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]")
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency [%]")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].Draw("ap")
 
             self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'QR')
-            self.ResultData['Plot']['ROOTObject'].SetTitle("");
+            self.ResultData['Plot']['ROOTObject'].SetTitle("")
             InterpolationFunction = cubicFit
             
             for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:

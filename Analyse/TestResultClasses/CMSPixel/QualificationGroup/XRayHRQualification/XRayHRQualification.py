@@ -41,7 +41,7 @@ class TestResult(GeneralTestResult):
 
         self.Attributes['InterpolatedEfficiencyRates'] = []
         for r in range(1, int(1 + self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_NInterpolationRates'])):
-            self.Attributes['InterpolatedEfficiencyRates'].append(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_InterpolationRate%d'%r])
+            self.Attributes['InterpolatedEfficiencyRates'].append(int(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_InterpolationRate%d'%r]))
 
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
@@ -114,22 +114,212 @@ class TestResult(GeneralTestResult):
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                 },
             },
-
-            # {
-                # 'Key': 'BumpBondingMap',
-                # 'DisplayOptions': {
-                    # 'Width': 4,
-                    # 'Order': 5,
-                # }
-            # },
-            # {
-                # 'Key': 'VcalThreshold',
-                # 'DisplayOptions': {
-                    # 'Width': 4,
-                    # 'Order': 3,
-                # }
-            # },
+            {
+                'Key': 'Grading',
+                'DisplayOptions': {
+                    'GroupWithNext': True,
+                    'Order': 99,
+                    'Show': False,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
+                'Key': 'Summary',
+                'DisplayOptions': {
+                    'GroupWithNext': False,
+                    'Order': 2,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
+                'Key': 'SummaryROCs',
+                'DisplayOptions': {
+                    'GroupWithNext': False,
+                    'Order': 3,
+                    'Width': 4,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            }
         ]
+
+        # value per ROC summary plots
+        for Rate in self.Attributes['InterpolatedEfficiencyRates']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'EfficiencySummary_{Rate}'.format(Rate=Rate),
+                'Module': 'EfficiencySummary',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 6,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'EfficiencySummary_{Rate}'.format(Rate=Rate)
+                },
+            })
+        for Rate in self.Attributes['Rates']['HRData']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'BumpBondingSummary_{Rate}'.format(Rate=Rate),
+                'Module': 'BumpBondingSummary',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 7,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'BumpBondingSummary_{Rate}'.format(Rate=Rate)
+                },
+            })
+        for Rate in self.Attributes['Rates']['HRSCurves']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'NoiseSummary_{Rate}'.format(Rate=Rate),
+                'Module': 'NoiseSummary',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 8,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'NoiseSummary_{Rate}'.format(Rate=Rate)
+                },
+            })
+
+        # value per pixel + distribution summary plots
+        for Rate in self.Attributes['Rates']['HRData']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'HitOverview_{Rate}'.format(Rate=Rate),
+                'Module': 'HitOverview',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 9,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'HitOverview_{Rate}'.format(Rate=Rate)
+                },
+            })
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'HitMapDistribution_{Rate}'.format(Rate=Rate),
+                'Module': 'HitMapDistribution',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 9,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'HitMapDistribution_{Rate}'.format(Rate=Rate)
+                },
+            })
+
+        for Rate in self.Attributes['Rates']['HRData']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'BumpBondingProblems_{Rate}'.format(Rate=Rate),
+                'Module': 'BumpBondingProblems',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 10,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'BumpBondingProblems_{Rate}'.format(Rate=Rate)
+                },
+            })
+
+        for Rate in self.Attributes['Rates']['HRData']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'HotPixelOverview_{Rate}'.format(Rate=Rate),
+                'Module': 'HotPixelOverview',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 20,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'HotPixelOverview_{Rate}'.format(Rate=Rate)
+                },
+            })
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'HotPixelSummary_{Rate}'.format(Rate=Rate),
+                'Module': 'HotPixelSummary',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 20,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'HotPixelSummary_{Rate}'.format(Rate=Rate)
+                },
+            })
+
+        for Rate in self.Attributes['Rates']['HRSCurves']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'ThresholdOverview_{Rate}'.format(Rate=Rate),
+                'Module': 'ThresholdOverview',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 30,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'ThresholdOverview_{Rate}'.format(Rate=Rate)
+                },
+            })
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'ThresholdDistribution_{Rate}'.format(Rate=Rate),
+                'Module': 'ThresholdDistribution',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 30,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'ThresholdDistribution_{Rate}'.format(Rate=Rate)
+                },
+            })
+
+        for Rate in self.Attributes['Rates']['HRSCurves']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'NoiseOverview_{Rate}'.format(Rate=Rate),
+                'Module': 'NoiseOverview',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 31,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'NoiseOverview_{Rate}'.format(Rate=Rate)
+                },
+            })
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'NoiseDistribution_{Rate}'.format(Rate=Rate),
+                'Module': 'NoiseDistribution',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 31,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'NoiseDistribution_{Rate}'.format(Rate=Rate)
+                },
+            })
+            
        
 
     def OpenFileHandle(self):

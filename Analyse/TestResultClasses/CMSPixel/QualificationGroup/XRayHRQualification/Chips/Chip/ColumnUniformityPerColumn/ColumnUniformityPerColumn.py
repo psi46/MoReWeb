@@ -34,17 +34,26 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()
-            RealHitrate150 = self.ParentObject.ResultData['SubTestResults']['HitMap_150'].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue']
-            RealHitrate50 = self.ParentObject.ResultData['SubTestResults']['HitMap_50'].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue']
+            HitRateHigh = 150
+            HitRateLow = 50
+
+            if not 'HitMap_{Rate}'.format(Rate=HitRateHigh) in self.ParentObject.ResultData['SubTestResults']:
+                HitRateHigh = max(Rates)
+
+            if not 'HitMap_{Rate}'.format(Rate=HitRateLow) in self.ParentObject.ResultData['SubTestResults']:
+                HitRateLow = min(Rates)
+
+            RealHitrateHigh = self.ParentObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=HitRateHigh)].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue']
+            RealHitrateLow = self.ParentObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=HitRateLow)].ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue']
             for Column in range(self.nCols):
-                HitRate150 = HitROOTOBjects[150].GetBinContent(Column+1)
-                HitRate50 = HitROOTOBjects[50].GetBinContent(Column+1)
-                if HitRate50 > 0 and RealHitrate50 > 0:
+                NumHitsHigh = HitROOTOBjects[HitRateHigh].GetBinContent(Column+1)
+                NumHitsLow = HitROOTOBjects[HitRateLow].GetBinContent(Column+1)
+                if HitRateLow > 0 and RealHitrateLow > 0:
                     ColumnUniformity = (
-                        float(HitRate150)
-                        /float(HitRate50)
-                        /float(RealHitrate150)
-                        *float(RealHitrate50)
+                        float(NumHitsHigh)
+                        /float(NumHitsLow)
+                        /float(RealHitrateHigh)
+                        *float(RealHitrateLow)
                     )
                 else:
                     ColumnUniformity = 0
@@ -55,12 +64,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 1.2 * self.ResultData['Plot'][
                 'ROOTObject'].GetMaximum())
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Uniformity");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw();
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column")
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Uniformity")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlue+2)
+            self.ResultData['Plot']['ROOTObject'].Draw()
             
             
             
@@ -69,13 +79,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Mean = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParameter(0)
             #sN
             RMS = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParError(0)
-            
-            
-            lineCLow = ROOT.TLine().DrawLine(
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_Factor_ColUniformity']*RMS,
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_Factor_ColUniformity']*RMS,
+                       
+            lineCHigh = ROOT.TLine().DrawLine(
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'],
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'],
             )
-            lineCLow.SetLineWidth(2);
+            lineCHigh.SetLineWidth(2)
+            lineCHigh.SetLineStyle(2)
+            lineCHigh.SetLineColor(ROOT.kRed)
+
+            lineCLow = ROOT.TLine().DrawLine(
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
+            )
+            lineCLow.SetLineWidth(2)
             lineCLow.SetLineStyle(2)
             lineCLow.SetLineColor(ROOT.kRed)
             

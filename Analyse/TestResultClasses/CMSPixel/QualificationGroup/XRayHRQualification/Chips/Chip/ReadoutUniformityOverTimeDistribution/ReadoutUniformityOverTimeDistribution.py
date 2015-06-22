@@ -37,7 +37,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.Canvas.Clear()
             self.ResultData['Plot']['ROOTObject'] = distribution.Clone(self.GetUniqueID())
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
-            self.ResultData['Plot']['ROOTObject'].Draw();
+            self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlue+2)
+            self.ResultData['Plot']['ROOTObject'].Draw()
 
             poisson = ROOT.TF1("poisson", "TMath::PoissonI(x,%f)*%f"%(distribution.GetMean(),float(UniformityOverTimePlot.GetNbinsX())*distribution.GetBinWidth(1)),0,EventsMaximum)
             

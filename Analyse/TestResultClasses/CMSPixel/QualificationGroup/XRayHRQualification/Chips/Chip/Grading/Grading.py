@@ -155,13 +155,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         RateIndex = 1
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
-
-            MeanEfficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(Rate)]['Value'])
+            MeanEfficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value'])
             Grades['EfficiencyGrade'] = 1
             if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
                 Grades['EfficiencyGrade'] = 2
             if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
                 Grades['EfficiencyGrade'] = 3
+            ROCGrades.append(Grades['EfficiencyGrade'])
             RateIndex += 1
 
             self.ResultData['HiddenData']['Efficiency_{Rate}'.format(Rate=Rate)] = MeanEfficiency
@@ -212,6 +212,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grades['HitMapGrade'] = 2
             if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
                 Grades['HitMapGrade'] = 3
+            ROCGrades.append(Grades['HitMapGrade'])
 
             NumberValues['MissingHits'] = MissingHits
 

@@ -34,16 +34,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['Plot']['ROOTObject']:
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()
-            self.ResultData['Plot']['ROOTObject'].SetTitle("");
+            self.ResultData['Plot']['ROOTObject'].SetTitle("")
             
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 1.2 * self.ResultData['Plot'][
                 'ROOTObject'].GetMaximum())
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Event");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Hits");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw();
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Event")
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Hits")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].Draw()
             
             
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(
