@@ -404,6 +404,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # Set the index to the newly created 'HighRateTest'
             idx = len(tests) - 1
 
+        self.check_Test_Software()
+        
         # Append the actual tests as subtests to the 'HighRateTest'
         # Distinguish by name. A test with name 'HighRateTest' is meant
         # as a generality which stands for
