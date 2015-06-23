@@ -163,7 +163,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                         'Order':200
                     },
-                    
+                },
+                {
+                    'Key':'CalDelScan',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':250
+                    },
                 },
                 {
                     'Key':'Grading',

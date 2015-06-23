@@ -108,6 +108,11 @@ class TestResult(GeneralTestResult):
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['PixelAlive'] = ROOT.TFile.Open(ROOTFiles[0])
 
+        CalDelScanPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_CalDel*_*')
+        for Path in CalDelScanPaths:
+            ROOTFiles = glob.glob(Path+'/*.root')
+            self.Attributes['ROOTFiles']['CalDelScan'] = ROOT.TFile.Open(ROOTFiles[0])
+
 
         self.ResultData['SubTestResultDictList'] = [
             {
@@ -291,6 +296,19 @@ class TestResult(GeneralTestResult):
                     'Rate': Rate,
                     'NumberOfChips': self.Attributes['NumberOfChips'],
                     'StorageKey': 'BumpBondingProblems_{Rate}'.format(Rate=Rate)
+                },
+            })
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'BumpBondingSummary_{Rate}'.format(Rate=Rate),
+                'Module': 'BumpBondingSummary',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 10,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'BumpBondingSummary_{Rate}'.format(Rate=Rate)
                 },
             })
 
