@@ -13,13 +13,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         
     def PopulateResultData(self):
-      TableHeader = ['ROC']
+      TableHeader = ['ROC','Grade']
       for Rate in self.ParentObject.Attributes['InterpolatedEfficiencyRates']:
         TableHeader.append('Eff {Rate}'.format(Rate=Rate))
 
       for Rate in self.ParentObject.Attributes['Rates']['HRData']:
         TableHeader.append('Rate "{Rate}"'.format(Rate=Rate))
-        TableHeader.append('Missing hits'.format(Rate=Rate))
+        TableHeader.append('BB prob'.format(Rate=Rate))
         TableHeader.append('RO prob '.format(Rate=Rate))
 
       TableHeader.append('Unif. prob'.format(Rate=Rate))
@@ -37,7 +37,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
          '###LINK###'
       )
 
-      GradeBHTMLTemplate = "<span style='color:#c82;font-weight:bold;'>%d</span>"
+      GradeBHTMLTemplate = "<span style='color:#f70;font-weight:bold;'>%d</span>"
       GradeCHTMLTemplate = "<span style='color:red;font-weight:bold;'>%d</span>"
 
       ChipsSubTestResult = self.ParentObject.ResultData['SubTestResults']['Chips']
@@ -51,7 +51,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                          '###LABEL###':'Chip '+str(ChipNo),
                          '###URL###':os.path.relpath(i['TestResultObject'].FinalResultsStoragePath, self.ParentObject.FinalResultsStoragePath)+'/TestResult.html'
                      }
-                 )
+                 ), ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value']
         ]
 
         RateIndex = 1
@@ -67,7 +67,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         for Rate in self.ParentObject.Attributes['Rates']['HRData']:
           TableRow.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value']))
-          MissingHits = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'])
+          MissingHits = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MissingHits_{Rate}'.format(Rate=Rate)])
           
           if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
             TableRow.append(GradeCHTMLTemplate%MissingHits)
