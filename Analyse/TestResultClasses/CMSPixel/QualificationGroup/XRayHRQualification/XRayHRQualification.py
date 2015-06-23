@@ -103,6 +103,12 @@ class TestResult(GeneralTestResult):
             self.Attributes['ROOTFiles']['MaskHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
             break
 
+        PixelAlivePaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_PixelAlive_*')
+        for Path in PixelAlivePaths:
+            ROOTFiles = glob.glob(Path+'/*.root')
+            self.Attributes['ROOTFiles']['PixelAlive'] = ROOT.TFile.Open(ROOTFiles[0])
+
+
         self.ResultData['SubTestResultDictList'] = [
             {
                 'Key': 'Chips',
@@ -149,6 +155,30 @@ class TestResult(GeneralTestResult):
         ]
 
         # value per ROC summary plots
+        self.ResultData['SubTestResultDictList'].append({
+                'Key': 'AliveOverview',
+                'Module': 'AliveOverview',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 40,
+                },
+                'InitialAttributes': {
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'AliveOverview'
+                },
+            })
+        self.ResultData['SubTestResultDictList'].append({
+                'Key': 'AliveSummary',
+                'Module': 'AliveSummary',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 40,
+                },
+                'InitialAttributes': {
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'AliveSummary'
+                },
+            })
         for Rate in self.Attributes['InterpolatedEfficiencyRates']:
             self.ResultData['SubTestResultDictList'].append({
                 'Key': 'EfficiencySummary_{Rate}'.format(Rate=Rate),
@@ -223,21 +253,6 @@ class TestResult(GeneralTestResult):
 
         for Rate in self.Attributes['Rates']['HRData']:
             self.ResultData['SubTestResultDictList'].append({
-                'Key': 'BumpBondingProblems_{Rate}'.format(Rate=Rate),
-                'Module': 'BumpBondingProblems',
-                'DisplayOptions': {
-                    'Width': 4,
-                    'Order': 10,
-                },
-                'InitialAttributes': {
-                    'Rate': Rate,
-                    'NumberOfChips': self.Attributes['NumberOfChips'],
-                    'StorageKey': 'BumpBondingProblems_{Rate}'.format(Rate=Rate)
-                },
-            })
-
-        for Rate in self.Attributes['Rates']['HRData']:
-            self.ResultData['SubTestResultDictList'].append({
                 'Key': 'HotPixelOverview_{Rate}'.format(Rate=Rate),
                 'Module': 'HotPixelOverview',
                 'DisplayOptions': {
@@ -261,6 +276,21 @@ class TestResult(GeneralTestResult):
                     'Rate': Rate,
                     'NumberOfChips': self.Attributes['NumberOfChips'],
                     'StorageKey': 'HotPixelSummary_{Rate}'.format(Rate=Rate)
+                },
+            })
+
+        for Rate in self.Attributes['Rates']['HRData']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'BumpBondingProblems_{Rate}'.format(Rate=Rate),
+                'Module': 'BumpBondingProblems',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 10,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'BumpBondingProblems_{Rate}'.format(Rate=Rate)
                 },
             })
 
@@ -319,7 +349,7 @@ class TestResult(GeneralTestResult):
                     'StorageKey': 'NoiseDistribution_{Rate}'.format(Rate=Rate)
                 },
             })
-            
+
        
 
     def OpenFileHandle(self):

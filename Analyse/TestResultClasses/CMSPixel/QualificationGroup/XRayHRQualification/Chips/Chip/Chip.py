@@ -157,6 +157,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     
                 },
                 {
+                    'Key':'AliveMap',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':200
+                    },
+                    
+                },
+                {
                     'Key':'Grading',
                     'InitialAttributes':{
                     },

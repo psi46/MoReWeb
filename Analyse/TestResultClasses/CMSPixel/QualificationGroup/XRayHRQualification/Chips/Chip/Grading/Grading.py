@@ -171,6 +171,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value'] = (self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value']+'/{Grade}'.format(Grade=GradeMapping[Grades['EfficiencyGrade']])).strip('/')
 
 
+        AliveMapROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
+        
         # hitmap and uniformity grading
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']:
             NumberValues = {}
@@ -204,7 +206,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             MissingHits = 0
             for col in range(0, 52):
                 for row in range(0, 80):
-                    if HitMapROOTObject.GetBinContent(col + 1, row + 1) < 1:
+                    PixelOk = True if AliveMapROOTObject.GetBinContent(col + 1, row + 1) == 10 and HotPixelMapROOTObject.GetBinContent(col + 1, row + 1) < 1 else False
+                    if HitMapROOTObject.GetBinContent(col + 1, row + 1) < 1 and PixelOk:
                         MissingHits += 1
 
             Grades['HitMapGrade'] = 1
@@ -282,7 +285,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['ColumnUniformityGrade'] = Grades['ColumnUniformityGrade']
         self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade']['Value'] = GradeMapping[Grades['ColumnUniformityGrade']]
 
-
+        ### Pixel Alive ###
+        PixelAliveROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
+        DeadPixels = 0
+        InefficientPixels = 0
+        for col in range(0, 52):
+            for row in range(0, 80):
+                if PixelAliveROOTObject.GetBinContent(col + 1, row + 1) < 10:
+                    InefficientPixels += 1
+                if PixelAliveROOTObject.GetBinContent(col + 1, row + 1) < 1:
+                    DeadPixels += 1
+        self.ResultData['HiddenData']['NumberOfDeadPixels'] = DeadPixels
+        self.ResultData['HiddenData']['NumberOfInefficientPixels'] = InefficientPixels
 
         ROCGrades.append(Grades['ColumnUniformityGrade'])        
         

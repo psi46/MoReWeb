@@ -27,6 +27,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
              
         self.ResultData['Plot']['ROOTGraph'] = ROOT.TGraph(len(RocNumbers), RocNumbers, Efficiencies)
 
+        try:
+            RateIndex = 1 + self.ParentObject.Attributes['InterpolatedEfficiencyRates'].index(int(self.Attributes['Rate']))
+        except:
+            RateIndex = 0
+            
         if self.ResultData['Plot']['ROOTGraph']:
             self.Canvas.Clear()
             self.ResultData['Plot']['ROOTGraph'].SetTitle("")
@@ -38,6 +43,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTGraph'].SetMarkerStyle(ROOT.kFullSquare)
 
             self.ResultData['Plot']['ROOTGraph'].Draw('APL')
+
+            if RateIndex > 0 and Minimum < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
+                lineB = ROOT.TLine().DrawLine(
+                    0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)],
+                    len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)],
+                )
+                lineB.SetLineWidth(2)
+                lineB.SetLineStyle(2)
+                lineB.SetLineColor(ROOT.kRed)
+
+            if RateIndex > 0 and Minimum < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
+                lineC = ROOT.TLine().DrawLine(
+                    0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)],
+                    len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)],
+                )
+                lineC.SetLineWidth(2)
+                lineC.SetLineStyle(2)
+                lineC.SetLineColor(ROOT.kRed)
 
             self.ResultData['Plot']['ROOTObject'] = self.ResultData['Plot']['ROOTGraph']
 
