@@ -60,12 +60,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             FirstBin = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst()
             LastBin = self.ResultData['Plot']['ROOTObject'].FindLastBinAbove(0)
 
+            # cut away at maximum 5%
+            if LastBin < 0.95 * self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast():
+                LastBin = int(0.95 * self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast())
+
             #nN
             Integral = self.ResultData['Plot']['ROOTObject'].Integral(FirstBin, LastBin)
 
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(FirstBin, LastBin)
             Mean = Integral / (LastBin - FirstBin + 1)
             RMS = self.ResultData['Plot']['ROOTObject'].GetRMS()
+
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange()
 
             RMS_theoretical = math.sqrt(Mean)
 
