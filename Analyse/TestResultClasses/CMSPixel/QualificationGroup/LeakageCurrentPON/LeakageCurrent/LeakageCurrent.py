@@ -38,7 +38,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 voltages.append(voltage)
                 timestamps.append(timeAfterStartup)
 
-        # take 2nd value measured by Keithley, first one can be strange
+        # take 2nd value measured by Keithley
         leakageCurrent = currents[1]
         Voltage = voltages[1]
 
@@ -75,15 +75,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
-                'Value':self.ParentObject.Attributes['ModuleID'], 
+                'Value':self.ParentObject.Attributes['ModuleID'],
                 'Label':'Module'
             },
             'LeakageCurrent': {
-                'Value': leakageCurrent, 
+                'Value': leakageCurrent,
                 'Label':'Leakage current [A]'
             },
             'Voltage': {
-                'Value': Voltage, 
+                'Value': Voltage,
                 'Label':'Voltage [V]'
             },
         }

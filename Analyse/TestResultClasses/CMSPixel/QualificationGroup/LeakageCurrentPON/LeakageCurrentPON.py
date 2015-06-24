@@ -60,8 +60,6 @@ class TestResult(GeneralTestResult):
                 self.Attributes['Temperature'] = 17.0
 
             break
-                    
-        print "LeakageCurrentPON::OpenFileHandle"
 
     def PopulateResultData(self):
         self.FileHandle.close()
