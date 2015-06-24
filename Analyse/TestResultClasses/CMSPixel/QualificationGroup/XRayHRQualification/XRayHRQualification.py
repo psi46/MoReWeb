@@ -108,6 +108,11 @@ class TestResult(GeneralTestResult):
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['PixelAlive'] = ROOT.TFile.Open(ROOTFiles[0])
 
+        CalDelScanPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_CalDel*_*')
+        for Path in CalDelScanPaths:
+            ROOTFiles = glob.glob(Path+'/*.root')
+            self.Attributes['ROOTFiles']['CalDelScan'] = ROOT.TFile.Open(ROOTFiles[0])
+
 
         self.ResultData['SubTestResultDictList'] = [
             {
@@ -293,6 +298,19 @@ class TestResult(GeneralTestResult):
                     'StorageKey': 'BumpBondingProblems_{Rate}'.format(Rate=Rate)
                 },
             })
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'BumpBondingSummary_{Rate}'.format(Rate=Rate),
+                'Module': 'BumpBondingSummary',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 10,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'BumpBondingSummary_{Rate}'.format(Rate=Rate)
+                },
+            })
 
         for Rate in self.Attributes['Rates']['HRSCurves']:
             self.ResultData['SubTestResultDictList'].append({
@@ -350,6 +368,33 @@ class TestResult(GeneralTestResult):
                 },
             })
 
+        for Rate in self.Attributes['Rates']['HREfficiency']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'EfficiencyOverview_{Rate}'.format(Rate=Rate),
+                'Module': 'EfficiencyOverview',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 50,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'EfficiencyOverview_{Rate}'.format(Rate=Rate)
+                },
+            })
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'EfficiencyDistribution_{Rate}'.format(Rate=Rate),
+                'Module': 'EfficiencyDistribution',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 50,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'EfficiencyDistribution_{Rate}'.format(Rate=Rate)
+                },
+            })
        
 
     def OpenFileHandle(self):
