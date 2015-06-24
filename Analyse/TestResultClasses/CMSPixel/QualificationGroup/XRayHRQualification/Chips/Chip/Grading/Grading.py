@@ -153,6 +153,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for GradeKey in self.Attributes['GradeKeys']['HREfficiency']:
             Grades[GradeKey] = -1
 
+        OmitGradesInFinalGrading = self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['OmitGradesInFinalGrading']
+
         RateIndex = 1
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             MeanEfficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value'])
@@ -161,15 +163,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grades['EfficiencyGrade'] = 2
             if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
                 Grades['EfficiencyGrade'] = 3
-            ROCGrades.append(Grades['EfficiencyGrade'])
+
+            if not 'EfficiencyGrade' in OmitGradesInFinalGrading and not 'EfficiencyGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
+                ROCGrades.append(Grades['EfficiencyGrade'])
+
             RateIndex += 1
 
             self.ResultData['HiddenData']['Efficiency_{Rate}'.format(Rate=Rate)] = MeanEfficiency
             self.ResultData['KeyValueDictPairs']['Efficiency']['Value'] = (self.ResultData['KeyValueDictPairs']['Efficiency']['Value']+'/{Value}'.format(Value=MeanEfficiency)).strip('/')
             
             self.ResultData['HiddenData']['EfficiencyGrade_{Rate}'.format(Rate=Rate)] = Grades['EfficiencyGrade']
-            self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value'] = (self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value']+'/{Grade}'.format(Grade=GradeMapping[Grades['EfficiencyGrade']])).strip('/')
 
+            Grade = '{Grade}'.format(Grade=GradeMapping[Grades['EfficiencyGrade']])
+            if 'EfficiencyGrade' in OmitGradesInFinalGrading or 'EfficiencyGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
+                Grade = '('+Grade+')'
+            self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value'] = (self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value']+'/'+Grade).strip('/')
 
         AliveMapROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
         
@@ -215,7 +223,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grades['HitMapGrade'] = 2
             if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
                 Grades['HitMapGrade'] = 3
-            ROCGrades.append(Grades['HitMapGrade'])
+
+            #if Rate == max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']):
+            if not 'HitMapGrade' in OmitGradesInFinalGrading and not 'HitMapGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
+                ROCGrades.append(Grades['HitMapGrade'])
 
             NumberValues['MissingHits'] = MissingHits
 
@@ -237,6 +248,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     Grades['ReadoutUniformityOverTimeGrade'] = 3
                     #print "non uniform event: %d %d / %f"%(Event, EventHits, ReadoutUniformityOverTimeMean)
             
+            if not 'ReadoutUniformityOverTimeGrade' in OmitGradesInFinalGrading and not 'ReadoutUniformityOverTimeGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
+                ROCGrades.append(Grades['ReadoutUniformityOverTimeGrade'])
+
             ### Column Readout Uniformity Over Time Grade ###
             Grades['ColumnReadoutUniformityOverTimeGrade'] = 1
             NumberValues['NumberOfNonUniformColumnEvents'] = 0
@@ -260,7 +274,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         NumberValues['NumberOfNonUniformColumnEvents'] += 1
                         Grades['ColumnReadoutUniformityOverTimeGrade'] = 3
 
-                ColumnReadoutUniformityHistogram.Delete()        
+                ColumnReadoutUniformityHistogram.Delete()
+
+            if not 'ColumnReadoutUniformityOverTimeGrade' in OmitGradesInFinalGrading and not 'ColumnReadoutUniformityOverTimeGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
+                ROCGrades.append(Grades['ColumnReadoutUniformityOverTimeGrade'])
 
             ### Grade/Values summary for different rates ###
             for NumberKey in self.Attributes['NumberKeys']['HRData']:
@@ -269,8 +286,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             for GradeKey in self.Attributes['GradeKeys']['HRData']:
                 self.ResultData['HiddenData'][GradeKey+'_{Rate}'.format(Rate=Rate)] = Grades[GradeKey]
-                self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/'+GradeMapping[Grades[GradeKey]]).strip('/')
-       
+                if not GradeKey in OmitGradesInFinalGrading and not GradeKey+'_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
+                    self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/'+GradeMapping[Grades[GradeKey]]).strip('/')
+                else:
+                    self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/('+GradeMapping[Grades[GradeKey]]+')').strip('/')
+
         ### Column Uniformity Grade ###
         Grades['ColumnUniformityGrade'] = 1         
         NumberValues['NumberOfNonUniformColumns'] = 0
@@ -285,6 +305,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['ColumnUniformityGrade'] = Grades['ColumnUniformityGrade']
         self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade']['Value'] = GradeMapping[Grades['ColumnUniformityGrade']]
 
+        if not 'ColumnUniformityGrade' in OmitGradesInFinalGrading:
+            ROCGrades.append(Grades['ColumnUniformityGrade'])
+
         ### Pixel Alive ###
         PixelAliveROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
         DeadPixels = 0
@@ -298,9 +321,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['NumberOfDeadPixels'] = DeadPixels
         self.ResultData['HiddenData']['NumberOfInefficientPixels'] = InefficientPixels
 
-        ROCGrades.append(Grades['ColumnUniformityGrade'])        
-        
         ### Final ROC Grade ###
         self.ResultData['KeyValueDictPairs']['ROCGrade']['Value'] = GradeMapping[max(ROCGrades)]
-            
-            

@@ -79,7 +79,7 @@ class TestResultEnvironment:
         'XRayHighRate_missing_xray_pixels_C':168,
     }
     XRayHRQualificationConfiguration = {
-        'Rates':[50,150],
+        'OmitGradesInFinalGrading':'HotPixelGrade',
         'TimeConstant':1,
         'Area':1,
     }
@@ -136,8 +136,8 @@ class TestResultEnvironment:
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
             for i in self.GradingParameters:
                 self.GradingParameters[i] = float(Configuration.get('GradingParameters', i))
-            if Configuration.has_option('XRayHRQualification','Rates'):
-                self.XRayHRQualificationConfiguration['Rates'] = [int(x.strip()) for x in Configuration.get('XRayHRQualification','Rates').split(',')]
+            if Configuration.has_option('XRayHRQualification','OmitGradesInFinalGrading'):
+                self.XRayHRQualificationConfiguration['OmitGradesInFinalGrading'] = [x.strip() for x in Configuration.get('XRayHRQualification','OmitGradesInFinalGrading').split(',')]
             if Configuration.has_option('XRayHRQualification','TimeConstant'):
                 self.XRayHRQualificationConfiguration['TimeConstant'] = float(Configuration.get('XRayHRQualification','TimeConstant').strip())
             if Configuration.has_option('XRayHRQualification','Area'):
