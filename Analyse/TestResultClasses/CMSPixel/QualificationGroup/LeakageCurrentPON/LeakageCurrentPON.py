@@ -80,9 +80,9 @@ class TestResult(GeneralTestResult):
     def CustomWriteToDatabase(self, ParentID):
         print 'Write to DB: ',ParentID
 
-        leakageCurrent = self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['LeakageCurrent']['Value']
+        leakageCurrent = float(self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['LeakageCurrent']['Value'])
 
-        inputTemp = 273.15 + self.Attributes['Temperature']
+        inputTemp = 273.15 + float(self.Attributes['Temperature'])
         outputTemp = 273.15 + 17.0
         Eef = 1.21
         kB = 8.62e-5

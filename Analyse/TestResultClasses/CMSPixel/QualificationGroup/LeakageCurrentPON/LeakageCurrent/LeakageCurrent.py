@@ -71,7 +71,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTGraph'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTGraph'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTGraph'].GetYaxis().CenterTitle()
-
+            self.ResultData['Plot']['ROOTGraph'].SetLineColor(ROOT.kBlue+2)
+            self.ResultData['Plot']['ROOTGraph'].SetMarkerColor(ROOT.kBlue+2)
+            self.ResultData['Plot']['ROOTGraph'].SetMarkerStyle(21)
             self.ResultData['Plot']['ROOTGraph'].Draw('APL')
             self.ResultData['Plot']['ROOTGraph'].GetXaxis().SetLabelSize(0.05)
             self.ResultData['Plot']['ROOTGraph'].GetYaxis().SetLabelSize(0.05)
@@ -92,11 +94,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Module'
             },
             'LeakageCurrent': {
-                'Value': leakageCurrent,
+                'Value': '%0.2e' % float(leakageCurrent),
                 'Label':'Leakage current [A]'
             },
             'Voltage': {
-                'Value': Voltage,
+                'Value': '%0.2e' % float(Voltage),
                 'Label':'Voltage [V]'
             },
         }
