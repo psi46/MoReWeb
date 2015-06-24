@@ -103,13 +103,31 @@ class TestResult(GeneralTestResult):
                 units.append(group.groups()[0].strip())
 
         self.analyseUnits(varlist, units)
+
         varlist = ':'.join(varlist)
         if 'Current' not in varlist or 'Voltage' not in varlist:
             raise Exception('Invalid IV Curve File, varlist:"%s"' % varlist)
         if self.verbose:
             print 'The varlist of the file "%s" is: "%s"' % (fileName, varlist)
-        IVTuple = ROOT.TNtuple(self.GetUniqueID(), "IVTuple", varlist)  # IVTuple
-        entries = IVTuple.ReadFile(fileName)
+
+        varlistSave = "Voltage:Current"
+        IVTuple = ROOT.TNtuple(self.GetUniqueID(), "IVTuple", varlistSave)  # IVTuple
+
+        IVCurveFile = open(fileName, "r")
+        lines = IVCurveFile.readlines()
+        lines = [line.replace('\n', '') for line in lines if not line.strip().startswith('#')]
+
+        IndexCurrent = analyser.index("current(A)")
+        IndexVoltage = analyser.index("voltage(V)")
+
+        entries = 0
+        for line in lines:
+            values = line.strip().split("\t")
+            IVTuple.Fill(float(values[IndexVoltage]), float(values[IndexCurrent]))
+            entries += 1
+
+        IVCurveFile.close()
+
         print 'read {entries} Entries from file {fileName}'.format(entries=entries, fileName=fileName)
         self.ResultData['HiddenData']['IVTuple'] = IVTuple
 
@@ -124,25 +142,27 @@ class TestResult(GeneralTestResult):
         
         self.ResultData['HiddenData']['IVCurveFilePath'] = IVCurveFileName
         self.ResultData['HiddenData']['TestTemperature'] = self.ParentObject.Attributes['TestTemperature']
-        
-        
 
         lines = IVCurveFile.readlines()
         lines = [line.replace('\n', '') for line in lines]
-        lines2 = [line for line in lines if line != '#' and 'LOG' not in line and line != '']
 
-        if lines2[0].startswith('#'):
-            analyser = lines2[0]
+        VoltageColumnDescription = 'voltage(V)'
+        CurrentColumnDescription = 'current(A)'
+
+        ColumnDescriptorLines = [line for line in lines if line.strip().startswith('#') and VoltageColumnDescription in line and CurrentColumnDescription in line]
+
+        if len(ColumnDescriptorLines) >= 1:
+            analyser = ColumnDescriptorLines[0].strip('#').split('\t')
+            if len(ColumnDescriptorLines) > 1:
+                print "Multiple lines with column descriptions 'voltage(V)' and 'current(A)' found in file '%s', using first one."%IVCurveFileName
         else:
-            analyser = ''
-        analyser = analyser.strip('#').split('\t')
-        if len(analyser) == 0:
-            self.getIVTuple(IVCurveFileName, ['voltage(V)', 'current(A)'])
-        else:
-            self.getIVTuple(IVCurveFileName, analyser)
+            analyser = [VoltageColumnDescription, CurrentColumnDescription]
+            print "No line with column descriptions 'voltage(V)' and 'current(A)' found in file '%s', using default one."%IVCurveFileName
+
+        self.getIVTuple(IVCurveFileName, analyser)
 
         IVTuple = self.ResultData['HiddenData']['IVTuple']
-        
+
         Voltage_List = array.array('d', [])
         Current_List = array.array('d', [])
         CurrentAtVoltage100V = 0
