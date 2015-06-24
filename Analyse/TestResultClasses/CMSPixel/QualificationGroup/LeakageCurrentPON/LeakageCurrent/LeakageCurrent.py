@@ -3,13 +3,24 @@ import array
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 import numpy
-
 import ROOT
+import time
+import datetime
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_LeakageCurrentPON_LeakageCurrent_TestResult'
         self.NameSingle='LeakageCurrent'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
+
+    def ReadTimestamp(self, value):
+        TimestampConverted = 0
+        try:
+            TimestampConverted = float(value)
+        except:
+            TimestampConverted = time.mktime(datetime.datetime.strptime(value[0:19], "%Y-%m-%d %H:%M:%S").timetuple())
+            TimestampConverted += float("0.%s"%value[20:24])
+        return TimestampConverted
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0)
@@ -25,14 +36,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         minCurrentVoltage = 0
 
         for line in self.ParentObject.FileHandle:
-            if line[0:1] != "#":
+            if not line.startswith('#'):
+                Values = line.strip().split("\t")
+
                 if first:
                     first = False
-                    timeOffset = float(line.strip().split("\t")[2])
+                    timeOffset = self.ReadTimestamp(Values[2])
 
-                voltage = float(line.strip().split("\t")[0])
-                current = float(line.strip().split("\t")[1])
-                timeAfterStartup = float(line.strip().split("\t")[2]) - timeOffset
+                voltage = float(Values[0])
+                current = float(Values[1])
+                timeAfterStartup = self.ReadTimestamp(Values[2]) - timeOffset
 
                 currents.append(current)
                 voltages.append(voltage)
