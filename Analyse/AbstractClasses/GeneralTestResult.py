@@ -436,6 +436,7 @@ class GeneralTestResult(object):
                 try:
                     self.FileHandle.close()
                 except:
+                    print '\x1b[33m warning: can not close file "%s" \x1b[0m'%repr(self.FileHandle)
                     try:
                         self.FileHandle.Close()
                     except:
