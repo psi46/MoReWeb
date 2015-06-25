@@ -26,9 +26,11 @@ class TestResult(GeneralTestResult):
             print "".ljust(len(tag), '=')
             print tag
 
-        fit_option = "QB"
-        if not self.verbose:
-            fit_option += 'Q'
+        fit_option = "Q"
+
+        if self.HistoDict.getboolean('XrayCalibration','LinearFitAdditionalConstraints'):
+            fit_option += "B"
+
         peak_centers = array.array('d', [])
         peak_errors = array.array('d', [])
         n_electrons = array.array('d', [])
@@ -86,6 +88,7 @@ class TestResult(GeneralTestResult):
             sorted_n_electrons.append(e[1])
             sorted_peak_errors.append(e[2])
             sorted_electron_error.append(0.0)
+
         self.ResultData['Plot']['ROOTObject'] = ROOT.TGraphErrors(len(sorted_peak_centers), sorted_peak_centers,
                                                                   sorted_n_electrons, sorted_peak_errors,
                                                                   sorted_electron_error)
@@ -101,10 +104,13 @@ class TestResult(GeneralTestResult):
         maxTrim *= 1.05  # todo: THink about a good value where you dont wanna fit...
         xmin = max(maxTrim, sorted_peak_centers[0])
         pol1TF1 = ROOT.TF1("pol1tf1","pol1", xmin, sorted_peak_centers[len(sorted_peak_centers) - 1]);
-        pol1TF1.SetParLimits(0, -2000, 2000);
-        pol1TF1.SetParLimits(1, 5, 500);
-        pol1TF1.SetParameter(0, 0);
-        pol1TF1.SetParameter(1, 50);
+
+        pol1TF1.SetParameter(0, 0)
+        pol1TF1.SetParameter(1, 50)
+
+        if self.HistoDict.getboolean('XrayCalibration','LinearFitAdditionalConstraints'):
+            pol1TF1.SetParLimits(0, -2000, 2000)
+            pol1TF1.SetParLimits(1, 5, 500)
 
         self.ResultData['Plot']['ROOTObject'].Fit(pol1TF1, fit_option, "SAME", xmin,
                                                   sorted_peak_centers[len(sorted_peak_centers) - 1])

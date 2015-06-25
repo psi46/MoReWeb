@@ -154,24 +154,27 @@ class TestResult(GeneralTestResult):
     # '''
     def FitHistoSpectrum(self, histo, xmin, xmax):
         name = "fit_{0}".format(histo.GetName())
-        gaus2fit = self.Fit2Gaus(histo)
+
         maxbinabove = 0
+        gausfit = self.FitGaus(histo, maxbinabove)
+        gaus0 = gausfit.GetParameter(0)
+        gaus1 = gausfit.GetParameter(1)
+        gaus2 = gausfit.GetParameter(2)
 
-        if (abs(gaus2fit.GetParameter(1)-gaus2fit.GetParameter(4)) > 40):
-            if (gaus2fit.GetParameter(1) > gaus2fit.GetParameter(4)):
-                gaus0 = gaus2fit.GetParameter(0)
-                gaus1 = gaus2fit.GetParameter(1)
-                gaus2 = gaus2fit.GetParameter(2)
-            else:
-                gaus0 = gaus2fit.GetParameter(3)
-                gaus1 = gaus2fit.GetParameter(4)
-                gaus2 = gaus2fit.GetParameter(5)
+        if self.HistoDict.getboolean('XrayCalibration','SpectrumFitImproveInitialGuess'):
+            gaus2fit = self.Fit2Gaus(histo)
 
-        else:
-            gausfit = self.FitGaus(histo, maxbinabove)
-            gaus0 = gausfit.GetParameter(0)
-            gaus1 = gausfit.GetParameter(1)
-            gaus2 = gausfit.GetParameter(2)
+            # if peaks clearly separated, chose the higher one for initial parameter guess
+            if (abs(gaus2fit.GetParameter(1)-gaus2fit.GetParameter(4)) > 40):
+                if (gaus2fit.GetParameter(1) > gaus2fit.GetParameter(4)):
+                    gaus0 = gaus2fit.GetParameter(0)
+                    gaus1 = gaus2fit.GetParameter(1)
+                    gaus2 = gaus2fit.GetParameter(2)
+                else:
+                    gaus0 = gaus2fit.GetParameter(3)
+                    gaus1 = gaus2fit.GetParameter(4)
+                    gaus2 = gaus2fit.GetParameter(5)
+
 
         if self.verbose:
             print 'Found Start parameter: ', gaus0, gaus1, gaus2
@@ -431,17 +434,22 @@ class TestResult(GeneralTestResult):
         fit.SetParLimits(0, 0, histo.Integral())
 
         fit.SetParameter(1, initguess)
-        fit.SetParLimits(1, max(left, maxbinabove), right)
+        if self.HistoDict.getboolean('XrayCalibration','SpectrumFitAdditionalConstraints'):
+            fit.SetParLimits(1, max(left, maxbinabove), right)
+        else:
+            fit.SetParLimits(1, left, right)
 
         fit.SetParameter(2, signalSigma)
         #Make sure we actually fit a 'signal like' peak, nothing too broad or narrow
         fit.SetParLimits(2, signalSigma - 5, signalSigma + 5)
 
-        if (maxbinabove > 0):
+        if (maxbinabove > 0 and self.HistoDict.getboolean('XrayCalibration','SpectrumFitAdditionalConstraints')):
             histo.GetXaxis().SetRange(int(max(left, maxbinabove)), int(right))
 
         histo.Fit(fit, self.Attributes['fitOption'])
-        histo.GetXaxis().SetRange()
+        if self.HistoDict.getboolean('XrayCalibration','SpectrumFitAdditionalConstraints'):
+            histo.GetXaxis().SetRange()
+
         return fit
 
     #'''
