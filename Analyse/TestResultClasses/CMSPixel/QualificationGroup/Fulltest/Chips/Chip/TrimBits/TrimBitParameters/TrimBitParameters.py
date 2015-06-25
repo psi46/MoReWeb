@@ -7,6 +7,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_TrimBits_TrimBitParameters'+str(self.Attributes['TrimValue'])+'_TestResult'
         self.NameSingle='TrimBitParameters'+str(self.Attributes['TrimValue'])
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        self.FileHandle = self.Attributes['TrimParametersFile']
 
     def PopulateResultData(self):
         self.ResultData['Plot']['ROOTObject'] =ROOT.TH1F(self.GetUniqueID(), '', 17, -.5, 16.5)

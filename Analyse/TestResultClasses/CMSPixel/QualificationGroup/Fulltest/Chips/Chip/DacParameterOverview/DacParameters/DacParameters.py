@@ -12,6 +12,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.Title = 'DacParameters - Trim ' + str(self.Attributes['DacParameterTrimValue'])
         else:
             self.Title = 'DacParameters - Raw'
+        self.FileHandle = self.Attributes['DacParametersFile']
 
     def PopulateResultData(self):
         ChipNo = self.ParentObject.ParentObject.Attributes['ChipNo']
