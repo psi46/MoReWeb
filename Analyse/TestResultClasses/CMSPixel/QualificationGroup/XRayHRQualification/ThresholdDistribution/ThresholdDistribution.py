@@ -13,7 +13,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         HitMapOverview = self.ParentObject.ResultData['SubTestResults']['ThresholdOverview_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
 
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum()) / 100), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
+        NBins = min(int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum()) / 100), 200)
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", NBins, float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
 
         for col in range(self.nCols*8): 
             for row in range(self.nRows*2):

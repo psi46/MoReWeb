@@ -37,7 +37,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         if Line:
                             LineArray = Line.strip().split()
                             Threshold = float(LineArray[0])
-                            self.UpdatePlot(ChipNo, column, row, Threshold)
+                            if 0 < Threshold < 10000:
+                                self.UpdatePlot(ChipNo, column, row, Threshold)
             SCurveFile.close()
 
 

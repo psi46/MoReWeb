@@ -72,7 +72,7 @@ class TestResult(GeneralTestResult):
                             self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)] = float(elements[-1])
                     testParametersFile.close()
             if not NTriggersReadFromFile:
-                print 'WARNING: testParameters.dat file not found, using default number of triggers Ntrig = %d'%self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)]
+                print '\x1b[31mWARNING: testParameters.dat file not found in "%s", using default number of triggers Ntrig = %d\x1b[0m'%(FolderName, self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)])
 
         HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_*')
         for Path in HRDataPaths:

@@ -200,7 +200,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             HotPixelThreshold =self.TestResultEnvironmentObject.GradingParameters['XRayHighRateHotPixels_Threshold']
             for Row in range(self.nRows):
                 for Column in range(self.nCols):
-                    PixelIsHotPixel = HotPixelMapROOTObject.GetBinContent(Column+1, Row+1)
+                    PixelIsHotPixel = HotPixelMapROOTObject.GetBinContent(Column+1, Row+1) if HotPixelMapROOTObject else False
                     if PixelIsHotPixel > 0:
                         NumberValues['NumberOfHotPixels'] += 1
                         self.ResultData['HiddenData']['ListOfHotPixels_{Rate}'.format(Rate=Rate)].append((ChipNo, Column, Row))
@@ -214,7 +214,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             MissingHits = 0
             for col in range(0, 52):
                 for row in range(0, 80):
-                    PixelOk = True if AliveMapROOTObject.GetBinContent(col + 1, row + 1) == 10 and HotPixelMapROOTObject.GetBinContent(col + 1, row + 1) < 1 else False
+                    PixelOk = True if (not AliveMapROOTObject) or AliveMapROOTObject.GetBinContent(col + 1, row + 1) == 10 and (not HotPixelMapROOTObject) or HotPixelMapROOTObject.GetBinContent(col + 1, row + 1) < 1 else False
                     if HitMapROOTObject.GetBinContent(col + 1, row + 1) < 1 and PixelOk:
                         MissingHits += 1
 
@@ -312,12 +312,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         PixelAliveROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
         DeadPixels = 0
         InefficientPixels = 0
-        for col in range(0, 52):
-            for row in range(0, 80):
-                if PixelAliveROOTObject.GetBinContent(col + 1, row + 1) < 10:
-                    InefficientPixels += 1
-                if PixelAliveROOTObject.GetBinContent(col + 1, row + 1) < 1:
-                    DeadPixels += 1
+        if PixelAliveROOTObject:
+            for col in range(0, 52):
+                for row in range(0, 80):
+                    if PixelAliveROOTObject.GetBinContent(col + 1, row + 1) < 10:
+                        InefficientPixels += 1
+                    if PixelAliveROOTObject.GetBinContent(col + 1, row + 1) < 1:
+                        DeadPixels += 1
         self.ResultData['HiddenData']['NumberOfDeadPixels'] = DeadPixels
         self.ResultData['HiddenData']['NumberOfInefficientPixels'] = InefficientPixels
 

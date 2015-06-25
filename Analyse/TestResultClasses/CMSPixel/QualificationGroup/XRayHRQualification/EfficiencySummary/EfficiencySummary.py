@@ -28,7 +28,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTGraph'] = ROOT.TGraph(len(RocNumbers), RocNumbers, Efficiencies)
 
         try:
-            RateIndex = 1 + self.ParentObject.Attributes['InterpolatedEfficiencyRates'].index(int(self.Attributes['Rate']))
+            RateIndex = 1 + self.ParentObject.Attributes['InterpolatedEfficiencyRates'].index(self.Attributes['Rate'])
         except:
             RateIndex = 0
             

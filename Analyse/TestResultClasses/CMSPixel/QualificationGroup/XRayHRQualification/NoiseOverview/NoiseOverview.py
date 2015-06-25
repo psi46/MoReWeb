@@ -37,7 +37,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         if Line:
                             LineArray = Line.strip().split()
                             Noise = float(LineArray[1])
-                            self.UpdatePlot(ChipNo, column, row, Noise)
+                            if 0 < Noise < 2000:
+                                self.UpdatePlot(ChipNo, column, row, Noise)
             SCurveFile.close()
 
         if self.ResultData['Plot']['ROOTObject']:
@@ -47,7 +48,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, 400)
+            if self.ResultData['Plot']['ROOTObject'].GetMaximum() < 600:
+                self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, 600)
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("electrons")
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitleOffset(0.5)
             self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle()
