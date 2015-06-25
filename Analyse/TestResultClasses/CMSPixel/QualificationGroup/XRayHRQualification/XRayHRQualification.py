@@ -83,7 +83,7 @@ class TestResult(GeneralTestResult):
             self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
 
 
-        HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRScurves_*')
+        HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRS[Cc]urves_*')
         for Path in HRSCurvesPaths:
             FolderName = os.path.basename(Path)
             Rate = int(FolderName.split('_')[2])
