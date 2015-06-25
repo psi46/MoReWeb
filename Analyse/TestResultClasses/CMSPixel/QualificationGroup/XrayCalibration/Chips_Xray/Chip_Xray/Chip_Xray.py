@@ -57,7 +57,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         }
                     }
                 )
-                key = 'Xray_HitMap_{Method}_Chip{Chip}'.format(Method = i['InitialAttributes']['Method'], Chip = self.Attributes['ChipNo'] )
+                key = 'Xray_HitMap_{Method}_{Target}_Chip{Chip}'.format(Method = i['InitialAttributes']['Method'], Target = target, Chip = self.Attributes['ChipNo'] )
                 self.ResultData['SubTestResultDictList'].append(
                     {
                         "Key": key,
