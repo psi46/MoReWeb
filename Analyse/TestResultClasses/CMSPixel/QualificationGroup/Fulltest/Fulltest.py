@@ -325,9 +325,9 @@ class TestResult(GeneralTestResult):
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage150V'] = IVCurveData['CurrentAtVoltage150V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
-           	if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
-           	    IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
-
+                
+            if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
+                IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
             if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
                 IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
             if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
@@ -360,8 +360,8 @@ class TestResult(GeneralTestResult):
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
             'Grade': grade,
-            'PixelDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadPixels'][
-                'Value'],
+            'PixelDefects': '{PixelDefects:d}'.format(PixelDefects=self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefects'][
+                'NumericValue']),
             'ROCsMoreThanOnePercent':
                 self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['BadRocs']['Value'],
             'Noise': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels'][
@@ -513,14 +513,15 @@ class TestResult(GeneralTestResult):
             print "IVCURVEDATA ", IVCurveData
             if IVCurveData['CurrentAtVoltage150V'] != -1 :
                 # extract Sensor name
-                module = pdb.getFullModule(Row['ModuleID'])
-                if module is None:
+              module = pdb.getFullModule(Row['ModuleID'])
+              if module is None:
                     print " Cannot find Module with ModuleID = ",(Row['ModuleID'])
                     exit (32)
-                bmodule = pdb.getBareModule(module.BAREMODULE_ID)
-                if bmodule is None:
+              bmodule = pdb.getBareModule(module.BAREMODULE_ID)
+              if bmodule is None:
                     print " Cannot find bareModule with bareModuleID = ",module.BAREMODULE_ID
-                    exit (33)
+                #    exit (33)
+              else:
                 sensor_id  =bmodule.SENSOR_ID
                 ivlog_path = IVCurveData['IVCurveFilePath']
                 outDir = Row['AbsFulltestSubfolder']
@@ -557,7 +558,8 @@ class TestResult(GeneralTestResult):
                              GRADE = gradeiv,
                              SLOPE = float(IVCurveData['IVSlope']),
                              TEMPERATURE = float(IVCurveData['TestTemperature']),
-                             COMMENT ="From FMT - TestID = "+ str(pp.TEST_ID),
+                             REF_ID= pp.TEST_ID,	
+                             COMMENT ="",
                              DATE = int(Row['TestDate']),
                              TYPE = "CYC")
   
