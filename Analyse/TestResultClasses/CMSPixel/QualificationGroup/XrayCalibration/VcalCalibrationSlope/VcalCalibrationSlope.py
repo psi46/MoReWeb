@@ -93,6 +93,7 @@ class TestResult(GeneralTestResult):
         else:
             ymax *= .8
 
+        ROOT.gStyle.SetOptStat(0)
         TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerColor(Parameters['MarkerColor'])
         TestResultObject.ResultData['Plot']['ROOTObject'].SetLineColor(Parameters['LineColor'])
 
