@@ -111,7 +111,8 @@ class TestResult(GeneralTestResult):
         CalDelScanPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_CalDel*_*')
         for Path in CalDelScanPaths:
             ROOTFiles = glob.glob(Path+'/*.root')
-            self.Attributes['ROOTFiles']['CalDelScan'] = ROOT.TFile.Open(ROOTFiles[0])
+            if len(ROOTFiles) > 0:
+                self.Attributes['ROOTFiles']['CalDelScan'] = ROOT.TFile.Open(ROOTFiles[0])
 
 
         self.ResultData['SubTestResultDictList'] = [
