@@ -18,7 +18,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         GraphEdges = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum())), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
         GraphCorners = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum())), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
 
-        for col in range(self.nCols*8): 
+        for col in range(self.nCols*8):
             for row in range(self.nRows*2):
                 result = HitMapOverview.GetBinContent(col + 1, row + 1)
                 if (col % 52 == 0 or col % 52 == 51) and (row % 80 == 0 or row % 80 == 79):
@@ -27,7 +27,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     GraphEdges.Fill(result)
                 else:
                     self.ResultData['Plot']['ROOTObject'].Fill(result)
-                
+
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("")

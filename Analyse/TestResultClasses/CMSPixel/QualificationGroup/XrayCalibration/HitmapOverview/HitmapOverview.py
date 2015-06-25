@@ -21,7 +21,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             SubTestKey = 'Xray_HitMap_{Method}_{Target}_Chip{Chip}'.format(Method=self.Attributes['Method'], Target=self.Attributes['Target'], Chip=chipNo)
             histo = ChipTestResultObject.ResultData['SubTestResults'][SubTestKey].ResultData['Plot']['ROOTObject']
 
-            for col in range(self.nCols): 
+            for col in range(self.nCols):
                 for row in range(self.nRows):
                     result = histo.GetBinContent(col + 1, row + 1)
                     self.UpdatePlot(chipNo, col, row, result)
@@ -41,7 +41,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['Format'] = 'png'
 
         self.Title = 'Hit Map {Target}'.format(Target=self.Attributes['Target'])
-        self.SaveCanvas()     
+        self.SaveCanvas()
 
     def UpdatePlot(self, chipNo, col, row, value):
         result = value
