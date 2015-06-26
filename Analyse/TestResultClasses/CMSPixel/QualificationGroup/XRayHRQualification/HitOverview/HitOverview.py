@@ -44,10 +44,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             XProjectionList.sort()
             Median = XProjectionList[int(len(XProjectionList)/2)]
 
-            print "####################### calculated max: %f"%self.ResultData['Plot']['ROOTObject'].GetMaximum()
-            print "####################### projection max: %f"%XProjection.GetMaximum()
-            print "####################### calculated median: %f"%Median
-
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
