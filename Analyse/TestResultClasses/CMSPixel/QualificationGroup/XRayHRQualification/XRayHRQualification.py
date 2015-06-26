@@ -146,17 +146,6 @@ class TestResult(GeneralTestResult):
                 'InitialAttributes': {
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                 },
-            },
-            {
-                'Key': 'SummaryROCs',
-                'DisplayOptions': {
-                    'GroupWithNext': False,
-                    'Order': 3,
-                    'Width': 4,
-                },
-                'InitialAttributes': {
-                    'ModuleVersion': self.Attributes['ModuleVersion'],
-                },
             }
         ]
 
@@ -394,6 +383,18 @@ class TestResult(GeneralTestResult):
                     'Rate': Rate,
                     'NumberOfChips': self.Attributes['NumberOfChips'],
                     'StorageKey': 'EfficiencyDistribution_{Rate}'.format(Rate=Rate)
+                },
+            })
+
+        self.ResultData['SubTestResultDictList'].append({
+                'Key': 'SummaryROCs',
+                'DisplayOptions': {
+                    'GroupWithNext': False,
+                    'Order': 3,
+                    'Width': 4,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
                 },
             })
        

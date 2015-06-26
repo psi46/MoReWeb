@@ -74,7 +74,8 @@ class TestResultEnvironment:
         'XRayHighRate_factor_dcol_uniformity_low':0.5,
         'XRayHighRate_factor_dcol_uniformity_high':1.5,
         'XRayHighRate_factor_readout_uniformity':7,
-        'XRayHighRate_SCurve_Noise_Threshold':400,
+        'XRayHighRate_SCurve_Noise_Threshold_B':400,
+        'XRayHighRate_SCurve_Noise_Threshold_C':800,
         'XRayHighRate_missing_xray_pixels_B':42,
         'XRayHighRate_missing_xray_pixels_C':168,
     }

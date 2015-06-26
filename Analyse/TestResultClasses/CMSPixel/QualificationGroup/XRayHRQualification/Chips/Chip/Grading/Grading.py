@@ -103,6 +103,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Value':'',
             'Label':'Column Uniformity Grade'
         }
+        self.ResultData['KeyValueDictPairs']['NoiseGrade'] = {
+            'Value':'',
+            'Label':'Noise Grade'
+        }
 
         self.ResultData['KeyList'] += [
                 'ROCGrade',
@@ -118,6 +122,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'ReadoutUniformityOverTimeGrade',
                 'ColumnReadoutUniformityOverTimeGrade',
                 'ColumnUniformityGrade',
+                'NoiseGrade'
             ]
         for Rate in RateData['HREfficiency']['Rates']:
             self.ResultData['HiddenData']['ListOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)] = []
@@ -214,7 +219,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             MissingHits = 0
             for col in range(0, 52):
                 for row in range(0, 80):
-                    PixelOk = True if (not AliveMapROOTObject) or AliveMapROOTObject.GetBinContent(col + 1, row + 1) == 10 and (not HotPixelMapROOTObject) or HotPixelMapROOTObject.GetBinContent(col + 1, row + 1) < 1 else False
+                    PixelOk = True if ((not AliveMapROOTObject) or AliveMapROOTObject.GetBinContent(col + 1, row + 1) == 10) and ((not HotPixelMapROOTObject) or HotPixelMapROOTObject.GetBinContent(col + 1, row + 1) < 1) else False
                     if HitMapROOTObject.GetBinContent(col + 1, row + 1) < 1 and PixelOk:
                         MissingHits += 1
 
@@ -307,6 +312,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         if not 'ColumnUniformityGrade' in OmitGradesInFinalGrading:
             ROCGrades.append(Grades['ColumnUniformityGrade'])
+
+        ### Noise Grading ###
+        Grades['NoiseGrade'] = 1 
+        for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves']:
+            NoiseTestResultObject = self.ParentObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)]
+            Noise = float(NoiseTestResultObject.ResultData['KeyValueDictPairs']['fit_peak']['Value'])
+
+            if Grades['NoiseGrade'] < 2 and Noise > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']:
+                Grades['NoiseGrade'] = 2
+
+            if Grades['NoiseGrade'] < 3 and Noise > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
+                Grades['NoiseGrade'] = 3
+                print "Grade noise to C: %f"%Noise
+            
+        ROCGrades.append(Grades['NoiseGrade'])
+        self.ResultData['KeyValueDictPairs']['NoiseGrade']['Value'] = GradeMapping[Grades['NoiseGrade']]
+
 
         ### Pixel Alive ###
         PixelAliveROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']

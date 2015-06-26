@@ -37,12 +37,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTGraph'].SetMarkerColor(ROOT.kMagenta+2)
             self.ResultData['Plot']['ROOTGraph'].SetMarkerStyle(ROOT.kFullSquare)
 
-            if Maximum < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold']*1.1:
-                self.ResultData['Plot']['ROOTGraph'].GetYaxis().SetRangeUser(0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold']*1.1)
+            if Maximum < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']*1.1:
+                self.ResultData['Plot']['ROOTGraph'].GetYaxis().SetRangeUser(0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']*1.1)
             
             lineB = ROOT.TLine().DrawLine(
-                0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold'],
-                len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold'],
+                0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'],
+                len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'],
             )
             lineB.SetLineWidth(2)
             lineB.SetLineStyle(2)

@@ -14,6 +14,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
 
+        ROOT.gPad.SetLogx(0)
         ROOT.gStyle.SetOptStat(0)
         self.Canvas.Clear()
 

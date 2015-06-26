@@ -56,10 +56,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         SCurveDataFileName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveDataFileName')
 
         print 'SCurve fitting... %s'%Directory
-        ePerVcal = 47
+        ePerVcal = self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
         HistoDict = BetterConfigParser()
         HistoDict.add_section('SCurveFitting')
-        HistoDict.set('SCurveFitting','nTrigs', str(100))
+        HistoDict.set('SCurveFitting','nTrigs', str(10))
         HistoDict.set('SCurveFitting','dir', '')
         HistoDict.set('SCurveFitting','ignoreValidityCheck', '1')
         HistoDict.set('SCurveFitting','inputFileName', SCurveDataFileName)
@@ -96,7 +96,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
-                        if Width > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold']:
+                        if Width > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']:
                             self.ResultData['HiddenData']['NumberOfNoisyPixels'] += 1
                             self.ResultData['HiddenData']['ListOfNoisyPixels'].append((ChipNo, column, row))
             ThresholdMean /= NPix
@@ -117,8 +117,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw()
 
             lineCHigh = ROOT.TLine().DrawLine(
-                self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold'], self.ResultData['Plot']['ROOTObject'].GetYaxis().GetXmin(),
-                self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold'], self.ResultData['Plot']['ROOTObject'].GetMaximum()
+                self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'], self.ResultData['Plot']['ROOTObject'].GetYaxis().GetXmin(),
+                self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'], self.ResultData['Plot']['ROOTObject'].GetMaximum()
             )
             lineCHigh.SetLineWidth(2)
             lineCHigh.SetLineStyle(2)
@@ -140,10 +140,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         over = self.ResultData['Plot']['ROOTObject'].GetBinContent(self.ResultData['Plot']['ROOTObject_hd'].GetNbinsX()+1)
 
         #fit peak
-        GaussFitFunction = ROOT.TF1("gaussfit","gaus(0)",30,400)
-        GaussFitFunction.SetParameter(0, 250)
-        GaussFitFunction.SetParameter(1, 150)
-        GaussFitFunction.SetParameter(2, 50)
+        GaussFitFunction = ROOT.TF1("gaussfit","gaus(0)", 30, 1000)
+        GaussFitFunction.SetParameter(0, self.ResultData['Plot']['ROOTObject'].GetMaximum())
+        GaussFitFunction.SetParameter(1, MeanSCurve)
+        GaussFitFunction.SetParameter(2, RMSSCurve)
         self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "QR")
 
         self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(IntegralSCurve)

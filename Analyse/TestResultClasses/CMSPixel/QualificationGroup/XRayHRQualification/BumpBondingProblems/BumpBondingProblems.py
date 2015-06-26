@@ -14,6 +14,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         }
 
     def PopulateResultData(self):
+        ROOT.gPad.SetLogx(0)
         ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
 
@@ -33,7 +34,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if histo:
                 for col in range(self.nCols): 
                     for row in range(self.nRows):
-                        PixelOk = True if (not histoAlive) or histoAlive.GetBinContent(col + 1, row + 1) == 10 and (not histoHot) or histoHot.GetBinContent(col + 1, row + 1) < 1 else False
+                        PixelOk = True if ((not histoAlive) or histoAlive.GetBinContent(col + 1, row + 1) == 10) and ((not histoHot) or histoHot.GetBinContent(col + 1, row + 1) < 1) else False
                         result = 1 if histo.GetBinContent(col + 1, row + 1) < 1 and PixelOk else 0
                         self.UpdatePlot(chipNo, col, row, result)
                         BumpBondingDefects += result

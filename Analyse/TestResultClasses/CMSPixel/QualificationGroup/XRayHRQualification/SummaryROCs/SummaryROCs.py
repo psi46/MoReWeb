@@ -90,8 +90,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
           Noise = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['fit_peak']['Value'])
-          if Noise >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold']:
+          if Noise >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
             TableRow.append(GradeCHTMLTemplate%Noise)
+          elif Noise >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']:
+            TableRow.append(GradeBHTMLTemplate%Noise)
           else:
             TableRow.append(Noise)
 

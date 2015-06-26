@@ -9,6 +9,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
     def PopulateResultData(self):
+        ROOT.gPad.SetLogx(0)
         ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
 
