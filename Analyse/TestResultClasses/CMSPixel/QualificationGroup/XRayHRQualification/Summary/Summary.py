@@ -69,7 +69,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 NoiseList.append(Noise)
 
             MeanNoise = sum(NoiseList) / float(len(NoiseList))
-            NoiseString = (NoiseString + "/{Noise:1.0f}".format(Noise=Noise)).strip("/")
+            NoiseString = (NoiseString + "/{Noise:1.0f}".format(Noise=MeanNoise)).strip("/")
 
         self.ResultData['KeyValueDictPairs']['Noise'] = {
                 'Value': NoiseString, 

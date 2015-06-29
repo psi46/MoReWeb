@@ -3,6 +3,7 @@ import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 import ROOT
 import math
+import os.path
 
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 from TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Fitting.SCurve_Fitting import *
@@ -60,20 +61,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)]
         SCurveDataFileName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveDataFileName')
 
-        print 'SCurve fitting... %s'%Directory
         ePerVcal = self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
-        HistoDict = BetterConfigParser()
-        HistoDict.add_section('SCurveFitting')
-        HistoDict.set('SCurveFitting','nTrigs', str(10))
-        HistoDict.set('SCurveFitting','dir', '')
-        HistoDict.set('SCurveFitting','ignoreValidityCheck', '1')
-        HistoDict.set('SCurveFitting','inputFileName', SCurveDataFileName)
-
-
-        fitter = SCurve_Fitting(True, HistoDict, ePerVcal=ePerVcal)
-        fitter.FitSCurve(Directory, ChipNo)
 
         SCurveFileName = Directory + '/' + self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveFileName').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+
+        if not os.path.isfile(SCurveFileName):
+            HistoDict = BetterConfigParser()
+            HistoDict.add_section('SCurveFitting')
+            HistoDict.set('SCurveFitting','nTrigs', str(10))
+            HistoDict.set('SCurveFitting','dir', '')
+            HistoDict.set('SCurveFitting','ignoreValidityCheck', '1')
+            HistoDict.set('SCurveFitting','inputFileName', SCurveDataFileName)
+            fitter = SCurve_Fitting(True, HistoDict, ePerVcal=ePerVcal)
+            fitter.FitSCurve(Directory, ChipNo)
+        else:
+            print "SCurve file '%s' already exists, skip fit"%SCurveFileName
+
         SCurveFile = open(SCurveFileName, "r")
         self.FileHandle = SCurveFile # needed in summary
 

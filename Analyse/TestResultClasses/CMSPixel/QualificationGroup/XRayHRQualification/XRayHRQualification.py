@@ -425,7 +425,7 @@ class TestResult(GeneralTestResult):
             ROCsMoreThanOnePercent = 'None'
 
         try:
-            Noise = self.ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Noise']['Value']
+            Noise = float(self.ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Noise']['Value'])
         except KeyError:
             Noise = 'None'
 
