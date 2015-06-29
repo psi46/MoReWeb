@@ -262,22 +262,37 @@ class GeneralTestResult(object):
             i['TestResultObject'] = self.ResultData['SubTestResults'][i['Key']]
             i2 += 1
 
-    def check_Test_Software(self):
-        # file = self.RawTestSessionDataPath + '/test.cfg'
-        # print file
+    def check_Test_Software_Pyxar(self):
         self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
         files = glob.glob(self.RawTestSessionDataPath + '/test.cfg') + \
                 glob.glob(self.RawTestSessionDataPath + '/*/test.cfg')
-        # print 'pyxar:',files
-        if len(files) > 0:
-            self.testSoftware = 'pyxar'
-        else:
-            data = glob.glob(self.RawTestSessionDataPath + '/*[p,P][x,X][a,A][r,R]*.*') + \
+        return len(files) > 0
+
+    def check_Test_Software_Pxar(self):
+        data = glob.glob(self.RawTestSessionDataPath + '/*[p,P][x,X][a,A][r,R]*.*') + \
                    glob.glob(self.RawTestSessionDataPath + '/*/*[p,P][x,X][a,A][r,R]*.*')
-            if len(data):
-                self.testSoftware = 'pxar'
-            else:
-                self.testSoftware = 'psi46expert'
+        if len(data):
+            return True
+
+        LogFileNames = glob.glob(self.RawTestSessionDataPath + '/*.log')
+        for LogFileName in LogFileNames:
+            LogFile = open(LogFileName, "r")
+            FirstLine = LogFile.readline()
+            LogFile.close()
+            if FirstLine.lower().find("welcome to pxar") > -1:
+                return True
+
+        return False
+
+    def check_Test_Software(self):
+
+        if self.check_Test_Software_Pyxar():
+            self.testSoftware = 'pyxar'
+        elif self.check_Test_Software_Pxar():
+            self.testSoftware = 'pxar'
+        else:
+            self.testSoftware = 'psi46expert'
+
         self.HistoDict = BetterConfigParser()
         fileName = 'Configuration/Software/%s.cfg' % self.testSoftware
         self.HistoDict.read(fileName)
