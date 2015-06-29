@@ -40,6 +40,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if Maximum < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']*1.1:
                 self.ResultData['Plot']['ROOTGraph'].GetYaxis().SetRangeUser(0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']*1.1)
             
+            self.ResultData['Plot']['ROOTGraph'].Draw('APL')
+            
             lineB = ROOT.TLine().DrawLine(
                 0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'],
                 len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'],
@@ -47,7 +49,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             lineB.SetLineWidth(2)
             lineB.SetLineStyle(2)
             lineB.SetLineColor(ROOT.kRed)
-            self.ResultData['Plot']['ROOTGraph'].Draw('APL')
 
             self.ResultData['Plot']['ROOTObject'] = self.ResultData['Plot']['ROOTGraph']
 
