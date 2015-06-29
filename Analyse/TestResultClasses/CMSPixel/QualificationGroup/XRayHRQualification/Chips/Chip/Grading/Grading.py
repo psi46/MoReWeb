@@ -31,7 +31,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'NumberOfNonUniformColumns',
                 'NumberOfNonUniformEvents',
                 'NumberOfNonUniformColumnEvents',
-                'MissingHits'
+                'BumpBondingDefects'
             ],
             'HRSCurves':[]
         }
@@ -79,9 +79,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Value':'',
             'Label':'# Non-Uniform Col. Events '+RateData['HRData']['RatesString']
         }
-        self.ResultData['KeyValueDictPairs']['MissingHits'] = {
+        self.ResultData['KeyValueDictPairs']['BumpBondingDefects'] = {
             'Value':'',
-            'Label':'# Missing hits '+RateData['HRData']['RatesString']
+            'Label':'# Bump Bonding Defects '+RateData['HRData']['RatesString']
         }
         self.ResultData['KeyValueDictPairs']['HotPixelsGrade'] = {
             'Value':'',
@@ -114,7 +114,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'NumberOfNonUniformColumns',
                 'NumberOfNonUniformEvents',
                 'NumberOfNonUniformColumnEvents',
-                'MissingHits',
+                'BumpBondingDefects',
                 'Efficiency',
                 'EfficiencyGrade',
                 'HotPixelsGrade',
@@ -185,7 +185,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value'] = (self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value']+'/'+Grade).strip('/')
 
         AliveMapROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
-        
+       
+        BumpBondingDefectsList = []
+
         # hitmap and uniformity grading
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']:
             NumberValues = {}
@@ -216,24 +218,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grades['HotPixelsGrade'] = 3
             
             ### Hit Map Grade ###
-            MissingHits = 0
-            for col in range(0, 52):
-                for row in range(0, 80):
-                    PixelOk = True if ((not AliveMapROOTObject) or AliveMapROOTObject.GetBinContent(col + 1, row + 1) == 10) and ((not HotPixelMapROOTObject) or HotPixelMapROOTObject.GetBinContent(col + 1, row + 1) < 1) else False
-                    if HitMapROOTObject.GetBinContent(col + 1, row + 1) < 1 and PixelOk:
-                        MissingHits += 1
+            BumpBondingDefects = int(self.ParentObject.ResultData['SubTestResults']['BumpBondingDefects_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'])
 
             Grades['HitMapGrade'] = 1
-            if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B']:
+            if BumpBondingDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B']:
                 Grades['HitMapGrade'] = 2
-            if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
+            if BumpBondingDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
                 Grades['HitMapGrade'] = 3
 
-            #if Rate == max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']):
             if not 'HitMapGrade' in OmitGradesInFinalGrading and not 'HitMapGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
                 ROCGrades.append(Grades['HitMapGrade'])
 
-            NumberValues['MissingHits'] = MissingHits
+            self.ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=Rate)] = BumpBondingDefects
+            BumpBondingDefectsList.append(BumpBondingDefects)
+            NumberValues['BumpBondingDefects'] = BumpBondingDefects
 
             ### ROC Readout Uniformity Over Time Grade ###
             Grades['ReadoutUniformityOverTimeGrade'] = 1
@@ -295,6 +293,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/'+GradeMapping[Grades[GradeKey]]).strip('/')
                 else:
                     self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/('+GradeMapping[Grades[GradeKey]]+')').strip('/')
+
+        ### Bump Bonding Defects (Minimum) ###
+        self.ResultData['HiddenData']['BumpBondingDefectsMin'] = min(BumpBondingDefectsList)
 
         ### Column Uniformity Grade ###
         Grades['ColumnUniformityGrade'] = 1         

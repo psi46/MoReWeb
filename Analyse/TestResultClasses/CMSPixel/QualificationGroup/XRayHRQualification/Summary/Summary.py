@@ -28,7 +28,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ROCGrades': {
                 'Value': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrades']['Value'],
                 'Label': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrades']['Label']
+            },
+            'PixelDefects': {
+                'Value': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value'],
+                'Label': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Label']
             }
         }
-        self.ResultData['KeyList'] = ['Module','Grade', 'ROCGrades']
+        self.ResultData['KeyList'] = ['Module','Grade', 'ROCGrades','PixelDefects']
 

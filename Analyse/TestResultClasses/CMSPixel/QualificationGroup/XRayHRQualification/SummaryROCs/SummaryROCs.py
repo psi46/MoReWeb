@@ -19,7 +19,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
       for Rate in self.ParentObject.Attributes['Rates']['HRData']:
         TableHeader.append('Rate "{Rate}"'.format(Rate=Rate))
-        TableHeader.append('BB prob'.format(Rate=Rate))
+        TableHeader.append('BB defect'.format(Rate=Rate))
         TableHeader.append('RO prob '.format(Rate=Rate))
 
       TableHeader.append('Unif. prob'.format(Rate=Rate))
@@ -67,14 +67,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         for Rate in self.ParentObject.Attributes['Rates']['HRData']:
           TableRow.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value']))
-          MissingHits = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MissingHits_{Rate}'.format(Rate=Rate)])
+          BumpBondingDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=Rate)])
           
-          if MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
-            TableRow.append(GradeCHTMLTemplate%MissingHits)
-          elif MissingHits >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B']:
-            TableRow.append(GradeBHTMLTemplate%MissingHits)
+          if BumpBondingDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
+            TableRow.append(GradeCHTMLTemplate%BumpBondingDefects)
+          elif BumpBondingDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B']:
+            TableRow.append(GradeBHTMLTemplate%BumpBondingDefects)
           else:
-            TableRow.append(MissingHits)
+            TableRow.append(BumpBondingDefects)
 
           NonUniformEvents = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)])
           if NonUniformEvents > 0:

@@ -26,16 +26,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         }
         self.ResultData['KeyList'] += ['RealHitrate','NumberOfDefectivePixels']
         self.ResultData['HiddenData']['ListOfDefectivePixels'] = []
-        
+
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
-        
-        self.ResultData['Plot']['ROOTObject'] = (
-            HistoGetter.get_histo(
-                self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
-                "Xray.hMap_Ag_C{ChipNo}_V0".format(ChipNo=self.ParentObject.Attributes['ChipNo']) 
-            ).Clone(self.GetUniqueID())
-        )
+
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])]
+        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'HitMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+
         NumberOfDefectivePixels = 0
         NumberOfHits = 0
         if self.ResultData['Plot']['ROOTObject']:
@@ -47,9 +45,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     else:
                         NumberOfDefectivePixels += 1
                         self.ResultData['HiddenData']['ListOfDefectivePixels'].append((ChipNo, Column, Row))
-                        
+
             self.ResultData['KeyValueDictPairs']['NHits']['Value'] = '{NHits:1.0f}'.format(NHits=NumberOfHits)
-            
+
             NTriggersROOTObject = (
             HistoGetter.get_histo(
                     self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
@@ -61,8 +59,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             NTriggers = float(NTriggersROOTObject.GetBinContent(1))
             NHits = float(self.ResultData['KeyValueDictPairs']['NHits']['Value'])
             RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6
-            
-            
+
             ROOT.gStyle.SetOptStat(0)
             self.Canvas.Clear()
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
@@ -72,14 +69,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
-            
 
         self.SaveCanvas()
-        self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{Rate}'.format(Rate=NumberOfDefectivePixels)
+        self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{NumberOfDefectivePixels:1.0f}'.format(NumberOfDefectivePixels=NumberOfDefectivePixels)
         self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{RealHitrate:1.2f}'.format(RealHitrate=RealHitrate)
         self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
-        
+
         self.Title = 'Hit Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
-        
 
 

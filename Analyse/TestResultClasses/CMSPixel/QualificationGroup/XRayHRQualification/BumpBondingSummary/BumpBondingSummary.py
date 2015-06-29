@@ -19,12 +19,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Maximum = 0
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            MissingHits = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MissingHits_{Rate}'.format(Rate=self.Attributes['Rate'])]
+            BumpBondingDefects = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=self.Attributes['Rate'])]
             ChipNo = ChipTestResultObject.Attributes['ChipNo']
             RocNumbers.append(ChipNo)
-            BBProblems.append(MissingHits)
-            if MissingHits > Maximum:
-                Maximum = MissingHits
+            BBProblems.append(BumpBondingDefects)
+            if BumpBondingDefects > Maximum:
+                Maximum = BumpBondingDefects
              
         self.ResultData['Plot']['ROOTGraph'] = ROOT.TGraph(len(RocNumbers), RocNumbers, BBProblems)
 
@@ -43,8 +43,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTGraph'].Draw('APL')
 
             lineB = ROOT.TLine().DrawLine(
-                0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B'],
-                len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B'],
+                0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B'] - 0.5,
+                len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B'] - 0.5,
             )
             lineB.SetLineWidth(2)
             lineB.SetLineStyle(2)
@@ -52,8 +52,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             if Maximum > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
                 lineC = ROOT.TLine().DrawLine(
-                    0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C'],
-                    len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C'],
+                    0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C'] - 0.5,
+                    len(RocNumbers), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C'] - 0.5,
                 )
                 lineC.SetLineWidth(2)
                 lineC.SetLineStyle(2)
@@ -61,6 +61,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             self.ResultData['Plot']['ROOTObject'] = self.ResultData['Plot']['ROOTGraph']
 
-        self.Title = 'BB problems {Rate}'.format(Rate=self.Attributes['Rate'])
+        self.Title = 'BB defects {Rate}'.format(Rate=self.Attributes['Rate'])
         self.ResultData['Plot']['Format'] = 'svg'
         self.SaveCanvas()

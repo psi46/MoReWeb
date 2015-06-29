@@ -39,14 +39,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('APL')
 
         DeadPixelsGraph = ROOT.TGraph(len(RocNumbers), RocNumbers, DeadPixelList)
-        DeadPixelsGraph.SetTitle("")
-        DeadPixelsGraph.GetYaxis().SetTitle("")
-        DeadPixelsGraph.GetXaxis().SetTitle("ROC")
-        DeadPixelsGraph.GetXaxis().CenterTitle()
-        DeadPixelsGraph.SetLineColor(ROOT.kRed+2)
-        DeadPixelsGraph.SetMarkerColor(ROOT.kRed+2)
-        DeadPixelsGraph.SetMarkerStyle(ROOT.kFullSquare)
-        DeadPixelsGraph.Draw('PL,SAME')
+
+        if DeadPixelsGraph:
+            DeadPixelsGraph.SetTitle("")
+            DeadPixelsGraph.GetYaxis().SetTitle("")
+            DeadPixelsGraph.GetXaxis().SetTitle("ROC")
+            DeadPixelsGraph.GetXaxis().CenterTitle()
+            DeadPixelsGraph.SetLineColor(ROOT.kRed+2)
+            DeadPixelsGraph.SetMarkerColor(ROOT.kRed+2)
+            DeadPixelsGraph.SetMarkerStyle(ROOT.kFullSquare)
+            DeadPixelsGraph.Draw('PL,SAME')
 
         self.Title = 'Dead/inefficient pixels'
         self.ResultData['Plot']['Format'] = 'svg'

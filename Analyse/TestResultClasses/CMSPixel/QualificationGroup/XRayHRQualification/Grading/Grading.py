@@ -33,6 +33,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'C': 0,
         }
         SubGrading = []
+
+        PixelDefects = 0
+        ROCsMoreThanOnePercent = 0
+
         for i in chipResults:
             ROCGrade = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value']
             GradeHistogram[ROCGrade] += 1
@@ -40,6 +44,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 ModuleGrade = 2
             if ROCGrade == GradeMapping[3] and ModuleGrade < 3:
                 ModuleGrade = 3
+
+            PixelDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefectsMin']
+            PixelDefects += PixelDefectsROC
+            if PixelDefectsROC > 41:
+                ROCsMoreThanOnePercent += 1
 
 
         SubGradings['PixelDefects'] = SubGrading
@@ -55,6 +64,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ROCGrades': {
                 'Value': '%d/%d/%d'%(GradeHistogram['A'], GradeHistogram['B'], GradeHistogram['C']),
                 'Label': 'ROC Grades A/B/C'
+            },
+            'PixelDefects': {
+                'Value': PixelDefects,
+                'Label': 'Pixel Defects'
+            },
+            'ROCsMoreThanOnePercent': {
+                'Value': ROCsMoreThanOnePercent,
+                'Label': 'ROCs with >1 %% defects'
             },
         }
         self.ResultData['HiddenData']['SubGradings'] = SubGradings

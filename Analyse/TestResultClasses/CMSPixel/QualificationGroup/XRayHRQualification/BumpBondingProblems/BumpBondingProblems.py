@@ -6,12 +6,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name='CMSPixel_QualificationGroup_XRayHRQualification_BumpBondingProblems_TestResult'
         self.NameSingle='BumpBondingProblems'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-        self.ResultData['KeyValueDictPairs'] = {
-            'BumpBondingDefects': {
-                'Value':'{0:1.0f}'.format(-1),
-                'Label':'Bump Bonding Defects'
-            },
-        }
+        self.ResultData['KeyValueDictPairs'] = {}
 
     def PopulateResultData(self):
         ROOT.gPad.SetLogx(0)
@@ -22,22 +17,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         yBins = 2 * self.nRows + 1
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins) 
 
-        BumpBondingDefects = 0
+        # copy ROC data to module data
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            histo = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
-            histoAlive = ChipTestResultObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
-            histoHot = ChipTestResultObject.ResultData['SubTestResults']['HotPixelMap_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
-
+            histo = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingDefects_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
             chipNo = ChipTestResultObject.Attributes['ChipNo']
 
-            if histo:
-                for col in range(self.nCols): 
-                    for row in range(self.nRows):
-                        PixelOk = True if ((not histoAlive) or histoAlive.GetBinContent(col + 1, row + 1) == 10) and ((not histoHot) or histoHot.GetBinContent(col + 1, row + 1) < 1) else False
-                        result = 1 if histo.GetBinContent(col + 1, row + 1) < 1 and PixelOk else 0
-                        self.UpdatePlot(chipNo, col, row, result)
-                        BumpBondingDefects += result
+            for col in range(self.nCols): 
+                for row in range(self.nRows):
+                    result = histo.GetBinContent(col + 1, row + 1)
+                    self.UpdatePlot(chipNo, col, row, result)
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
@@ -52,7 +41,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
         self.ResultData['Plot']['Format'] = 'png'
-        self.ResultData['KeyValueDictPairs']['BumpBondingDefects']['Value'] = '{0:1.0f}'.format(BumpBondingDefects)
 
         self.Title = 'Bump Bonding Defects {Rate}'.format(Rate=self.Attributes['Rate'])
         self.SaveCanvas()     

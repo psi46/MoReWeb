@@ -10,8 +10,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_TestResult'
         self.NameSingle = 'Chip'
         self.Title = 'Chip '+str(self.Attributes['ChipNo'])
+        self.ResultData['SubTestResultDictList'] = [
+                {
+                    'Key':'AliveMap',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':200
+                    },
+                }
+        ]
         # order!
-        self.ResultData['SubTestResultDictList'] = []
         i = 0
         for Rate in self.ParentObject.ParentObject.Attributes['Rates']['HREfficiency']:
             self.ResultData['SubTestResultDictList'] += [
@@ -70,6 +79,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'InitialAttributes':{
                         'Rate':Rate,
                         'StorageKey':'HitMap_{Rate}'.format(Rate=Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':50+i
+                    },
+                },
+                {
+                    'Key':'BumpBondingDefects_{Rate}'.format(Rate=Rate),
+                    'Module':'BumpBondingDefects',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'BumpBondingDefects_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':50+i
@@ -155,14 +175,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':2    
                     },
                     
-                },
-                {
-                    'Key':'AliveMap',
-                    'InitialAttributes':{
-                    },
-                    'DisplayOptions':{
-                        'Order':200
-                    },
                 },
                 {
                     'Key':'CalDelScan',

@@ -410,11 +410,20 @@ class TestResult(GeneralTestResult):
             print 'Write to DB: ',ParentID
 
         try:
-            grade = self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Grade']['Value']
+            grade = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Value']
         except KeyError:
             grade = 'None'
-        
-        
+
+        try:
+            PixelDefects = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value']
+        except KeyError:
+            PixelDefects = 'None'
+
+        try:
+            ROCsMoreThanOnePercent = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCsMoreThanOnePercent']['Value']
+        except KeyError:
+            ROCsMoreThanOnePercent = 'None'
+
         print 'fill row'
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
@@ -422,6 +431,8 @@ class TestResult(GeneralTestResult):
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
             'Grade': grade,
+            'PixelDefects': PixelDefects,
+            'ROCsMoreThanOnePercent': ROCsMoreThanOnePercent,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -613,6 +624,8 @@ class TestResult(GeneralTestResult):
                         TestType,
                         QualificationType,
                         Grade,
+                        PixelDefects,
+                        ROCsMoreThanOnePercent,
                         RelativeModuleFinalResultsPath,
                         FulltestSubfolder
                         
@@ -623,6 +636,8 @@ class TestResult(GeneralTestResult):
                         :TestType,
                         :QualificationType,
                         :Grade,
+                        :PixelDefects,
+                        :ROCsMoreThanOnePercent,
                         :RelativeModuleFinalResultsPath,
                         :FulltestSubfolder
                         
