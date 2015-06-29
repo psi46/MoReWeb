@@ -18,7 +18,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Maximum = 0
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            Noise = float(ChipTestResultObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['KeyValueDictPairs']['fit_peak']['Value'])
+            Noise = float(ChipTestResultObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['KeyValueDictPairs']['mu']['Value'])
             ChipNo = ChipTestResultObject.Attributes['ChipNo']
             RocNumbers.append(ChipNo)
             NoiseList.append(Noise)

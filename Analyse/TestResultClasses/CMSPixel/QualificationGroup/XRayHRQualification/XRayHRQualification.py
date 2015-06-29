@@ -424,6 +424,11 @@ class TestResult(GeneralTestResult):
         except KeyError:
             ROCsMoreThanOnePercent = 'None'
 
+        try:
+            Noise = self.ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Noise']['Value']
+        except KeyError:
+            Noise = 'None'
+
         print 'fill row'
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
@@ -433,6 +438,7 @@ class TestResult(GeneralTestResult):
             'Grade': grade,
             'PixelDefects': PixelDefects,
             'ROCsMoreThanOnePercent': ROCsMoreThanOnePercent,
+            'Noise': Noise,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -461,7 +467,11 @@ class TestResult(GeneralTestResult):
             EfficiencyOverviewTestResultObject = self.ResultData['SubTestResults']['EfficiencyOverview']
             
 
-            
+            for Rate in self.Attributes['InterpolatedEfficiencyRates']:
+                HighRateData['Interpolated_Efficiency_{Rate}'.format(Rate=Rate)] = int(
+                    GradingTestResultObject.ResultData['KeyValueDictPairs']['NumberOfLowEfficiencyPixels_{Rate}'.format(Rate=Rate)]['Value']
+                )
+
             for Rate in self.Attributes['Rates']['HREfficiency']:
                 # Number of pixels with efficiency below cut (Sum over all 16 ROCs is module value)
                 HighRateData['LowEffPixels_Module_{Rate}'.format(Rate=Rate)] = int(
@@ -626,6 +636,7 @@ class TestResult(GeneralTestResult):
                         Grade,
                         PixelDefects,
                         ROCsMoreThanOnePercent,
+                        Noise,
                         RelativeModuleFinalResultsPath,
                         FulltestSubfolder
                         
@@ -638,6 +649,7 @@ class TestResult(GeneralTestResult):
                         :Grade,
                         :PixelDefects,
                         :ROCsMoreThanOnePercent,
+                        :Noise,
                         :RelativeModuleFinalResultsPath,
                         :FulltestSubfolder
                         

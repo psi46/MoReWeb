@@ -34,5 +34,49 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Label']
             }
         }
-        self.ResultData['KeyList'] = ['Module','Grade', 'ROCGrades','PixelDefects']
+
+        ### Mean Efficiency ###
+        RatesString = ''
+        EfficienciesString = ''
+        for Rate in self.ParentObject.Attributes['InterpolatedEfficiencyRates']:
+            RatesString = (RatesString + "/{Rate}".format(Rate=Rate)).strip("/")
+
+            EfficiencyList = []
+            for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+                ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                Efficiency = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Efficiency_{Rate}'.format(Rate=Rate)]
+                EfficiencyList.append(Efficiency)
+
+            MeanEfficiency = sum(EfficiencyList) / float(len(EfficiencyList))
+            EfficienciesString = (EfficienciesString + "/{Eff:1.2f}".format(Eff=MeanEfficiency)).strip("/")
+
+        self.ResultData['KeyValueDictPairs']['Efficiency'] = {
+                'Value': EfficienciesString, 
+                'Label': 'Efficiency %s'%RatesString,
+                'Unit': '%',
+            }
+
+        ### Mean Noise ###
+        RatesString = ''
+        NoiseString = ''
+        for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
+            RatesString = (RatesString + "/{Rate}".format(Rate=Rate)).strip("/")
+
+            NoiseList = []
+            for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+                ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                Noise = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noise_{Rate}'.format(Rate=Rate)]
+                NoiseList.append(Noise)
+
+            MeanNoise = sum(NoiseList) / float(len(NoiseList))
+            NoiseString = (NoiseString + "/{Noise:1.0f}".format(Noise=Noise)).strip("/")
+
+        self.ResultData['KeyValueDictPairs']['Noise'] = {
+                'Value': NoiseString, 
+                'Label': 'Noise %s'%RatesString,
+                'Unit': 'e-',
+            }
+
+        self.ResultData['KeyList'] = ['Module','Grade', 'ROCGrades','PixelDefects','Efficiency','Noise']
+
 

@@ -318,7 +318,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Grades['NoiseGrade'] = 1 
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves']:
             NoiseTestResultObject = self.ParentObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)]
-            Noise = float(NoiseTestResultObject.ResultData['KeyValueDictPairs']['fit_peak']['Value'])
+            Noise = float(NoiseTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value'])
+            self.ResultData['HiddenData']['Noise_{Rate}'.format(Rate=Rate)] = Noise
 
             if Grades['NoiseGrade'] < 2 and Noise > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']:
                 Grades['NoiseGrade'] = 2

@@ -2,6 +2,7 @@
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 import ROOT
+import math
 
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 from TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Fitting.SCurve_Fitting import *
@@ -26,15 +27,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'threshold':{
                 'Value':'{0:1.2f}'.format(-1),
-                'Label':'thr [e-]'
+                'Label':'thr'
             },
             'fit_peak': {
                 'Value':'{0:1.2f}'.format(-999),
-                'Label':'μ'
+                'Label':'fit peak'
             },
             'fit_sigma':{
                 'Value':'{0:1.2f}'.format(-1),
-                'Label':'σ'
+                'Label':'σ fit'
+            },
+            'fit_skewness':{
+                'Value':'{0:1.2f}'.format(-1),
+                'Label':'​ɣ​1'
             },
         }
 
@@ -47,8 +52,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gStyle.SetOptStat(1)
         ChipNo=self.ParentObject.Attributes['ChipNo']
         
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) # hw
-        self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) #Noise in unbonded pixel (not displayed) # hd
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 1000.) # hw
+        self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 1000.) #Noise in unbonded pixel (not displayed) # hd
         self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # ht
         
         Rate = self.Attributes['Rate']
@@ -116,9 +121,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlue+2)
             self.ResultData['Plot']['ROOTObject'].Draw()
 
-            lineCHigh = ROOT.TLine().DrawLine(
+            lineBHigh = ROOT.TLine().DrawLine(
                 self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'], self.ResultData['Plot']['ROOTObject'].GetYaxis().GetXmin(),
                 self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'], self.ResultData['Plot']['ROOTObject'].GetMaximum()
+            )
+            lineBHigh.SetLineWidth(2)
+            lineBHigh.SetLineStyle(2)
+            lineBHigh.SetLineColor(ROOT.kRed)
+
+            lineCHigh = ROOT.TLine().DrawLine(
+                self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C'], self.ResultData['Plot']['ROOTObject'].GetYaxis().GetXmin(),
+                self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C'], self.ResultData['Plot']['ROOTObject'].GetMaximum()
             )
             lineCHigh.SetLineWidth(2)
             lineCHigh.SetLineStyle(2)
@@ -140,20 +153,29 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         over = self.ResultData['Plot']['ROOTObject'].GetBinContent(self.ResultData['Plot']['ROOTObject_hd'].GetNbinsX()+1)
 
         #fit peak
-        GaussFitFunction = ROOT.TF1("gaussfit","gaus(0)", 30, 1000)
-        GaussFitFunction.SetParameter(0, self.ResultData['Plot']['ROOTObject'].GetMaximum())
-        GaussFitFunction.SetParameter(1, MeanSCurve)
+        GaussFitFunction = ROOT.TF1("peakfit","[0]*exp(-0.5*((x-[1])/[2])**2)*0.5*(1.0+TMath::Erf([3]*((x-[1])/[2])/sqrt(2)))", 30, 1000)
+        GaussFitFunction.SetParameter(0, 1.5*self.ResultData['Plot']['ROOTObject'].GetMaximum())
+        GaussFitFunction.SetParameter(1, MeanSCurve*0.70)
+        GaussFitFunction.SetParLimits(1, 0, 1000)
         GaussFitFunction.SetParameter(2, RMSSCurve)
-        self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "QR")
+        GaussFitFunction.SetParameter(3, 1)
+        GaussFitFunction.SetParLimits(3, -20, 20)
+
+        self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "BQRM")
+
+
+        FitDelta = GaussFitFunction.GetParameter(3) / math.sqrt(1 + GaussFitFunction.GetParameter(3)*GaussFitFunction.GetParameter(3))
+        FitSkewness = (4-math.pi)/2 * pow(FitDelta * math.sqrt(2/math.pi),3)/pow(1-2*FitDelta*FitDelta/math.pi, 1.5)
 
         self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(IntegralSCurve)
         self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(MeanSCurve)
         self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMSSCurve)
         self.ResultData['KeyValueDictPairs']['threshold']['Value'] = '{0:1.2f}'.format(ThresholdMean)
-        self.ResultData['KeyValueDictPairs']['fit_peak']['Value'] = '{0:1.0f}'.format(GaussFitFunction.GetParameter(1))
+        self.ResultData['KeyValueDictPairs']['fit_peak']['Value'] = '{0:1.0f}'.format(GaussFitFunction.GetMaximumX(30, 1000))
         self.ResultData['KeyValueDictPairs']['fit_sigma']['Value'] = '{0:1.0f}'.format(GaussFitFunction.GetParameter(2))
+        self.ResultData['KeyValueDictPairs']['fit_skewness']['Value'] = '{0:1.2e}'.format(FitSkewness)
 
-        self.ResultData['KeyList'] = ['N','mu','sigma','threshold']
+        self.ResultData['KeyList'] = ['N','mu','sigma','threshold','fit_peak', 'fit_skewness']
         if under:
             self.ResultData['KeyValueDictPairs']['under'] = {'Value':'{0:1.2f}'.format(under), 'Label':'<='}
             self.ResultData['KeyList'].append('under')
