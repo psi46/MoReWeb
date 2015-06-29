@@ -57,10 +57,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             )
             
             Fit = self.ResultData['Plot']['ROOTObject'].Fit('pol0','RQ0')
-            #mN
-            Mean = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParameter(0)
-            #sN
-            RMS = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParError(0)
+
+            Mean = -1
+            RMS = -1
+            if self.ResultData['Plot']['ROOTObject'].GetFunction('pol0'):
+                Mean = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParameter(0)
+                RMS = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParError(0)
             
             
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(

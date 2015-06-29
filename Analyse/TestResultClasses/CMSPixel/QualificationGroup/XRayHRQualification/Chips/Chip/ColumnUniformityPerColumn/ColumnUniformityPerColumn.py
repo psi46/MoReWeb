@@ -48,7 +48,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             for Column in range(self.nCols):
                 NumHitsHigh = HitROOTOBjects[HitRateHigh].GetBinContent(Column+1)
                 NumHitsLow = HitROOTOBjects[HitRateLow].GetBinContent(Column+1)
-                if HitRateLow > 0 and RealHitrateLow > 0:
+                if HitRateLow > 0 and RealHitrateLow > 0 and RealHitrateHigh > 0 and NumHitsLow > 0:
                     ColumnUniformity = (
                         float(NumHitsHigh)
                         /float(NumHitsLow)
@@ -75,10 +75,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
             
             Fit = self.ResultData['Plot']['ROOTObject'].Fit('pol0','RQ0')
-            #mN
-            Mean = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParameter(0)
-            #sN
-            RMS = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParError(0)
+
+            Mean = -1
+            RMS = -1
+            if self.ResultData['Plot']['ROOTObject'].GetFunction('pol0'):
+                Mean = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParameter(0)
+                RMS = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParError(0)
                        
             lineCHigh = ROOT.TLine().DrawLine(
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'],

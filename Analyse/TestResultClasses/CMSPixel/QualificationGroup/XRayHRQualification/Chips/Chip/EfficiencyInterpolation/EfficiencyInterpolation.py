@@ -56,49 +56,57 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         PixelRateList.append(PixelRate)
                         PixelEfficiencyList.append(PixelEfficiency)
 
-                DoubleColumnMeanEfficiency = ROOT.TMath.Mean(len(PixelEfficiencyList), PixelEfficiencyList)
+                try:
+                    DoubleColumnMeanEfficiency = ROOT.TMath.Mean(len(PixelEfficiencyList), PixelEfficiencyList)
+                    DoubleColumnRate = ROOT.TMath.Mean(len(PixelRateList), PixelRateList)
+                    # correct measured hit rate by efficiency, in %
+                    DoubleColumnRateList.append(DoubleColumnRate / DoubleColumnMeanEfficiency)
+                    DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
+                except:
+                    pass
 
-                # correct measured hit rate by efficiency
-                DoubleColumnRateList.append(ROOT.TMath.Mean(len(PixelRateList), PixelRateList) / DoubleColumnMeanEfficiency)
-                
-                # in %
-                DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
+
 
         self.Canvas.Clear()
-        
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(len(DoubleColumnRateList),DoubleColumnRateList,DoubleColumnEfficiencyList)
-        if self.ResultData['Plot']['ROOTObject']:
-            ROOT.gStyle.SetOptStat(0)
-            
-            cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 40, 150)
-            cubicFit.SetParameter(1, 100)
-            cubicFit.SetParameter(2, 5e-7)
-            
-            PlotMinEfficiency = 80
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(PlotMinEfficiency, 105.)
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, 300)
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]")
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency [%]")
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].Draw("ap")
 
-            self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'QR')
-            self.ResultData['Plot']['ROOTObject'].SetTitle("")
-            InterpolationFunction = cubicFit
-            
-            for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
-                line = ROOT.TLine().DrawLine(
-                    InterpolationRate * 1e6 * ScalingFactor, PlotMinEfficiency,
-                    InterpolationRate * 1e6 * ScalingFactor, 100)
-                line.SetLineWidth(2)
-                line.SetLineStyle(2)
-                line.SetLineColor(ROOT.kRed)
+        if len(DoubleColumnRateList) > 0:
+            self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList,DoubleColumnEfficiencyList)
 
-                self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
-                self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)] 
+            if self.ResultData['Plot']['ROOTObject']:
+                ROOT.gStyle.SetOptStat(0)
 
+                cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 40, 150)
+                cubicFit.SetParameter(1, 100)
+                cubicFit.SetParameter(2, 5e-7)
+
+                PlotMinEfficiency = 80
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(PlotMinEfficiency, 105.)
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, 300)
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]")
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency [%]")
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+                self.ResultData['Plot']['ROOTObject'].Draw("ap")
+
+                self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'QR')
+                self.ResultData['Plot']['ROOTObject'].SetTitle("")
+                InterpolationFunction = cubicFit
+
+                for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
+                    line = ROOT.TLine().DrawLine(
+                        InterpolationRate * 1e6 * ScalingFactor, PlotMinEfficiency,
+                        InterpolationRate * 1e6 * ScalingFactor, 100)
+                    line.SetLineWidth(2)
+                    line.SetLineStyle(2)
+                    line.SetLineColor(ROOT.kRed)
+
+                    self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
+                    self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)]
+        else:
+                for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
+                    self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=0)
+                    self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)]
 
         self.Title = 'Efficiency Interpolation: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         self.SaveCanvas()        
