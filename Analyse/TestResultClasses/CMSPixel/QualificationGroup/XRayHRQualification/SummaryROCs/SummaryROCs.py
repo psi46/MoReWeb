@@ -19,13 +19,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
       for Rate in self.ParentObject.Attributes['Rates']['HRData']:
         TableHeader.append('Rate "{Rate}"'.format(Rate=Rate))
-        TableHeader.append('BB defect'.format(Rate=Rate))
+        TableHeader.append('BB def'.format(Rate=Rate))
         TableHeader.append('RO prob '.format(Rate=Rate))
 
       TableHeader.append('Unif. prob'.format(Rate=Rate))
 
       for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
-        TableHeader.append('Noise [e-] "{Rate}"'.format(Rate=Rate))
+        TableHeader.append('Noise "{Rate}"'.format(Rate=Rate))
+        TableHeader.append('Noisy pix "{Rate}"'.format(Rate=Rate))
 
       self.ResultData['Table'] = {
          'HEADER': [TableHeader],
@@ -96,5 +97,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             TableRow.append(GradeBHTMLTemplate%("{Value:1.0f}".format(Value=Noise)))
           else:
             TableRow.append("{Value:1.0f}".format(Value=Noise))
+          NoisyPixels = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['HiddenData']['NumberOfNoisyPixels'])
+          TableRow.append("{Value:1.0f}".format(Value=NoisyPixels))            
 
         self.ResultData['Table']['BODY'].append(TableRow)

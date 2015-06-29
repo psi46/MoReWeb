@@ -425,9 +425,9 @@ class TestResult(GeneralTestResult):
             ROCsMoreThanOnePercent = 'None'
 
         try:
-            Noise = float(self.ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Noise']['Value'])
+            NoisyPixels = float(self.ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'])
         except KeyError:
-            Noise = 'None'
+            NoisyPixels = 'None'
 
         print 'fill row'
         Row = {
@@ -438,7 +438,7 @@ class TestResult(GeneralTestResult):
             'Grade': grade,
             'PixelDefects': PixelDefects,
             'ROCsMoreThanOnePercent': ROCsMoreThanOnePercent,
-            'Noise': Noise,
+            'Noise': NoisyPixels,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,

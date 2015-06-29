@@ -104,7 +104,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
-                        if Width > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']:
+                        if Width > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
                             self.ResultData['HiddenData']['NumberOfNoisyPixels'] += 1
                             self.ResultData['HiddenData']['ListOfNoisyPixels'].append((ChipNo, column, row))
             ThresholdMean /= NPix
