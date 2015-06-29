@@ -17,6 +17,11 @@ except NameError:
 import Helper.ROOTConfiguration as ROOTConfiguration
 import glob
 
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
 
 class GeneralTestResult(object):
     nRows = 80
@@ -972,9 +977,9 @@ class GeneralTestResult(object):
                         data[key] = list(data[key])
                     
                 f = open(self.FinalResultsStoragePath + '/'+DataKey+'.json', 'w')
-                f.write(json.dumps(self.ResultData[DataKey], sort_keys=True, indent=4, separators=(',', ': ')))
+                f.write(json.dumps(self.ResultData[DataKey], sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
                 f.close()
-            except (KeyError,IOError):
+            except (KeyError,IOError,TypeError):
                 if data and key in data:
                     warnings.warn(
                         'Cannot create JSON for %s, %s' % (type(data[key]['Value']), self.ResultData[DataKey]))
