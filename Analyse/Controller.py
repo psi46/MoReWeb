@@ -1,10 +1,11 @@
 #!/usr/bin/env python
  # -*- coding: utf-8 -*-
-from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
+from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview, GeneralProductionOverview
 import AbstractClasses.Helper.hasher as hasher
 import argparse
 # from AbstractClasses import Helper
 import TestResultClasses.CMSPixel.QualificationGroup.QualificationGroup
+from OverviewClasses.CMSPixel.ProductionOverview import ProductionOverview
 import os, time,shutil, sys
 # import errno
 import ConfigParser
@@ -336,6 +337,12 @@ elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
 
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
+
+print "production overview:"
+
+ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
+ProductionOverviewObject.GenerateOverview()
+
 # TestResultEnvironmentInstance.ErrorList.append( {'test1':'bla'})
 print '\nErrorList:'
 for i in TestResultEnvironmentInstance.ErrorList:

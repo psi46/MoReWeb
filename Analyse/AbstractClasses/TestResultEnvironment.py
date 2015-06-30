@@ -126,6 +126,10 @@ class TestResultEnvironment:
 
         self.OverviewHTMLTemplate = open('HTML/Overview/OverviewTemplate.html').read()
         self.OverviewStylesheet = open('HTML/Overview/OverviewTemplate.css').read()
+        self.ProductionOverviewHTMLTemplate = open('HTML/ProductionOverview/OverviewTemplate.html').read()
+        self.ProductionOverviewTableHTMLTemplate = open('HTML/ProductionOverview/Table.html').read()
+        self.ProductionOverviewPlotHTMLTemplate = open('HTML/ProductionOverview/Plot.html').read()
+        self.ProductionOverviewStylesheet = open('HTML/ProductionOverview/OverviewTemplate.css').read()
         self.HtmlParser = Helper.HtmlParser.HtmlParser()
 
         ROOT.gEnv.GetValue("Canvas.SavePrecision", -1)
