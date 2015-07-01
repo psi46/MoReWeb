@@ -54,9 +54,13 @@ class GeneralProductionOverview:
         if self.SavePlotFile:
             if self.Canvas:
                 self.Canvas.Update()
+                # save svg
                 PlotFileName = self.GetPlotFileName()
                 self.Canvas.SaveAs(PlotFileName)
                 self.Attributes['ImageFile'] = PlotFileName
+                # save pdf
+                PlotFileNamePDF = self.GetPlotFileName('pdf')
+                self.Canvas.SaveAs(PlotFileNamePDF)
 
     def dict_factory(self, cursor, row):
         d = {}
@@ -189,6 +193,7 @@ class GeneralProductionOverview:
                     {
                         '###IMAGELARGECONTAINERID###': self.Attributes['StorageKey'] + self.GetUniqueID(),
                         '###FILENAME###': URL,
+                        '###PDFFILENAME###': URL[0:-3]+"pdf",
                         '###MARGIN_TOP###': str(int(-800. / float(
                             self.DisplayOptions['Width'] * self.TestResultEnvironmentObject.Configuration['DefaultValues'][
                                 'CanvasWidth']) *
@@ -201,7 +206,7 @@ class GeneralProductionOverview:
                 )
         return HTML
 
-    def Table(self, TableData):
+    def Table(self, TableData, RowLimit = 999):
 
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
         TableHTMLTemplate = self.TestResultEnvironmentObject.ProductionOverviewTableHTMLTemplate
@@ -211,8 +216,22 @@ class GeneralProductionOverview:
         TableRowHTMLTemplate = HtmlParser.getSubpart(TableHTMLTemplate, '###TABLE_ROW###')
 
         TableRows = ''
+        HTML = ''
+        TableID = "table_%s"%hash(str(TableData))
+        HideRowsID = "hidebutton_%s"%hash(str(TableData))
 
+        # fill rows
+        NRows = 0
+        NRowsHidden = 0
+        RowLimitReached = False
         for Row in TableData:
+            NRows += 1
+
+            RowClass = ''
+            if NRows > RowLimit:
+                RowClass = 'hidden'
+                NRowsHidden += 1
+
             TableRow = ''
             for Column in Row:
 
@@ -230,9 +249,24 @@ class GeneralProductionOverview:
                         '###VALUE###': Value,
                     }
                 )
-            TableRows += HtmlParser.substituteSubpart(TableRowHTMLTemplate, '###TABLE_COLUMN###', TableRow)
-        
-        return HtmlParser.substituteSubpart(TableHTMLTemplate, '###TABLE_ROW###', TableRows)
+            TableRows += HtmlParser.substituteMarkerArray(
+                HtmlParser.substituteSubpart(TableRowHTMLTemplate, '###TABLE_COLUMN###', TableRow),
+                {
+                        '###CLASS###': RowClass,
+                })
+
+        # build table
+        HTML += HtmlParser.substituteMarkerArray(
+            HtmlParser.substituteSubpart(TableHTMLTemplate, '###TABLE_ROW###', TableRows),
+                {
+                        '###TABLEID###': TableID,
+                })
+
+        # button to show hidden rows
+        if NRowsHidden > 0:
+            HTML += "<div id='{HideRowsID}'><a href='#' onclick='var table=document.getElementById(\"{TableID}\");var len=table.childNodes[1].childNodes.length;for (var i=0;i<len;i++){{table.childNodes[1].childNodes[i].className=\" \";}};document.getElementById(\"{HideRowsID}\").style.display=\"none\";return false;'>show hidden {NRowsHidden} of {NRows} rows</a></div>".format(TableID=TableID,NRows=NRows,NRowsHidden=NRowsHidden,HideRowsID=HideRowsID)
+
+        return HTML
 
 
     def Boxed(self, HTML, Width = -1):
@@ -245,7 +279,7 @@ class GeneralProductionOverview:
         if self.DisplayOptions.has_key('Clear'):
             ClearStyle = "clear:%s;"%self.DisplayOptions['Clear']
         return HtmlParser.substituteSubpart(
-            '<div style="' + ClearStyle + 'margin:3px;padding:2px;border:1px solid #ccc;float:left;width:{BoxWidth}px;min-height:{BoxHeight}px;"><h4>{Title}</h4><!-- ###CONTENT### -->content<!-- ###CONTENT### --></div>'.format(BoxWidth = Width * SingleBoxWidth, BoxHeight=SingleBoxHeight, Title=self.Title),
+            '<div style="' + ClearStyle + 'margin:3px;padding:2px;border:none;float:left;width:{BoxWidth}px;min-height:{BoxHeight}px;"><h4>{Title}</h4><!-- ###CONTENT### -->content<!-- ###CONTENT### --></div>'.format(BoxWidth = Width * SingleBoxWidth, BoxHeight=SingleBoxHeight, Title=self.Title),
             '###CONTENT###',
             HTML
         )

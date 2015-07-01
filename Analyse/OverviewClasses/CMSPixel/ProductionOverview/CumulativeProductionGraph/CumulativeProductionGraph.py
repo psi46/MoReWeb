@@ -149,6 +149,32 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HistStack.GetXaxis().SetTimeOffset(dh.Convert())
         HistStack.GetXaxis().SetLabelOffset(0.035)
         HistStack.GetXaxis().SetTimeFormat("#splitline{%m-%d}{ %Y}")
+        HistStack.GetYaxis().SetTitle("# modules")
+        HistStack.GetYaxis().SetTitleOffset(0.7)
+
+        title = ROOT.TText()
+        title.SetNDC()
+        title.SetTextAlign(12)
+        title.SetTextColor(ROOT.kBlue)
+        title.DrawText(0.15,0.965,"Grade A")
+
+        title2 = ROOT.TText()
+        title2.SetNDC()
+        title2.SetTextAlign(12)
+        title2.SetTextColor(ROOT.kBlack)
+        title2.DrawText(0.30,0.965,"Grade B")
+
+        title3 = ROOT.TText()
+        title3.SetNDC()
+        title3.SetTextAlign(12)
+        title3.SetTextColor(ROOT.kRed)
+        title3.DrawText(0.45,0.965,"Grade C")
+
+        title4 = ROOT.TText()
+        title4.SetNDC()
+        title4.SetTextAlign(12)
+        title4.SetTextColor(ROOT.kMagenta)
+        title4.DrawText(0.60,0.965,"incomplete")
 
         self.SaveCanvas()
 

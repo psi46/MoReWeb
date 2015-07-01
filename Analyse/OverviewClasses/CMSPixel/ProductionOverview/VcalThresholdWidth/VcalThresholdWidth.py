@@ -19,7 +19,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
     def GenerateOverview(self):
-        ROOT.gStyle.SetOptStat(0)
+        ROOT.gStyle.SetOptStat(1)
         ROOT.gPad.SetLogy(1)
 
         TableData = []

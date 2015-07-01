@@ -171,6 +171,26 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 )
 
+        ### Full test duration ###
+        self.SubPages.append(
+            {
+                "Key": "Duration",
+                "Module": "Duration",
+            }
+        )
+
+        ### IV ###
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "IVCurveOverlay_{Test}".format(Test = Test),
+                    "Module": "IVCurveOverlay",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "IVCurveOverlay_{Test}".format(Test = Test),
+                    }
+                }
+            )
 
     def GenerateOverview(self):
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
