@@ -27,6 +27,14 @@
 		font-weight:bold;
 	}
 
+	#Page #ContentWrap #Content a.anchor
+	{
+		display: block; 
+		position: relative; 
+		top: -120px; 
+		visibility: hidden;
+	}
+
 	#Page #ContentWrap #Content .Plot .ImageLink .Image
 	{
 		border:1px solid #fff;

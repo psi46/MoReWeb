@@ -70,10 +70,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         break
         
         Histogram.Draw("")
+
         title = ROOT.TText()
         title.SetNDC()
         title.SetTextAlign(12)
-
         Subtitle = self.Attributes['Test']
         TestNames = {'m20_1' : 'Fulltest -20°C BTC', 'm20_2': 'Fulltest -20°C ATC', 'p17_1': 'Fulltest +17°C'}
         if TestNames.has_key(Subtitle):

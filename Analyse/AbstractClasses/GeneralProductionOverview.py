@@ -31,6 +31,8 @@ class GeneralProductionOverview:
             self.Attributes.update(InitialAttributes)
 
         self.DateTimeFormat = "%Y-%m-%d %H:%M"
+        self.nCols = 52
+        self.nRows = 80
         self.Canvas = ROOT.TCanvas()
         self.Canvas.Clear()
         self.Canvas.cd()
@@ -60,6 +62,9 @@ class GeneralProductionOverview:
                 self.Attributes['ImageFile'] = PlotFileName
                 # save pdf
                 PlotFileNamePDF = self.GetPlotFileName('pdf')
+                self.Canvas.SaveAs(PlotFileNamePDF)
+                # save root
+                PlotFileNamePDF = self.GetPlotFileName('root')
                 self.Canvas.SaveAs(PlotFileNamePDF)
 
     def dict_factory(self, cursor, row):

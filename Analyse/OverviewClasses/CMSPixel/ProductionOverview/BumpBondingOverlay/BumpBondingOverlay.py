@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
 import glob
@@ -33,7 +34,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         nCols = 8 * 52+1
         nRows = 2 * 80+1
         SummaryMap = ROOT.TH2D(self.GetUniqueID(), "", nCols, 0, nCols, nRows, 0, nRows)
-        SummaryMap.Fill(10,10)
 
         SubtestSubfolder = "BumpBondingProblems_150"
 
@@ -59,6 +59,12 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 print "th2d in root file not found"
         
         SummaryMap.Draw("colz")
+
+        title = ROOT.TText()
+        title.SetNDC()
+        title.SetTextAlign(12)
+        Subtitle = "modules: %d, Grades: %s"%(NModules, self.Attributes['Grade'])
+        title.DrawText(0.15,0.965,Subtitle)
 
         self.SaveCanvas()
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of modules: %d"%NModules)

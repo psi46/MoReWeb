@@ -10,6 +10,14 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.ImportPath = 'OverviewClasses.CMSPixel.ProductionOverview'
         self.SaveHTML = True
 
+        self.SubPages.append({
+            "InitialAttributes" : {
+                "Sections": ["BumpBonding", "DeadPixel", "PerformanceParameters", "DACs", "IVCurves", "HighRate", "VcalCalibration"]
+            }, 
+            "Key": "Section",
+            "Module": "SectionNavigation"
+        })
+
         self.SubPages.append(
             {
                 "Key": "GradingOverview",
@@ -48,6 +56,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             }
         )
 
+        ### bump bonding ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "BumpBonding", "Title": "BumpBonding Defects"}, "Key": "Section","Module": "Section"})
         for Grade in ['All','A', 'B', 'C']:
             self.SubPages.append(
                 {
@@ -61,7 +71,25 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             )
 
         TestsList = ['m20_1', 'm20_2', 'p17_1']
-        self.SubPages.append({"Key": "Dummy","Module": "Dummy"})
+
+        ### dead pixels ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "DeadPixel", "Title": "Dead Pixels"}, "Key": "Section","Module": "Section"})
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "DeadPixelOverlay_{Test}".format(Test = Test),
+                    "Module": "DeadPixelOverlay",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "Grade": "All",
+                        "StorageKey" : "DeadPixelOverlay_{Test}".format(Test = Test),
+                    }
+                }
+            )
+
+        ### performance parameters ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "PerformanceParameters", "Title": "Performance Parameters per ROC"}, "Key": "Section","Module": "Section"})
 
         for Test in TestsList:
             self.SubPages.append(
@@ -118,7 +146,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             )
 
         ### DACs ###
-        self.SubPages.append({"Key": "Dummy","Module": "Dummy"})
+
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "DACs", "Title": "DAC Parameters"}, "Key": "Section","Module": "Section"})
         TrimThresholds = ['', '35']
         DACs = ['caldel', 'phoffset', 'phscale', 'vana', 'vthrcomp', 'vtrim']
         for Test in TestsList:
@@ -180,6 +209,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         )
 
         ### IV ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "IVCurves", "Title": "IV Curves"}, "Key": "Section","Module": "Section"})
         for Test in TestsList:
             self.SubPages.append(
                 {
@@ -191,6 +221,41 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
+
+        ### HR ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "HighRate", "Title": "HighRateTests"}, "Key": "Section","Module": "Section"})
+        for Rate in [50, 120]:
+            self.SubPages.append(
+                {
+                    "Key": "Efficiency_{Rate}".format(Rate = Rate),
+                    "Module": "Efficiency",
+                    "InitialAttributes" : {
+                        "Rate": "{Rate}".format(Rate = Rate),
+                        "StorageKey" : "Efficiency_{Rate}".format(Rate = Rate),
+                    }
+                }
+            )
+
+        ### Vcal Calibration ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "VcalCalibration", "Title": "Vcal Calibration"}, "Key": "Section","Module": "Section"})
+        self.SubPages.append(
+            {
+                "Key": "VcalSlope",
+                "Module": "VcalSlope",
+                "InitialAttributes" : {
+                    "StorageKey" : "VcalSlope_Spectrum",
+                }
+            }
+        )
+        self.SubPages.append(
+            {
+                "Key": "VcalOffset",
+                "Module": "VcalOffset",
+                "InitialAttributes" : {
+                    "StorageKey" : "VcalOffset_Spectrum",
+                }
+            }
+        )
 
     def GenerateOverview(self):
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
