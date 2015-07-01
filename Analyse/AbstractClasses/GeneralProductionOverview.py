@@ -245,7 +245,7 @@ class GeneralProductionOverview:
         if self.DisplayOptions.has_key('Clear'):
             ClearStyle = "clear:%s;"%self.DisplayOptions['Clear']
         return HtmlParser.substituteSubpart(
-            '<div style="' + ClearStyle + 'margin:3px;padding:2px;border:2px solid #ccc;float:left;width:{BoxWidth}px;min-height:{BoxHeight}px;"><h4>{Title}</h4><!-- ###CONTENT### -->content<!-- ###CONTENT### --></div>'.format(BoxWidth = Width * SingleBoxWidth, BoxHeight=SingleBoxHeight, Title=self.Title),
+            '<div style="' + ClearStyle + 'margin:3px;padding:2px;border:1px solid #ccc;float:left;width:{BoxWidth}px;min-height:{BoxHeight}px;"><h4>{Title}</h4><!-- ###CONTENT### -->content<!-- ###CONTENT### --></div>'.format(BoxWidth = Width * SingleBoxWidth, BoxHeight=SingleBoxHeight, Title=self.Title),
             '###CONTENT###',
             HTML
         )

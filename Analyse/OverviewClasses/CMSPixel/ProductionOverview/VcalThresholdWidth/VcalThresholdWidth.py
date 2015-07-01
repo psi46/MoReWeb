@@ -6,9 +6,10 @@ import json
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='CMSPixel_ProductionOverview_MeanNoiseROC'
-    	self.NameSingle='MeanNoiseROC'
-        self.Title = 'MeanNoiseROC {Test}'.format(Test=self.Attributes['Test'])
+
+        self.NameSingle='VcalThresholdWidth'
+    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Title = 'Vcal Threshold Width {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
             'Width': 1,
         }
@@ -18,7 +19,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
     def GenerateOverview(self):
-        ROOT.gStyle.SetOptStat(1)
+        ROOT.gStyle.SetOptStat(0)
         ROOT.gPad.SetLogy(1)
 
         TableData = []
@@ -32,15 +33,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         HTML = ""
 
-        NoiseMax = 1200
+        HistogramMax = 600
         NBins = 120
-        Histogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
+        ScaleFactor = self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
+        Histogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, HistogramMax)
 
         PlotColor = self.GetTestPlotColor(self.Attributes['Test'])
         Histogram.SetLineColor(PlotColor)
         Histogram.SetFillColor(PlotColor)
         Histogram.SetFillStyle(1001)
-        Histogram.GetXaxis().SetTitle("Noise [e-]")
+        Histogram.GetXaxis().SetTitle("Threshold Width [e-]")
         Histogram.GetYaxis().SetTitle("# ROCs")
         Histogram.GetYaxis().SetTitleOffset(1.5)
 
@@ -54,7 +56,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == self.Attributes['Test']:
 
                         for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'SCurveWidths', 'KeyValueDictPairs.json'])
+                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'VcalThresholdTrimmed', 'KeyValueDictPairs.json'])
                             JSONFiles = glob.glob(Path)
                             if len(JSONFiles) > 1:
                                 print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
@@ -65,40 +67,41 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 with open(JSONFiles[0]) as data_file:    
                                     JSONData = json.load(data_file)
                                 
-                                Histogram.Fill(float(JSONData["mu"]['Value']))
+                                
+                                Histogram.Fill(ScaleFactor * float(JSONData["sigma"]['Value']))
                                 NROCs += 1
 
                         break
         
         Histogram.Draw("")
         
-        GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['noiseB'])
-        GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['noiseC'])
+        GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['trimmingB'])
+        GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['trimmingC'])
 
         PlotMaximum = Histogram.GetMaximum()*1.1
         Histogram.SetMaximum(PlotMaximum)
 
-        CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
+        CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, HistogramMax)
         for i in range(1,NBins):
-            if i > GradeAB/NoiseMax*NBins and i < GradeBC/NoiseMax*NBins:
+            if i > GradeAB/HistogramMax*NBins and i < GradeBC/HistogramMax*NBins:
                 CloneHistogram.SetBinContent(i, PlotMaximum)
           
         CloneHistogram.SetFillColorAlpha(ROOT.kBlue, 0.12)
         CloneHistogram.SetFillStyle(1001)
         CloneHistogram.Draw("same")
 
-        CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
+        CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, HistogramMax)
         for i in range(1,NBins):
-            if i >= GradeBC/NoiseMax*NBins:
+            if i >= GradeBC/HistogramMax*NBins:
                 CloneHistogram2.SetBinContent(i, PlotMaximum)
           
         CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
         CloneHistogram2.SetFillStyle(1001)
         CloneHistogram2.Draw("same")
 
-        CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
+        CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, HistogramMax)
         for i in range(1,NBins):
-            if i <= GradeAB/NoiseMax*NBins:
+            if i <= GradeAB/HistogramMax*NBins:
                 CloneHistogram3.SetBinContent(i, PlotMaximum)
           
         CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)

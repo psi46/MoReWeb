@@ -6,9 +6,9 @@ import datetime
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='CMSPixel_ProductionOverview_WeeklyProduction'
-    	self.NameSingle='WeeklyProduction'
-        self.Title = 'Weekly Production A/B/C'
+        self.NameSingle='CumulativeProductionGraph'
+        self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Title = 'Cumulative Production Graph'
         self.DisplayOptions = {
             'Width': 2,
         }
@@ -19,8 +19,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         Rows = AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.FetchData(self)
         
-        ### list of modules tested
         ModuleIDsList = []
+
         for RowTuple in Rows:
             if not RowTuple['ModuleID'] in ModuleIDsList:
                 ModuleIDsList.append(RowTuple['ModuleID'])
@@ -67,7 +67,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         XrayHR = RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
                         ModuleGrades.append(RowTuple['Grade'])
 
-
             FinalGrade = 'None'
             if len(FTMinus20BTC) > 0 and len(FTMinus20ATC) > 0 and len(FT17) > 0 and len(XrayHR) > 0:
                 if 'C' in ModuleGrades:
@@ -76,7 +75,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     FinalGrade = 'B'
                 elif 'A' in ModuleGrades:
                     FinalGrade = 'A'
-
 
             Module['ModuleID'] = ModuleID
             Module['Grade'] = FinalGrade
@@ -90,8 +88,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def CreatePlot(self):
 
-    	ModuleData = self.FetchData()
-    	
+        ModuleData = self.FetchData()
+        
         TimestampBegin = min(ModuleData, key=lambda x: x['TestDate'])['TestDate']
         TimeBegin = datetime.datetime.fromtimestamp(TimestampBegin)
         YearBegin = int(TimeBegin.strftime("%Y"))
@@ -106,15 +104,19 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TimeEnd = datetime.datetime.strptime("%d-%d-1"%(YearEnd, WeekNumberEnd), '%Y-%W-%w')
         TimestampEnd = time.mktime(TimeEnd.timetuple())
 
-        SecondsPerWeek = 7 * 24 * 60 * 60
+        SecondsPerDay = 24 * 60 * 60
         TimeOffset = TimestampBegin
 
-        HistStack = ROOT.THStack("hs_weekly_production","")
+        HistStack = ROOT.THStack("hs_cummulative_graph","")
 
-        hA = ROOT.TH1D("h1a", "h1-a", int((TimestampEnd - TimestampBegin)/SecondsPerWeek), TimestampBegin - TimeOffset, TimestampEnd - TimeOffset)
-        hB = ROOT.TH1D("h1b", "h1-b", int((TimestampEnd - TimestampBegin)/SecondsPerWeek), TimestampBegin - TimeOffset, TimestampEnd - TimeOffset)
-        hC = ROOT.TH1D("h1c", "h1-c", int((TimestampEnd - TimestampBegin)/SecondsPerWeek), TimestampBegin - TimeOffset, TimestampEnd - TimeOffset)
-        hN = ROOT.TH1D("h1n", "h1-n", int((TimestampEnd - TimestampBegin)/SecondsPerWeek), TimestampBegin - TimeOffset, TimestampEnd - TimeOffset)
+        HistogramXMin = TimestampBegin - TimeOffset
+        HistogramXMax = TimestampEnd - TimeOffset
+        HistogramNBins = int((TimestampEnd - TimestampBegin)/SecondsPerDay)
+
+        hA = ROOT.TH1D("h1ac", "h1-a", HistogramNBins, HistogramXMin, HistogramXMax)
+        hB = ROOT.TH1D("h1bc", "h1-b", HistogramNBins, HistogramXMin, HistogramXMax)
+        hC = ROOT.TH1D("h1cc", "h1-c", HistogramNBins, HistogramXMin, HistogramXMax)
+        hN = ROOT.TH1D("h1nc", "h1-n", HistogramNBins, HistogramXMin, HistogramXMax)
 
         dh = ROOT.TDatime(int(TimeBegin.strftime("%Y")),int(TimeBegin.strftime("%m")),int(TimeBegin.strftime("%d")),00,00,00)
         hA.SetFillStyle(1001)
@@ -128,6 +130,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         for Module in ModuleData:
             if Module['Grade'] == 'A':
+
                 hA.Fill(Module['TestDate'] - TimeOffset)
             elif Module['Grade'] == 'B':
                 hB.Fill(Module['TestDate'] - TimeOffset)
@@ -136,16 +139,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             else:
                 hN.Fill(Module['TestDate'] - TimeOffset)
 
-        HistStack.Add(hA)
-        HistStack.Add(hB)
-        HistStack.Add(hC)
-        HistStack.Add(hN)
+        HistStack.Add(hA.GetCumulative())
+        HistStack.Add(hB.GetCumulative())
+        HistStack.Add(hC.GetCumulative())
+        HistStack.Add(hN.GetCumulative())
 
         HistStack.Draw()
         HistStack.GetXaxis().SetTimeDisplay(1)
         HistStack.GetXaxis().SetTimeOffset(dh.Convert())
-        HistStack.GetXaxis().SetLabelOffset(0.02)
-        HistStack.GetXaxis().SetTimeFormat("%y-%W")
+        HistStack.GetXaxis().SetLabelOffset(0.035)
+        HistStack.GetXaxis().SetTimeFormat("#splitline{%m-%d}{ %Y}")
 
         self.SaveCanvas()
 

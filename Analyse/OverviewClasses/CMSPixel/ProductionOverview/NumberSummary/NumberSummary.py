@@ -4,7 +4,7 @@ import AbstractClasses
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='NumberSummary'
+    	self.Name='CMSPixel_ProductionOverview_NumberSummary'
     	self.NameSingle='NumberSummary'
         self.Title = 'Summary'
         self.DisplayOptions = {

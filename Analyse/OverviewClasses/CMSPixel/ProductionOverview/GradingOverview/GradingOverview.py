@@ -4,7 +4,7 @@ import AbstractClasses
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='GradingOverview'
+    	self.Name='CMSPixel_ProductionOverview_GradingOverview'
     	self.NameSingle='GradingOverview'
         self.Title = 'Grading overview'
         self.DisplayOptions = {
@@ -30,14 +30,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         XrayCal_Grades = []
         XrayHR_Grades = []
         Final_Grades = []
-
-
-        TableData = [
-            [
-                {'Class' : 'Header', 'Value' : 'Tested modules:'}, {'Class' : 'Value', 'Value' : "%d"%len(ModuleIDsList)}
-            ]
-        ]
-        HTML = self.Table(TableData)
 
         for ModuleID in ModuleIDsList:
 
@@ -86,6 +78,12 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             XrayCal_Grades.append(XrayCal)
             XrayHR_Grades.append(XrayHR)
 
+        TableData = [
+            [{'Class' : 'Header', 'Value' : 'Tested modules:'}, {'Class' : 'Value', 'Value' : "%d"%len(ModuleIDsList)}],
+            [{'Class' : 'Header', 'Value' : 'Fully tested:'}, {'Class' : 'Value', 'Value' : "%d"%len(Final_Grades)}],
+        ]
+        HTML = self.Table(TableData)
+
         TableData = []
         TableData.append(    
             [
@@ -114,7 +112,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             [{'Class' : 'Header', 'Value' : 'Final'}, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='A']) }, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='B']) }, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='C']) }]
         )
 
-        HTML += self.Table(TableData) + self.BoxFooter("<b>Final</b> only counts modules with all necessary tests done.")
+        HTML += self.Table(TableData) + self.BoxFooter("<div style='height:10px;'></div><b>Final</b> only counts modules with all necessary tests done.")
 
         return self.Boxed(HTML)
 

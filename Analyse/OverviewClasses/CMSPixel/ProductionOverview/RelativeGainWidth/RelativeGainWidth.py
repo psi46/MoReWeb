@@ -6,7 +6,7 @@ import json
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='RelativeGainWidth'
+    	self.Name='CMSPixel_ProductionOverview_RelativeGainWidth'
     	self.NameSingle='RelativeGainWidth'
         self.Title = 'RelativeGainWidth {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
@@ -14,11 +14,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         }
         self.SubPages = []
         self.SavePlotFile = True
-        self.Canvas.SetCanvasSize(400,600)
+        self.Canvas.SetCanvasSize(400,500)
 
 
     def GenerateOverview(self):
-        ROOT.gStyle.SetOptStat(0)
+        ROOT.gStyle.SetOptStat(1)
         ROOT.gPad.SetLogy(1)
 
         TableData = []

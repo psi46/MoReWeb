@@ -5,7 +5,7 @@ import glob
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='BumpBondingOverlay'
+    	self.Name='CMSPixel_ProductionOverview_BumpBondingOverlay'
     	self.NameSingle='BumpBondingOverlay'
         self.Title = 'Bump Bonding Defects Overlay, Grade: %s'%self.Attributes['Grade']
         self.DisplayOptions = {
