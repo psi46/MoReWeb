@@ -17,17 +17,19 @@ class GeneralProductionOverview:
         self.NameSingle = 'GeneralProductionOverview'
         self.SubPages = []
         self.HTMLFileName = ''
+        self.BasePath = ''
         self.SaveHTML = False
         self.SavePlotFile = False
         self.ImportPath = ''
-        self.Title = ''
+        self.Title = 'ProductionOverview'
         self.DisplayOptions = {
             'Width': 2,
         }
         self.FileHandles = []
         self.LastUniqueIDCounter = 1
         self.Attributes = {
-            'StorageKey': self.Name
+            'StorageKey': self.Name,
+            'BasePath': '',
         }
         if InitialAttributes:
             self.Attributes.update(InitialAttributes)
@@ -44,7 +46,20 @@ class GeneralProductionOverview:
         self.Canvas = ROOT.TCanvas()
         self.Canvas.Clear()
         self.Canvas.cd()
+
+        ### custom init
         self.CustomInit()
+
+        ### create submodule folder
+        self.Attributes['BasePath'] += self.GetStorageKey() + '/'
+        directory = self.GlobalOverviewPath + '/' + self.Attributes['BasePath']
+        try:
+            os.mkdir(directory)
+        except:
+            pass
+
+    def PrintInfo(self, Text):
+        print "\x1b[37m\x1b[44m" + Text + "\x1b[0m"
 
     def GetStorageKey(self):
         if self.Attributes.has_key('StorageKey') and len(self.Attributes['StorageKey']) > 0:
@@ -52,13 +67,9 @@ class GeneralProductionOverview:
         else:
             return self.NameSingle
 
-    def GetPlotFileName(self,Suffix='svg',Global=True):
+    def GetPlotFileName(self,Suffix='svg',Global=False):
         if Global:
-            directory = self.GlobalOverviewPath + '/' + self.GetStorageKey() + '/'
-            try:
-                os.mkdir(directory)
-            except:
-                pass
+            directory = self.GlobalOverviewPath + '/' + self.Attributes['BasePath']
         else:
             directory = self.GetStorageKey() + '/'
 
@@ -74,14 +85,13 @@ class GeneralProductionOverview:
             if self.Canvas:
                 self.Canvas.Update()
                 # save svg
-                PlotFileName = self.GetPlotFileName()
-                self.Canvas.SaveAs(PlotFileName)
+                self.Canvas.SaveAs(self.GetPlotFileName('svg', True))
                 self.Attributes['ImageFile'] = self.GetPlotFileName('svg', False)
                 # save pdf
-                PlotFileNamePDF = self.GetPlotFileName('pdf')
+                PlotFileNamePDF = self.GetPlotFileName('pdf', True)
                 self.Canvas.SaveAs(PlotFileNamePDF)
                 # save root
-                PlotFileNamePDF = self.GetPlotFileName('root')
+                PlotFileNamePDF = self.GetPlotFileName('root', True)
                 self.Canvas.SaveAs(PlotFileNamePDF)
 
     def dict_factory(self, cursor, row):
@@ -122,7 +132,6 @@ class GeneralProductionOverview:
         FinalHTML = HTMLTemplate
 
         # Stylesheet
-
         StylesheetHTMLTemplate = HtmlParser.getSubpart(HTMLTemplate, '###HEAD_STYLESHEET_TEMPLATE###')
         StylesheetHTML = HtmlParser.substituteMarkerArray(
             StylesheetHTMLTemplate,
@@ -148,36 +157,32 @@ class GeneralProductionOverview:
             SubModule = SubPage['Module']
             importdir = self.ImportPath + '.' + SubModule
             try:
-                #print 'import ',importdir,SubModule
                 f = __import__(importdir + '.' + SubModule, fromlist=[importdir + '.' + 'ProductionOverview'])
             except ImportError as inst:
-                #print 'could not ',importdir+'.'+SubModule,SubModule
-                #print 'type',type(inst)
-                #print 'inst',inst
                 f = __import__(importdir + '.ProductionOverview', fromlist=[''])
-                #print 'imported', f, 'please change name of file'
             pass
-
             SubPage['ProductionOverview'] = f
 
-        ### run submodules
 
+        ### run submodules
         for SubPage in self.SubPages:
 
             InitialAttributes = {}
             if SubPage.has_key('InitialAttributes'):
                 InitialAttributes = SubPage['InitialAttributes']
+
+            InitialAttributes['BasePath'] = self.Attributes['BasePath']
+
+            ### instanciate submodule
             SubPageClass = SubPage['ProductionOverview'].ProductionOverview(TestResultEnvironmentObject=self.TestResultEnvironmentObject, InitialAttributes = InitialAttributes)
 
-
-            if InitialAttributes:
-                self.Attributes.update(InitialAttributes)
-
+            ### generate html overview of submodule
             #try:
             SubPageContentHTML = SubPageClass.GenerateOverview()
             #except:
             #    SubPageContentHTML = "sub page module not found or 'SubPage['ProductionOverview'].GenerateOverview()' failed"
 
+            ### add to this module html page
             ContentHTML += SubPageContentHTML
 
         FinalHTML = HtmlParser.substituteSubpart(
@@ -186,6 +191,49 @@ class GeneralProductionOverview:
             ContentHTML
         )
 
+
+        # Clickpath
+        Levels = self.Attributes['BasePath'][:].split('/')
+
+        ClickPathEntries = []
+        ClickPathEntryTemplate = HtmlParser.getSubpart(HTMLTemplate, '###CLICKPATH_ENTRY###')
+        LevelPath = ''
+        i = 0
+        tmpTestResultObject = self
+        for Level in Levels[2:]:
+            LevelPath = '../' * i
+            ClickPathEntries.append(HtmlParser.substituteMarkerArray(
+                ClickPathEntryTemplate,
+                {
+                    '###URL###': HtmlParser.MaskHTML(LevelPath + self.HTMLFileName),
+                    '###LABEL###': HtmlParser.MaskHTML(tmpTestResultObject.Title)
+                }
+            ))
+            try:
+                if self.ParentObject:
+                    tmpTestResultObject = tmpTestResultObject.ParentObject
+            except:
+                pass 
+
+            i += 1
+       
+        OverviewHTMLLink = self.TestResultEnvironmentObject.GlobalOverviewPath + '/ProductionOverview/ProductionOverview.html'
+        ClickPathEntries.append(HtmlParser.substituteMarkerArray(
+            ClickPathEntryTemplate,
+            {
+                '###URL###': HtmlParser.MaskHTML(OverviewHTMLLink),
+                '###LABEL###': 'Overview'
+            }
+        ))
+        ClickPathEntries.reverse()
+        CSSClasses = ''
+
+        FinalHTML = HtmlParser.substituteSubpartArray(
+            FinalHTML,
+            {
+                '###CLICKPATH_ENTRY###': ''.join(ClickPathEntries),
+            }
+        )
 
         return FinalHTML
 
@@ -196,7 +244,7 @@ class GeneralProductionOverview:
 
         if self.SaveHTML:
             print "create production overview page: '%s'"%self.HTMLFileName
-            f = open(self.GlobalOverviewPath+'/'+self.HTMLFileName, 'w')
+            f = open(self.GlobalOverviewPath+'/'+self.Attributes['BasePath'] + self.HTMLFileName, 'w')
             f.write(FinalHTML)
             f.close()
 

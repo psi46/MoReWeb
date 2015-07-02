@@ -7,7 +7,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def CustomInit(self):
         self.NameSingle='MeanNoiseROC'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+    	self.Name='CMSPixel_ProductionOverview_ProductionOverviewPage_%s'%self.NameSingle
         self.Title = 'MeanNoiseROC {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
             'Width': 1,
