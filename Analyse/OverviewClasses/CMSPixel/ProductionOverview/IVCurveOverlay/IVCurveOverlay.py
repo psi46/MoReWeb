@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
 import glob
@@ -61,12 +62,14 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         title = ROOT.TText()
         title.SetNDC()
         title.SetTextAlign(12)
-        title.DrawText(0.15,0.965,self.Attributes['Test'])
-
-
+        Subtitle = self.Attributes['Test']
+        TestNames = {'m20_1' : 'Fulltest -20°C BTC', 'm20_2': 'Fulltest -20°C ATC', 'p17_1': 'Fulltest +17°C'}
+        if TestNames.has_key(Subtitle):
+            Subtitle = TestNames[Subtitle]
+        title.DrawText(0.15,0.965,"%s, modules: %d"%(Subtitle,NModules))
 
         self.SaveCanvas()
-        HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of modules: %d"%NModules)
+        HTML = self.Image(self.Attributes['ImageFile'])
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
         ROOT.gPad.SetLogy(0)

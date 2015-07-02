@@ -18,7 +18,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
     def GenerateOverview(self):
-        ROOT.gStyle.SetOptStat(1)
+        ROOT.gStyle.SetOptStat(111210)
         ROOT.gPad.SetLogy(1)
 
         TableData = []
@@ -55,24 +55,23 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == self.Attributes['Test']:
 
                         for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'PHCalibrationGain', 'KeyValueDictPairs.json'])
-                            JSONFiles = glob.glob(Path)
-                            if len(JSONFiles) > 1:
-                                print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
-                            elif len(JSONFiles) < 1:
-                                print "WARNING: %s json file not found: '%s"%(self.Name, Path)
-                            else:
-                                
-                                with open(JSONFiles[0]) as data_file:    
-                                    JSONData = json.load(data_file)
-                                
-                                if float(JSONData["mu"]['Value'])>0:
-                                    Histogram.Fill(float(JSONData["sigma"]['Value']) / float(JSONData["mu"]['Value']))
-                                    NROCs += 1
+                            Sigma = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'PHCalibrationGain', 'KeyValueDictPairs.json', 'sigma', 'Value'])
+                            Mu = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'PHCalibrationGain', 'KeyValueDictPairs.json', 'mu', 'Value'])
+                            
+                            if Sigma is not None and Mu is not None and float(Mu)>0:
+                                Histogram.Fill(float(Sigma) / float(Mu))
+                                NROCs += 1
 
                         break
         
         Histogram.Draw("")
+
+        ROOT.gPad.Update()
+        PaveStats = Histogram.FindObject("stats")
+        PaveStats.SetX1NDC(0.62)
+        PaveStats.SetX2NDC(0.83)
+        PaveStats.SetY1NDC(0.8)
+        PaveStats.SetY2NDC(0.9)
         
         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['gainB'])
         GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['gainC'])

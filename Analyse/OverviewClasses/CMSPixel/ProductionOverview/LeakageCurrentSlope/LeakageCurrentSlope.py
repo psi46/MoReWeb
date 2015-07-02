@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
 import glob
@@ -6,9 +7,9 @@ import json
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-        self.NameSingle='Efficiency'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
-        self.Title = 'Efficiency {Rate}'.format(Rate=self.Attributes['Rate'])
+        self.NameSingle='LeakageCurrentSlope'
+        self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Title = 'Leakage Current Slope 150V {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
             'Width': 1,
         }
@@ -16,9 +17,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.SavePlotFile = True
         self.Canvas.SetCanvasSize(400,500)
 
+
     def GenerateOverview(self):
         ROOT.gStyle.SetOptStat(111210)
         ROOT.gPad.SetLogy(1)
+        ROOT.gPad.SetLogx(0)
 
         TableData = []
 
@@ -31,63 +34,55 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         HTML = ""
 
-        HistogramMin = 90
-        HistogramMax = 102
-        NBins = 100
-        Histogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        HistogramMin = -1
+        HistogramMax = 4
+        NBins = 60
 
-        PlotColor = ROOT.kGreen+2
+        Histogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, HistogramMax)
+
+        PlotColor = self.GetTestPlotColor(self.Attributes['Test'])
         Histogram.SetLineColor(PlotColor)
         Histogram.SetFillColor(PlotColor)
         Histogram.SetFillStyle(1001)
-        Histogram.GetXaxis().SetTitle("Efficiency")
-        Histogram.GetYaxis().SetTitle("# ROCs")
+        Histogram.GetXaxis().SetTitle("I(150 V) / I(100 V)")
+        Histogram.GetYaxis().SetTitle("# modules")
         Histogram.GetYaxis().SetTitleOffset(1.5)
 
-        NROCs = 0
+        NModules = 0
         for ModuleID in ModuleIDsList:
 
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     TestType = RowTuple['TestType']
 
-                    if TestType == 'XRayHRQualification':
+                    if TestType == self.Attributes['Test']:
 
-                        for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'EfficiencyInterpolation', 'KeyValueDictPairs.json'])
-                            JSONFiles = glob.glob(Path)
-                            if len(JSONFiles) > 1:
-                                print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
-                            elif len(JSONFiles) < 1:
-                                print "WARNING: %s json file not found: '%s"%(self.Name, Path)
-                            else:
-                                
-                                with open(JSONFiles[0]) as data_file:    
-                                    JSONData = json.load(data_file)
-                                
-                                Histogram.Fill(float(JSONData["InterpolatedEfficiency{Rate}".format(Rate=self.Attributes['Rate'])]['Value']))
-                                NROCs += 1
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'Variation', 'Value'])
+                        if Value is not None:
+                            Histogram.Fill(float(Value))
+                            NModules += 1
 
-                        break
-        
         Histogram.Draw("")
+
         ROOT.gPad.Update()
         PaveStats = Histogram.FindObject("stats")
-      	PaveStats.SetX1NDC(0.18)
-      	PaveStats.SetX2NDC(0.42)
-      	PaveStats.SetY1NDC(0.78)
-      	PaveStats.SetY2NDC(0.88)
-       
-        # Grading, TODO: replace by real values if merged with hirate branch 
-        GradeAB = 98
-        GradeBC = 95
+        PaveStats.SetX1NDC(0.62)
+        PaveStats.SetX2NDC(0.83)
+        PaveStats.SetY1NDC(0.8)
+        PaveStats.SetY2NDC(0.9)
+
+        GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
+        if self.TestResultEnvironmentObject.GradingParameters.has_key('slopeivC'):
+            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['slopeivC'])
+        else:
+            GradeBC = 100
 
         PlotMaximum = Histogram.GetMaximum()*1.1
         Histogram.SetMaximum(PlotMaximum)
 
         CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
         for i in range(1,NBins):
-            if i >= CloneHistogram.GetXaxis().FindBin(GradeBC) and i <= CloneHistogram.GetXaxis().FindBin(GradeAB):
+            if i <= CloneHistogram.GetXaxis().FindBin(GradeBC) and i >= CloneHistogram.GetXaxis().FindBin(GradeAB):
                 CloneHistogram.SetBinContent(i, PlotMaximum)
           
         CloneHistogram.SetFillColorAlpha(ROOT.kBlue, 0.12)
@@ -96,7 +91,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
         for i in range(1,NBins):
-            if i < CloneHistogram.GetXaxis().FindBin(GradeBC):
+            if i > CloneHistogram.GetXaxis().FindBin(GradeBC):
                 CloneHistogram2.SetBinContent(i, PlotMaximum)
           
         CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
@@ -105,29 +100,30 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
         for i in range(1,NBins):
-            if i > CloneHistogram.GetXaxis().FindBin(GradeAB):
+            if i < CloneHistogram.GetXaxis().FindBin(GradeAB):
                 CloneHistogram3.SetBinContent(i, PlotMaximum)
           
         CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)
         CloneHistogram3.SetFillStyle(1001)
         CloneHistogram3.Draw("same")
 
-        # subtitle
         title = ROOT.TText()
         title.SetNDC()
         title.SetTextAlign(12)
-        title.SetTextSize(0.03)
-        Subtitle = "Efficiency at {Rate} MHz/cm^2, ROCs:{NROCs}".format(Rate=self.Attributes['Rate'], NROCs=NROCs)
-        title.DrawText(0.15,0.95,Subtitle)
+        Subtitle = self.Attributes['Test']
+        TestNames = {'m20_1' : 'Fulltest -20°C BTC', 'm20_2': 'Fulltest -20°C ATC', 'p17_1': 'Fulltest +17°C'}
+        if TestNames.has_key(Subtitle):
+            Subtitle = TestNames[Subtitle]
+        title.DrawText(0.15,0.965,"%s, modules: %d"%(Subtitle,NModules))
 
         self.SaveCanvas()
 
-        HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of ROCs: %d"%NROCs)
+        HTML = self.Image(self.Attributes['ImageFile'])
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
 
         ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogx(0)
         return self.Boxed(HTML)
-
 

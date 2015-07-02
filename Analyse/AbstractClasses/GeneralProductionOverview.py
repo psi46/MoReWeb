@@ -4,6 +4,8 @@ import time
 import datetime
 import os
 import ROOT
+import glob
+import json
 
 class GeneralProductionOverview:
     def __init__(self, TestResultEnvironmentObject = None, InitialAttributes = None):
@@ -50,7 +52,13 @@ class GeneralProductionOverview:
             os.mkdir(directory)
         except:
             pass
-        return directory + 'plot.' + Suffix
+
+        try:
+            Name = self.NameSingle
+        except:
+            Name = 'plot'
+
+        return directory + Name + '.' + Suffix
 
     def SaveCanvas(self):
         if self.SavePlotFile:
@@ -131,14 +139,14 @@ class GeneralProductionOverview:
             SubModule = SubPage['Module']
             importdir = self.ImportPath + '.' + SubModule
             try:
-                print 'import ',importdir,SubModule
+                #print 'import ',importdir,SubModule
                 f = __import__(importdir + '.' + SubModule, fromlist=[importdir + '.' + 'ProductionOverview'])
             except ImportError as inst:
-                print 'could not ',importdir+'.'+SubModule,SubModule
-                print 'type',type(inst)
-                print 'inst',inst
+                #print 'could not ',importdir+'.'+SubModule,SubModule
+                #print 'type',type(inst)
+                #print 'inst',inst
                 f = __import__(importdir + '.ProductionOverview', fromlist=[''])
-                print 'imported', f, 'please change name of file'
+                #print 'imported', f, 'please change name of file'
             pass
 
             SubPage['ProductionOverview'] = f
@@ -317,6 +325,22 @@ class GeneralProductionOverview:
             return ROOT.kBlue+1
         else:
             return ROOT.kBlack
+    def GetJSONValue(self, Keys):
+
+        Path = self.GlobalOverviewPath + '/' + '/'.join(Keys[0:-2])
+        JSONFiles = glob.glob(Path)
+        if len(JSONFiles) > 1:
+            print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
+            return None
+        elif len(JSONFiles) < 1:
+            print "WARNING: %s json file not found: '%s"%(self.Name, Path)
+            return None
+        else:
+
+            with open(JSONFiles[0]) as data_file:    
+                JSONData = json.load(data_file)
+
+        return JSONData[Keys[-2]][Keys[-1]]
 
     def GetUniqueID(self):
         self.LastUniqueIDCounter += 1

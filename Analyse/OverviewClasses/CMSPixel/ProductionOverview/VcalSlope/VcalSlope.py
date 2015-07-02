@@ -17,7 +17,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.Canvas.SetCanvasSize(400,500)
 
     def GenerateOverview(self):
-        ROOT.gStyle.SetOptStat(1)
+        ROOT.gStyle.SetOptStat(111210)
         ROOT.gPad.SetLogy(1)
 
         TableData = []
@@ -70,6 +70,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         break
         
         Histogram.Draw("")
+        
+        ROOT.gPad.Update()
+        PaveStats = Histogram.FindObject("stats")
+        PaveStats.SetX1NDC(0.18)
+        PaveStats.SetX2NDC(0.42)
+        PaveStats.SetY1NDC(0.78)
+        PaveStats.SetY2NDC(0.88)
 
         # subtitle
         title = ROOT.TText()

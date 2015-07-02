@@ -9,7 +9,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         self.NameSingle='VcalThresholdWidth'
     	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
-        self.Title = 'Vcal Threshold Width {Test}'.format(Test=self.Attributes['Test'])
+        self.Title = 'Vcal Thr. Width {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
             'Width': 1,
         }
@@ -19,7 +19,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
     def GenerateOverview(self):
-        ROOT.gStyle.SetOptStat(1)
+        ROOT.gStyle.SetOptStat(111210)
         ROOT.gPad.SetLogy(1)
 
         TableData = []
@@ -56,24 +56,22 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == self.Attributes['Test']:
 
                         for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'VcalThresholdTrimmed', 'KeyValueDictPairs.json'])
-                            JSONFiles = glob.glob(Path)
-                            if len(JSONFiles) > 1:
-                                print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
-                            elif len(JSONFiles) < 1:
-                                print "WARNING: %s json file not found: '%s"%(self.Name, Path)
-                            else:
-                                
-                                with open(JSONFiles[0]) as data_file:    
-                                    JSONData = json.load(data_file)
-                                
-                                
-                                Histogram.Fill(ScaleFactor * float(JSONData["sigma"]['Value']))
+                            Sigma = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'VcalThresholdTrimmed', 'KeyValueDictPairs.json', 'sigma', 'Value'])
+
+                            if Sigma is not None:
+                                Histogram.Fill(ScaleFactor * float(Sigma))
                                 NROCs += 1
 
                         break
         
         Histogram.Draw("")
+
+        ROOT.gPad.Update()
+        PaveStats = Histogram.FindObject("stats")
+        PaveStats.SetX1NDC(0.62)
+        PaveStats.SetX2NDC(0.83)
+        PaveStats.SetY1NDC(0.8)
+        PaveStats.SetY2NDC(0.9)
         
         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['trimmingB'])
         GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['trimmingC'])

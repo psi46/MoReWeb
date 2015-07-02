@@ -113,24 +113,19 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HistogramXMax = TimestampEnd - TimeOffset
         HistogramNBins = int((TimestampEnd - TimestampBegin)/SecondsPerDay)
 
-        hA = ROOT.TH1D("h1ac", "h1-a", HistogramNBins, HistogramXMin, HistogramXMax)
-        hB = ROOT.TH1D("h1bc", "h1-b", HistogramNBins, HistogramXMin, HistogramXMax)
-        hC = ROOT.TH1D("h1cc", "h1-c", HistogramNBins, HistogramXMin, HistogramXMax)
-        hN = ROOT.TH1D("h1nc", "h1-n", HistogramNBins, HistogramXMin, HistogramXMax)
+        hA = ROOT.TH1D("h1ac", "", HistogramNBins, HistogramXMin, HistogramXMax)
+        hB = ROOT.TH1D("h1bc", "", HistogramNBins, HistogramXMin, HistogramXMax)
+        hC = ROOT.TH1D("h1cc", "", HistogramNBins, HistogramXMin, HistogramXMax)
+        hN = ROOT.TH1D("h1nc", "", HistogramNBins, HistogramXMin, HistogramXMax)
 
         dh = ROOT.TDatime(int(TimeBegin.strftime("%Y")),int(TimeBegin.strftime("%m")),int(TimeBegin.strftime("%d")),00,00,00)
-        hA.SetFillStyle(1001)
-        hA.SetFillColor(ROOT.kBlue)
-        hB.SetFillStyle(1001)
-        hB.SetFillColor(ROOT.kBlack)
-        hC.SetFillStyle(1001)
-        hC.SetFillColor(ROOT.kRed)
-        hN.SetFillStyle(1001)
-        hN.SetFillColor(ROOT.kMagenta)
+        hA.SetLineColor(ROOT.kBlue)
+        hB.SetLineColor(ROOT.kBlack)
+        hC.SetLineColor(ROOT.kRed)
+        hN.SetLineColor(ROOT.kMagenta)
 
         for Module in ModuleData:
             if Module['Grade'] == 'A':
-
                 hA.Fill(Module['TestDate'] - TimeOffset)
             elif Module['Grade'] == 'B':
                 hB.Fill(Module['TestDate'] - TimeOffset)
@@ -139,18 +134,25 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             else:
                 hN.Fill(Module['TestDate'] - TimeOffset)
 
-        HistStack.Add(hA.GetCumulative())
-        HistStack.Add(hB.GetCumulative())
-        HistStack.Add(hC.GetCumulative())
-        HistStack.Add(hN.GetCumulative())
+        hA = hA.GetCumulative()
+        hB = hB.GetCumulative()
+        hC = hC.GetCumulative()
+        hN = hN.GetCumulative()
 
-        HistStack.Draw()
-        HistStack.GetXaxis().SetTimeDisplay(1)
-        HistStack.GetXaxis().SetTimeOffset(dh.Convert())
-        HistStack.GetXaxis().SetLabelOffset(0.035)
-        HistStack.GetXaxis().SetTimeFormat("#splitline{%m-%d}{ %Y}")
-        HistStack.GetYaxis().SetTitle("# modules")
-        HistStack.GetYaxis().SetTitleOffset(0.7)
+        hA.GetXaxis().SetTimeDisplay(1)
+        hA.GetXaxis().SetTimeOffset(dh.Convert())
+        hA.GetXaxis().SetLabelOffset(0.035)
+        hA.GetXaxis().SetTimeFormat("#splitline{%m-%d}{ %Y}")
+        hA.GetYaxis().SetTitle("# modules")
+        hA.GetYaxis().SetTitleOffset(0.7)
+        hA.GetYaxis().SetRangeUser(0, 1.05*max([hA.GetMaximum(),hB.GetMaximum(),hC.GetMaximum(),hN.GetMaximum()]))
+
+        ROOT.gStyle.SetOptStat(0)
+
+        hA.Draw()
+        hB.Draw("same")
+        hC.Draw("same")
+        hN.Draw("same")
 
         title = ROOT.TText()
         title.SetNDC()

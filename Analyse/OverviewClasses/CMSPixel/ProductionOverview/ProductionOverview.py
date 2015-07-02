@@ -28,7 +28,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             }
         )
 
-
         self.SubPages.append(
             {
                 "Key": "WeeklyProduction",
@@ -53,6 +52,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             {
                 "Key": "ModuleList",
                 "Module": "ModuleList",
+            }
+        )
+
+        self.SubPages.append(
+            {
+                "Key": "ModuleFailuresOverview",
+                "Module": "ModuleFailuresOverview",
+                "InitialAttributes" : {
+                    "StorageKey" : "ModuleFailuresOverview",
+                },
             }
         )
 
@@ -221,6 +230,31 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "LeakageCurrent_{Test}".format(Test = Test),
+                    "Module": "LeakageCurrent",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "LeakageCurrent_{Test}".format(Test = Test),
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "LeakageCurrentSlope_{Test}".format(Test = Test),
+                    "Module": "LeakageCurrentSlope",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "LeakageCurrentSlope_{Test}".format(Test = Test),
+                    }
+                }
+            )
+
 
         ### HR ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "HighRate", "Title": "HighRateTests"}, "Key": "Section","Module": "Section"})
