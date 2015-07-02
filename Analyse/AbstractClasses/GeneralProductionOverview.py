@@ -33,6 +33,12 @@ class GeneralProductionOverview:
             self.Attributes.update(InitialAttributes)
 
         self.DateTimeFormat = "%Y-%m-%d %H:%M"
+        self.GradeColors = {
+            'A': ROOT.kGreen+2,
+            'B': ROOT.kOrange+1,
+            'C': ROOT.kRed,
+            'None': ROOT.kBlue,
+        }
         self.nCols = 52
         self.nRows = 80
         self.Canvas = ROOT.TCanvas()
@@ -46,12 +52,15 @@ class GeneralProductionOverview:
         else:
             return self.NameSingle
 
-    def GetPlotFileName(self,Suffix='svg'):
-        directory = self.GlobalOverviewPath + '/' + self.GetStorageKey() + '/'
-        try:
-            os.mkdir(directory)
-        except:
-            pass
+    def GetPlotFileName(self,Suffix='svg',Global=True):
+        if Global:
+            directory = self.GlobalOverviewPath + '/' + self.GetStorageKey() + '/'
+            try:
+                os.mkdir(directory)
+            except:
+                pass
+        else:
+            directory = self.GetStorageKey() + '/'
 
         try:
             Name = self.NameSingle
@@ -67,7 +76,7 @@ class GeneralProductionOverview:
                 # save svg
                 PlotFileName = self.GetPlotFileName()
                 self.Canvas.SaveAs(PlotFileName)
-                self.Attributes['ImageFile'] = PlotFileName
+                self.Attributes['ImageFile'] = self.GetPlotFileName('svg', False)
                 # save pdf
                 PlotFileNamePDF = self.GetPlotFileName('pdf')
                 self.Canvas.SaveAs(PlotFileNamePDF)
@@ -325,6 +334,13 @@ class GeneralProductionOverview:
             return ROOT.kBlue+1
         else:
             return ROOT.kBlack
+
+    def GetGradeColor(self, Grade):
+        if Grade in self.GradeColors:
+            return self.GradeColors[Grade]
+        else:
+            return ROOT.kBlack
+
     def GetJSONValue(self, Keys):
 
         Path = self.GlobalOverviewPath + '/' + '/'.join(Keys[0:-2])

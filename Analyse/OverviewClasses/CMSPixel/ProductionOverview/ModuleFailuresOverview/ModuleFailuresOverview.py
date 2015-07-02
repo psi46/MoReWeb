@@ -45,6 +45,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         FullTests = ['m20_1','m20_2','p17_1'][::-1]
 
+        ColorB = 0.84
+        ColorC = 1.00
+
         for ModuleID in ModuleIDsList:
 
             Summary.GetXaxis().SetBinLabel(BinNumber, ModuleID)
@@ -58,7 +61,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'Variation', 'Value'])
                         if Value is not None and float(Value) > GradeAB:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVSlope') + TestIndex, 1)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVSlope') + TestIndex, ColorB)
 
             ### IV 150
             for RowTuple in Rows:
@@ -71,9 +74,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
                         if Value is not None and float(Value) > GradeBC:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, 2)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorC)
                         elif Value is not None and float(Value) > GradeAB:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, 1)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorB)
 
             ### Pedestal Spread
             for RowTuple in Rows:
@@ -86,9 +89,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PedestalSpreadGradeCROCs', 'Value'])
 
                         if ValueC is not None and float(ValueC) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('PedestalSpread') + TestIndex, 2)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('PedestalSpread') + TestIndex, ColorC)
                         elif ValueB is not None and float(ValueB) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('PedestalSpread') + TestIndex, 1)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('PedestalSpread') + TestIndex, ColorB)
 
             ### RelativeGainWidth
             for RowTuple in Rows:
@@ -101,9 +104,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'RelativeGainWidthGradeCROCs', 'Value'])
 
                         if ValueC is not None and float(ValueC) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('RelativeGainWidth') + TestIndex, 2)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('RelativeGainWidth') + TestIndex, ColorC)
                         elif ValueB is not None and float(ValueB) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('RelativeGainWidth') + TestIndex, 1)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('RelativeGainWidth') + TestIndex, ColorB)
 
             ### VcalThrWidth
             for RowTuple in Rows:
@@ -116,9 +119,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'VcalThresholdWidthGradeCROCs', 'Value'])
 
                         if ValueC is not None and float(ValueC) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('VcalThrWidth') + TestIndex, 2)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('VcalThrWidth') + TestIndex, ColorC)
                         elif ValueB is not None and float(ValueB) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('VcalThrWidth') + TestIndex, 1)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('VcalThrWidth') + TestIndex, ColorB)
 
             ### Noise
             for RowTuple in Rows:
@@ -131,9 +134,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'NoiseGradeCROCs', 'Value'])
 
                         if ValueC is not None and float(ValueC) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('Noise') + TestIndex, 2)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('Noise') + TestIndex, ColorC)
                         elif ValueB is not None and float(ValueB) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('Noise') + TestIndex, 1)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('Noise') + TestIndex, ColorB)
 
             ### deadPixel
             for RowTuple in Rows:
@@ -146,9 +149,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsGradeCROCs', 'Value'])
 
                         if ValueC is not None and float(ValueC) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixel') + TestIndex, 2)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixel') + TestIndex, ColorC)
                         elif ValueB is not None and float(ValueB) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixel') + TestIndex, 1)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixel') + TestIndex, ColorB)
 
             ### lowEfficiency
             for RowTuple in Rows:
@@ -165,15 +168,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 EfficiencyGrades += Grades
 
                         if 'C' in EfficiencyGrades:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + TestIndex, 2)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + TestIndex, ColorC)
                         elif 'B' in EfficiencyGrades:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + TestIndex, 1)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + TestIndex, ColorB)
 
             BinNumber += 1
 
-
-
-        Summary.Draw("colz")
+        Summary.Draw("col")
         line1 = ROOT.TLine()
         line1.SetLineStyle(2)
         linePositions = [3*i for i in range(1, len(YLabels))]
@@ -181,6 +182,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         for linePosition in linePositions:
             line1.DrawLine(0,linePosition,len(ModuleIDsList),linePosition)
 
+
+        title = ROOT.TText()
+        title.SetNDC()
+        title.SetTextAlign(12)
+        title.SetTextColor(self.GetGradeColor('B'))
+        title.DrawText(0.15,0.965,"Grade B")
+
+        title2 = ROOT.TText()
+        title2.SetNDC()
+        title2.SetTextAlign(12)
+        title2.SetTextColor(self.GetGradeColor('C'))
+        title2.DrawText(0.23,0.965,"Grade C")
 
 
         self.SaveCanvas()

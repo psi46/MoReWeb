@@ -119,10 +119,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         hN = ROOT.TH1D("h1nc", "", HistogramNBins, HistogramXMin, HistogramXMax)
 
         dh = ROOT.TDatime(int(TimeBegin.strftime("%Y")),int(TimeBegin.strftime("%m")),int(TimeBegin.strftime("%d")),00,00,00)
-        hA.SetLineColor(ROOT.kBlue)
-        hB.SetLineColor(ROOT.kBlack)
-        hC.SetLineColor(ROOT.kRed)
-        hN.SetLineColor(ROOT.kMagenta)
+        hA.SetLineColor(self.GetGradeColor('A'))
+        hB.SetLineColor(self.GetGradeColor('B'))
+        hC.SetLineColor(self.GetGradeColor('C'))
+        hN.SetLineColor(self.GetGradeColor('None'))
 
         for Module in ModuleData:
             if Module['Grade'] == 'A':
@@ -157,25 +157,25 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         title = ROOT.TText()
         title.SetNDC()
         title.SetTextAlign(12)
-        title.SetTextColor(ROOT.kBlue)
+        title.SetTextColor(self.GetGradeColor('A'))
         title.DrawText(0.15,0.965,"Grade A")
 
         title2 = ROOT.TText()
         title2.SetNDC()
         title2.SetTextAlign(12)
-        title2.SetTextColor(ROOT.kBlack)
+        title2.SetTextColor(self.GetGradeColor('B'))
         title2.DrawText(0.30,0.965,"Grade B")
 
         title3 = ROOT.TText()
         title3.SetNDC()
         title3.SetTextAlign(12)
-        title3.SetTextColor(ROOT.kRed)
+        title3.SetTextColor(self.GetGradeColor('C'))
         title3.DrawText(0.45,0.965,"Grade C")
 
         title4 = ROOT.TText()
         title4.SetNDC()
         title4.SetTextAlign(12)
-        title4.SetTextColor(ROOT.kMagenta)
+        title4.SetTextColor(self.GetGradeColor('None'))
         title4.DrawText(0.60,0.965,"incomplete")
 
         self.SaveCanvas()
