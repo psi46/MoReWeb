@@ -24,7 +24,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # Define subdirectories to store needed DB files to be upload
         #
 
-
         bareModuleID = str(self.FinalResultsStoragePath).split('/')[-5]
         bareModuleIDName = bareModuleID.split('_')[-4]
         bareModuleTime = bareModuleID.split('_')[-3] + '_' + bareModuleID.split('_')[-2] + '_' + bareModuleID.split('_')[-1]  
@@ -111,6 +110,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         globalTemp = ""
         globalRH = ""
         globalBBcut = ""
+        globalBMname = ""
         
         if os.path.isfile(bareModulefilename):        
             BareModuleInfoFile = open(bareModulefilename, "r")
@@ -133,6 +133,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             globalRH = ParameterValue
                         if (Key=="BBcut:"):
                             globalBBcut = ParameterValue
+                        if (Key=="BMname:"):
+                            globalBMname = ParameterValue
 
                         print 'globalNameLab: ',globalNameLab
 
@@ -155,25 +157,34 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         allrocs2 = {}
 
         digCurrentList = {}
+        listPlWidthCut = {}
 
         for i in chipResults:
             if self.ParentObject.testSoftware == 'pxar':
                 chipNum = i['TestResultObject'].Attributes['ChipNo'];
-                digCurrentList[chipNum] = 1000.*i['TestResultObject'].ResultData['SubTestResults']['DigChipCurrent'].ResultData['KeyValueDictPairs']['MaxCurrent']['Value'];
+                #print 'DIgCurrent???! ', (i['TestResultObject'].ResultData['SubTestResults']['DigChipCurrent'].ResultData['KeyValueDictPairs']['MaxCurrent']['Value'])
+                valdigChip =  (i['TestResultObject'].ResultData['SubTestResults']['DigChipCurrent'].ResultData['KeyValueDictPairs']['MaxCurrent']['Value'])
+                #print 'DIgCurrent???! ',valdigChip
+                if valdigChip=='None':                    
+                    digCurrentList[chipNum] = 'None'
+                else:
+                    digCurrentList[chipNum] = 1000.*i['TestResultObject'].ResultData['SubTestResults']['DigChipCurrent'].ResultData['KeyValueDictPairs']['MaxCurrent']['Value'];
                 #print 'chipno ',i['TestResultObject'].Attributes['ChipNo']
-                #print 'DIgCurrent! ', float(i['TestResultObject'].ResultData['SubTestResults']['DigChipCurrent'].ResultData['KeyValueDictPairs']['MaxCurrent']['Value']),i
+                #print 'DIgCurrent???! ', (i['TestResultObject'].ResultData['SubTestResults']['DigChipCurrent'].ResultData['KeyValueDictPairs']['MaxCurrent']['Value']),i
 
                 DeadBumps = int(i['TestResultObject'].ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['NDeadBumps']['Value']);
                 totalMissingBumps = totalMissingBumps + DeadBumps;
                 #print 'Inside Chips-loop:',i,totalDeadBumps
                 listDefectBumps = i['TestResultObject'].ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['DeadBumps']['Value'];
             else:
+                chipNum = i['TestResultObject'].Attributes['ChipNo'];
                 MissingBumps = int(i['TestResultObject'].ResultData['SubTestResults']['BareBBMap'].ResultData['KeyValueDictPairs']['NMissingBumps']['Value']);
                 totalMissingBumps = totalMissingBumps + MissingBumps;
                 DeadBumps = int(i['TestResultObject'].ResultData['SubTestResults']['BareBBMap'].ResultData['KeyValueDictPairs']['NDeadBumps']['Value']);
                 totalDeadBumps = totalDeadBumps + DeadBumps;
                 #print 'Inside Chips-loop:',i,MissingBumps,totalDeadBumps
                 listDefectBumps = i['TestResultObject'].ResultData['SubTestResults']['BareBBMap'].ResultData['KeyValueDictPairs']['MissingBumps']['Value'];
+                listPlWidthCut[chipNum] = i['TestResultObject'].ResultData['SubTestResults']['BareBBWidth'].ResultData['KeyValueDictPairs']['thrCutBB2Map']['Value']
 
 
             if not listDefectBumps:
@@ -207,7 +218,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         fbbmapforDB.write('Temperature: ' + globalTemp +'\n')
         fbbmapforDB.write('RH: ' + globalRH + '\n' )
         fbbmapforDB.write('Dead_Missing_Channels: ' + str(totalMissingBumps) + '\n' )
-        fbbmapforDB.write('BB_cut_criteria: ' + globalBBcut + '\n')
+        #fbbmapforDB.write('BB_cut_criteria: ' + globalBBcut + '\n')
+        fbbmapforDB.write('BB_cut_criteria: ' + str(listPlWidthCut) + '\n')
         fbbmapforDB.close()
         
         # copy png images to this DB subdirectory
@@ -249,13 +261,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         clkval = 0
 
         if self.ParentObject.testSoftware == 'pxar':
-            print 'ID measurement from hd histogram'
+            #print 'ID measurement from hd histogram'
             deser160val = 4
             clkval = 0
         else:
             deser160val = 5
             clkval = 22
-            print 'Here: '
         #    # get the ID measurement from log file
             digCurrentNameFile = DirectoryDac+"/digCurrent.dat"
             fileDigCurrent = open(digCurrentNameFile, 'r')
@@ -270,7 +281,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         for i in range(0,16):            
+            print
+            #if self.ParentObject.testSoftware == 'pxar':
             dacFileName = DirectoryDac+"/dacParameters_C"+ str(i)+".dat"
+            #else:
+            #    if i < 10:
+            #        dacFileName = DirectoryDac+"/dacParameters_c500_"+ str(globalBMname) + "c0" + str(i)+".dat"
+            #    else:
+            #        dacFileName = DirectoryDac+"/dacParameters_c500_"+ str(globalBMname) + "c" + str(i)+".dat"
+            #    print 'DACFIle: ', dacFileName
             if i < 10:
                 dacFileNameForDB =  DirectoryDacToSave+"/Bare_module_ROC0"+ str(i)+"_setup.csv"
             else:
