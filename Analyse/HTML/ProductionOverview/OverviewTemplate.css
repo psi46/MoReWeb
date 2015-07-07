@@ -48,7 +48,9 @@
 	}
 	#Page #ContentWrap #Content .Plot .ImageLink:active .Image
 	{
-		margin-top:1px;
+		position:relative;
+		top:1px;
+		left:1px;
 	}
 	#Page #ContentWrap #Content .Plot .LargeImageContainer[id]
 	{
