@@ -273,7 +273,7 @@ class GeneralTestResult(object):
         if len(data):
             return True
 
-        LogFileNames = glob.glob(self.RawTestSessionDataPath + '/*.log')
+        LogFileNames = glob.glob(self.RawTestSessionDataPath + '/*.log') + glob.glob(self.RawTestSessionDataPath + '/*/*.log')
         for LogFileName in LogFileNames:
             LogFile = open(LogFileName, "r")
             FirstLine = LogFile.readline()
