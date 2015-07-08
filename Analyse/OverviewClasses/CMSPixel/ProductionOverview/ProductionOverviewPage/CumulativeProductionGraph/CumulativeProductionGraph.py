@@ -90,6 +90,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         ModuleData = self.FetchData()
         
+        SecondsPerDay = 24 * 60 * 60
         TimestampBegin = min(ModuleData, key=lambda x: x['TestDate'])['TestDate']
         TimeBegin = datetime.datetime.fromtimestamp(TimestampBegin)
         YearBegin = int(TimeBegin.strftime("%Y"))
@@ -101,10 +102,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TimeEnd = datetime.datetime.fromtimestamp(TimestampEnd)
         YearEnd = int(TimeEnd.strftime("%Y"))
         WeekNumberEnd = int(TimeEnd.strftime("%W"))
-        TimeEnd = datetime.datetime.strptime("%d-%d-1"%(YearEnd, WeekNumberEnd), '%Y-%W-%w')
-        TimestampEnd = time.mktime(TimeEnd.timetuple())
+        TimeEnd = datetime.datetime.strptime("%d-%d-6"%(YearEnd, WeekNumberEnd), '%Y-%W-%w')
+        TimestampEnd = time.mktime(TimeEnd.timetuple())+1*SecondsPerDay-1
 
-        SecondsPerDay = 24 * 60 * 60
         TimeOffset = TimestampBegin
 
         HistStack = ROOT.THStack("hs_cummulative_graph","")

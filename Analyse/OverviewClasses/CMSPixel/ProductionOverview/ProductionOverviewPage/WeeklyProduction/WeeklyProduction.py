@@ -92,6 +92,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     	ModuleData = self.FetchData()
     	
+        SecondsPerWeek = 7 * 24 * 60 * 60
         TimestampBegin = min(ModuleData, key=lambda x: x['TestDate'])['TestDate']
         TimeBegin = datetime.datetime.fromtimestamp(TimestampBegin)
         YearBegin = int(TimeBegin.strftime("%Y"))
@@ -104,9 +105,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         YearEnd = int(TimeEnd.strftime("%Y"))
         WeekNumberEnd = int(TimeEnd.strftime("%W"))
         TimeEnd = datetime.datetime.strptime("%d-%d-1"%(YearEnd, WeekNumberEnd), '%Y-%W-%w')
-        TimestampEnd = time.mktime(TimeEnd.timetuple())
+        TimestampEnd = time.mktime(TimeEnd.timetuple())+SecondsPerWeek
 
-        SecondsPerWeek = 7 * 24 * 60 * 60
         TimeOffset = TimestampBegin
 
         HistStack = ROOT.THStack("hs_weekly_production","")
