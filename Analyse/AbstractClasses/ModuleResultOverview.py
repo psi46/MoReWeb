@@ -257,8 +257,6 @@ class ModuleResultOverview:
         HTMLTemplate = self.TestResultEnvironmentObject.OverviewHTMLTemplate
         FinalHTML = HTMLTemplate
 
-
-
         # Stylesheet
 
         StylesheetHTMLTemplate = HtmlParser.getSubpart(HTMLTemplate, '###HEAD_STYLESHEET_TEMPLATE###')
@@ -300,7 +298,6 @@ class ModuleResultOverview:
     def GenerateOverviewHTMLFile(self):
         HTMLFileName = 'Overview.html'
         FinalHTML = self.GenerateOverviewHTML()
-
         f = open(self.GlobalOverviewPath+'/'+HTMLFileName, 'w')
         f.write(FinalHTML)
         f.close()
