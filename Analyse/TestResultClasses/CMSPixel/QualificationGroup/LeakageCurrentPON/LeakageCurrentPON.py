@@ -46,7 +46,7 @@ class TestResult(GeneralTestResult):
 
     def OpenFileHandle(self):
 
-        testPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_leakageCurrentPON_*')
+        testPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_[lL]eakageCurrentPON_*')
         for Path in testPaths:
             FolderName = os.path.basename(Path)
             self.FileHandle = open(self.RawTestSessionDataPath+"/"+FolderName + "/leakageCurrent.log", 'r')
@@ -67,12 +67,12 @@ class TestResult(GeneralTestResult):
         self.ResultData['KeyValueDictPairs'] = {
             'LeakageCurrent': {
                 "Value": self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['LeakageCurrent']['Value'],
-                "Label": 'LeakageCurrentPeak',
-                "Unit": "",
+                "Label": 'Leakage Current',
+                "Unit": "A",
             },'Voltage': {
                 "Value": self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['Voltage']['Value'],
-                "Label": 'LeakageCurrentPeakTime',
-                "Unit": "",
+                "Label": 'Voltage',
+                "Unit": "V",
             },
         }
 
@@ -81,24 +81,18 @@ class TestResult(GeneralTestResult):
         print 'Write to DB: ',ParentID
 
         leakageCurrent = float(self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['LeakageCurrent']['Value'])
+        gradeMapping = {1: 'A', 2: 'B', 3: 'C'}
 
-        inputTemp = 273.15 + float(self.Attributes['Temperature'])
-        outputTemp = 273.15 + 17.0
-        Eef = 1.21
-        kB = 8.62e-5
-        exp = Eef / 2 / kB * (1 / inputTemp - 1 / outputTemp)
-        leakageCurrentRecalculated = leakageCurrent * outputTemp ** 2 / inputTemp ** 2 * math.exp(exp)
-
-        grade = 'A'
+        grade = 1
         # grading parameters in uA
         if self.TestResultEnvironmentObject.GradingParameters.has_key('leakageCurrentPON_B'):
             thr_B = self.TestResultEnvironmentObject.GradingParameters['leakageCurrentPON_B']
-            if abs(leakageCurrent*1.0e6) > abs(thr_B):
-                grade = 'B'
+            if abs(leakageCurrent) > abs(thr_B)*1.e-6:
+                grade = 2
         if self.TestResultEnvironmentObject.GradingParameters.has_key('leakageCurrentPON_C'):
             thr_C = self.TestResultEnvironmentObject.GradingParameters['leakageCurrentPON_C']
-            if abs(leakageCurrent*1.0e6) > abs(thr_C):
-                grade = 'C'
+            if abs(leakageCurrent) > abs(thr_C)*1.e-6:
+                grade = 3
 
         print 'fill row'
         Row = {
@@ -110,11 +104,9 @@ class TestResult(GeneralTestResult):
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
                                                  self.TestResultEnvironmentObject.FinalModuleResultsPath),
-            'CurrentAtVoltage150V': leakageCurrent,
-            'RecalculatedVoltage': leakageCurrentRecalculated,  #recalculated current!
+            'initialCurrent': leakageCurrent,
             'Temperature': self.Attributes['Temperature'],
-            'Grade': grade,
-            'Comments': '',
+            'Grade': gradeMapping[grade]
         }
         print 'fill row end'
 
@@ -134,11 +126,9 @@ class TestResult(GeneralTestResult):
                         QualificationType,
                         RelativeModuleFinalResultsPath,
                         FulltestSubfolder,
-                        CurrentAtVoltage150V,
-                        RecalculatedVoltage,
+                        initialCurrent,
                         Temperature,
-                        Grade,
-                        Comments
+                        Grade
                     )
                     VALUES (
                         :ModuleID,
@@ -147,11 +137,9 @@ class TestResult(GeneralTestResult):
                         :QualificationType,
                         :RelativeModuleFinalResultsPath,
                         :FulltestSubfolder,
-                        :CurrentAtVoltage150V,
-                        :RecalculatedVoltage,
+                        :initialCurrent,
                         :Temperature,
-                        :Grade,
-                        :Comments
+                        :Grade
                     )
                     ''', Row)
                 return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid

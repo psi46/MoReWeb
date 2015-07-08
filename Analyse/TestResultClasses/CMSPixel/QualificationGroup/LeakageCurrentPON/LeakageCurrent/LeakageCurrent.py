@@ -52,41 +52,54 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 timestamps.append(timeAfterStartup)
 
         # take 2nd value measured by Keithley
-        leakageCurrent = currents[1]
-        Voltage = voltages[1]
+        if len(voltages) > 1:
+            leakageCurrent = currents[1]
+            Voltage = voltages[1]
+            Timestamp = timestamps[1]
+        elif len(voltages) > 0:
+            leakageCurrent = currents[0]
+            Voltage = voltages[0]
+            Timestamp = timestamps[0]
+        else:
+            leakageCurrent = 0
+            Voltage = 0
+            Timestamp = 0
+
 
         numPoints = len(numpy.array(timestamps))
         tgraph = ROOT.TGraph(numPoints, numpy.array(timestamps), numpy.array(currents))
 
-        self.ResultData['Plot']['ROOTGraph'] = tgraph.Clone()
+        self.ResultData['Plot']['ROOTObject'] = tgraph.Clone()
         self.ResultData['Plot']['Caption'] = self.ParentObject.Attributes['ModuleID']
 
 
-        if self.ResultData['Plot']['ROOTGraph']:
+        if self.ResultData['Plot']['ROOTObject']:
             self.Canvas.Clear()
 
-            self.ResultData['Plot']['ROOTGraph'].SetName("%s_%r"%(self.ParentObject.Attributes['ModuleID'],self.GetUniqueID()))
-            self.ResultData['Plot']['ROOTGraph'].SetTitle(";time [s];leakage current")
-            self.ResultData['Plot']['ROOTGraph'].GetXaxis().SetTitleOffset(1.5)
-            self.ResultData['Plot']['ROOTGraph'].GetXaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTGraph'].GetYaxis().SetTitleOffset(1.5)
-            self.ResultData['Plot']['ROOTGraph'].GetYaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTGraph'].SetLineColor(ROOT.kBlue+2)
-            self.ResultData['Plot']['ROOTGraph'].SetMarkerColor(ROOT.kBlue+2)
-            self.ResultData['Plot']['ROOTGraph'].SetMarkerStyle(21)
-            self.ResultData['Plot']['ROOTGraph'].Draw('APL')
-            self.ResultData['Plot']['ROOTGraph'].GetXaxis().SetLabelSize(0.05)
-            self.ResultData['Plot']['ROOTGraph'].GetYaxis().SetLabelSize(0.05)
-            self.ResultData['Plot']['ROOTGraph'].GetXaxis().SetTitleSize(0.05)
-            self.ResultData['Plot']['ROOTGraph'].GetYaxis().SetTitleSize(0.05)
+            self.ResultData['Plot']['ROOTObject'].SetName("%s_%r"%(self.ParentObject.Attributes['ModuleID'],self.GetUniqueID()))
+            self.ResultData['Plot']['ROOTObject'].SetTitle(";time [s];leakage current")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlue+2)
+            self.ResultData['Plot']['ROOTObject'].SetMarkerColor(ROOT.kBlue+2)
+            self.ResultData['Plot']['ROOTObject'].SetMarkerStyle(21)
+            self.ResultData['Plot']['ROOTObject'].Draw('APL')
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetLabelSize(0.05)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetLabelSize(0.05)
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitleSize(0.05)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleSize(0.05)
 
-            self.ResultData['Plot']['ROOTObject'] = self.ResultData['Plot']['ROOTGraph']
+            el2 = ROOT.TEllipse(Timestamp, leakageCurrent, 4, abs(max(currents)-min(currents))*0.08)
+            el2.SetLineColor(ROOT.kRed)
+            el2.SetFillStyle(0)
+            el2.Draw('')
 
+        
         self.ResultData['Plot']['Enabled'] = 1
 
         self.SaveCanvas()
-
-        self.ResultData['Plot']['ROOTObject'] = 0
 
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
