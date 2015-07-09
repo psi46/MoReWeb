@@ -90,7 +90,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             TestResultObject.ResultData['Plot']['Enabled'] = 1
             TestResultObject.ResultData['Plot']['ImageFile'] = TestResultObject.GetPlotFileName()
             print TestResultObject.GetPlotFileName()
-            TestResultObject.Title = 'Digital Current'
+            TestResultObject.Title = Parameters['name'] if Parameters.has_key('name') else 'Digital Current'
             TestResultObject.SaveCanvas()
 
         except Exception as e:

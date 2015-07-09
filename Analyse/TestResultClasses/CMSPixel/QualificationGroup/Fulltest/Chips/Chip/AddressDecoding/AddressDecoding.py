@@ -39,7 +39,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyList'].append('NAddressDecodingProblems')
 
     def HasAddressDecodingProblem(self, column, row):
-        if self.ResultData['Plot']['ROOTObject'].GetBinContent(column + 1, row + 1) < 1:
+        if self.ResultData['Plot']['ROOTObject'].GetBinContent(column + 1, row + 1) < -0.5:
             self.AddressProblemList.add((self.chipNo, column, row))
             return True
         return False
