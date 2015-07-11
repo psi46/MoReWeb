@@ -146,7 +146,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         HighRatePixelMap = self.ResultData['SubTestResults']['HighRatePixelMap']
         self.ResultData['Plot']['ROOTObject'] = HighRatePixelMap.ResultData['Plot']['ROOTObject'].Clone(self.GetUniqueID())
         self.ResultData['Plot']['ROOTObject'].Draw("colz")
-        if self.SavePlotFile:
-             self.Canvas.SaveAs(self.GetPlotFileName())
+        self.SaveCanvas()
         self.ResultData['Plot']['Enabled'] = 0
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        

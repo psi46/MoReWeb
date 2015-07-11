@@ -73,6 +73,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                         'Order':1,
                     }
+                },
+                {'Key':'DigChipCurrent',
+                    'DisplayOptions':{
+                        'Order':1,
+                    }
                 },                
                 ]
             
@@ -84,6 +89,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 {'Key':'OpParameters',
                  'DisplayOptions':{
                         'Order':16,
+                        }
+                 },
+                {'Key':'BareBBWidth',
+                 'DisplayOptions':{
+                        'Order':1,
                         }
                  },
                 {
@@ -102,11 +112,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':1,
                         }
                  },
-                {'Key':'BareBBWidth',
-                 'DisplayOptions':{
-                        'Order':1,
-                        }
-                 },
+#                {'Key':'BareBBWidth',
+#                 'DisplayOptions':{
+#                        'Order':1,
+#                        }
+#                 },
                 
                 
                 ]

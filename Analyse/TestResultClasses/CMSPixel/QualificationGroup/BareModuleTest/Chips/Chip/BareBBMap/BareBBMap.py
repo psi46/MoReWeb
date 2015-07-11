@@ -28,6 +28,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         print 'Inside BareBBMap ChipNo: ', ChipNo
         print 'and the histname: ', histname
 
+
+
+        # Calculate the cut from BareBBwidth distribution
+        #['KeyValueDictPairs']['thrCutBB2Map']['Value'] 
+        #        self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Mean']['Value']
+        #print '====Access: Cut Value from BBWidth',self.ParentObject.ResultData['SubTestResults']['BareBBWidth'].ResultData['KeyValueDictPairs']['thrCutBB2Map']['Value']
+        plWidthCutVal = self.ParentObject.ResultData['SubTestResults']['BareBBWidth'].ResultData['KeyValueDictPairs']['thrCutBB2Map']['Value']
+        print 'Used Width Cut ',plWidthCutVal
+
+
         #        histname = self.HistoDict.get(self.NameSingle,'BareBBScan')
 
         if self.HistoDict.has_option(self.NameSingle,'BareBBMap'):
@@ -78,7 +88,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             if iBegin == 0:
                                 iBegin = ybin; # begin of plateau
                         
-                    if iEnd - iBegin < 35: #hard-coded CUT
+                    endCont = self.ResultData['Plot']['ROOTObject_Scan'].GetYaxis().GetBinUpEdge(iEnd);
+                    beginCont = self.ResultData['Plot']['ROOTObject_Scan'].GetYaxis().GetBinUpEdge(iBegin);
+
+                    if endCont - beginCont < plWidthCutVal:
+                    #if iEnd - iBegin < plWidthCutVal: #coming from the analysis of PlWidth distribution
                         ++nMissing;
                         print 'Missing Bump at raw col:', int(ibinCenter/80), int(ibinCenter%80);
                         # with weight 2 to draw it as red
@@ -113,11 +127,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             #for column in range(self.nCols): #Column
             #    for row in range(self.nRows): #Row
             #print 'content', column, row, self.ResultData['Plot']['ROOTObject'].GetBinContent(column, row), self.ResultData['Plot']['ROOTObject'].GetXaxis().GetBinCenter( column ), self.ResultData['Plot']['ROOTObject'].GetYaxis().GetBinCenter( row );
-
-        
-            if self.SavePlotFile:
-                self.Canvas.SaveAs(self.GetPlotFileName())
-                self.ResultData['Plot']['Enabled'] = 1
-                self.Title = 'Bare BBMap: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-                self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
-
+            
+            self.Title = 'Bare BBMap: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+                
+            self.SaveCanvas()    
+            

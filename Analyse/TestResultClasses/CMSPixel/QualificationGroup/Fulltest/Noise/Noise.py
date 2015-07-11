@@ -150,11 +150,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             #TestResultObject.ResultData['Plot']['ROOTObject'].SaveAs(TestResultObject.GetPlotFileName()+'.cpp')
         ROOT.gPad.SetLogy(0);
 
-        TestResultObject.Canvas.SaveAs(TestResultObject.GetPlotFileName())
-        TestResultObject.ResultData['Plot']['Enabled'] = 1
+        TestResultObject.SaveCanvas()
         TestResultObject.ResultData['Plot']['Caption'] = Parameters['Key']
-        TestResultObject.ResultData['Plot']['ImageFile'] = TestResultObject.GetPlotFileName()
-
+        
 
         #mG
         #Mean = TestResultObject.ResultData['Plot']['ROOTObject'].GetMean()

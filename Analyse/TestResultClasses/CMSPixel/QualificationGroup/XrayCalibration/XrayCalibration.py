@@ -44,6 +44,34 @@ class TestResult(GeneralTestResult):
         self.add_calibration_method(target_list)
         self.add_chips()
 
+        for Target in self.Attributes['TargetNames']:
+            self.ResultData["SubTestResultDictList"].append({
+                "Key": "HitmapOverview_{Target}".format(Target=Target),
+                "Module": "HitmapOverview",
+                "InitialAttributes": {
+                    "StorageKey": "HitmapOverview_{Target}".format(Target=Target),
+                    "Target": "{Target}".format(Target=Target),
+                    "Method": self.Attributes['Method'],
+                },
+                "DisplayOptions": {
+                    "Order": 100,
+                    "Width": 4
+                }
+            })
+            self.ResultData["SubTestResultDictList"].append({
+                "Key": "HitmapDistribution_{Target}".format(Target=Target),
+                "Module": "HitmapDistribution",
+                "InitialAttributes": {
+                    "StorageKey": "HitmapDistribution_{Target}".format(Target=Target),
+                    "Target": "{Target}".format(Target=Target),
+                    'Method': self.Attributes['Method'],
+                },
+                "DisplayOptions": {
+                    "Order": 100,
+                    "Width": 1
+                }
+            })
+
     def add_chips(self):
         self.ResultData["SubTestResultDictList"].append(
             {

@@ -19,7 +19,8 @@ class TestResult(GeneralTestResult):
             'CurrentAtVoltage150V': {
                 'Value': '{0:1.2f}'.format(0),
                 'Label': 'I(150 V)',
-                'Unit': 'μA'
+                'Unit': 'μA',
+                'Factor': 1e-6
             },
             'Variation': {
                 'Value': '{0:1.2f}'.format(0),
@@ -32,8 +33,11 @@ class TestResult(GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V'] = {
                 'Value': '{0:1.2f}'.format(0),
                 'Label': 'I_rec(150 V, 17 degC))',
-                'Unit': 'μA'
+                'Unit': 'μA',
+                'Factor': 1e-6
             }
+            self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Label'] = 'I_rec(150 V, {temp} degC'.format(temp = self.ParentObject.Attributes['TestTemperature'])
+            self.ResultData['KeyList'].append('recalculatedCurrentAtVoltage150V')
             self.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation'] = {
                 'Value': '{0:1.2f}'.format(0),
                 'Label': 'I_rec(150 V) / I_rec(100 V)'
@@ -99,13 +103,31 @@ class TestResult(GeneralTestResult):
                 units.append(group.groups()[0].strip())
 
         self.analyseUnits(varlist, units)
+
         varlist = ':'.join(varlist)
         if 'Current' not in varlist or 'Voltage' not in varlist:
             raise Exception('Invalid IV Curve File, varlist:"%s"' % varlist)
         if self.verbose:
             print 'The varlist of the file "%s" is: "%s"' % (fileName, varlist)
-        IVTuple = ROOT.TNtuple(self.GetUniqueID(), "IVTuple", varlist)  # IVTuple
-        entries = IVTuple.ReadFile(fileName)
+
+        varlistSave = "Voltage:Current"
+        IVTuple = ROOT.TNtuple(self.GetUniqueID(), "IVTuple", varlistSave)  # IVTuple
+
+        IVCurveFile = open(fileName, "r")
+        lines = IVCurveFile.readlines()
+        lines = [line.replace('\n', '') for line in lines if not line.strip().startswith('#')]
+
+        IndexCurrent = analyser.index("current(A)")
+        IndexVoltage = analyser.index("voltage(V)")
+
+        entries = 0
+        for line in lines:
+            values = line.strip().split("\t")
+            IVTuple.Fill(float(values[IndexVoltage]), float(values[IndexCurrent]))
+            entries += 1
+
+        IVCurveFile.close()
+
         print 'read {entries} Entries from file {fileName}'.format(entries=entries, fileName=fileName)
         self.ResultData['HiddenData']['IVTuple'] = IVTuple
 
@@ -117,20 +139,27 @@ class TestResult(GeneralTestResult):
 
         IVCurveFileName = "{Directory}/ivCurve.log".format(Directory=Directory)
         IVCurveFile = open(IVCurveFileName, "r")
+        
+        self.ResultData['HiddenData']['IVCurveFilePath'] = IVCurveFileName
+        self.ResultData['HiddenData']['TestTemperature'] = self.ParentObject.Attributes['TestTemperature']
 
         lines = IVCurveFile.readlines()
         lines = [line.replace('\n', '') for line in lines]
-        lines2 = [line for line in lines if line != '#' and 'LOG' not in line and line != '']
 
-        if lines2[0].startswith('#'):
-            analyser = lines2[0]
+        VoltageColumnDescription = 'voltage(V)'
+        CurrentColumnDescription = 'current(A)'
+
+        ColumnDescriptorLines = [line for line in lines if line.strip().startswith('#') and VoltageColumnDescription in line and CurrentColumnDescription in line]
+
+        if len(ColumnDescriptorLines) >= 1:
+            analyser = ColumnDescriptorLines[0].strip('#').split('\t')
+            if len(ColumnDescriptorLines) > 1:
+                print "Multiple lines with column descriptions 'voltage(V)' and 'current(A)' found in file '%s', using first one."%IVCurveFileName
         else:
-            analyser = ''
-        analyser = analyser.strip('#').split('\t')
-        if len(analyser) == 0:
-            self.getIVTuple(IVCurveFileName, ['voltage(V)', 'current(A)'])
-        else:
-            self.getIVTuple(IVCurveFileName, analyser)
+            analyser = [VoltageColumnDescription, CurrentColumnDescription]
+            print "No line with column descriptions 'voltage(V)' and 'current(A)' found in file '%s', using default one."%IVCurveFileName
+
+        self.getIVTuple(IVCurveFileName, analyser)
 
         IVTuple = self.ResultData['HiddenData']['IVTuple']
 
@@ -176,7 +205,12 @@ class TestResult(GeneralTestResult):
                 i += 1
 
         IVCurveFile.close()
-
+        
+        self.ResultData['HiddenData']['IVCurveData'] = {
+        	'VoltageList':Voltage_List,
+        	'CurrentList':Current_List
+        }
+        
         if CurrentAtVoltage100V != 0.:
             Variation = CurrentAtVoltage150V / CurrentAtVoltage100V
         else:
@@ -191,7 +225,7 @@ class TestResult(GeneralTestResult):
                                                                         self.ParentObject.Attributes['TestTemperature'],
                                                                         self.ParentObject.Attributes[
                                                                             'recalculateCurrentTo'])
-            recalculatedCurrentAtVoltage100V *= self.ResultData['HiddenData']['FactorI'] * 1e6
+            recalculatedCurrentAtVoltage100V *= self.ResultData['HiddenData']['FactorI']
             recalculatedCurrentVariation = 0
             if recalculatedCurrentAtVoltage100V != 0:
                 recalculatedCurrentVariation = recalculatedCurrentAtVoltage150V / recalculatedCurrentAtVoltage100V
@@ -216,17 +250,26 @@ class TestResult(GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
         self.ResultData['Plot']['ROOTObject'].Draw("aC")
 
-        CurrentAtVoltage150V *= self.ResultData['HiddenData']['FactorI'] * 1e6
+        CurrentAtVoltage150V *= self.ResultData['HiddenData']['FactorI'] 
+        CurrentAtVoltage150V *= 1./self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Factor'] #to show the value in muA and not in A
         self.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'] = '{0:1.2f}'.format(CurrentAtVoltage150V)
+        
+        CurrentAtVoltage100V *= self.ResultData['HiddenData']['FactorI'] 
+        self.ResultData['HiddenData']['CurrentAtVoltage100V'] = CurrentAtVoltage100V
         self.ResultData['KeyValueDictPairs']['Variation']['Value'] = '{0:1.2f}'.format(Variation)
 
         if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
+            recalculatedCurrentAtVoltage150V *= 1./self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']['Factor']
             self.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']['Value'] = '{0:1.2f}'.format(
                 recalculatedCurrentAtVoltage150V)
             self.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation']['Value'] = '{0:1.2f}'.format(
                 recalculatedCurrentVariation)
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'I-V-Curve'
         self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        if self.verbose:
+            print  self.ResultData['Plot']['Caption'] 
+            for key in  self.ResultData['KeyValueDictPairs']:
+                print '*',key,self.ResultData['KeyValueDictPairs'][key]['Value'],self.ResultData['KeyValueDictPairs'][key].get('Unit',None),self.ResultData['KeyValueDictPairs'][key].get('Factor',None)
+            #raw_input ('press enter')
+        

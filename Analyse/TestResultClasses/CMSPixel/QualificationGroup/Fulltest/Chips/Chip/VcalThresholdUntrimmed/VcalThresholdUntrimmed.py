@@ -70,8 +70,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
 
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Vcal Threshold Untrimmed'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        

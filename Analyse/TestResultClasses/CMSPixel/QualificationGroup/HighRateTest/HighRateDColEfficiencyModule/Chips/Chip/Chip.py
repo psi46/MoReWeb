@@ -82,7 +82,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         HighRateDColEfficiency = self.ResultData['SubTestResults']['HighRateDColEfficiency']
         self.ResultData['Plot']['ROOTObject'] = HighRateDColEfficiency.ResultData['Plot']['ROOTObject'].Clone(self.GetUniqueID())
         self.ResultData['Plot']['ROOTObject'].Draw("colz")
-        if self.SavePlotFile:
-             self.Canvas.SaveAs(self.GetPlotFileName())
+        self.SaveCanvas()
         self.ResultData['Plot']['Enabled'] = 0
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()

@@ -93,6 +93,7 @@ class TestResult(GeneralTestResult):
         else:
             ymax *= .8
 
+        ROOT.gStyle.SetOptStat(0)
         TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerColor(Parameters['MarkerColor'])
         TestResultObject.ResultData['Plot']['ROOTObject'].SetLineColor(Parameters['LineColor'])
 
@@ -148,7 +149,6 @@ class TestResult(GeneralTestResult):
         TestResultObject.ResultData['KeyList'].append('min%s' % Parameters['Key'])
         TestResultObject.ResultData['KeyList'].append('max%s' % Parameters['Key'])
 
-        TestResultObject.Canvas.SaveAs(TestResultObject.GetPlotFileName())
-        TestResultObject.ResultData['Plot']['Enabled'] = 1
+        TestResultObject.SaveCanvas()
         TestResultObject.ResultData['Plot']['Caption'] = Parameters['Key']
-        TestResultObject.ResultData['Plot']['ImageFile'] = TestResultObject.GetPlotFileName()
+        

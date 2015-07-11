@@ -70,11 +70,18 @@ class GeneralTestResult(object):
         self.Enabled = True
         self.SavePlotFile = True
         self.GzipSVG = TestResultEnvironmentObject.Configuration['GzipSVG']
+        
         self.DefaultImageFormat = TestResultEnvironmentObject.Configuration['DefaultImageFormat'].strip().lower()
+        if TestResultEnvironmentObject.Configuration.has_key('AdditionalImageFormats'):
+            self.AdditionalImageFormats = TestResultEnvironmentObject.Configuration['AdditionalImageFormats'].strip().lower().split(',')
+        else:
+        	self.AdditionalImageFormats = ['root', 'pdf']
+        	
         if TestResultEnvironmentObject.Configuration.has_key('OverviewHTMLLink'):
             self.OverviewHTMLLink = TestResultEnvironmentObject.Configuration['OverviewHTMLLink']
         else:
             self.OverviewHTMLLink = None
+            
         # Path for current test to folder with root-files
         self.RawTestSessionDataPath = ''
 
@@ -114,7 +121,9 @@ class GeneralTestResult(object):
                 'ROOTObject': None,
                 'Caption': '',
                 'ImageFile': '',
-                'Format': self.DefaultImageFormat  # svg
+                'Format': self.DefaultImageFormat,
+                'AdditionalFormats':self.AdditionalImageFormats,
+                'ImageFilePDF':'',
             },
             # SubTest Results
             'SubTestResults': {},
@@ -252,22 +261,37 @@ class GeneralTestResult(object):
             i['TestResultObject'] = self.ResultData['SubTestResults'][i['Key']]
             i2 += 1
 
-    def check_Test_Software(self):
-        # file = self.RawTestSessionDataPath + '/test.cfg'
-        # print file
+    def check_Test_Software_Pyxar(self):
         self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
         files = glob.glob(self.RawTestSessionDataPath + '/test.cfg') + \
                 glob.glob(self.RawTestSessionDataPath + '/*/test.cfg')
-        # print 'pyxar:',files
-        if len(files) > 0:
-            self.testSoftware = 'pyxar'
-        else:
-            data = glob.glob(self.RawTestSessionDataPath + '/*[p,P][x,X][a,A][r,R]*.*') + \
+        return len(files) > 0
+
+    def check_Test_Software_Pxar(self):
+        data = glob.glob(self.RawTestSessionDataPath + '/*[p,P][x,X][a,A][r,R]*.*') + \
                    glob.glob(self.RawTestSessionDataPath + '/*/*[p,P][x,X][a,A][r,R]*.*')
-            if len(data):
-                self.testSoftware = 'pxar'
-            else:
-                self.testSoftware = 'psi46expert'
+        if len(data):
+            return True
+
+        LogFileNames = glob.glob(self.RawTestSessionDataPath + '/*.log') + glob.glob(self.RawTestSessionDataPath + '/*/*.log')
+        for LogFileName in LogFileNames:
+            LogFile = open(LogFileName, "r")
+            FirstLine = LogFile.readline()
+            LogFile.close()
+            if FirstLine.lower().find("welcome to pxar") > -1:
+                return True
+
+        return False
+
+    def check_Test_Software(self):
+
+        if self.check_Test_Software_Pyxar():
+            self.testSoftware = 'pyxar'
+        elif self.check_Test_Software_Pxar():
+            self.testSoftware = 'pxar'
+        else:
+            self.testSoftware = 'psi46expert'
+
         self.HistoDict = BetterConfigParser()
         fileName = 'Configuration/Software/%s.cfg' % self.testSoftware
         self.HistoDict.read(fileName)
@@ -391,7 +415,7 @@ class GeneralTestResult(object):
         self.SetCanvasSize()
         try:
             self.PopulateResultData()
-            self.SaveCanvas()
+            #self.SaveCanvas()
             self.check_for_comments()
         except Exception as inst:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -427,6 +451,7 @@ class GeneralTestResult(object):
                 try:
                     self.FileHandle.close()
                 except:
+                    print '\x1b[33m warning: can not close file "%s" \x1b[0m'%repr(self.FileHandle)
                     try:
                         self.FileHandle.Close()
                     except:
@@ -492,7 +517,12 @@ class GeneralTestResult(object):
         if self.SavePlotFile:
             if self.Canvas:
                 self.Canvas.SaveAs(self.GetPlotFileName())
-                self.Canvas.SaveAs(self.GetPlotFileName('root'))
+                for Suffix in self.ResultData['Plot']['AdditionalFormats']:
+                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
+                	if Suffix == 'pdf':
+                		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName(Suffix)
+                self.ResultData['Plot']['Enabled'] = 1
+                self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''
         Generate the filename including the full path to the plot file according to the format
     '''
@@ -739,6 +769,8 @@ class GeneralTestResult(object):
                     {
                         '###FILENAME###': HtmlParser.MaskHTML(
                             RecursionRelativePath + os.path.basename(TestResultObject.ResultData['Plot']['ImageFile'])),
+                        '###PDFFILENAME###': HtmlParser.MaskHTML(
+                            RecursionRelativePath + os.path.basename(TestResultObject.ResultData['Plot']['ImageFilePDF'])),
                         '###IMAGELARGECONTAINERID###': HtmlParser.MaskHTML(
                             TestResultObject.Name + '_' + TestResultObject.Key),
                         '###MARGIN_TOP###': str(int(-800. / float(

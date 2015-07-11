@@ -99,8 +99,6 @@ class TestResult(GeneralTestResult):
         }
         self.ResultData['KeyList'] = ['mu', 'sigma']
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Trim Bits'
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
+        

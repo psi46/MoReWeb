@@ -32,17 +32,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 for row in range(self.nRows): #Row
                     self.HasAddressDecodingProblem(column, row)
 
-        if self.SavePlotFile:
-            self.Canvas.SaveAs(self.GetPlotFileName())
-        self.ResultData['Plot']['Enabled'] = 1
+        self.SaveCanvas()
         self.Title = 'Address Decoding: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
         self.ResultData['KeyValueDictPairs']['AddressDecodingProblems'] = {'Value':self.AddressProblemList, 'Label':'Address Decoding Problems', }
         self.ResultData['KeyValueDictPairs']['NAddressDecodingProblems'] = {'Value':len(self.AddressProblemList), 'Label':'N Address DecodingProblems', }
         self.ResultData['KeyList'].append('NAddressDecodingProblems')
 
     def HasAddressDecodingProblem(self, column, row):
-        if self.ResultData['Plot']['ROOTObject'].GetBinContent(column + 1, row + 1) < 1:
+        if self.ResultData['Plot']['ROOTObject'].GetBinContent(column + 1, row + 1) < -0.5:
             self.AddressProblemList.add((self.chipNo, column, row))
             return True
         return False
