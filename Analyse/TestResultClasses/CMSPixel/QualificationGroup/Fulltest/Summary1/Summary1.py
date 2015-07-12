@@ -14,7 +14,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             2:'B',
             3:'C'
         }
-        BadRocs = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['BadRocs']['Value'])
+        PixelDefectsRocsA = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsA']['Value'])
+        PixelDefectsRocsB = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsB']['Value'])
+        PixelDefectsRocsC = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsC']['Value'])
         DeadPixels = 0
         AddressProblems = 0
         ThresholdDefects = 0
@@ -54,9 +56,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         
         nPixelDefectsTotal  = 0
-        nPixelDefectsGradeA = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['nPixelDefectsGradeA']['Value'])
-        nPixelDefectsGradeB = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['nPixelDefectsGradeB']['Value'])
-        nPixelDefectsGradeC = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['nPixelDefectsGradeC']['Value'])
+        PixelDefectsRocsA = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsA']['Value'])
+        PixelDefectsRocsB = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsB']['Value'])
+        PixelDefectsRocsC = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsC']['Value'])
         ModuleGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Value'])
         
         self.ResultData['KeyValueDictPairs'] = {
@@ -68,9 +70,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value':GradeMapping[ModuleGrade], 
                 'Label':'Grade'
             },
-            'BadRocs': {
-                'Value':'{0:1.0f}'.format(BadRocs), 
+            'PixelDefectsRocsA': {
+                'Value':'{0:1.0f}'.format(PixelDefectsRocsA), 
+                'Label':'ROCs < 1% defects'
+            },
+            'PixelDefectsRocsB': {
+                'Value':'{0:1.0f}'.format(PixelDefectsRocsB), 
                 'Label':'ROCs > 1% defects'
+            },
+            'PixelDefectsRocsC': {
+                'Value':'{0:1.0f}'.format(PixelDefectsRocsC), 
+                'Label':'ROCs > 4% defects'
             },
             'DeadPixels': {
                 'Value':'{0:1.0f}'.format(DeadPixels), 
@@ -85,7 +95,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Threshold Defects'
             },
             'PixelDefects': {
-                'Value':'%d - %d/%d/%d'%(TotalDefects,nPixelDefectsGradeA,nPixelDefectsGradeB,nPixelDefectsGradeC),
+#                'Value':'%d - %d/%d/%d'%(TotalDefects,nPixelDefectsGradeA,nPixelDefectsGradeB,nPixelDefectsGradeC)
+                'Value':'%d - %d/%d/%d'%(TotalDefects,PixelDefectsRocsA,PixelDefectsRocsB,PixelDefectsRocsC),
                 'Label':'Pixel Defects - A/B/C',
                 'NumericValue':TotalDefects,
             },

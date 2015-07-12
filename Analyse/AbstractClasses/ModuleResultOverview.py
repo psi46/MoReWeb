@@ -67,8 +67,18 @@ class ModuleResultOverview:
                 'InGlobalOverviewList': True
              },
              {
+                'Label':'ROCs < 1%',
+                'DBColumnName':'ROCsLessThanOnePercent',
+                'InGlobalOverviewList': True
+             },
+             {
                 'Label':'ROCs > 1%',
                 'DBColumnName':'ROCsMoreThanOnePercent',
+                'InGlobalOverviewList': True
+             },
+             {
+                'Label':'ROCs > 4%',
+                'DBColumnName':'ROCsMoreThanFourPercent',
                 'InGlobalOverviewList': True
              },
              {
