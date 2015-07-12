@@ -113,14 +113,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         if self.ParentObject.Attributes['TestType'] == 'p17_1':
             # Grading
-            if ModuleGrade == 1 and PixelDefectsRocsB > 1:
+            if ModuleGrade == 1 and PixelDefectsRocsB > 0:
                 ModuleGrade = 2
             if ModuleGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters[
                 'currentB']:
                 ModuleGrade = 2;
             if ModuleGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
                 ModuleGrade = 2
-            if PixelDefectsRocsC > 1:
+            if PixelDefectsRocsC > 0:
                 ModuleGrade = 3
             if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
                 ModuleGrade = 3;
@@ -133,7 +133,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
  '''
         else:
             # Grading
-            if ModuleGrade == 1 and PixelDefectsRocsB > 1:
+            if ModuleGrade == 1 and PixelDefectsRocsB > 0:
                 ModuleGrade = 2
             if ModuleGrade == 1 and RecalculatedCurrentAtVoltage150V and RecalculatedCurrentAtVoltage150V > \
                     self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
@@ -141,7 +141,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if ModuleGrade == 1 and RecalculatedCurrentVariation and RecalculatedCurrentVariation > \
                     self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
                 ModuleGrade = 2
-            if PixelDefectsRocsC > 1:
+            if PixelDefectsRocsC > 0:
                 ModuleGrade = 3
             if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
                 ModuleGrade = 3
