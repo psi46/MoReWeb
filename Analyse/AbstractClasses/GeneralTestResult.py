@@ -977,16 +977,22 @@ class GeneralTestResult(object):
                             data[key]['Value'] = value
                     elif type(data[key])==dict:
                         data[key] = list(data[key])
-                    
+                    else:
+                        data_value = data[key]
+                        data[key] = {'Value': str(data_value)}
+
                 f = open(self.FinalResultsStoragePath + '/'+DataKey+'.json', 'w')
                 f.write(json.dumps(self.ResultData[DataKey], sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
                 f.close()
             except (KeyError,IOError,TypeError):
                 if data and key in data:
-                    warnings.warn(
-                        'Cannot create JSON for %s, %s' % (type(data[key]['Value']), self.ResultData[DataKey]))
+                    if type(data[key])==dict:
+                        warnings.warn(
+                            'Cannot create JSON for %s, %s' % (type(data[key]['Value']), str(self.ResultData[DataKey])))
+                    else:
+                        warnings.warn('Cannot create JSON for %s.' % (repr(data)))
                 else:
-                    warnings.warn('Cannot create JSON for %s, %s' % (type(data), self.ResultData[DataKey]))
+                    warnings.warn('Cannot create JSON for %s.' % (repr(data)))
 
     '''
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in ASCII format
