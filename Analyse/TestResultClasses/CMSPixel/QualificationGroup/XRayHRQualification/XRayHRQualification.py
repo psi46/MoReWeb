@@ -114,8 +114,23 @@ class TestResult(GeneralTestResult):
             if len(ROOTFiles) > 0:
                 self.Attributes['ROOTFiles']['CalDelScan'] = ROOT.TFile.Open(ROOTFiles[0])
 
+        self.ResultData['SubTestResultDictList'] = []
 
-        self.ResultData['SubTestResultDictList'] = [
+        for Rate in self.Attributes['Rates']['HRSCurves']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'Fitting_{Rate}'.format(Rate=Rate),
+                'Module': 'Fitting',
+                'DisplayOptions': {
+                    'Order': 99,
+                    'Show': False,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            })
+
+        self.ResultData['SubTestResultDictList'] += [
             {
                 'Key': 'Chips',
                 'DisplayOptions': {

@@ -16,7 +16,7 @@ class PH_Fitting():
     vcalSteps = 5
     rangeConversion = 7
 
-    def __init__(self,fitMode,refit=True,HistoDict = None):
+    def __init__(self,fitMode,refit=True,HistoDict = None, ParallelProcessing = False):
         self.k = 0
         # ROOT.gStyle
         self.verbose = False
@@ -26,12 +26,14 @@ class PH_Fitting():
         self.vcal = [50,100,150,200,250,30,50,70,90,200];
         self.vcalLow = self.vcal
         self.HistoDict = HistoDict
+        self.ParallelProcessing = ParallelProcessing
         for  i  in range( 0, 2 * self.vcalSteps):
             self.vcalLow[i] = self.vcal[i];
             if i > (self.vcalSteps - 1):
                 self.vcalLow[i] *= self.rangeConversion
         self.InitFit()
         self.InitResultHistos()
+        print "parallel processing ", self.ParallelProcessing
 
 
     def getUniqueID(self, name):
@@ -110,51 +112,35 @@ class PH_Fitting():
 
         print "Fitting PH Curves %s"%dir
         maxChi2 = [-1]*4
-#         self.ClearResultHistos()
-#
-#
-#         print 'using pool '
-#         pool = Pool(processes=1)
-#
-#         res = pool.map(functools.partial(self.FitPHCurve,dirName=dir), range(nRocs))
-#         print res
-#
-        threads = []
-        #result = Queue()
-        result = Queue()
-        for chip in range (0,nRocs):
-        #p = Process(target=self.FitPHCurve, args=(dir,chip,result))
-            self.FitPHCurve(dir, chip, result)
-            p = chip
-            threads.append(p)
+        results = []
 
-#         #loop as long as not all finished
-#         nProcesses = 3
-#         i = 0
-#         while any([(p.is_alive() or p.exitcode == None ) for p in threads]):
-#             if len(multiprocessing.active_children())< nProcesses:
-#                 if i< len(threads):
-#                     print [(p.is_alive() or p.exitcode == None ) for p in threads]
-#                     print 'start process %s of %s'%(i,len(threads))
-#                     threads[i].start()
-# #                     threads[i].join()
-#                     i += 1
-#             for k in range(i):
-#                 threads[k].join()
-#             time.sleep(1)
-#             print [(p.is_alive() or p.exitcode == None ) for p in threads]
-#             print len(multiprocessing.active_children()),multiprocessing.active_children()
-#             print i, len(threads)
-# #             if result.empty():
-# #                 print 0
-# #             else:
-# #                 print result.qsize()
-# #
-#         for p in threads:
-#             p.join()
+        if self.ParallelProcessing:
+            Processes = []
+            q = Queue()
+            # start 16 processes
+            for chip in range(0,nRocs):
+                p = Process(target=self.FitPHCurve, args=(dir, chip, q,))
+                p.start()
+                Processes.append(p)
 
-        results = [result.get() for p in threads]
-            #
+            # read back data
+            for chip in range(0,nRocs):
+                results.append(q.get())
+
+            # wait for all to finish
+            for chip in range(0,nRocs):
+                Processes[chip].join()
+        else:
+            # use old way for compatibility
+            threads = []
+            result = Queue()
+            for chip in range (0,nRocs):
+                self.FitPHCurve(dir, chip, result)
+                p = chip
+                threads.append(p)
+
+            results = [result.get() for p in threads]
+
         for chi2,histos in results :
             if chi2[0] ==-1:
                 print 'Failed to to fit in chip %s'%chi2[1]
@@ -191,8 +177,7 @@ class PH_Fitting():
             retVal =[-1]*4
             retVal[1]=chip
             retVal = [retVal,[]]
-#             if result:
-            result.put(retVal)
+            if result: result.put(retVal)
             return
 
         if self.fitMode ==3:
@@ -204,8 +189,7 @@ class PH_Fitting():
             retVal =[-2]*4
             retVal[1]=chip
             retVal = [retVal,[]]
-#             if result:
-            result.put(retVal)
+            if result: result.put(retVal)
             return
 
         dataSet = inputFile.readlines()
@@ -254,7 +238,7 @@ class PH_Fitting():
         outputFile.close()
         retVal = [maxChi2,[self.histoChi,self.histoFits]]
         print "\tMax Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
-        result.put(retVal)
+        if result: result.put(retVal)
 #         sys.exit()
         return
 #         return retVal

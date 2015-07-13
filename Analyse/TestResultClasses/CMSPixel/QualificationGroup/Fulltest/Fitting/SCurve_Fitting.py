@@ -8,7 +8,7 @@ import time
 class SCurve_Fitting():
     nCols = 52
     nRows = 80
-    def __init__(self, refit = True, HistoDict = None, chi2Limit = 2.0, ePerVcal = 50.0, verbose = False):
+    def __init__(self, refit = True, HistoDict = None, chi2Limit = 2.0, ePerVcal = 50.0, verbose = False, ParallelProcessing = False):
         print 'SCURVE Fitting'
         ROOT.gStyle
         self.verbose = verbose
@@ -19,9 +19,12 @@ class SCurve_Fitting():
             self.nReadouts = self.HistoDict.getint('SCurveFitting','nTrigs')
         else:
             self.nReadouts = 50
+
+        self.ParallelProcessing = ParallelProcessing
         self.chiLimit = chi2Limit
         self.ePerVcal = ePerVcal
         self.slope = self.getVcal(0,255)/256
+        print "parallel processing ", self.ParallelProcessing
         print "ePerVcal ",self.ePerVcal
         print 'slope: ',self.slope
         print 'nTrigs',self.nReadouts
@@ -46,10 +49,25 @@ class SCurve_Fitting():
         print "Fitting SCurves %s"%dir
         maxChi2 = [-1]*4
         results = []
-#             p = Process(target=self.FitPHCurve, args=(dir,chip,result))
-        for chip in range(0,nRocs):
-            results.append(self.FitSCurve(dir, chip))
-            #
+
+        if self.ParallelProcessing:
+            Processes = []
+            q = Queue()
+            # start 16 processes
+            for chip in range(0,nRocs):
+                p = Process(target=self.FitSCurve, args=(dir, chip, q,))
+                p.start()
+                Processes.append(p)
+            # read back data
+            for chip in range(0,nRocs):
+                results.append(q.get())
+            # wait for all to finish
+            for chip in range(0,nRocs):
+                Processes[chip].join()
+        else:
+            for chip in range(0,nRocs):
+                results.append(self.FitSCurve(dir, chip))
+            
         for chi2,histos in results :
             if chi2[0] ==-1:
                 print 'Failed to to fit in chip %s'%chi2[1]
@@ -108,13 +126,16 @@ class SCurve_Fitting():
         outputFile.write("Threshold Sigma\n\n")
         return outputFile
 
-    def FitSCurve(self,dirName,chip):
+    def FitSCurve(self,dirName,chip, q = None):
         print "Fitting SCurve for chip %i"%chip
         inputFile = self.getInputFile(dirName,chip)
         if type(inputFile)==list:
+            if q: q.put(inputFile)
             return inputFile
         outputFile = self.getOutputFile(dirName,chip)
-        if type(outputFile) == list: return outputFile
+        if type(outputFile) == list: 
+            if q: q.put(outputFile)
+            return outputFile
 
         dataSet = inputFile.readlines()
         if self.verbose:
@@ -153,6 +174,7 @@ class SCurve_Fitting():
         print badPixels
         inputFile.close()
         outputFile.close()
+        if q: q.put([chi2,[]])
         return [chi2,[]]
 
 
