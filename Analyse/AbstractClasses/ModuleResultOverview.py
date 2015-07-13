@@ -163,7 +163,6 @@ class ModuleResultOverview:
                 Identificator+='_%s'%RowTuple['QualificationType']
 #            Identificator+='_%s'%RowTuple['TestDate']
 #            print Identificator
-
             if not FinalModuleRowsDict.has_key(Identificator):
                 FinalModuleRowsDict[Identificator] = {}
                 ModuleIDList.append(Identificator)
@@ -200,6 +199,7 @@ class ModuleResultOverview:
                             '###LABEL###':HtmlParser.MaskHTML(RowTuple['ModuleID'])
                         }
                     )
+
 
                 # Parse the date
                 try:
@@ -257,6 +257,8 @@ class ModuleResultOverview:
         HTMLTemplate = self.TestResultEnvironmentObject.OverviewHTMLTemplate
         FinalHTML = HTMLTemplate
 
+
+
         # Stylesheet
 
         StylesheetHTMLTemplate = HtmlParser.getSubpart(HTMLTemplate, '###HEAD_STYLESHEET_TEMPLATE###')
@@ -298,6 +300,7 @@ class ModuleResultOverview:
     def GenerateOverviewHTMLFile(self):
         HTMLFileName = 'Overview.html'
         FinalHTML = self.GenerateOverviewHTML()
+
         f = open(self.GlobalOverviewPath+'/'+HTMLFileName, 'w')
         f.write(FinalHTML)
         f.close()
