@@ -167,13 +167,34 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BadROCs') + TestIndex, ColorC)
                         elif ValueB is not None and float(ValueB) > 0:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BadROCs') + TestIndex, ColorB)
+            ### defectiveBumps
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    
+                    if RowTuple['TestType'] == 'XRayHRQualification':
+
+                        BBGrades = []
+                        for Chip in range(0,16):
+                            BBGradesROC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'HitMapGrade', 'Value'])
+                            if BBGradesROC:
+                                for BBGradeROC in BBGradesROC.split("/"):
+                                    if not '(' in BBGradeROC and len(BBGradeROC)>0:
+                                        BBGrades.append(BBGradeROC)
+
+                        if 'C' in BBGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 0, ColorC)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 1, ColorC)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 2, ColorC)
+                        elif 'B' in BBGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 0, ColorB)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 1, ColorB)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 2, ColorB)
 
             ### lowEfficiency
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     
                     if RowTuple['TestType'] == 'XRayHRQualification':
-                        TestIndex = 1
 
                         EfficiencyGrades = []
                         for Chip in range(0,16):
@@ -183,9 +204,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 EfficiencyGrades += Grades
 
                         if 'C' in EfficiencyGrades:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + TestIndex, ColorC)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 0, ColorC)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 1, ColorC)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 2, ColorC)
                         elif 'B' in EfficiencyGrades:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + TestIndex, ColorB)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 0, ColorB)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 1, ColorB)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 2, ColorB)
 
             BinNumber += 1
 
