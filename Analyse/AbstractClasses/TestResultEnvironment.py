@@ -50,6 +50,8 @@ class TestResultEnvironment:
         'currentC':10,
         'currentCm10':15,
         'slopeivB': 2,
+        'leakageCurrentPON_B': 5,
+        'leakageCurrentPON_C': 15,
         # check
         'minThrDiff':-5,
         'maxThrDiff':5,

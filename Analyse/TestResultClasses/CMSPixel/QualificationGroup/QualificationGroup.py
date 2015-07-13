@@ -155,6 +155,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 tests, test, index = self.appendHighRateTest(tests, test, index)
             elif 'powercycle' in test.testname:
                 test = test.next()
+            elif 'leakagecurrentpon' in test.testname.lower():
+                print '\t-> appendLeakageCurrentPON'
+                tests, test, index = self.appendLeakageCurrentPON(tests, test, index)
             else:
                 if self.verbose:
                     print '\t-> cannot convert ', test.testname
@@ -502,6 +505,41 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Width': 4
             }
         })
+
+    def appendLeakageCurrentPON(self, tests, test, index):
+        key = 'LeakageCurrentPON'
+        idx = -1
+        for i in range(len(tests)):
+            if tests[i]["Key"] == key:
+                idx = i
+                break
+
+        # If no 'LeakageCurrentPON' test exists yet, create one
+        if idx < 0:
+            tests.append({
+                'Key': key,
+                'Module': 'LeakageCurrentPON',
+                'InitialAttributes': {
+                    'StorageKey': key,
+                    'IncludeIVCurve': False,
+                    'ModuleID': self.Attributes['ModuleID'],
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                    'ModuleType': self.Attributes['ModuleType'],
+                    'TestType': 'LeakageCurrentPON',
+                    'TestTemperature': test.environment.temperature,
+                },
+                'DisplayOptions': {
+                    'Order': len(tests) + 1,
+                    'Width': 2
+                }
+            })
+
+            idx = len(tests) - 1
+
+        test = test.next()
+        index += 1
+
+        return tests, test, index
 
     def PopulateResultData(self):
 
