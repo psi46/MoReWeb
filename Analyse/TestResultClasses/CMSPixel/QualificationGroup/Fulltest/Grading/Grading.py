@@ -24,14 +24,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             2: 'B',
             3: 'C'
         }
-        BadRocs = 0
+        PixelDefectsRocsA = 0
+        PixelDefectsRocsB = 0
+        PixelDefectsRocsC = 0
         chipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
         print 'Subgrading, PixelDefects:',chipResults
         SubGrading = []
         for i in chipResults:
             if int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
+                'Total']['Value']) > 0.04 * self.nCols * self.nRows:
+                PixelDefectsRocsC += 1
+            elif int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
                 'Total']['Value']) > 0.01 * self.nCols * self.nRows:
-                BadRocs += 1
+                PixelDefectsRocsB += 1
+            else:
+                PixelDefectsRocsA += 1
+
             SubGrading.append([
                 i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
                     'PixelDefectsGrade']['Value'] for i in chipResults])
@@ -105,14 +113,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         if self.ParentObject.Attributes['TestType'] == 'p17_1':
             # Grading
-            if ModuleGrade == 1 and BadRocs > 1:
+            if ModuleGrade == 1 and PixelDefectsRocsB > 0:
                 ModuleGrade = 2
             if ModuleGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters[
                 'currentB']:
                 ModuleGrade = 2;
             if ModuleGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
                 ModuleGrade = 2
-            if BadRocs > 2:
+            if PixelDefectsRocsC > 0:
                 ModuleGrade = 3
             if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
                 ModuleGrade = 3;
@@ -125,7 +133,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
  '''
         else:
             # Grading
-            if ModuleGrade == 1 and BadRocs > 1:
+            if ModuleGrade == 1 and PixelDefectsRocsB > 0:
                 ModuleGrade = 2
             if ModuleGrade == 1 and RecalculatedCurrentAtVoltage150V and RecalculatedCurrentAtVoltage150V > \
                     self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
@@ -133,7 +141,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if ModuleGrade == 1 and RecalculatedCurrentVariation and RecalculatedCurrentVariation > \
                     self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
                 ModuleGrade = 2
-            if BadRocs > 2:
+            if PixelDefectsRocsC > 0:
                 ModuleGrade = 3
             if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
                 ModuleGrade = 3
@@ -164,9 +172,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '{0:1.0f}'.format(ModuleGrade),
                 'Label': 'Grade'
             },
-            'BadRocs': {
-                'Value': '{0:1.0f}'.format(BadRocs),
+            'PixelDefectsRocsA': {
+                'Value': '{0:1.0f}'.format(PixelDefectsRocsA),
+                'Label': 'ROCs < 1% defects'
+            },
+            'PixelDefectsRocsB': {
+                'Value': '{0:1.0f}'.format(PixelDefectsRocsB),
                 'Label': 'ROCs > 1% defects'
+            },
+            'PixelDefectsRocsC': {
+                'Value': '{0:1.0f}'.format(PixelDefectsRocsC),
+                'Label': 'ROCs < 4% defects'
             },
             'nPixelDefectsGradeA': {
                 'Value': '{0:1.0f}'.format(nPixelDefectsGradeA),
@@ -186,7 +202,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #self.ResultData['HiddenData']['nPixelDefectsGradeB'] = nPixelDefectsGradeB
         #self.ResultData['HiddenData']['nPixelDefectsGradeC'] = nPixelDefectsGradeC
 
-        self.ResultData['KeyList'] = ['Module', 'ModuleGrade', 'BadRocs']
+        self.ResultData['KeyList'] = ['Module', 'ModuleGrade', 'PixelDefectsRocsB']
 
 
         # needed in summary1

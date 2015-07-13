@@ -362,8 +362,12 @@ class TestResult(GeneralTestResult):
             'Grade': grade,
             'PixelDefects': '{PixelDefects:d}'.format(PixelDefects=self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefects'][
                 'NumericValue']),
+            'ROCsLessThanOnePercent':
+                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsRocsA']['Value'],
             'ROCsMoreThanOnePercent':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['BadRocs']['Value'],
+                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsRocsB']['Value'],
+            'ROCsMoreThanFourPercent':
+                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsRocsC']['Value'],
             'Noise': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels'][
                 'Value'],
             'Trimming': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['TrimProblems'][
@@ -686,7 +690,9 @@ class TestResult(GeneralTestResult):
                         QualificationType,
                         Grade,
                         PixelDefects,
+                        ROCsLessThanOnePercent,
                         ROCsMoreThanOnePercent,
+                        ROCsMoreThanFourPercent,
                         Noise,
                         Trimming,
                         PHCalibration,
@@ -709,7 +715,9 @@ class TestResult(GeneralTestResult):
                         :QualificationType,
                         :Grade,
                         :PixelDefects,
+                        :ROCsLessThanOnePercent,
                         :ROCsMoreThanOnePercent,
+                        :ROCsMoreThanFourPercent,
                         :Noise,
                         :Trimming,
                         :PHCalibration,
