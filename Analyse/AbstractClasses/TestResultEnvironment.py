@@ -63,9 +63,29 @@ class TestResultEnvironment:
         'PixelMapMaxValue':10,
         'PixelMapMinValue':0,
         'PixelMapMaskDefectUpperThreshold': 0,
-        'BumpBondingProblemsNSigma': 5
+        'BumpBondingProblemsNSigma': 5,
+        'XRayHighRateEfficiency_NInterpolationRates': 2,
+        'XRayHighRateEfficiency_InterpolationRate1': 50,
+        'XRayHighRateEfficiency_InterpolationRate2': 120,
+        'XRayHighRateEfficiency_max_allowed_loweff_A_Rate1':98,
+        'XRayHighRateEfficiency_max_allowed_loweff_A_Rate2':98,
+        'XRayHighRateEfficiency_max_allowed_loweff_B_Rate1':95,
+        'XRayHighRateEfficiency_max_allowed_loweff_B_Rate2':95,
+        'XRayHighRateHotPixels_max_allowed_hot':100,
+        'XRayHighRateHotPixels_Threshold':1,
+        'XRayHighRate_factor_dcol_uniformity_low':0.5,
+        'XRayHighRate_factor_dcol_uniformity_high':1.5,
+        'XRayHighRate_factor_readout_uniformity':7,
+        'XRayHighRate_SCurve_Noise_Threshold_B':400,
+        'XRayHighRate_SCurve_Noise_Threshold_C':800,
+        'XRayHighRate_missing_xray_pixels_B':42,
+        'XRayHighRate_missing_xray_pixels_C':168,
     }
-
+    XRayHRQualificationConfiguration = {
+        'OmitGradesInFinalGrading':'HotPixelGrade',
+        'TimeConstant':1,
+        'Area':1,
+    }
 
     # Database connection
     GlobalDBConnection = None
@@ -119,7 +139,12 @@ class TestResultEnvironment:
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
             for i in self.GradingParameters:
                 self.GradingParameters[i] = float(Configuration.get('GradingParameters', i))
-
+            if Configuration.has_option('XRayHRQualification','OmitGradesInFinalGrading'):
+                self.XRayHRQualificationConfiguration['OmitGradesInFinalGrading'] = [x.strip() for x in Configuration.get('XRayHRQualification','OmitGradesInFinalGrading').split(',')]
+            if Configuration.has_option('XRayHRQualification','TimeConstant'):
+                self.XRayHRQualificationConfiguration['TimeConstant'] = float(Configuration.get('XRayHRQualification','TimeConstant').strip())
+            if Configuration.has_option('XRayHRQualification','Area'):
+                self.XRayHRQualificationConfiguration['Area'] = float(Configuration.get('XRayHRQualification','Area').strip())
 
         self.MainStylesheet = open('HTML/Main.css').read()
 
@@ -214,7 +239,7 @@ class TestResultEnvironment:
             self.LocalDBConnection.close()
 
     def existInDB(self,moduleID,QualificationType):
-        print 'check wheather module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
+        print 'check whether module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
         AdditionalWhere =""
         AdditionalWhere += ' AND ModuleID=:ModuleID '
         AdditionalWhere += ' AND QualificationType=:QualificationType '

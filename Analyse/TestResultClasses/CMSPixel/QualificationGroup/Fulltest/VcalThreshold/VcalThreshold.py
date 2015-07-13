@@ -100,6 +100,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['Format'] = 'png'
 
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Vcal Threshold'
-        
+        self.SaveCanvas()        

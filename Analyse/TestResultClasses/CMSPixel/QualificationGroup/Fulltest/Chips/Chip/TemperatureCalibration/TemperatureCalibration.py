@@ -28,9 +28,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw("A*");
 
 
-        self.SaveCanvas()
         self.Title = 'Address Levels: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        
+        self.SaveCanvas()        
     def analyse(self, directoryName, chipId)
         tl = ROOT.TLatex()
 
@@ -115,7 +114,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['HiddenData']['gADCgraph']_Measurement[chipId][itemprange].SetLineWidth(2);
                     self.ResultData['HiddenData']['gADCgraph']_Measurement[chipId][itemprange].Draw("L");
                     numGraphs+=1
-                    label = "Vref = {:3.2f}".format( vReference[itemprange])
+                    label = "Vref = {0:3.2f}".format( vReference[itemprange])
                     legendTempRanges.AddEntry(self.ResultData['HiddenData']['gADCgraph']_Measurement[chipId][itemprange], label, "l");
 
 
@@ -142,7 +141,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['HiddenData']['gADCgraph']_Calibration[chipId][itemprange].SetLineWidth(2);
                     self.ResultData['HiddenData']['gADCgraph']_Calibration[chipId][itemprange].Draw("L");
                     numGraphs+=1
-                    label = "Vref = {:3.2f}".format( vReference[itemprange])
+                    label = "Vref = {0:3.2f}".format( vReference[itemprange])
                     legendTempRanges.AddEntry(self.ResultData['HiddenData']['gADCgraph']_Calibration[chipId][itemprange], label, "l");
 
 

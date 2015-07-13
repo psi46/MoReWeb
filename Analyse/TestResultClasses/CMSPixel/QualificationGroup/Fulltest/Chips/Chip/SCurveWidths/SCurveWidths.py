@@ -141,6 +141,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['over'] = {'Value':'{0:1.2f}'.format(over), 'Label':'>='}
             self.ResultData['KeyList'].append('over')
 
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'S-Curve widths: Noise (e^{-})'
-        
+        self.SaveCanvas()        

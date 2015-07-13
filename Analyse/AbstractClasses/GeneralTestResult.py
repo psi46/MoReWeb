@@ -17,6 +17,11 @@ except NameError:
 import Helper.ROOTConfiguration as ROOTConfiguration
 import glob
 
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
 
 class GeneralTestResult(object):
     nRows = 80
@@ -106,7 +111,8 @@ class GeneralTestResult(object):
             # Key / ValueDict (dict with {Value, Unit, Label}, if Label not specified, the key is used as label) Pairs
             # 'KeyValueDictPairs':{
             # 'MyKey':{
-            # 'Value':25,
+            # 'Value':'25',
+            # 'NumericValue':25,
             # 'Unit': 'kg',
             # 'Label': 'My Key'
             # }
@@ -274,6 +280,7 @@ class GeneralTestResult(object):
             return True
 
         LogFileNames = glob.glob(self.RawTestSessionDataPath + '/*.log') + glob.glob(self.RawTestSessionDataPath + '/*/*.log')
+
         for LogFileName in LogFileNames:
             LogFile = open(LogFileName, "r")
             FirstLine = LogFile.readline()
@@ -517,10 +524,14 @@ class GeneralTestResult(object):
         if self.SavePlotFile:
             if self.Canvas:
                 self.Canvas.SaveAs(self.GetPlotFileName())
+                if not self.ResultData['Plot']['Caption']:
+                    self.ResultData['Plot']['Caption'] = self.Title
                 for Suffix in self.ResultData['Plot']['AdditionalFormats']:
-                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
                 	if Suffix == 'pdf':
                 		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName(Suffix)
+                		if self.ResultData['Plot']['ROOTObject']:
+                		    self.ResultData['Plot']['ROOTObject'].SetTitle(self.ResultData['Plot']['Caption'])
+                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
                 self.ResultData['Plot']['Enabled'] = 1
                 self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''
@@ -954,26 +965,28 @@ class GeneralTestResult(object):
     def GenerateDataFileJSON(self):
         data = None
         key = None
-        try:
-            data = self.ResultData['KeyValueDictPairs']
-            for key in data:
-                # {'NotAlivePixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'MaskDefects': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'NoisyPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'DeadPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'InefficentPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}}
-                if data[key].has_key('Value'):
-                    value = data[key]['Value']
-                    if type(value) == set:
-                        value = list(value)
-                        data[key]['Value'] = value
-                pass
-            # self.ResultData['KeyValueDictPairs']
-            f = open(self.FinalResultsStoragePath + '/KeyValueDictPairs.json', 'w')
-            f.write(json.dumps(self.ResultData['KeyValueDictPairs'], sort_keys=True, indent=4, separators=(',', ': ')))
-            f.close()
-        except (KeyError,IOError):
-            if data and key in data:
-                warnings.warn(
-                    'Cannot create JSON for %s, %s' % (type(data[key]['Value']), self.ResultData['KeyValueDictPairs']))
-            else:
-                warnings.warn('Cannot create JSON for %s, %s' % (type(data), self.ResultData['KeyValueDictPairs']))
+        DataKeys = ['KeyValueDictPairs', 'HiddenData']
+        for DataKey in DataKeys:
+            try:
+                data = self.ResultData[DataKey]
+                for key in data:
+                    if type(data[key])==dict and data[key].has_key('Value'):
+                        value = data[key]['Value']
+                        if type(value) == set:
+                            value = list(value)
+                            data[key]['Value'] = value
+                    elif type(data[key])==dict:
+                        data[key] = list(data[key])
+                    
+                f = open(self.FinalResultsStoragePath + '/'+DataKey+'.json', 'w')
+                f.write(json.dumps(self.ResultData[DataKey], sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
+                f.close()
+            except (KeyError,IOError,TypeError):
+                if data and key in data:
+                    warnings.warn(
+                        'Cannot create JSON for %s, %s' % (type(data[key]['Value']), self.ResultData[DataKey]))
+                else:
+                    warnings.warn('Cannot create JSON for %s, %s' % (type(data), self.ResultData[DataKey]))
 
     '''
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in ASCII format
