@@ -31,9 +31,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         first = True
         timeOffset = 0
-        minCurrent = 999
-        minCurrentPos = 0
-        minCurrentVoltage = 0
 
         for line in self.ParentObject.FileHandle:
             if not line.startswith('#'):
@@ -43,8 +40,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     first = False
                     timeOffset = self.ReadTimestamp(Values[2])
 
-                voltage = float(Values[0])
-                current = float(Values[1])
+                voltage = abs(float(Values[0]))
+                current = abs(float(Values[1]))
                 timeAfterStartup = self.ReadTimestamp(Values[2]) - timeOffset
 
                 currents.append(current)
@@ -96,21 +93,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             GradeCCurrent = self.TestResultEnvironmentObject.GradingParameters['leakageCurrentPON_C']*1.e-6
             Line = ROOT.TLine()
 
-            self.ResultData['Plot']['ROOTObject'].SetMaximum(0)
+            self.ResultData['Plot']['ROOTObject'].SetMinimum(0)
             if MaxCurrent < GradeBCurrent:
-                self.ResultData['Plot']['ROOTObject'].SetMinimum(-1.1*GradeBCurrent)
+                self.ResultData['Plot']['ROOTObject'].SetMaximum(1.1*GradeBCurrent)
             else:
-                self.ResultData['Plot']['ROOTObject'].SetMinimum(-1.1*MaxCurrent)
+                self.ResultData['Plot']['ROOTObject'].SetMaximum(1.1*MaxCurrent)
 
             Line.SetLineColor(ROOT.kRed)
-            lineB = Line.DrawLine(self.ResultData['Plot']['ROOTObject'].GetXaxis().GetXmin(), -GradeBCurrent, self.ResultData['Plot']['ROOTObject'].GetXaxis().GetXmax(), -GradeBCurrent)
+            lineB = Line.DrawLine(self.ResultData['Plot']['ROOTObject'].GetXaxis().GetXmin(), GradeBCurrent, self.ResultData['Plot']['ROOTObject'].GetXaxis().GetXmax(), GradeBCurrent)
 
             if MaxCurrent > GradeCCurrent:
-                self.ResultData['Plot']['ROOTObject'].SetMaximum(0)
                 Line.SetLineColor(ROOT.kRed)
-                lineC = Line.DrawLine(self.ResultData['Plot']['ROOTObject'].GetXaxis().GetXmin(), -GradeCCurrent, self.ResultData['Plot']['ROOTObject'].GetXaxis().GetXmax(), -GradeCCurrent)
+                lineC = Line.DrawLine(self.ResultData['Plot']['ROOTObject'].GetXaxis().GetXmin(), GradeCCurrent, self.ResultData['Plot']['ROOTObject'].GetXaxis().GetXmax(), GradeCCurrent)
 
-            el2 = ROOT.TEllipse(Timestamp, leakageCurrent, 4, abs(self.ResultData['Plot']['ROOTObject'].GetMinimum())*0.05)
+            el2 = ROOT.TEllipse(Timestamp, leakageCurrent, 4, abs(self.ResultData['Plot']['ROOTObject'].GetMaximum())*0.05)
             el2.SetLineColor(ROOT.kRed)
             el2.SetFillStyle(0)
             el2.Draw('')
