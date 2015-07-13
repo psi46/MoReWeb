@@ -21,7 +21,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
     def GenerateOverview(self):
         ROOT.gStyle.SetOptStat(111210)
         ROOT.gPad.SetLogy(1)
-        ROOT.gPad.SetLogx(1)
+        ROOT.gPad.SetLogx(0)
 
         TableData = []
 

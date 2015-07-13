@@ -404,7 +404,11 @@ class GeneralProductionOverview:
             with open(JSONFiles[0]) as data_file:    
                 JSONData = json.load(data_file)
 
-        return JSONData[Keys[-2]][Keys[-1]]
+        try:
+            value = JSONData[Keys[-2]][Keys[-1]]
+        except:
+            value = None
+        return value
 
     def GetUniqueID(self):
         self.LastUniqueIDCounter += 1

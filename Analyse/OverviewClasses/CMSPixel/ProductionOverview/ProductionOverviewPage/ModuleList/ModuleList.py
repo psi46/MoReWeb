@@ -40,6 +40,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             Complete = ''
             FinalGrade = 'None'
             ModuleGrades = []
+            LCGrade = ''
 
             for RowTuple in Rows:
                 if RowTuple['ModuleID']==ModuleID:
@@ -62,6 +63,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == 'LeakageCurrentPON':
                         LCTest = self.DateFromTimestamp(RowTuple['TestDate'])
                         ModuleGrades.append(RowTuple['Grade'])
+                        LCGrade = RowTuple['Grade']
 
             if len(FTMinus20BTC) > 0 and len(FTMinus20ATC) > 0 and len(FT17) > 0 and len(XrayHR) > 0:
                 if len(XrayCal) > 0:
@@ -72,6 +74,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     FinalGrade = 'B'
                 elif 'A' in ModuleGrades:
                     FinalGrade = 'A'
+
+            if LCGrade == 'C' and not (len(FTMinus20BTC) > 0 and len(FTMinus20ATC) > 0 and len(FT17) > 0 and len(XrayHR) > 0 and len(XrayCal) > 0):
+                Complete = '<div style="text-align:center;color:#999;" title="High leakage current, no qualification to be done">&#x2713;</div>'
+                FinalGrade = 'C'
 
             TableData.append(
                 [

@@ -72,7 +72,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
                         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
                         GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
-                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
                         if Value is not None and float(Value) > GradeBC:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorC)
                         elif Value is not None and float(Value) > GradeAB:
@@ -152,6 +152,21 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixel') + TestIndex, ColorC)
                         elif ValueB is not None and float(ValueB) > 0:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixel') + TestIndex, ColorB)
+
+            ### BadROCs
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    
+                    if RowTuple['TestType'] in FullTests:
+                        TestIndex = FullTests.index(RowTuple['TestType'])
+
+                        ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsB', 'Value'])
+                        ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsC', 'Value'])
+
+                        if ValueC is not None and float(ValueC) > 0:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BadROCs') + TestIndex, ColorC)
+                        elif ValueB is not None and float(ValueB) > 0:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BadROCs') + TestIndex, ColorB)
 
             ### lowEfficiency
             for RowTuple in Rows:

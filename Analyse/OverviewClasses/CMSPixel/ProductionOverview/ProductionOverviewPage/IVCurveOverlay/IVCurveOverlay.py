@@ -54,19 +54,21 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 NModules += 1
                             else:
                                 print "WARNING: graph in root file not found"
-        MultiGraph.Draw("AL")
-        MultiGraph.GetXaxis().SetTitle("Voltage [V]")
-        MultiGraph.GetYaxis().SetTitle("Current [A]")
-        MultiGraph.GetYaxis().SetTitleOffset(1)
+        if MultiGraph:
+            MultiGraph.Draw("AL")
+            if MultiGraph.GetXaxis():
+                MultiGraph.GetXaxis().SetTitle("Voltage [V]")
+                MultiGraph.GetYaxis().SetTitle("Current [A]")
+                MultiGraph.GetYaxis().SetTitleOffset(1)
 
-        title = ROOT.TText()
-        title.SetNDC()
-        title.SetTextAlign(12)
-        Subtitle = self.Attributes['Test']
-        TestNames = {'m20_1' : 'Fulltest -20°C BTC', 'm20_2': 'Fulltest -20°C ATC', 'p17_1': 'Fulltest +17°C'}
-        if TestNames.has_key(Subtitle):
-            Subtitle = TestNames[Subtitle]
-        title.DrawText(0.15,0.965,"%s, modules: %d"%(Subtitle,NModules))
+            title = ROOT.TText()
+            title.SetNDC()
+            title.SetTextAlign(12)
+            Subtitle = self.Attributes['Test']
+            TestNames = {'m20_1' : 'Fulltest -20°C BTC', 'm20_2': 'Fulltest -20°C ATC', 'p17_1': 'Fulltest +17°C'}
+            if TestNames.has_key(Subtitle):
+                Subtitle = TestNames[Subtitle]
+            title.DrawText(0.15,0.965,"%s, modules: %d"%(Subtitle,NModules))
 
         self.SaveCanvas()
         HTML = self.Image(self.Attributes['ImageFile'])
