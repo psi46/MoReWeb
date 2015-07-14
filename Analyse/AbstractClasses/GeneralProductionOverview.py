@@ -360,18 +360,42 @@ class GeneralProductionOverview:
     def DateFromTimestamp(self, Timestamp):
         return datetime.datetime.fromtimestamp(Timestamp).strftime(self.DateTimeFormat)
 
-    def GetHistFromROOTFile(self, RootFileName, HistName):
-        RootFile = ROOT.TFile.Open(RootFileName)
-        RootFileCanvas = RootFile.Get("c1")
-        PrimitivesList = RootFileCanvas.GetListOfPrimitives()
+    def GetHistFromROOTFile(self, RootFileNames, HistName):
+        if not type(RootFileNames) == list:
+            RootFileNames = [RootFileNames]
 
-        ClonedROOTObject = None
-        for i in range(0, PrimitivesList.GetSize()):
-            if PrimitivesList.At(i).GetName().find(HistName) > -1:
-                ClonedROOTObject = PrimitivesList.At(i).Clone(self.GetUniqueID())
+        MultipleFilesWarning = False
+        if len(RootFileNames) > 1:
+            print "More than 1 root file found! Using the first one which contains the histogram."
+            MultipleFilesWarning = True
+        elif len(RootFileNames) < 1:
+            print ".root file for histogram %s not found!"%HistName
+            return None
+
+        HistogramFound = False
+        for RootFileName in RootFileNames:
+            RootFile = ROOT.TFile.Open(RootFileName)
+            RootFileCanvas = RootFile.Get("c1")
+            PrimitivesList = RootFileCanvas.GetListOfPrimitives()
+
+            ClonedROOTObject = None
+            for i in range(0, PrimitivesList.GetSize()):
+                if PrimitivesList.At(i).GetName().find(HistName) > -1:
+                    ClonedROOTObject = PrimitivesList.At(i).Clone(self.GetUniqueID())
+                    HistogramFound = True
+                    break
+
+            if HistogramFound:
+                self.FileHandles.append(RootFile)
+                if MultipleFilesWarning:
+                    print " => Histogram '%s' found in file '%s"%(HistName, RootFile)
                 break
+            else:
+                RootFile.Close()
 
-        self.FileHandles.append(RootFile)
+        if not HistogramFound:
+            return None
+
         self.Canvas.cd()
         return ClonedROOTObject
 

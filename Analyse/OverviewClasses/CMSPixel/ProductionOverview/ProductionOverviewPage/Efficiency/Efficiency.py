@@ -46,29 +46,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         NROCs = 0
         for ModuleID in ModuleIDsList:
-
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     TestType = RowTuple['TestType']
-
                     if TestType == 'XRayHRQualification':
-
                         for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'EfficiencyInterpolation', 'KeyValueDictPairs.json'])
-                            JSONFiles = glob.glob(Path)
-                            if len(JSONFiles) > 1:
-                                print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
-                            elif len(JSONFiles) < 1:
-                                print "WARNING: %s json file not found: '%s"%(self.Name, Path)
-                            else:
-                                
-                                with open(JSONFiles[0]) as data_file:    
-                                    JSONData = json.load(data_file)
-                                
-                                Histogram.Fill(float(JSONData["InterpolatedEfficiency{Rate}".format(Rate=self.Attributes['Rate'])]['Value']))
+                            Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip,  'EfficiencyInterpolation', 'KeyValueDictPairs.json', "InterpolatedEfficiency{Rate}".format(Rate=self.Attributes['Rate']), 'Value'])
+                            if Value is not None:
+                                Histogram.Fill(float(Value))
                                 NROCs += 1
-
-                        break
         
         Histogram.Draw("")
         ROOT.gPad.Update()
@@ -78,7 +64,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
       	PaveStats.SetY1NDC(0.78)
       	PaveStats.SetY2NDC(0.88)
        
-        # Grading, TODO: replace by real values if merged with hirate branch 
+        # Grading
         GradeAB = 98
         GradeBC = 95
 

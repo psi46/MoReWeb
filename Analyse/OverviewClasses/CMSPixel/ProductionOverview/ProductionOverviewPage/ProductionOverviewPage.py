@@ -82,6 +82,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
+        self.SubPages.append(
+            {
+                "Key": "BumpBondingVsId",
+                "Module": "BumpBondingVsId",
+                "InitialAttributes" : {
+                    "StorageKey" : "BumpBondingVsId",
+                }
+            }
+        )
 
         TestsList = ['m20_1', 'm20_2', 'p17_1']
 

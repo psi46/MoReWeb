@@ -46,17 +46,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == 'XRayHRQualification' and (RowTuple['Grade'] == self.Attributes['Grade'] or self.Attributes['Grade'] == 'All'):
                         Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], SubtestSubfolder, '*.root'])
                         RootFiles = glob.glob(Path)
-                        if len(RootFiles) > 1:
-                            print "more than 1 root file found"
-                        elif len(RootFiles) < 1:
-                            print "root file not found in: '%s"%Path
+
+                        ROOTObject = self.GetHistFromROOTFile(RootFiles, "BumpBonding")
+                        if ROOTObject:
+                            SummaryMap.Add(ROOTObject)
+                            NModules += 1
                         else:
-                            ROOTObject = self.GetHistFromROOTFile(RootFiles[0], "BumpBonding")
-                            if ROOTObject:
-                                SummaryMap.Add(ROOTObject)
-                                NModules += 1
-                            else:
-                                print "th2d in root file not found"
+                            print "BumpBonding map not found for module: '%s'"%ModuleId
         
         SummaryMap.Draw("colz")
 

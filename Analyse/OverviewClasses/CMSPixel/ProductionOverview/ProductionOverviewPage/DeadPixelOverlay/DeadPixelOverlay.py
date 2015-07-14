@@ -44,20 +44,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         for Chip in range(0,16):
                             Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'PixelMap', '*.root'])
                             RootFiles = glob.glob(Path)
-                            if len(RootFiles) > 1:
-                                print "WARNING: more than 1 root file found in: '%s"%Path
-                            elif len(RootFiles) < 1:
-                                print "WARNING: root file not found in: '%s"%Path
+                            ROOTObject = self.GetHistFromROOTFile(RootFiles, "PixelMap")
+                            if ROOTObject:
+                                for col in range(0, self.nCols):
+                                    for row in range(0, self.nRows):
+                                        if ROOTObject.GetBinContent(1+col, 1+row) < 1:
+                                            self.UpdatePlot(SummaryMap, Chip, col, row, 1)
                             else:
-                                ROOTObject = self.GetHistFromROOTFile(RootFiles[0], "PixelMap")
-                                if ROOTObject:
-                                    for col in range(0, self.nCols):
-                                        for row in range(0, self.nRows):
-                                            if ROOTObject.GetBinContent(1+col, 1+row) < 1:
-                                                self.UpdatePlot(SummaryMap, Chip, col, row, 1)
-                                else:
-                                    print "WARNING: th2d in root file '%s' not found"%RootFiles[0]
-                        
+                                print "Dead Pixel map not found for module '%s'"%ModuleID
+                    
                         NModules += 1
 
         SummaryMap.Draw("colz")
