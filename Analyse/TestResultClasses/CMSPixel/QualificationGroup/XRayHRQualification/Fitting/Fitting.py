@@ -16,7 +16,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         SysConfiguration.read(['Configuration/SystemConfiguration.cfg'])
         ParallelProcessing = False
         try:
-            if SysConfiguration.get('SystemConfiguration', 'ParallelProcessing')>0:
+            if int(SysConfiguration.get('SystemConfiguration', 'ParallelProcessing').strip())>0:
                 ParallelProcessing = True
         except:
             print "no 'ParallelProcessing' option found, running sequentially..."
