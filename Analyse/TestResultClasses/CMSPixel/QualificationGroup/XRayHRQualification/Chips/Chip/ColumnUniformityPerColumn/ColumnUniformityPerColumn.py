@@ -2,7 +2,7 @@
 import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
-
+import array
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -19,11 +19,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'σ'
             }
         }
-        
+
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         HitROOTOBjects = {}
-        
+
         histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'hitsVsColumn').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']
         for Rate in Rates:
@@ -59,9 +59,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     ColumnUniformity = 0
                 self.ResultData['Plot']['ROOTObject'].SetBinContent(Column+1, ColumnUniformity)
 
-            
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
-            
+
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 1.2 * self.ResultData['Plot'][
                 'ROOTObject'].GetMaximum())
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column")
@@ -71,17 +70,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlue+2)
             self.ResultData['Plot']['ROOTObject'].Draw()
-            
-            
-            
-            Fit = self.ResultData['Plot']['ROOTObject'].Fit('pol0','RQ0')
 
-            Mean = -1
-            RMS = -1
-            if self.ResultData['Plot']['ROOTObject'].GetFunction('pol0'):
-                Mean = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParameter(0)
-                RMS = self.ResultData['Plot']['ROOTObject'].GetFunction('pol0').GetParError(0)
-                       
+            ColumnRatios = array.array('d', [])
+            for i in range(1, self.ResultData['Plot']['ROOTObject'].GetNbinsX()+1):
+                ColumnRatios.append(self.ResultData['Plot']['ROOTObject'].GetBinContent(i))
+
+            Mean = ROOT.TMath.Mean(len(ColumnRatios), ColumnRatios)
+            RMS = ROOT.TMath.RMS(len(ColumnRatios), ColumnRatios)
+
             lineCHigh = ROOT.TLine().DrawLine(
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'],
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'],
@@ -97,12 +93,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             lineCLow.SetLineWidth(2)
             lineCLow.SetLineStyle(2)
             lineCLow.SetLineColor(ROOT.kRed)
-            
+
             self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(Mean)
             self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMS)
 
             self.ResultData['KeyList'] += ['mu','sigma']
-            
 
         self.Title = 'Col. Uniformity Ratio: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         self.SaveCanvas()        

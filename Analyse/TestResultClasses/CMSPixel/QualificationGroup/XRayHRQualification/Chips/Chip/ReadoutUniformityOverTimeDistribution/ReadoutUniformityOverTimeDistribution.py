@@ -53,18 +53,36 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if Ei > 0.5:
                     chi2 += (distribution.GetBinContent(i) - Ei)*(distribution.GetBinContent(i) - Ei)/Ei
                     ndf += 1
-
             chi2ndf_max = 99999
 
             if ndf < 3:
                 chi2ndf = chi2ndf_max
             else:
                 chi2ndf = chi2 / (ndf - 2)
-
             if chi2ndf > chi2ndf_max:
                 chi2ndf = chi2ndf_max
 
             poisson.Draw("same")
+
+            Ymax = 1.1 * max(distribution.GetMaximum(), poisson.GetMaximum(0, EventsMaximum))
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0., Ymax)
+
+            lineCLow = ROOT.TLine().DrawLine(
+                distribution.GetMean()-self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']*sigma_th, 0,
+                distribution.GetMean()-self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']*sigma_th, Ymax,
+            )
+            lineCLow.SetLineWidth(2)
+            lineCLow.SetLineStyle(2)
+            lineCLow.SetLineColor(ROOT.kRed)
+            
+            lineCHigh = ROOT.TLine().DrawLine(
+                distribution.GetMean()+self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']*sigma_th, 0,
+                distribution.GetMean()+self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']*sigma_th, Ymax,
+            )
+            lineCHigh.SetLineWidth(2)
+            lineCHigh.SetLineStyle(2)
+            lineCHigh.SetLineColor(ROOT.kRed)
+
 
             self.ResultData['KeyValueDictPairs']['chi2/ndf']['Value'] = '{0:1.2f}'.format(chi2ndf)
             self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(sigma)
