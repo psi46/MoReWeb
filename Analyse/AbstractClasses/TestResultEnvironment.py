@@ -80,6 +80,8 @@ class TestResultEnvironment:
         'XRayHighRate_SCurve_Noise_Threshold_C':800,
         'XRayHighRate_missing_xray_pixels_B':42,
         'XRayHighRate_missing_xray_pixels_C':168,
+        'XRayHighRate_pixel_defects_B':42,
+        'XRayHighRate_pixel_defects_C':168,
     }
     XRayHRQualificationConfiguration = {
         'OmitGradesInFinalGrading':'HotPixelGrade',

@@ -48,7 +48,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['HiddenData']['htmax'] = 255.;
         self.ResultData['HiddenData']['htmin'] = 0.
-        self.ResultData['HiddenData']['NumberOfNoisyPixels'] = 0
+        self.ResultData['HiddenData']['NumberOfNoisyPixels'] = {
+            'Label': 'Number of noisy pixels',
+            'Value': 0,
+        }
         self.ResultData['HiddenData']['ListOfNoisyPixels'] = []
 
     def PopulateResultData(self):
@@ -105,7 +108,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
                         if Width > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
-                            self.ResultData['HiddenData']['NumberOfNoisyPixels'] += 1
+                            self.ResultData['HiddenData']['NumberOfNoisyPixels']['Value'] += 1
                             self.ResultData['HiddenData']['ListOfNoisyPixels'].append((ChipNo, column, row))
             ThresholdMean /= NPix
 

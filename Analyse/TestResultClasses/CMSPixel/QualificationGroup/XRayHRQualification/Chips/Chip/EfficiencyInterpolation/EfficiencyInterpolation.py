@@ -93,6 +93,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].SetTitle("")
                 InterpolationFunction = cubicFit
 
+                # values to show in summary
                 for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
                     line = ROOT.TLine().DrawLine(
                         InterpolationRate * 1e6 * ScalingFactor, PlotMinEfficiency,
@@ -103,6 +104,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                     self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
                     self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)]
+
+                # always interpolate at this rates, but don't show them in summary
+                for InterpolationRate in [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]:
+                    self.ResultData['HiddenData']['InterpolatedEfficiency%d'%int(InterpolationRate)] = {
+                        'Label': 'Interpolated Efficiency at %s Mhz/cm2'%int(InterpolationRate),
+                        'Value': '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor)),
+                        'Unit': '%',
+                    }
+
         else:
                 for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
                     self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=0)

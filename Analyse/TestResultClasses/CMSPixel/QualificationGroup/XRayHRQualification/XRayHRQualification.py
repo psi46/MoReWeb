@@ -435,9 +435,19 @@ class TestResult(GeneralTestResult):
             PixelDefects = 'None'
 
         try:
+            ROCsLessThanOnePercent = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCsLessThanOnePercent']['Value']
+        except KeyError:
+            ROCsLessThanOnePercent = 'None'
+
+        try:
             ROCsMoreThanOnePercent = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCsMoreThanOnePercent']['Value']
         except KeyError:
             ROCsMoreThanOnePercent = 'None'
+
+        try:
+            ROCsMoreThanFourPercent = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCsMoreThanFourPercent']['Value']
+        except KeyError:
+            ROCsMoreThanFourPercent = 'None'
 
         try:
             NoisyPixels = float(self.ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'])
@@ -452,7 +462,9 @@ class TestResult(GeneralTestResult):
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
             'Grade': grade,
             'PixelDefects': PixelDefects,
+            'ROCsLessThanOnePercent': ROCsLessThanOnePercent,
             'ROCsMoreThanOnePercent': ROCsMoreThanOnePercent,
+            'ROCsMoreThanFourPercent': ROCsMoreThanFourPercent,
             'Noise': NoisyPixels,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
@@ -467,17 +479,37 @@ class TestResult(GeneralTestResult):
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
             'Operator': self.Attributes['Operator'],
-            
-
         }
+
         print 'fill row end'
         if False and self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
-            #from PixelDB import *
-            #pdb = PixelDBInterface(operator="tommaso", center="pisa")
-            #pdb.connectToDB()
-            HighRateData = {
-                'Rates':self.Attributes['Rates']
-            }
+
+            HighRateData = Row.deepcopy()
+
+            from PixelDB import *
+            # modified by Tommaso
+            #
+            # try and speak directly with PixelDB
+            #
+            pdb = PixelDBInterface(operator="tommaso", center="pisa")
+            pdb.connectToDB()
+            
+            OPERATOR = os.environ['PIXEL_OPERATOR']
+            CENTER = os.environ['PIXEL_CENTER']
+            s = Session(CENTER, OPERATOR)
+            pdb.insertSession(s)
+            print "--------------------"
+            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, HighRateData
+            print "--------------------"
+            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, HighRateData)
+               
+            if pp is None:
+                print "INSERTION FAILED!"
+                sys.exit(31)
+            insertedID=pp.TEST_ID
+
+
+            '''
             GradingTestResultObject = self.ResultData['SubTestResults']['Grading']
             EfficiencyOverviewTestResultObject = self.ResultData['SubTestResults']['EfficiencyOverview']
             
@@ -631,6 +663,7 @@ class TestResult(GeneralTestResult):
                         GradingTestResultObject.ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]
                     )
                     
+            '''
                     
                     
             # here comes the code for pixel db upload
@@ -650,7 +683,9 @@ class TestResult(GeneralTestResult):
                         QualificationType,
                         Grade,
                         PixelDefects,
+                        ROCsLessThanOnePercent,
                         ROCsMoreThanOnePercent,
+                        ROCsMoreThanFourPercent,
                         Noise,
                         RelativeModuleFinalResultsPath,
                         FulltestSubfolder
@@ -663,7 +698,9 @@ class TestResult(GeneralTestResult):
                         :QualificationType,
                         :Grade,
                         :PixelDefects,
+                        :ROCsLessThanOnePercent,
                         :ROCsMoreThanOnePercent,
+                        :ROCsMoreThanFourPercent,
                         :Noise,
                         :RelativeModuleFinalResultsPath,
                         :FulltestSubfolder

@@ -10,7 +10,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
         self.Attributes['GradeKeys'] = {
             'HREfficiency':[
-                'EfficiencyGrade',
             ],
             'HRData':[
                 'HotPixelsGrade',
@@ -24,7 +23,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['NumberKeys'] = {
             'HREfficiency':[
                 'NumberOfLowEfficiencyPixels',
-                'Efficiency'
             ],
             'HRData':[
                 'NumberOfHotPixels',
@@ -106,6 +104,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['NoiseGrade'] = {
             'Value':'',
             'Label':'Noise Grade'
+        }        
+        self.ResultData['KeyValueDictPairs']['PixelDefects'] = {
+            'Value':'',
+            'Label':'Total Number of Pixel Defects',
         }
 
         self.ResultData['KeyList'] += [
@@ -136,6 +138,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = -1
                 for GradeKey in self.Attributes['GradeKeys'][RateType]:
                     self.ResultData['HiddenData'][GradeKey+'_{Rate}'.format(Rate=Rate)] = -1
+
+        for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
+            self.ResultData['HiddenData']['Efficiency_{Rate}'.format(Rate=Rate)] = {
+                'Label': 'Efficiency at %s MHz/cm2'%Rate,
+                'Value': '',
+                'Unit': '%',
+            }
+            self.ResultData['HiddenData']['EfficiencyGrade_{Rate}'.format(Rate=Rate)] = {
+                'Label': 'Efficiency Grade at %s MHz/cm2'%Rate,
+                'Value': '',
+                'Unit': '',
+            }
             
 	
     def PopulateResultData(self):
@@ -187,6 +201,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         AliveMapROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
        
         BumpBondingDefectsList = []
+        NoiseDefectsList = []
+        HotPixelDefectsList = []
 
         # hitmap and uniformity grading
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']:
@@ -211,6 +227,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     if PixelIsHotPixel > 0:
                         NumberValues['NumberOfHotPixels'] += 1
                         self.ResultData['HiddenData']['ListOfHotPixels_{Rate}'.format(Rate=Rate)].append((ChipNo, Column, Row))
+            HotPixelDefectsList.append(NumberValues['NumberOfHotPixels'])
 
             ### Hot Pixels Grade ###
             Grades['HotPixelsGrade'] = 1
@@ -294,9 +311,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 else:
                     self.ResultData['KeyValueDictPairs'][GradeKey]['Value'] = (self.ResultData['KeyValueDictPairs'][GradeKey]['Value']+'/('+GradeMapping[Grades[GradeKey]]+')').strip('/')
 
-        ### Bump Bonding Defects (Minimum) ###
-        self.ResultData['HiddenData']['BumpBondingDefectsMin'] = min(BumpBondingDefectsList)
-
         ### Column Uniformity Grade ###
         Grades['ColumnUniformityGrade'] = 1         
         NumberValues['NumberOfNonUniformColumns'] = 0
@@ -327,8 +341,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if Grades['NoiseGrade'] < 3 and Noise > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
                 Grades['NoiseGrade'] = 3
                 print "Grade noise to C: %f"%Noise
-            
-        ROCGrades.append(Grades['NoiseGrade'])
+
+            NoisyPixels = int(NoiseTestResultObject.ResultData['HiddenData']['NumberOfNoisyPixels']['Value'])
+            NoiseDefectsList.append(NoisyPixels)
+        
+        if not 'NoiseGrade' in OmitGradesInFinalGrading and not 'NoiseGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:   
+            ROCGrades.append(Grades['NoiseGrade'])
+
         self.ResultData['KeyValueDictPairs']['NoiseGrade']['Value'] = GradeMapping[Grades['NoiseGrade']]
 
 
@@ -346,5 +365,49 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['NumberOfDeadPixels'] = DeadPixels
         self.ResultData['HiddenData']['NumberOfInefficientPixels'] = InefficientPixels
 
+
+        ###  extract one number from tests done for different rates ###
+        ###  BumpBonding: minimum number of missing hits (~highest rate = best statistics)
+
+        NoiseDefects = max(NoiseDefectsList) if len(NoiseDefectsList) > 0 else 0
+        HotPixelDefects = max(HotPixelDefectsList) if len(HotPixelDefectsList) > 0 else 0
+        BumpBondingDefects = min(BumpBondingDefectsList) if len(BumpBondingDefectsList) > 0 else 0
+        TotalPixelDefects = NoiseDefects + HotPixelDefects + BumpBondingDefects
+
+        self.ResultData['HiddenData']['BumpBondingDefects'] = {
+            'Label': 'Bump Bonding Defects',
+            'Value': BumpBondingDefects,
+        }
+        self.ResultData['HiddenData']['HotPixelDefects'] = {
+            'Label': 'Hot Pixels',
+            'Value': HotPixelDefects,
+        }
+        self.ResultData['HiddenData']['NoiseDefects'] = {
+            'Label': 'Noisy Pixels which exceed noise_thr_C=%d'%self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C'],
+            'Value': NoiseDefects,
+        }        
+        self.ResultData['HiddenData']['PixelDefects'] = {
+            'Label': 'Total Pixel Defects',
+            'Value': TotalPixelDefects,
+        }
+        self.ResultData['KeyValueDictPairs']['PixelDefects']['Value'] = TotalPixelDefects
+
+        ### total pixel defects grading ###
+        Grades['PixelDefectsGrade'] = 1
+        if TotalPixelDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_B']:
+            Grades['PixelDefectsGrade'] = 2
+        if TotalPixelDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_C']:
+            Grades['PixelDefectsGrade'] = 3
+        if not 'PixelDefectsGrade' in OmitGradesInFinalGrading:   
+            ROCGrades.append(Grades['PixelDefectsGrade'])
+
         ### Final ROC Grade ###
         self.ResultData['KeyValueDictPairs']['ROCGrade']['Value'] = GradeMapping[max(ROCGrades)]
+
+        GradeFormatted = GradeMapping[max(ROCGrades)]
+        print '-'*78
+        print ' ROC {ROC:2.0f}: Grade {Grade}'.format(ROC=self.ParentObject.Attributes['ChipNo'], Grade=GradeFormatted)
+        print '         Pixel Defects:              {Defects}'.format(Defects=TotalPixelDefects)
+        print '         BumpBonding Defects:        {Defects}'.format(Defects=BumpBondingDefects)
+        print '         Efficiency at 120 MHz/cm2:  {Eff}'.format(Eff=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency120']['Value'])
+       

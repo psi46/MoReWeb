@@ -32,7 +32,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'PixelDefects': {
                 'Value': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value'],
                 'Label': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Label']
-            }
+            },
+            'BumpBondingDefects': {
+                'Value': "{BB:1.0f}".format(BB=self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['BumpBondingDefects']['Value']), 
+                'Label': 'Bump Bonding Defects',
+            },
+            'NoisyPixels': {
+                'Value': "{NoisyPixels:1.0f}".format(NoisyPixels=self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NoiseDefects']['Value']), 
+                'Label': 'Noisy Pixels',
+            },
+            'HotPixelDefects': {
+                'Value': "{HotPixelDefects:1.0f}".format(HotPixelDefects=self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['HotPixelDefects']['Value']), 
+                'Label': 'Hot Pixels',
+            },
+            'ROCsWithReadoutProblems': {
+                'Value': "{ROCsWithReadoutProblems:1.0f}".format(ROCsWithReadoutProblems=self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCsWithReadoutProblems']['Value']), 
+                'Label': 'ROCs with r/o problems',
+            },
+            'ROCsWithUniformityProblems': {
+                'Value': "{ROCsWithUniformityProblems:1.0f}".format(ROCsWithUniformityProblems=self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCsWithUniformityProblems']['Value']), 
+                'Label': 'ROCs with unif problems',
+            },
         }
 
         ### Mean Efficiency ###
@@ -75,33 +95,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['KeyValueDictPairs']['Noise'] = {
                 'Value': NoiseString, 
-                'Label': 'Noise %s'%RatesString,
+                'Label': 'Mean Noise %s'%RatesString,
                 'Unit': 'e-',
             }
 
-        ### Noisy Pixels ###
-        RatesString = ''
-        NoiseString = ''
-        for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
-            RatesString = (RatesString + "/{Rate}".format(Rate=Rate)).strip("/")
-
-            NoiseList = []
-            for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
-                ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-                Noise = ChipTestResultObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['HiddenData']['NumberOfNoisyPixels']
-                NoiseList.append(Noise)
-
-            TotalNoisyPixels = sum(NoiseList)
-            NoiseString = (NoiseString + "/{Noise:1.0f}".format(Noise=TotalNoisyPixels)).strip("/")
-
-            break #allow only one noise rate for now
-
-        self.ResultData['KeyValueDictPairs']['NoisyPixels'] = {
-                'Value': NoiseString, 
-                'Label': 'Noisy Pixels %s'%RatesString,
-                'Unit': '',
-            }
-
-        self.ResultData['KeyList'] = ['Module','Grade', 'ROCGrades','PixelDefects','Efficiency','Noise','NoisyPixels']
+        self.ResultData['KeyList'] = ['Module','Grade', 'ROCGrades','PixelDefects','BumpBondingDefects','NoisyPixels', 'HotPixelDefects', 'ROCsWithReadoutProblems', 'ROCsWithUniformityProblems', 'Efficiency','Noise']
 
 

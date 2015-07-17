@@ -13,7 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         
     def PopulateResultData(self):
-      TableHeader = ['ROC','Grade']
+      TableHeader = ['ROC','Grade','Defects']
       for Rate in self.ParentObject.Attributes['InterpolatedEfficiencyRates']:
         TableHeader.append('Eff {Rate}'.format(Rate=Rate))
 
@@ -52,8 +52,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                          '###LABEL###':'Chip '+str(ChipNo),
                          '###URL###':os.path.relpath(i['TestResultObject'].FinalResultsStoragePath, self.ParentObject.FinalResultsStoragePath)+'/TestResult.html'
                      }
-                 ), ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value']
+                 ), 
+                 '<div style="text-align:center;">%s</div>'%ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value'],             
         ]
+        
+        PixelDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value'])
+        if PixelDefects > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_C']:
+          TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=PixelDefects)))
+        elif PixelDefects > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_B']:
+          TableRow.append(GradeBHTMLTemplate%("{Value:1.0f}".format(Value=PixelDefects)))
+        else:
+          TableRow.append("{Value:1.0f}".format(Value=PixelDefects))
 
         RateIndex = 1
         for Rate in self.ParentObject.Attributes['InterpolatedEfficiencyRates']:
@@ -97,7 +106,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             TableRow.append(GradeBHTMLTemplate%("{Value:1.0f}".format(Value=Noise)))
           else:
             TableRow.append("{Value:1.0f}".format(Value=Noise))
-          NoisyPixels = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['HiddenData']['NumberOfNoisyPixels'])
-          TableRow.append("{Value:1.0f}".format(Value=NoisyPixels))            
+          NoisyPixels = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['HiddenData']['NumberOfNoisyPixels']['Value'])  
+          if NoisyPixels > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_C']:
+            TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=NoisyPixels)))
+          elif NoisyPixels > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_B']:
+            TableRow.append(GradeBHTMLTemplate%("{Value:1.0f}".format(Value=NoisyPixels)))
+          else:
+            TableRow.append("{Value:1.0f}".format(Value=NoisyPixels))
 
         self.ResultData['Table']['BODY'].append(TableRow)
