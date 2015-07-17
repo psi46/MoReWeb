@@ -77,25 +77,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             }
 
         ### Mean Noise ###
-        RatesString = ''
-        NoiseString = ''
-        for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
-            RatesString = (RatesString + "/{Rate}".format(Rate=Rate)).strip("/")
-
-            NoiseList = []
-            for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
-                ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-                Noise = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noise_{Rate}'.format(Rate=Rate)]
-                NoiseList.append(Noise)
-
-            MeanNoise = sum(NoiseList) / float(len(NoiseList))
-            NoiseString = (NoiseString + "/{Noise:1.0f}".format(Noise=MeanNoise)).strip("/")
-
-            break #allow only one noise rate for now
-
         self.ResultData['KeyValueDictPairs']['Noise'] = {
-                'Value': NoiseString, 
-                'Label': 'Mean Noise %s'%RatesString,
+                'Value': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['MeanNoise']['Value'], 
+                'Label': 'Mean Noise',
                 'Unit': 'e-',
             }
 

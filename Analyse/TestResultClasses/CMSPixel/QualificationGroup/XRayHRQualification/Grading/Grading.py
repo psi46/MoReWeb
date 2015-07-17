@@ -94,6 +94,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if NonUniformEventsROC > 0:
                 ROCsWithReadoutProblems += 1
 
+            # mean noise
+            if len(self.ParentObject.Attributes['Rates']['HRSCurves']) > 0:
+                Rate = self.ParentObject.Attributes['Rates']['HRSCurves'][0]
+
+                NoiseList = []
+                for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+                    ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                    Noise = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noise_{Rate}'.format(Rate=Rate)]
+                    NoiseList.append(Noise)
+
+                MeanNoise = sum(NoiseList) / float(len(NoiseList))
+            else:
+                MeanNoise = -1
+
         SubGradings['PixelDefects'] = SubGrading
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -151,6 +165,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ROCsWithUniformityProblems': {
                 'Value': ROCsWithUniformityProblems,
                 'Label': 'ROCs with unif. problems'
+            },
+            'MeanNoise': {
+                'Value': "{Noise:1.0f}".format(Noise=MeanNoise),
+                'Label': 'Mean Noise'
             },
         }
         self.ResultData['HiddenData']['SubGradings'] = SubGradings
