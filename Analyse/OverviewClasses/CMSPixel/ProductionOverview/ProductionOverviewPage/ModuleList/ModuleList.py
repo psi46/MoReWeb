@@ -45,23 +45,25 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID']==ModuleID:
                     TestType = RowTuple['TestType']
+                    Url = self.GlobalOverviewPath + '/' + RowTuple['RelativeModuleFinalResultsPath'] + '/' + RowTuple['FulltestSubfolder'] + '/TestResult.html'
+
                     if TestType == 'm20_1':
-                        FTMinus20BTC = self.DateFromTimestamp(RowTuple['TestDate'])
+                        FTMinus20BTC = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
                         ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'm20_2':
-                        FTMinus20ATC = self.DateFromTimestamp(RowTuple['TestDate'])
+                        FTMinus20ATC = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
                         ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'p17_1':
-                        FT17 = self.DateFromTimestamp(RowTuple['TestDate'])
+                        FT17 = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
                         ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'XrayCalibration_Spectrum':
-                        XrayCal = self.DateFromTimestamp(RowTuple['TestDate'])
+                        XrayCal = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
                         ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'XRayHRQualification':
-                        XrayHR = self.DateFromTimestamp(RowTuple['TestDate'])
+                        XrayHR = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
                         ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'LeakageCurrentPON':
-                        LCTest = self.DateFromTimestamp(RowTuple['TestDate'])
+                        LCTest = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
                         ModuleGrades.append(RowTuple['Grade'])
                         LCGrade = RowTuple['Grade']
 
