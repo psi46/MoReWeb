@@ -613,7 +613,7 @@ class TestResult(GeneralTestResult):
                 while True:
                     maximum = histo.GetBinContent(histo.GetMaximumBin())
                     entries = histo.GetEntries()
-                    ratio = float(maximum) / float(entries)
+                    ratio = float(maximum) / float(entries) if entries > 0 else 1
                     if ratio < .025:
                         histo.Rebin()
                     else:
@@ -632,7 +632,12 @@ class TestResult(GeneralTestResult):
                 rate = -1
             else:
                 rate = nhits/(ntrig*25e-9*area)
-            order = min(int(math.log10(rate))/3,3)
+
+            if rate>0:
+                order = min(int(math.log10(rate))/3,3)
+            else:
+                order = 0
+
             rate_divider =  10**(3*order)
             rate2 = round(rate/rate_divider,1)
             if order == 0:
