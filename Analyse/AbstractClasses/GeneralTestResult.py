@@ -27,12 +27,18 @@ class GeneralTestResult(object):
     nRows = 80
     nCols = 52
     nTotalChips = 16
+
+    try:
+        MoReWebVersion = subprocess.check_output(["git", "describe"])
+    except:
+        MoReWebVersion = 'unknown MoReWeb version'
+
     '''
         Initialization function
         @param ParentObject Reference to the Parent Object
         @param InitialModulePath Starting point of modules
     '''
-
+    
     def __init__(self, TestResultEnvironmentObject, ParentObject=None, InitialModulePath=None,
                  InitialFinalResultsStoragePath=None, InitialAttributes=None, Key=None, DisplayOptions=None):
         ROOTConfiguration.initialise_ROOT()
@@ -704,12 +710,8 @@ class GeneralTestResult(object):
             TestResultObject.Title = TestResultObject.NameSingle
         MyObjectTestDate = ''
         if RecursionLevel == 0 and TestResultObject.Attributes['TestDate']:
-            try:
-                MoReWebVersion = subprocess.check_output(["git", "describe"])
-            except:
-                MoReWebVersion = 'unknown MoReWeb version'
             MyObjectTestDate = 'Test Date: ' + datetime.datetime.fromtimestamp(
-                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%m") + '<br><span style="font-size:10.5pt;" title="' + MoReWebVersion + '">Analysis time: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%m") + '</span>'
+                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%M") + '<br><span style="font-size:10.5pt;" title="' + GeneralTestResult.MoReWebVersion + '">Analysis date: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + '</span>'
 
         MainTestResultAdditionalClasses = ''
 
