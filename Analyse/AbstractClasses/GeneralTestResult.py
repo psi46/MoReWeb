@@ -461,14 +461,22 @@ class GeneralTestResult(object):
 
         if Level:
             if self.FileHandle:
-                try:
-                    self.FileHandle.close()
-                except:
-                    print '\x1b[33m warning: can not close file "%s" \x1b[0m'%repr(self.FileHandle)
+
+                if not type(self.FileHandle) == list:
+                    self.FileHandle = [self.FileHandle]
+
+                for SingleFileHandle in self.FileHandle:
                     try:
-                        self.FileHandle.Close()
+                        if "ROOT.TFile" in repr(SingleFileHandle):
+                            if self.verbose:
+                                print '\x1b[35mclose ROOT file "%s" ...\x1b[0m'%repr(SingleFileHandle)
+                            SingleFileHandle.Close()
+                        else:
+                            if self.verbose:
+                                print '\x1b[32mclose file "%s" ...\x1b[0m'%repr(SingleFileHandle)
+                            SingleFileHandle.close()
                     except:
-                        pass
+                        print '\x1b[33m warning: can not close file "%s" \x1b[0m'%repr(SingleFileHandle)
 
     '''
         Reads all attributes and writes it to the memory

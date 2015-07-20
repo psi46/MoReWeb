@@ -39,6 +39,8 @@ class TestResult(GeneralTestResult):
             'HRSCurves':[]
         }
 
+        self.FileHandle = []
+
         self.Attributes['InterpolatedEfficiencyRates'] = []
         for r in range(1, int(1 + self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_NInterpolationRates'])):
             self.Attributes['InterpolatedEfficiencyRates'].append(int(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_InterpolationRate%d'%r]))
@@ -54,6 +56,7 @@ class TestResult(GeneralTestResult):
             self.Attributes['Rates']['HREfficiency'].append(Rate)
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
+            self.FileHandle.append(self.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=Rate)])
 
             self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)] = 50 #pxar default
             NTriggersReadFromFile = False            
@@ -81,6 +84,7 @@ class TestResult(GeneralTestResult):
             self.Attributes['Rates']['HRData'].append(Rate)
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
+            self.FileHandle.append(self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)])
 
 
         HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRS[Cc]urves_*')
@@ -101,18 +105,21 @@ class TestResult(GeneralTestResult):
             if len(ROOTFiles) > 1:
                 warnings.warn("The directory '%s' contains more than one .root file, choosing first one: '%s'"%(FolderName, ROOTFiles[0]))
             self.Attributes['ROOTFiles']['MaskHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
+            self.FileHandle.append(self.Attributes['ROOTFiles']['MaskHotPixels'])
             break
 
         PixelAlivePaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_PixelAlive_*')
         for Path in PixelAlivePaths:
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['PixelAlive'] = ROOT.TFile.Open(ROOTFiles[0])
+            self.FileHandle.append(self.Attributes['ROOTFiles']['PixelAlive'])
 
         CalDelScanPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_CalDel*_*')
         for Path in CalDelScanPaths:
             ROOTFiles = glob.glob(Path+'/*.root')
             if len(ROOTFiles) > 0:
                 self.Attributes['ROOTFiles']['CalDelScan'] = ROOT.TFile.Open(ROOTFiles[0])
+                self.FileHandle.append(self.Attributes['ROOTFiles']['CalDelScan'])
 
         self.ResultData['SubTestResultDictList'] = []
 
@@ -418,6 +425,7 @@ class TestResult(GeneralTestResult):
         pass
 
     def PopulateResultData(self):
+        self.CloseSubTestResultFileHandles()
         pass
 
     def CustomWriteToDatabase(self, ParentID):
