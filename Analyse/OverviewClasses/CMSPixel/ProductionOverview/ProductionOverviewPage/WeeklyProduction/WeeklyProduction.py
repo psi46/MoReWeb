@@ -155,7 +155,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             HistStack.Draw()
             HistStack.GetXaxis().SetTimeDisplay(1)
             HistStack.GetXaxis().SetTimeOffset(dh.Convert())
-            HistStack.GetXaxis().SetLabelOffset(0.02)
+            HistStack.GetXaxis().SetLabelOffset(0.05)
             HistStack.GetXaxis().SetTimeFormat("#splitline{%m-%d}{ %Y}")
             HistStack.GetXaxis().SetTitle("")
             HistStack.GetXaxis().SetTitleOffset(1)

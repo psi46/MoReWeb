@@ -15,7 +15,7 @@ class GeneralProductionOverview:
             self.TestResultEnvironmentObject = TestResultEnvironmentObject
             self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
 
-        self.Debug = True
+        self.Debug = False
         self.Name = 'AbstractClasses_GeneralProductionOverview'
         self.NameSingle = 'GeneralProductionOverview'
         self.SubPages = []
@@ -286,9 +286,14 @@ class GeneralProductionOverview:
         self.CloseFileHandles()
 
 
-    def Image(self, URL):
+    def Image(self, URL, Style = None):
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
         PlotTemplate = self.TestResultEnvironmentObject.ProductionOverviewPlotHTMLTemplate
+        StyleCSS = ''
+        if Style:
+            for StyleElement in Style:
+                StyleCSS += "%s:%s;"%(StyleElement, Style[StyleElement])
+
         HTML = HtmlParser.substituteMarkerArray(
                     PlotTemplate,
                     {
@@ -303,6 +308,7 @@ class GeneralProductionOverview:
                                                             'CanvasHeight']) / 2.)),
                         '###WIDTH###': str(self.DisplayOptions['Width']),
                         '###HEIGHT###': str(1),
+                        '###STYLE###': StyleCSS,
                     }
                 )
         return HTML

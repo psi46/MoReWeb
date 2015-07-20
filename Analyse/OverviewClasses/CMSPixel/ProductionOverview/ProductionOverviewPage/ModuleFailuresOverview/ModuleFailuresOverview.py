@@ -16,7 +16,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             self.DisplayOptions['Width'] = self.Attributes['Width']
         self.SubPages = []
         self.SavePlotFile = True
-        self.Canvas.SetCanvasSize(1600, 600)
+        self.Canvas.SetCanvasSize(1600, 500)
         self.Canvas.Update()
 
     def GenerateOverview(self):
@@ -33,7 +33,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         ModuleIDsList.sort()
-        YLabels = ['IVSlope', 'IV150', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'BadROCs', 'AddressProblems', 'trimbitDefects', 'defectiveBumps', 'maskDefects', 'deadPixel', 'lowHREfficiency'][::-1]
+        YLabels = ['IVSlope', 'IV150', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'BadROCs', 'AddressProblems', 'trimbitDefects', 'defectiveBumps', 'maskDefects', 'deadPixel', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         BinNumber = 1
@@ -214,9 +214,38 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 1, ColorB)
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 2, ColorB)
 
+            ### r/o problems
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    if RowTuple['TestType'] == 'XRayHRQualification':
+
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithReadoutProblems', 'Value'])
+                        if Value is not None and Value > 0:
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('ReadoutProblems') + 0, ColorC)
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('ReadoutProblems') + 1, ColorC)
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('ReadoutProblems') + 2, ColorC)
+
+            ### unif problems
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    if RowTuple['TestType'] == 'XRayHRQualification':
+
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithUniformityProblems', 'Value'])
+                        if Value is not None and Value > 0:
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('UniformityProblems') + 0, ColorC)
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('UniformityProblems') + 1, ColorC)
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('UniformityProblems') + 2, ColorC)
+
             BinNumber += 1
 
+        ROOT.gPad.SetLeftMargin(0.16)
+        ROOT.gPad.SetRightMargin(0.03)
+
         Summary.Draw("col")
+        Summary.GetYaxis().SetLabelSize(0.07)
+        Summary.GetXaxis().LabelsOption("v")
+        Summary.GetXaxis().SetLabelSize(0.05)
+
         line1 = ROOT.TLine()
         line1.SetLineStyle(2)
         linePositions = [3*i for i in range(1, len(YLabels))]
@@ -239,7 +268,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         self.SaveCanvas()
-        HTML = self.Image(self.Attributes['ImageFile'])
+        HTML = self.Image(self.Attributes['ImageFile'], {'height': '250px'})
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
         return self.Boxed(HTML)
