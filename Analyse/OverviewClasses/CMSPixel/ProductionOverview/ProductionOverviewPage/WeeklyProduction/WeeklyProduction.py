@@ -17,6 +17,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def FetchData(self):
 
+        # always show the full available data, but draw marker around selected period
+        self.Attributes['DateBeginMarker'] = self.Attributes['DateBegin']
+        self.Attributes['DateEndMarker'] = self.Attributes['DateEnd']
+        self.Attributes['DateBegin'] = None
+        self.Attributes['DateEnd'] = None
         Rows = AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.FetchData(self)
         
         ### list of modules tested
@@ -91,89 +96,101 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
     def CreatePlot(self):
 
     	ModuleData = self.FetchData()
-    	
-        SecondsPerWeek = 7 * 24 * 60 * 60
-        TimestampBegin = min(ModuleData, key=lambda x: x['TestDate'])['TestDate']
-        TimeBegin = datetime.datetime.fromtimestamp(TimestampBegin)
-        YearBegin = int(TimeBegin.strftime("%Y"))
-        WeekNumberBegin = int(TimeBegin.strftime("%W"))
-        TimeBegin = datetime.datetime.strptime("%d-%d-1"%(YearBegin, WeekNumberBegin), '%Y-%W-%w')
-        TimestampBegin = time.mktime(TimeBegin.timetuple())
+        
+        if len(ModuleData) > 0:	
+            SecondsPerWeek = 7 * 24 * 60 * 60
+            TimestampBegin = min(ModuleData, key=lambda x: x['TestDate'])['TestDate']
+            TimeBegin = datetime.datetime.fromtimestamp(TimestampBegin)
 
-        TimestampEnd = time.time() + 24*60*60
-        TimeEnd = datetime.datetime.fromtimestamp(TimestampEnd)
-        YearEnd = int(TimeEnd.strftime("%Y"))
-        WeekNumberEnd = int(TimeEnd.strftime("%W"))
-        TimeEnd = datetime.datetime.strptime("%d-%d-1"%(YearEnd, WeekNumberEnd), '%Y-%W-%w')
-        TimestampEnd = time.mktime(TimeEnd.timetuple())+SecondsPerWeek
+            YearBegin = TimeBegin.isocalendar()[0]
+            WeekNumberBegin = TimeBegin.isocalendar()[1]
+            TimeBegin = self.iso_to_gregorian(YearBegin, WeekNumberBegin, 1)
+            TimestampBegin = time.mktime(TimeBegin.timetuple())
 
-        TimeOffset = TimestampBegin
+            TimestampNow = time.time()
+            TimeEnd = datetime.datetime.fromtimestamp(TimestampNow) + datetime.timedelta(days=1) - datetime.timedelta(seconds=1)
 
-        HistStack = ROOT.THStack("hs_weekly_production","")
+            YearEnd = TimeEnd.isocalendar()[0]
+            WeekNumberEnd = TimeEnd.isocalendar()[1]
+            TimeEnd = self.iso_to_gregorian(YearEnd, WeekNumberEnd, 1) + datetime.timedelta(days=7) - datetime.timedelta(seconds=1)
+            TimestampEnd = time.mktime(TimeEnd.timetuple())
 
-        hA = ROOT.TH1D("h1a", "h1-a", int((TimestampEnd - TimestampBegin)/SecondsPerWeek), TimestampBegin - TimeOffset, TimestampEnd - TimeOffset)
-        hB = ROOT.TH1D("h1b", "h1-b", int((TimestampEnd - TimestampBegin)/SecondsPerWeek), TimestampBegin - TimeOffset, TimestampEnd - TimeOffset)
-        hC = ROOT.TH1D("h1c", "h1-c", int((TimestampEnd - TimestampBegin)/SecondsPerWeek), TimestampBegin - TimeOffset, TimestampEnd - TimeOffset)
-        hN = ROOT.TH1D("h1n", "h1-n", int((TimestampEnd - TimestampBegin)/SecondsPerWeek), TimestampBegin - TimeOffset, TimestampEnd - TimeOffset)
+            TimeOffset = TimestampBegin
 
-        dh = ROOT.TDatime(int(TimeBegin.strftime("%Y")),int(TimeBegin.strftime("%m")),int(TimeBegin.strftime("%d")),00,00,00)
-        hA.SetFillStyle(1001)
-        hA.SetFillColor(self.GetGradeColor('A'))
-        hB.SetFillStyle(1001)
-        hB.SetFillColor(self.GetGradeColor('B'))
-        hC.SetFillStyle(1001)
-        hC.SetFillColor(self.GetGradeColor('C'))
-        hN.SetFillStyle(1001)
-        hN.SetFillColor(self.GetGradeColor('None'))
+            HistStack = ROOT.THStack("hs_weekly_production%s"%self.GetUniqueID(),"")
+            NBins = int((TimestampEnd - TimestampBegin)/SecondsPerWeek)
+            LeftEdge = TimestampBegin - TimeOffset
+            RightEdge = TimestampEnd - TimeOffset
 
-        for Module in ModuleData:
-            if Module['Grade'] == 'A':
-                hA.Fill(Module['TestDate'] - TimeOffset)
-            elif Module['Grade'] == 'B':
-                hB.Fill(Module['TestDate'] - TimeOffset)
-            elif Module['Grade'] == 'C':
-                hC.Fill(Module['TestDate'] - TimeOffset)
-            else:
-                hN.Fill(Module['TestDate'] - TimeOffset)
+            hA = ROOT.TH1D("h1a", "h1-a_%s"%self.GetUniqueID(), NBins, LeftEdge, RightEdge)
+            hB = ROOT.TH1D("h1b", "h1-b_%s"%self.GetUniqueID(), NBins, LeftEdge, RightEdge)
+            hC = ROOT.TH1D("h1c", "h1-c_%s"%self.GetUniqueID(), NBins, LeftEdge, RightEdge)
+            hN = ROOT.TH1D("h1n", "h1-n_%s"%self.GetUniqueID(), NBins, LeftEdge, RightEdge)
 
-        HistStack.Add(hA)
-        HistStack.Add(hB)
-        HistStack.Add(hC)
-        HistStack.Add(hN)
+            dh = ROOT.TDatime(int(TimeBegin.strftime("%Y")),int(TimeBegin.strftime("%m")),int(TimeBegin.strftime("%d")),00,00,00)
+            hA.SetFillStyle(1001)
+            hA.SetFillColor(self.GetGradeColor('A'))
+            hB.SetFillStyle(1001)
+            hB.SetFillColor(self.GetGradeColor('B'))
+            hC.SetFillStyle(1001)
+            hC.SetFillColor(self.GetGradeColor('C'))
+            hN.SetFillStyle(1001)
+            hN.SetFillColor(self.GetGradeColor('None'))
 
-        HistStack.Draw()
-        HistStack.GetXaxis().SetTimeDisplay(1)
-        HistStack.GetXaxis().SetTimeOffset(dh.Convert())
-        HistStack.GetXaxis().SetLabelOffset(0.02)
-        HistStack.GetXaxis().SetTimeFormat("%y-%W")
-        HistStack.GetXaxis().SetTitle("year/week")
-        HistStack.GetXaxis().SetTitleOffset(1)
-        HistStack.GetYaxis().SetTitle("# modules")
-        HistStack.GetYaxis().SetTitleOffset(0.7)
+            for Module in ModuleData:
+                if Module['Grade'] == 'A':
+                    hA.Fill(Module['TestDate'] - TimeOffset)
+                elif Module['Grade'] == 'B':
+                    hB.Fill(Module['TestDate'] - TimeOffset)
+                elif Module['Grade'] == 'C':
+                    hC.Fill(Module['TestDate'] - TimeOffset)
+                else:
+                    hN.Fill(Module['TestDate'] - TimeOffset)
 
-        title = ROOT.TText()
-        title.SetNDC()
-        title.SetTextAlign(12)
-        title.SetTextColor(self.GetGradeColor('A'))
-        title.DrawText(0.15,0.965,"Grade A")
+            HistStack.Add(hA)
+            HistStack.Add(hB)
+            HistStack.Add(hC)
+            HistStack.Add(hN)
 
-        title2 = ROOT.TText()
-        title2.SetNDC()
-        title2.SetTextAlign(12)
-        title2.SetTextColor(self.GetGradeColor('B'))
-        title2.DrawText(0.30,0.965,"Grade B")
+            HistStack.Draw()
+            HistStack.GetXaxis().SetTimeDisplay(1)
+            HistStack.GetXaxis().SetTimeOffset(dh.Convert())
+            HistStack.GetXaxis().SetLabelOffset(0.02)
+            HistStack.GetXaxis().SetTimeFormat("#splitline{%m-%d}{ %Y}")
+            HistStack.GetXaxis().SetTitle("")
+            HistStack.GetXaxis().SetTitleOffset(1)
+            HistStack.GetYaxis().SetTitle("# modules")
+            HistStack.GetYaxis().SetTitleOffset(0.7)
 
-        title3 = ROOT.TText()
-        title3.SetNDC()
-        title3.SetTextAlign(12)
-        title3.SetTextColor(self.GetGradeColor('C'))
-        title3.DrawText(0.45,0.965,"Grade C")
+            title = ROOT.TText()
+            title.SetNDC()
+            title.SetTextAlign(12)
+            title.SetTextColor(self.GetGradeColor('A'))
+            title.DrawText(0.15,0.965,"Grade A")
 
-        title4 = ROOT.TText()
-        title4.SetNDC()
-        title4.SetTextAlign(12)
-        title4.SetTextColor(self.GetGradeColor('None'))
-        title4.DrawText(0.60,0.965,"incomplete")
+            title2 = ROOT.TText()
+            title2.SetNDC()
+            title2.SetTextAlign(12)
+            title2.SetTextColor(self.GetGradeColor('B'))
+            title2.DrawText(0.30,0.965,"Grade B")
+
+            title3 = ROOT.TText()
+            title3.SetNDC()
+            title3.SetTextAlign(12)
+            title3.SetTextColor(self.GetGradeColor('C'))
+            title3.DrawText(0.45,0.965,"Grade C")
+
+            title4 = ROOT.TText()
+            title4.SetNDC()
+            title4.SetTextAlign(12)
+            title4.SetTextColor(self.GetGradeColor('None'))
+            title4.DrawText(0.60,0.965,"incomplete")
+        else:
+            title4 = ROOT.TText()
+            title4.SetNDC()
+            title4.SetTextAlign(12)
+            title4.SetTextColor(self.GetGradeColor('None'))
+            title4.DrawText(0.60,0.965,"no modules found")
 
 
         self.SaveCanvas()

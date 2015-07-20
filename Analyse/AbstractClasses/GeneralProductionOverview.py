@@ -8,11 +8,14 @@ import glob
 import json
 
 class GeneralProductionOverview:
+    LastUniqueIDCounter = 1
+
     def __init__(self, TestResultEnvironmentObject = None, InitialAttributes = None):
         if TestResultEnvironmentObject:
             self.TestResultEnvironmentObject = TestResultEnvironmentObject
             self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
 
+        self.Debug = True
         self.Name = 'AbstractClasses_GeneralProductionOverview'
         self.NameSingle = 'GeneralProductionOverview'
         self.SubPages = []
@@ -31,6 +34,9 @@ class GeneralProductionOverview:
             'StorageKey': self.Name,
             'BasePath': '',
         }
+        self.Attributes['DateBegin'] = None
+        self.Attributes['DateEnd'] = None
+        self.Attributes['Title'] = 'ProductionOverview'
         if InitialAttributes:
             self.Attributes.update(InitialAttributes)
 
@@ -58,8 +64,19 @@ class GeneralProductionOverview:
         except:
             pass
 
-    def PrintInfo(self, Text):
-        print "\x1b[37m\x1b[44m" + Text + "\x1b[0m"
+    # http://stackoverflow.com/a/1700069
+    def iso_year_start(self, iso_year):
+        "The gregorian calendar date of the first day of the given ISO year"
+        fourth_jan = datetime.date(iso_year, 1, 4)
+        delta = datetime.timedelta(fourth_jan.isoweekday()-1)
+        return fourth_jan - delta 
+    def iso_to_gregorian(self, iso_year, iso_week, iso_day):
+        "Gregorian calendar date for the given ISO year, week and day"
+        year_start = self.iso_year_start(iso_year)
+        return year_start + datetime.timedelta(days=iso_day-1, weeks=iso_week-1)
+
+    def PrintInfo(self, Text, Color=4):
+        print "\x1b[37m\x1b[%dm"%(40+Color) + Text + "\x1b[0m"
 
     def GetStorageKey(self):
         if self.Attributes.has_key('StorageKey') and len(self.Attributes['StorageKey']) > 0:
@@ -100,26 +117,38 @@ class GeneralProductionOverview:
             d[col[0]] = row[idx]
         return d
 
-    def FetchData(self, ModuleID = None, DateBegin = None, DateEnd = True):
+    def FetchData(self, ModuleID = None):
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
 
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             Rows = {}
         else:
             AdditionalWhere = ''
+            AdditionalParams = {}
+
             if ModuleID:
                 AdditionalWhere += ' AND ModuleID=:ModuleID '
-            self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
-                'SELECT * FROM ModuleTestResults '+
-                'WHERE 1=1 '+
-                AdditionalWhere+
-                'ORDER BY ModuleID ASC,TestType ASC,TestDate ASC ',
-                {
-                    'ModuleID':ModuleID
-                }
-            )
+                AdditionalParams['ModuleID'] = ModuleID
+
+            if self.Attributes['DateBegin']:
+                AdditionalWhere += ' AND TestDate >= :DateBegin '
+                AdditionalParams['DateBegin'] = time.mktime(self.Attributes['DateBegin'].timetuple())
+
+            if self.Attributes['DateEnd']:
+                AdditionalWhere += ' AND TestDate <= :DateEnd '
+                AdditionalParams['DateEnd'] = time.mktime(self.Attributes['DateEnd'].timetuple())
+
+            Query = 'SELECT * FROM ModuleTestResults WHERE 1=1 '+ AdditionalWhere + ' ORDER BY ModuleID ASC,TestType ASC,TestDate ASC '
+
+            if self.Debug:
+                self.PrintInfo("Query: %s"%Query)
+
+            self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(Query, AdditionalParams)
+
             self.TestResultEnvironmentObject.LocalDBConnectionCursor.row_factory = self.dict_factory
             Rows = self.TestResultEnvironmentObject.LocalDBConnectionCursor.fetchall()
+            if self.Debug:
+                self.PrintInfo(" => %d rows returned"%len(Rows),3)
 
         return Rows
 
@@ -150,6 +179,12 @@ class GeneralProductionOverview:
             '###HEAD_STYLESHEET_TEMPLATE###',
             ''
         )
+        FinalHTML = HtmlParser.substituteMarkerArray(
+            FinalHTML, { 
+                '###PAGETITLE###': self.Attributes['Title'],
+            }
+        )
+        
         ContentHTML = ''
 
         ### load modules
@@ -206,7 +241,7 @@ class GeneralProductionOverview:
                 ClickPathEntryTemplate,
                 {
                     '###URL###': HtmlParser.MaskHTML(LevelPath + self.HTMLFileName),
-                    '###LABEL###': HtmlParser.MaskHTML(tmpTestResultObject.Title)
+                    '###LABEL###': HtmlParser.MaskHTML(tmpTestResultObject.Attributes['Title'])
                 }
             ))
             try:
@@ -222,7 +257,7 @@ class GeneralProductionOverview:
             ClickPathEntryTemplate,
             {
                 '###URL###': HtmlParser.MaskHTML(OverviewHTMLLink),
-                '###LABEL###': 'Overview'
+                '###LABEL###': 'Production Overview'
             }
         ))
         ClickPathEntries.reverse()
@@ -248,11 +283,7 @@ class GeneralProductionOverview:
             f.write(FinalHTML)
             f.close()
 
-        for FileHandle in self.FileHandles:
-            if repr(FileHandle).find('ROOT.TFile') > -1:
-                FileHandle.Close()
-            else:
-                FileHandle.close()
+        self.CloseFileHandles()
 
 
     def Image(self, URL):
@@ -435,12 +466,21 @@ class GeneralProductionOverview:
         return value
 
     def GetUniqueID(self):
-        self.LastUniqueIDCounter += 1
-        return self.Name + '_' + str(self.LastUniqueIDCounter)
+        GeneralProductionOverview.LastUniqueIDCounter += 1
+        return self.Name + '_' + str(GeneralProductionOverview.LastUniqueIDCounter)
 
     def CustomInit(self):
         pass
 
     def CreatePlot(self):
         pass
+
+    def CloseFileHandles(self):
+        for FileHandle in self.FileHandles:
+             if repr(FileHandle).find('ROOT.TFile') > -1:
+                 FileHandle.Close()
+             else:
+                 FileHandle.close()
+
+
 

@@ -16,7 +16,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         self.SubPages.append({
             "InitialAttributes" : {
-                "Sections": ["BumpBonding", "DeadPixel", "PerformanceParameters", "DACs", "IVCurves", "HighRate", "VcalCalibration"]
+                "Sections": ["BumpBonding", "DeadPixel", "PerformanceParameters", "DACs", "IVCurves", "HighRate", "VcalCalibration"],
+                "DateBegin": self.Attributes['DateBegin'],
+                "DateEnd": self.Attributes['DateEnd'],
             }, 
             "Key": "Section",
             "Module": "SectionNavigation"
@@ -28,46 +30,85 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 "Module": "GradingOverview",
                 "InitialAttributes" : {
                     "StorageKey" : "GradingOverview",
+                    "DateBegin": self.Attributes['DateBegin'],
+                    "DateEnd": self.Attributes['DateEnd'],
                 },
             }
         )
 
-        self.SubPages.append(
-            {
-                "Key": "WeeklyProduction",
-                "Module": "WeeklyProduction",
-                "InitialAttributes" : {
-                    "StorageKey" : "WeeklyProduction",
-                },
-            }
-        )
+        if self.Attributes['ShowWeeklyPlots']:
+            self.SubPages.append(
+                {
+                    "Key": "WeeklyProduction",
+                    "Module": "WeeklyProduction",
+                    "InitialAttributes" : {
+                        "StorageKey" : "WeeklyProduction",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    },
+                }
+            )
 
-        self.SubPages.append(
-            {
-                "Key": "CumulativeProductionGraph",
-                "Module": "CumulativeProductionGraph",
-                "InitialAttributes" : {
-                    "StorageKey" : "CumulativeProductionGraph",
-                },
-            }
-        )
+            self.SubPages.append(
+                {
+                    "Key": "CumulativeProductionGraph",
+                    "Module": "CumulativeProductionGraph",
+                    "InitialAttributes" : {
+                        "StorageKey" : "CumulativeProductionGraph",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    },
+                }
+            )
 
-        self.SubPages.append(
-            {
-                "Key": "ModuleList",
-                "Module": "ModuleList",
-            }
-        )
+            self.SubPages.append(
+                {
+                    "Key": "ModuleList",
+                    "Module": "ModuleList",
+                    "InitialAttributes" : {
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    },
+                }
+            )
 
-        self.SubPages.append(
-            {
-                "Key": "ModuleFailuresOverview",
-                "Module": "ModuleFailuresOverview",
-                "InitialAttributes" : {
-                    "StorageKey" : "ModuleFailuresOverview",
-                },
-            }
-        )
+            self.SubPages.append(
+                {
+                    "Key": "ModuleFailuresOverview",
+                    "Module": "ModuleFailuresOverview",
+                    "InitialAttributes" : {
+                        "StorageKey" : "ModuleFailuresOverview",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    },
+                }
+            )
+        else:     
+            self.SubPages.append(
+                {
+                    "Key": "ModuleFailuresOverview",
+                    "Module": "ModuleFailuresOverview",
+                    "InitialAttributes" : {
+                        "StorageKey" : "ModuleFailuresOverview",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                        "Width": 4,
+                    },
+                }
+            )
+
+            self.SubPages.append(
+                {
+                    "Key": "ModuleList",
+                    "Module": "ModuleList",
+                    "InitialAttributes" : {
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    },
+                }
+            )
+
+
 
         ### bump bonding ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "BumpBonding", "Title": "BumpBonding Defects"}, "Key": "Section","Module": "Section"})
@@ -79,6 +120,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Grade": "{Grade}".format(Grade = Grade),
                         "StorageKey" : "BumpBondingOverlay_{Grade}".format(Grade = Grade),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -88,6 +131,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 "Module": "BumpBondingVsId",
                 "InitialAttributes" : {
                     "StorageKey" : "BumpBondingVsId",
+                    "DateBegin": self.Attributes['DateBegin'],
+                    "DateEnd": self.Attributes['DateEnd'],
                 }
             }
         )
@@ -106,6 +151,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         "Test": "{Test}".format(Test = Test),
                         "Grade": "All",
                         "StorageKey" : "DeadPixelOverlay_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -121,6 +168,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Test": "{Test}".format(Test = Test),
                         "StorageKey" : "MeanNoise_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -135,6 +184,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Test": "{Test}".format(Test = Test),
                         "StorageKey" : "RelativeGainWidth_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -149,6 +200,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Test": "{Test}".format(Test = Test),
                         "StorageKey" : "PedestalSpread_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -163,6 +216,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Test": "{Test}".format(Test = Test),
                         "StorageKey" : "VcalThresholdWidth_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -186,6 +241,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 "Maximum": 256,
                                 "NBins": 256,
                                 "StorageKey" : "DACDistribution_{Test}_{DAC}_{Trim}".format(Test=Test, DAC=DAC,Trim=Trim),
+                                "DateBegin": self.Attributes['DateBegin'],
+                                "DateEnd": self.Attributes['DateEnd'],
                             }
                         }
                     )
@@ -204,6 +261,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             "Maximum": 16,
                             "NBins": 64,
                             "StorageKey" : "DACDistribution_{Test}_{DAC}_{Trim}".format(Test=Test, DAC="TrimBits_mu",Trim=Trim),
+                            "DateBegin": self.Attributes['DateBegin'],
+                            "DateEnd": self.Attributes['DateEnd'],
                         }
                     }
                 )
@@ -218,6 +277,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             "Maximum": 5,
                             "NBins": 64,
                             "StorageKey" : "DACDistribution_{Test}_{DAC}_{Trim}".format(Test=Test, DAC="TrimBits_sigma",Trim=Trim),
+                            "DateBegin": self.Attributes['DateBegin'],
+                            "DateEnd": self.Attributes['DateEnd'],
                         }
                     }
                 )
@@ -227,6 +288,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             {
                 "Key": "Duration",
                 "Module": "Duration",
+                "InitialAttributes" : {
+                    "DateBegin": self.Attributes['DateBegin'],
+                    "DateEnd": self.Attributes['DateEnd'],
+                }
             }
         )
 
@@ -240,6 +305,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Test": "{Test}".format(Test = Test),
                         "StorageKey" : "IVCurveOverlay_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -252,6 +319,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Test": "{Test}".format(Test = Test),
                         "StorageKey" : "LeakageCurrent_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -264,6 +333,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Test": "{Test}".format(Test = Test),
                         "StorageKey" : "LeakageCurrentSlope_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -279,6 +350,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Rate": "{Rate}".format(Rate = Rate),
                         "StorageKey" : "Efficiency_{Rate}".format(Rate = Rate),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
                     }
                 }
             )
@@ -291,6 +364,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 "Module": "VcalSlope",
                 "InitialAttributes" : {
                     "StorageKey" : "VcalSlope_Spectrum",
+                    "DateBegin": self.Attributes['DateBegin'],
+                    "DateEnd": self.Attributes['DateEnd'],
                 }
             }
         )
@@ -300,6 +375,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 "Module": "VcalOffset",
                 "InitialAttributes" : {
                     "StorageKey" : "VcalOffset_Spectrum",
+                    "DateBegin": self.Attributes['DateBegin'],
+                    "DateEnd": self.Attributes['DateEnd'],
                 }
             }
         )
@@ -307,5 +384,5 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
     def GenerateOverview(self):
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
-        HTML = "<a href='%s'>Production Overview '%s'</a><br />"%(self.GetStorageKey()+'/'+self.HTMLFileName, self.Attributes['StorageKey'])
+        HTML = "<a href='%s'>Production Overview '%s'</a><br />"%(self.GetStorageKey()+'/'+self.HTMLFileName, self.Attributes['Title'])
         return HTML

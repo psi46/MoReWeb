@@ -12,6 +12,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.DisplayOptions = {
             'Width': 5,
         }
+        if self.Attributes.has_key('Width'):
+            self.DisplayOptions['Width'] = self.Attributes['Width']
         self.SubPages = []
         self.SavePlotFile = True
         self.Canvas.SetCanvasSize(1600, 600)

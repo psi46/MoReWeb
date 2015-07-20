@@ -50,16 +50,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         ModuleIndex.append(NModules)
                         NModules += 1
 
-        ROOTObject = ROOT.TGraph(NModules, ModuleIndex, ModulePixelDefects)
-        ROOTObject.SetLineColor(ROOT.kBlue + 2)
-        ROOTObject.Draw("APL")
+        if NModules > 0:
+            ROOTObject = ROOT.TGraph(NModules, ModuleIndex, ModulePixelDefects)
+            ROOTObject.SetLineColor(ROOT.kBlue + 2)
+            ROOTObject.Draw("APL")
 
-        title = ROOT.TText()
-        title.SetNDC()
-        title.SetTextAlign(12)
-        title.SetTextColor(ROOT.kBlue + 2)
-        Subtitle = "total number of BB defects, modules: %s to %s (%d)"%(ModuleIDsList[0], ModuleIDsList[-1], NModules)
-        title.DrawText(0.15, 0.965, Subtitle)
+            title = ROOT.TText()
+            title.SetNDC()
+            title.SetTextAlign(12)
+            title.SetTextColor(ROOT.kBlue + 2)
+            Subtitle = "total number of BB defects, modules: %s to %s (%d)"%(ModuleIDsList[0], ModuleIDsList[-1], NModules)
+            title.DrawText(0.15, 0.965, Subtitle)
 
         self.SaveCanvas()
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of modules: %d"%NModules)
