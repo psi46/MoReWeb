@@ -7,7 +7,7 @@ import warnings
 import os
 import ConfigParser
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
-
+import subprocess
 
 try:
     set
@@ -704,8 +704,12 @@ class GeneralTestResult(object):
             TestResultObject.Title = TestResultObject.NameSingle
         MyObjectTestDate = ''
         if RecursionLevel == 0 and TestResultObject.Attributes['TestDate']:
+            try:
+                MoReWebVersion = subprocess.check_output(["git", "describe"])
+            except:
+                MoReWebVersion = 'unknown MoReWeb version'
             MyObjectTestDate = 'Test Date: ' + datetime.datetime.fromtimestamp(
-                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%m")
+                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%m") + '<br><span style="font-size:10.5pt;" title="' + MoReWebVersion + '">Analysis time: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%m") + '</span>'
 
         MainTestResultAdditionalClasses = ''
 
