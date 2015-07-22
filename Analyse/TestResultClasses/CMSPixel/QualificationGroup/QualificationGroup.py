@@ -69,7 +69,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions': {
                         'Order': 1
                     }
-                },     
+                },
             ]
 
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
@@ -138,13 +138,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             test = test.next()
         index = 0
         test = testchain.next()
-        if not ('HREfficiency' in Testnames): 
+        if not ('HREfficiency' in Testnames):
             tests, test, index = self.appendTemperatureGraph(tests, test, index)
         HRTestAdded = False
         while test:
             if 'fulltest' in test.testname.lower():
                 print '\t-> appendFulltest'
                 tests, test, index = self.appendFulltest(tests, test, index)
+            elif 'powercycle' in test.testname:
+                test = test.next()
             elif 'cycle' in test.testname.lower():
                 print '\t-> appendTemperatureCycle'
                 tests, test, index = self.appendTemperatureCycle(tests, test, index)
@@ -162,8 +164,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print '\t-> appendXRayHighRateTest'
                 tests, test, index = self.appendXRayHighRateTest(tests, test, index)
                 HRTestAdded = True
-            elif 'powercycle' in test.testname:
-                test = test.next()
             elif 'leakagecurrentpon' in test.testname.lower():
                 print '\t-> appendLeakageCurrentPON'
                 tests, test, index = self.appendLeakageCurrentPON(tests, test, index)
@@ -376,7 +376,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     ## by name and made subtests to the 'HighRateTest'.
     def appendXRayHighRateTest(self, tests, test, index):
         key = 'XRayHRQualification'
-        
+
         # Find the index of a previously created 'HighRateTest'
         idx = -1
         for i in range(len(tests)):
@@ -408,7 +408,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             idx = len(tests) - 1
 
         self.check_Test_Software()
-        
+
         # Append the actual tests as subtests to the 'HighRateTest'
         # Distinguish by name. A test with name 'HighRateTest' is meant
         # as a generality which stands for
