@@ -252,7 +252,7 @@ class GeneralProductionOverview:
 
             i += 1
        
-        OverviewHTMLLink = self.TestResultEnvironmentObject.GlobalOverviewPath + '/ProductionOverview/ProductionOverview.html'
+        OverviewHTMLLink = '../../ProductionOverview/ProductionOverview.html'
         ClickPathEntries.append(HtmlParser.substituteMarkerArray(
             ClickPathEntryTemplate,
             {
@@ -293,7 +293,6 @@ class GeneralProductionOverview:
         if Style:
             for StyleElement in Style:
                 StyleCSS += "%s:%s;"%(StyleElement, Style[StyleElement])
-
         HTML = HtmlParser.substituteMarkerArray(
                     PlotTemplate,
                     {

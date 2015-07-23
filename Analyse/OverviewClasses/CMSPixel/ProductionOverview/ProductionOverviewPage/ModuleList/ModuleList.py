@@ -45,7 +45,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID']==ModuleID:
                     TestType = RowTuple['TestType']
-                    Url = self.GlobalOverviewPath + '/' + RowTuple['RelativeModuleFinalResultsPath'] + '/' + RowTuple['FulltestSubfolder'] + '/TestResult.html'
+                    Url = '../../' + RowTuple['RelativeModuleFinalResultsPath'] + '/' + RowTuple['FulltestSubfolder'] + '/TestResult.html'
 
                     if TestType == 'm20_1':
                         FTMinus20BTC = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
