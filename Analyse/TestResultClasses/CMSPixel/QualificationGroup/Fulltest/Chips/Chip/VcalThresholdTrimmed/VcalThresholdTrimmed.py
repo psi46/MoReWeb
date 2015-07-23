@@ -20,7 +20,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         histname = HistoDict.get(self.NameSingle, 'ThresholdDist')
         object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)
-	print object, histname
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1F(self.GetUniqueID(),'ThresholdDist',256,-.5,255.5)
         for bin in range(0,object.GetNbinsX()+1):
             x = object.GetXaxis().GetBinLowEdge(bin)

@@ -28,7 +28,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         PixelDefectsRocsB = 0
         PixelDefectsRocsC = 0
         chipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
-        print 'Subgrading, PixelDefects:',chipResults
         SubGrading = []
         for i in chipResults:
             if int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
