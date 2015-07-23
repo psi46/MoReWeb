@@ -511,7 +511,7 @@ class TestResult(GeneralTestResult):
 #
 #
             print "IVCURVEDATA ", IVCurveData
-            if IVCurveData['CurrentAtVoltage150V'] != -1 :
+            if IVCurveData['CurrentAtVoltage150V'] != -1 and IVCurveData['IVCurveFilePath'] != ""  :
                 # extract Sensor name
               module = pdb.getFullModule(Row['ModuleID'])
               if module is None:
