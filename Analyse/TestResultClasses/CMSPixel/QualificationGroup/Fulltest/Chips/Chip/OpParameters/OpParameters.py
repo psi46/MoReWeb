@@ -48,7 +48,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #                except:
 #                    vcalTrim  = -1
             DacParametersFile = open(DacParametersFileName, "r")
-            print 'DacParametersFile', DacParametersFile
             self.ResultData['HiddenData']['DacParameters']['File'+i] = DacParametersFile
 
             if DacParametersFile :

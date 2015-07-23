@@ -1,5 +1,6 @@
-
 import ROOT
+import re
+
 verbose = False
 def get_histo(rootfile,name,rocNo = None):
     histoname = name
@@ -23,6 +24,16 @@ def get_histo(rootfile,name,rocNo = None):
     if dir == None:
         return None
     histo = dir.Get(histoname[-1])
+    if not histo and '*' in histoname[-1]:
+        try:
+            regex = histoname[-1].replace('*','.*?')
+            for Key in dir.GetListOfKeys():
+                if re.match(regex, Key.GetName()):
+                    histo = dir.Get(Key.GetName())
+                    break
+        except:
+            pass
+
     if not histo:
         if verbose and 'Xray.' not in name:
             dir.GetListOfKeys().Print()
