@@ -144,7 +144,8 @@ class PH_Fitting():
                     maxChi2 = chi2
                 self.AddToHistos(histos)
 
-        print "Total Max Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
+        if maxChi2[1] > -1:
+            print "Total Max Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
         self.SaveResultHistos()
 
 
