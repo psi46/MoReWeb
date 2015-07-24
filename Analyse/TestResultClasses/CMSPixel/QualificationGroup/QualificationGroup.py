@@ -176,7 +176,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return tests
 
     def appendTemperatureGraph(self, tests, test, index):
-        if os.path.isfile(self.RawTestSessionDataPath+'/'+'temperature.log'):
+        TemperatureLogFileName = None
+
+        FileNamesToCheck = [
+            self.RawTestSessionDataPath+'/temperature.log',
+            self.RawTestSessionDataPath+'/logfiles/temperature.log',
+        ]
+
+        for FileNameToCheck in FileNamesToCheck:
+            if os.path.isfile(FileNameToCheck):
+                TemperatureLogFileName = FileNameToCheck
+                break
+
+        if TemperatureLogFileName is not None:
             tests.append(
                 {
                     'Key': 'Temperature',
@@ -188,6 +200,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'ModuleVersion': self.Attributes['ModuleVersion'],
                         'ModuleType': self.Attributes['ModuleType'],
                         'TestType': 'Temperature',
+                        'LogFileName': TemperatureLogFileName,
                     },
                     'DisplayOptions': {
                         'Order': len(tests) + 1,
