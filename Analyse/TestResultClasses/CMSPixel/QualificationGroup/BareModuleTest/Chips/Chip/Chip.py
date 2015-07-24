@@ -49,17 +49,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':9,
                     }
                 },
-                {'Key':'BareBBMap',
-                    'DisplayOptions':{
-                        'Order':1,
-                    }
-                },
+#                {'Key':'BareBBMap',
+#                    'DisplayOptions':{
+#                        'Order':1,
+#                    }
+#                },
                 {'Key':'BareBBScan',
                     'DisplayOptions':{
                         'Order':1,
                     }
                 },
                 {'Key':'BareBBWidth',
+                    'DisplayOptions':{
+                        'Order':1,
+                    }
+                },
+                {'Key':'BareBBMap',
                     'DisplayOptions':{
                         'Order':1,
                     }
