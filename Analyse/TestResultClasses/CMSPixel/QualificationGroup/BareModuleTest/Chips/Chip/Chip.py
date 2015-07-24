@@ -55,35 +55,35 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #                    }
 #                },
                 {'Key':'BareBBScan',
-                    'DisplayOptions':{
+                 'DisplayOptions':{
                         'Order':1,
-                    }
-                },
+                        }
+                 },
                 {'Key':'BareBBWidth',
-                    'DisplayOptions':{
+                 'DisplayOptions':{
                         'Order':1,
-                    }
-                },
+                        }
+                 },
                 {'Key':'BareBBMap',
-                    'DisplayOptions':{
+                 'DisplayOptions':{
                         'Order':1,
-                    }
-                },
+                        }
+                 },
 #                {'Key':'PixelMapNew',
 #                    'DisplayOptions':{
 #                        'Order':1,
 #                    }
 #                },
-                 {'Key':'PixelMap',
-                    'DisplayOptions':{
+                {'Key':'PixelMap',
+                 'DisplayOptions':{
                         'Order':1,
-                    }
-                },
+                        }
+                 },
                 {'Key':'DigChipCurrent',
-                    'DisplayOptions':{
+                 'DisplayOptions':{
                         'Order':1,
-                    }
-                },                
+                        }
+                 },                
                 ]
             
             

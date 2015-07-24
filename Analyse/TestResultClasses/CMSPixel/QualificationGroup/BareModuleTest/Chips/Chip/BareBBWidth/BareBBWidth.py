@@ -55,9 +55,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             #print '"====== !!! max ', ymax, ' at ',xmax, ' and sigma: ', sigma               
             for ii in range (maxbin,1,-2):
                 jj = ii -2
-                print 'ii jj',ii,jj,' ',self.ResultData['Plot']['ROOTObject'].GetBinContent(jj),self.ResultData['Plot']['ROOTObject'].GetBinContent(ii)
+                #print 'ii jj',ii,jj,' ',self.ResultData['Plot']['ROOTObject'].GetBinContent(jj),self.ResultData['Plot']['ROOTObject'].GetBinContent(ii)
                 if (self.ResultData['Plot']['ROOTObject'].GetBinContent(jj) < y50) and (self.ResultData['Plot']['ROOTObject'].GetBinContent(ii) >= y50):
-                    print 'aqui ',ii, ' - - ',jj,'',y50
+                    #print 'aqui ',ii, ' - - ',jj,'',y50
                     ni = self.ResultData['Plot']['ROOTObject'].GetBinContent(ii)
                     nj = self.ResultData['Plot']['ROOTObject'].GetBinContent(jj)
                     xi = self.ResultData['Plot']['ROOTObject'].GetBinCenter(ii)
@@ -68,12 +68,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     sigma = (xmax - x50)/ 1.3863
                     break
 
-            print 'n50 ', nj,' at ', xj, ' sigma ',sigma
+            #print 'n50 ', nj,' at ', xj, ' sigma ',sigma
             x1 = xmax - sigma*math.sqrt(2*math.log(ymax))    
-            print 'x1 , x1',x1
+            #print 'x1 , x1',x1
             #cut = x1
             cut = x1 - sigma
-            print 'First Cut: ', cut
+            #print 'First Cut: ', cut
             if cut > cutmax:
                 cut = cutmax
 
