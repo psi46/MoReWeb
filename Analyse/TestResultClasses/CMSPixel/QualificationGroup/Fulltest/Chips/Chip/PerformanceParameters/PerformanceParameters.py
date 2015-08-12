@@ -92,13 +92,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label': 'ThresholdTrimmed σ',
             },
             'Threshold':{
-                'Value': '{0:1.2f}'.format(float(self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['mu']['Value'])
+                'Value': '{0:1.0f}'.format(float(self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['mu']['Value'])
                         * self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']),
                 'Label': 'Threshold',
                 'Unit': 'e-',
             },
             'ThresholdWidth':{
-                'Value': '{0:1.2f}'.format(float(self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['sigma']['Value'])
+                'Value': '{0:1.0f}'.format(float(self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['sigma']['Value'])
                         * self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']),
                 'Label': 'Threshold Width',
                 'Unit': 'e-',
