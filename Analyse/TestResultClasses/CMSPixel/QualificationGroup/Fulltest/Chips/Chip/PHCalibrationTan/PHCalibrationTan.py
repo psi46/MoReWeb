@@ -14,7 +14,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
     def PopulateResultData(self):
         #PHCalibrationTan = Parameter1
-        
+        ChipNo=self.ParentObject.Attributes['ChipNo']
         #hPar1
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", 350, -1., 6.)  # par1
         Directory = self.RawTestSessionDataPath
@@ -27,6 +27,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.FileHandle = PHCalibrationFitTanFile #needed in summary
         
         #SCurveFile.seek(2*200) # omit the first 400 bytes
+
+        try:
+            DeadPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
+        except:
+            DeadPixelList = set([])
 
         if PHCalibrationFitTanFile:
             
@@ -41,7 +46,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         LineArray = Line.strip().split()
                         try:
                             float(LineArray[1])
-                            self.ResultData['Plot']['ROOTObject'].Fill(float(LineArray[1]));
+                            if (ChipNo, i, j) not in DeadPixelList:
+                                self.ResultData['Plot']['ROOTObject'].Fill(float(LineArray[1]))
                         
                         except (ValueError, TypeError, IndexError):
                             pass
