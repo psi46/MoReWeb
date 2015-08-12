@@ -65,6 +65,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.FileHandle = SCurveFile # needed in summary
 
+        try:
+            DeadPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
+        except:
+            DeadPixelList = set([])
+
         if not SCurveFile:
             raise Exception('Cannot find SCurveFile "%s"'%SCurveFileName)
         else:
@@ -84,7 +89,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         if self.verbose:  print column, row, Threshold, Width
                         #Threshold, Sign, SomeString, a, b = Line.strip().split()
 
-                        self.ResultData['Plot']['ROOTObject'].Fill(Width)
+                        if (ChipNo, column, row) not in DeadPixelList:
+                            self.ResultData['Plot']['ROOTObject'].Fill(Width)
+
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         if not isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:
