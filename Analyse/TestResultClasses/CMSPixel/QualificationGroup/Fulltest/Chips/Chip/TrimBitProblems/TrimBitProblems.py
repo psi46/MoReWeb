@@ -29,8 +29,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             TrimBitHistograms.append(tmpHistogram)
         for col in range(self.nCols):  # Column
             for row in range(self.nRows):  # Row
-                deadTrimBits = self.GetDeadTrimBits(col, row, TrimBitHistograms)
-                self.ResultData['Plot']['ROOTObject'].Fill(col, row, deadTrimBits)
+                if (ChipNo, col, row) not in self.PixelNotAliveList:
+                    deadTrimBits = self.GetDeadTrimBits(col, row, TrimBitHistograms)
+                    self.ResultData['Plot']['ROOTObject'].Fill(col, row, deadTrimBits)
 
         if self.ResultData['Plot']['ROOTObject']:
 
@@ -59,7 +60,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'nDeadPixels': {
                 'Value':'{0:1.0f}'.format(len(self.PixelNotAliveList)),
-                'Label':'including Dead Pixels'
+                'Label':'Dead Pixels'
             },
 
                                                 }
