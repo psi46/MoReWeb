@@ -52,7 +52,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == self.Attributes['Test']:
 
                         for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'DACParameterOverview', 'DacParameters{Trim}'.format(Trim=self.Attributes['Trim']), 'KeyValueDictPairs.json'])
+                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'DacParameterOverview', 'DacParameters{Trim}'.format(Trim=self.Attributes['Trim']), 'KeyValueDictPairs.json'])
                             JSONFiles = glob.glob(Path)
                             if len(JSONFiles) > 1:
                                 print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
