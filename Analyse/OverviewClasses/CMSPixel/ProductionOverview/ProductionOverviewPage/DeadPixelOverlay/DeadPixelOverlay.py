@@ -69,6 +69,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         title.DrawText(0.15,0.965,Subtitle)
 
         self.SaveCanvas()
+        self.CloseFileHandles()
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of modules: %d"%NModules)
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)

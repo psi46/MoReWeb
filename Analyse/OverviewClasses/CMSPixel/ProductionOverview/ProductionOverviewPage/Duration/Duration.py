@@ -77,9 +77,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         HistStack = ROOT.THStack("hs_fulltest_duration","")
 
-        hA = ROOT.TH1D("h1duration_m20_1", "", NBins, 0, HistogramMax)
-        hB = ROOT.TH1D("h1duration_m20_2", "", NBins, 0, HistogramMax)
-        hC = ROOT.TH1D("h1duration_p17_1", "", NBins, 0, HistogramMax)
+        hA = ROOT.TH1D("h1duration_m20_1_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
+        hB = ROOT.TH1D("h1duration_m20_2_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
+        hC = ROOT.TH1D("h1duration_p17_1_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
 
         hA.SetFillStyle(1001)
         hA.SetFillColor(self.GetTestPlotColor('m20_1'))

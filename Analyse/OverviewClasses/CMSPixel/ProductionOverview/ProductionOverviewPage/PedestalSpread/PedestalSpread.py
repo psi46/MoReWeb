@@ -105,6 +105,22 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         CloneHistogram3.SetFillStyle(1001)
         CloneHistogram3.Draw("same")
 
+        # mean, rms and gauss fit sigma
+        GaussFitFunction = ROOT.TF1("GaussFitFunction", "gaus(0)")
+        GaussFitFunction.SetParameter(0, Histogram.GetBinContent(Histogram.GetMaximumBin()))
+        GaussFitFunction.SetParameter(1, Histogram.GetMean())
+        GaussFitFunction.SetParameter(2, Histogram.GetRMS())
+        GaussFitFunction.SetParLimits(1,0,3000)
+        GaussFitFunction.SetParLimits(2,0,500)
+        Histogram.Fit(GaussFitFunction, "QB0")
+        GaussFitSigma = GaussFitFunction.GetParameter(2)
+        title = ROOT.TText()
+        title.SetNDC()
+        title.SetTextAlign(12)
+        title.SetTextSize(0.035)
+        TitleText = "Mean: %d, RMS: %d, Gauss-fit sigma: %d"%(Histogram.GetMean(), Histogram.GetRMS(), GaussFitSigma)
+        title.DrawText(0.15, 0.965, TitleText)
+
         self.SaveCanvas()
 
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of ROCs: %d"%NROCs)
