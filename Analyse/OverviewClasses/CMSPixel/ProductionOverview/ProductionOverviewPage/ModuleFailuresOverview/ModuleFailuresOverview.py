@@ -33,7 +33,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         ModuleIDsList.sort()
-        YLabels = ['IVSlope', 'IV150', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'BadROCs', 'AddressProblems', 'trimbitDefects', 'defectiveBumps', 'maskDefects', 'deadPixel', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems'][::-1]
+        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'BadROCs', 'AddressProblems', 'trimbitDefects', 'defectiveBumps', 'maskDefects', 'deadPixel', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         BinNumber = 1
@@ -41,11 +41,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         YBinNumber = 1
         for YLabel in YLabels:
             Summary.GetYaxis().SetBinLabel(YBinNumber, '')
-            Summary.GetYaxis().SetBinLabel(YBinNumber+2, '')
             Summary.GetYaxis().SetBinLabel(YBinNumber+1, YLabel)
+            Summary.GetYaxis().SetBinLabel(YBinNumber+2, '')
             YBinNumber += 3
 
         FullTests = ['m20_1','m20_2','p17_1'][::-1]
+        TestTypeLeakageCurrentPON = ['LeakageCurrentPON']
+        TestTypeXrayHR = 'XRayHRQualification'
 
         ColorB = 0.84
         ColorC = 1.00
@@ -53,6 +55,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         for ModuleID in ModuleIDsList:
 
             Summary.GetXaxis().SetBinLabel(BinNumber, ModuleID)
+
+            ### LeakageCurrent PON
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    
+                    if RowTuple['TestType'] in TestTypeLeakageCurrentPON:
+                        GradeC = 15*1e-6
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'KeyValueDictPairs.json', 'LeakageCurrent', 'Value'])
+                        if Value is not None and float(Value) > GradeC:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('LCStartup') + 0, ColorC)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('LCStartup') + 1, ColorC)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('LCStartup') + 2, ColorC)
 
             ### IV slope
             for RowTuple in Rows:
@@ -173,7 +187,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     
-                    if RowTuple['TestType'] == 'XRayHRQualification':
+                    if RowTuple['TestType'] == TestTypeXrayHR:
 
                         BBGrades = []
                         for Chip in range(0,16):
@@ -196,7 +210,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     
-                    if RowTuple['TestType'] == 'XRayHRQualification':
+                    if RowTuple['TestType'] == TestTypeXrayHR:
 
                         EfficiencyGrades = []
                         for Chip in range(0,16):
@@ -217,7 +231,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             ### r/o problems
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] == 'XRayHRQualification':
+                    if RowTuple['TestType'] == TestTypeXrayHR:
 
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithReadoutProblems', 'Value'])
                         if Value is not None and Value > 0:
@@ -228,7 +242,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             ### unif problems
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] == 'XRayHRQualification':
+                    if RowTuple['TestType'] == TestTypeXrayHR:
 
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithUniformityProblems', 'Value'])
                         if Value is not None and Value > 0:
@@ -243,8 +257,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         Summary.Draw("col")
         Summary.GetYaxis().SetLabelSize(0.07)
+
+
         Summary.GetXaxis().LabelsOption("v")
-        Summary.GetXaxis().SetLabelSize(0.05)
+        if len(ModuleIDsList) > 200:
+            Summary.GetXaxis().SetLabelSize(0.015)
+        elif len(ModuleIDsList) > 100:
+            Summary.GetXaxis().SetLabelSize(0.025)
+        elif len(ModuleIDsList) > 50:
+            Summary.GetXaxis().SetLabelSize(0.035)
+        else:
+            Summary.GetXaxis().SetLabelSize(0.05)
 
         line1 = ROOT.TLine()
         line1.SetLineStyle(2)

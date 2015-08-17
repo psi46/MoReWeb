@@ -31,12 +31,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 ModuleIDsList.append(RowTuple['ModuleID'])
 
         # check if all grades are available
-        FTMinus20BTC_Grades = []
-        FTMinus20ATC_Grades = []
-        FT17_Grades = []
-        XrayCal_Grades = []
-        XrayHR_Grades = []
-        Final_Grades = []
         ModuleData = []
 
         for ModuleID in ModuleIDsList:
@@ -51,6 +45,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             XrayCal = ''
             XrayHR = ''
             Complete = ''
+            LeakageCurrent = ''
 
             for RowTuple in Rows:
                 if RowTuple['ModuleID']==ModuleID:
@@ -71,6 +66,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == 'XRayHRQualification':
                         XrayHR = RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
                         ModuleGrades.append(RowTuple['Grade'])
+                    if TestType == 'LeakageCurrentPON':
+                        LeakageCurrent = RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
+                        ModuleGrades.append(RowTuple['Grade'])
+
 
             FinalGrade = 'None'
             if len(FTMinus20BTC) > 0 and len(FTMinus20ATC) > 0 and len(FT17) > 0 and len(XrayHR) > 0:
@@ -80,6 +79,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     FinalGrade = 'B'
                 elif 'A' in ModuleGrades:
                     FinalGrade = 'A'
+
+            # only use leakage current grade as final grade if it is C
+            if len(LeakageCurrent) > 0:
+                if LeakageCurrent.upper() == 'C':
+                    FinalGrade = 'C'
 
             Module['ModuleID'] = ModuleID
             Module['Grade'] = FinalGrade

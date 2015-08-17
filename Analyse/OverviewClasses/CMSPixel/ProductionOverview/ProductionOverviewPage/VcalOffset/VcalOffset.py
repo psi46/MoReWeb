@@ -53,20 +53,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
                     if TestType == 'XrayCalibration_Spectrum':
                         for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips_Xray','Chip_Xray%d'%Chip, 'Xray_Calibration_Spectrum_Chip%d'%Chip, 'KeyValueDictPairs.json'])
-                            JSONFiles = glob.glob(Path)
-                            if len(JSONFiles) > 1:
-                                print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
-                            elif len(JSONFiles) < 1:
-                                print "WARNING: %s json file not found: '%s"%(self.Name, Path)
-                            else:
-                                
-                                with open(JSONFiles[0]) as data_file:    
-                                    JSONData = json.load(data_file)
-                                
-                                Histogram.Fill(float(JSONData["Offset"]['Value']))
+                            Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips_Xray', 'Chip_Xray%d'%Chip,  'Xray_Calibration_Spectrum_Chip%d'%Chip, 'KeyValueDictPairs.json', "Offset", 'Value'])
+                            if Value is not None:
+                                Histogram.Fill(float(Value))
                                 NROCs += 1
-
                         break
         
         Histogram.Draw("")

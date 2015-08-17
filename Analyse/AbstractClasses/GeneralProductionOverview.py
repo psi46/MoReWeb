@@ -457,7 +457,9 @@ class GeneralProductionOverview:
             print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
             return None
         elif len(JSONFiles) < 1:
-            print "WARNING: %s json file not found: '%s"%(self.Name, Path)
+            # first Fulltest at -20 is allowed to not have IV curve, don't show warning in this case
+            if not 'ModuleFulltestPxar_m20_1/IVCurve' in Path:
+                print "WARNING: %s json file not found: '%s"%(self.Name, Path)
             return None
         else:
 
