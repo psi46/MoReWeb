@@ -1,5 +1,6 @@
 import AbstractClasses
 import ROOT
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
@@ -24,7 +25,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ]
 
         self.ResultData['SubTestResultDictList'] += [
-
                 {'Key':'OpParameters',
                     'DisplayOptions':{
                         'Order':16,
@@ -61,6 +61,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':5,
                     }
                 },
+                {'Key':'BumpBondingMap',
+                    'DisplayOptions':{
+                        'Order':5,
+                    }
+                }
+            ]
+
+        self.ResultData['SubTestResultDictList'] += [
+            {'Key':'BB4',
+                'DisplayOptions':{
+                    'Order':5,
+                }
+            }
+        ]
+
+        self.ResultData['SubTestResultDictList'] += [
                 {'Key':'TrimBitTest',
                     'DisplayOptions':{
                         'Order':7,

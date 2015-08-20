@@ -37,7 +37,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'nDeadBumps': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadBumpList'])),
-                'Label':' - Dead Bumps'
+                'Label':' - Dead Bumps %s'%(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SpecialBumpBondingTestName'] if self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData'].has_key('SpecialBumpBondingTestName') else '') 
             },
             'nDeadTrimbits': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadTrimbitsList'])),
