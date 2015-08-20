@@ -405,9 +405,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['ROCGrade']['Value'] = GradeMapping[max(ROCGrades)]
 
         GradeFormatted = GradeMapping[max(ROCGrades)]
-        print '-'*78
         print ' ROC {ROC:2.0f}: Grade {Grade}'.format(ROC=self.ParentObject.Attributes['ChipNo'], Grade=GradeFormatted)
         print '         Pixel Defects:              {Defects}'.format(Defects=TotalPixelDefects)
         print '         BumpBonding Defects:        {Defects}'.format(Defects=BumpBondingDefects)
         print '         Efficiency at 120 MHz/cm2:  {Eff}'.format(Eff=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency120']['Value'])
-       
+        print '-'*78
