@@ -52,7 +52,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Label': 'Number of noisy pixels',
             'Value': 0,
         }
-        self.ResultData['HiddenData']['ListOfNoisyPixels'] = []
+        self.NoisePixelList = set()
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(1)
@@ -108,9 +108,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
                         self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
                         if Width > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
-                            self.ResultData['HiddenData']['NumberOfNoisyPixels']['Value'] += 1
-                            self.ResultData['HiddenData']['ListOfNoisyPixels'].append((ChipNo, column, row))
+                            self.NoisePixelList.add((ChipNo, column, row))
             ThresholdMean /= NPix
+        self.ResultData['HiddenData']['ListOfNoisyPixels'] = {'Label': 'Noisy Pixels List', 'Value': self.NoisePixelList}
+        self.ResultData['HiddenData']['NumberOfNoisyPixels'] = {'Label': 'Noisy Pixels', 'Value': len(self.NoisePixelList)}
 
         if self.ResultData['Plot']['ROOTObject_ht'].GetMaximum() < self.ResultData['HiddenData']['htmax']:
             self.ResultData['HiddenData']['htmax'] = self.ResultData['Plot']['ROOTObject_ht'].GetMaximum()

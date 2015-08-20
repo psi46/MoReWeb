@@ -15,7 +15,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Bump Bonding Defects'
             },
         }
-        self.ResultData['HiddenData']['ListOfDefectivePixels'] = []
+        self.BBDefectsList = set()
 
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
@@ -29,8 +29,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) 
 
-        NumberOfDefectivePixels = 0
-
         if histoHitMap:
             for Row in range(self.nRows):
                 for Column in range(self.nCols):
@@ -40,8 +38,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     PixelUnmasked = (not histoHot) or (histoHot.GetBinContent(Column+1, Row+1) < 1)
 
                     if PixelHits < 1 and PixelAlive and PixelUnmasked:
-                        NumberOfDefectivePixels += 1
-                        self.ResultData['HiddenData']['ListOfDefectivePixels'].append((ChipNo, Column, Row))
+                        self.BBDefectsList.add((ChipNo, Column, Row))
                         self.ResultData['Plot']['ROOTObject'].SetBinContent(Column+1, Row+1, 1)
 
             ROOT.gStyle.SetOptStat(0)
@@ -55,8 +52,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
         self.SaveCanvas()
-        self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{NumberOfDefectivePixels:1.0f}'.format(NumberOfDefectivePixels=NumberOfDefectivePixels)
-        
+        self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{NumberOfDefectivePixels:1.0f}'.format(NumberOfDefectivePixels=len(self.BBDefectsList))
+        self.ResultData['HiddenData']['ListOfDefectivePixels'] = {'Label': 'BB defects', 'Value': self.BBDefectsList}
         self.Title = 'Bump Bonding Defects {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         
 

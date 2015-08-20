@@ -63,5 +63,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.SaveCanvas()
         
         self.ResultData['KeyList'] = ['Slope', 'Offset']
-        print ("ROC %d"%self.chipNo).ljust(6) + " Slope = " + ("%.2f"%slope['Value']).ljust(8) + " Offset = " + ("%.1f"%offset['Value']).ljust(8)
+        print ("ROC %d"%self.chipNo).ljust(6) + " Slope = " + ("%.2f"%slope['Value']).ljust(5) + " +/- " + ("%.1f"%slope['Sigma']).ljust(4) + " Offset = " + ("%.1f"%offset['Value']).ljust(8)
         self.ResultData['KeyValueDictPairs'] = {'Slope': slope,'Offset': offset,'chi2': chi2}

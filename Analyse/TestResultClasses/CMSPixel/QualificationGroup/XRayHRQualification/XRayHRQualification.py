@@ -76,6 +76,7 @@ class TestResult(GeneralTestResult):
                     testParametersFile.close()
             if not NTriggersReadFromFile:
                 print '\x1b[31mWARNING: testParameters.dat file not found in "%s", using default number of triggers Ntrig = %d\x1b[0m'%(FolderName, self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)])
+        self.Attributes['Rates']['HREfficiency'].sort()
 
         HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_*')
         for Path in HRDataPaths:
@@ -107,6 +108,21 @@ class TestResult(GeneralTestResult):
             self.Attributes['ROOTFiles']['MaskHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
             self.FileHandle.append(self.Attributes['ROOTFiles']['MaskHotPixels'])
             break
+
+        RetrimHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_RetrimHotPixels_*')
+        if len(RetrimHotPixelsPaths) > 1:
+                warnings.warn("multiple RetrimHotPixels tests found")
+
+        for Path in RetrimHotPixelsPaths:
+            FolderName = os.path.basename(Path)
+            ROOTFiles = glob.glob(Path+'/*.root')
+            if len(ROOTFiles) > 1:
+                warnings.warn("The directory '%s' contains more than one .root file, choosing first one: '%s'"%(FolderName, ROOTFiles[0]))
+            self.Attributes['ROOTFiles']['RetrimHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
+            self.Attributes['RetrimHotPixelsPath'] = Path
+            self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels'])
+            break
+
 
         PixelAlivePaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_PixelAlive_*')
         for Path in PixelAlivePaths:
