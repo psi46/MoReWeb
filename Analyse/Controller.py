@@ -338,10 +338,10 @@ elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
 
-print "production overview:"
-
-ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
-ProductionOverviewObject.GenerateOverview()
+if int(Configuration.get('SystemConfiguration', 'GenerateProductionOverview')) > 0:
+    print "production overview:"
+    ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
+    ProductionOverviewObject.GenerateOverview()
 
 # TestResultEnvironmentInstance.ErrorList.append( {'test1':'bla'})
 print '\nErrorList:'
