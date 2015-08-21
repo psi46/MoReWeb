@@ -384,5 +384,5 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
     def GenerateOverview(self):
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
-        HTML = "<a href='%s'>Production Overview '%s'</a><br />"%(self.GetStorageKey()+'/'+self.HTMLFileName, self.Attributes['Title'])
+        HTML = "<a href='%s'>%s</a><br />"%(self.GetStorageKey()+'/'+self.HTMLFileName, self.Attributes['Title'])
         return HTML

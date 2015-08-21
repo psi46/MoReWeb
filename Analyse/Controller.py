@@ -50,7 +50,9 @@ Configuration.read([
     'Configuration/GradingParameters.cfg',
     'Configuration/SystemConfiguration.cfg',
     'Configuration/Paths.cfg',
-    'Configuration/ModuleInformation.cfg'])
+    'Configuration/ModuleInformation.cfg',
+    'Configuration/ProductionOverview.cfg'
+    ])
 
 if args.revision != -1:
     revisionNumber = int(args.revision)
