@@ -87,7 +87,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
             Module['ModuleID'] = ModuleID
             Module['Grade'] = FinalGrade
-            Module['TestDate'] = max(TestDates) #datetime.datetime.fromtimestamp(max(TestDates)).strftime("%Y-%m-%d %H:%m")
+            Module['TestDate'] = min(TestDates) #datetime.datetime.fromtimestamp(max(TestDates)).strftime("%Y-%m-%d %H:%m")
             ModuleData.append(Module)
 
         ModuleData.sort(key=lambda x: x['TestDate'], reverse=True)
@@ -147,10 +147,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 else:
                     hN.Fill(Module['TestDate'] - TimeOffset)
 
-            hA = hA.GetCumulative()
-            hB = hB.GetCumulative()
-            hC = hC.GetCumulative()
-            hN = hN.GetCumulative()
+            hA = self.GetCumulative(hA)
+            hB = self.GetCumulative(hB)
+            hC = self.GetCumulative(hC)
+            hN = self.GetCumulative(hN)
 
             hA.GetXaxis().SetTimeDisplay(1)
             hA.GetXaxis().SetTimeOffset(dh.Convert())

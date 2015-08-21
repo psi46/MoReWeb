@@ -90,9 +90,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         for DurationMinutes in TestDurations['m20_1']:
             hA.Fill(DurationMinutes)
-        for DurationSeconds in TestDurations['m20_2']:
+        for DurationMinutes in TestDurations['m20_2']:
             hB.Fill(DurationMinutes)
-        for DurationSeconds in TestDurations['p17_1']:
+        for DurationMinutes in TestDurations['p17_1']:
             hC.Fill(DurationMinutes)
 
         HistStack.Add(hA)

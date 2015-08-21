@@ -489,5 +489,14 @@ class GeneralProductionOverview:
              else:
                  FileHandle.close()
 
+    def GetCumulative(self, ROOTHist):
+        nbinsx = ROOTHist.GetNbinsX()
+        THCumulative = ROOTHist.Clone(self.GetUniqueID())
+        Sum = 0
+        for binx in range(1, nbinsx+1):
+            Sum += ROOTHist.GetBinContent(binx)
+            THCumulative.SetBinContent(binx, Sum)
+        return THCumulative
+
 
 
