@@ -54,7 +54,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.SaveCanvas()
         self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{NumberOfDefectivePixels:1.0f}'.format(NumberOfDefectivePixels=len(self.BBDefectsList))
         self.ResultData['HiddenData']['ListOfDefectivePixels'] = {'Label': 'BB defects', 'Value': self.BBDefectsList}
-        self.Title = 'Bump Bonding Defects {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
+        self.Title = 'BB Defects {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         
 
 

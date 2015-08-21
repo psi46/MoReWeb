@@ -118,9 +118,10 @@ class TestResult(GeneralTestResult):
             ROOTFiles = glob.glob(Path+'/*.root')
             if len(ROOTFiles) > 1:
                 warnings.warn("The directory '%s' contains more than one .root file, choosing first one: '%s'"%(FolderName, ROOTFiles[0]))
-            self.Attributes['ROOTFiles']['RetrimHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
-            self.Attributes['RetrimHotPixelsPath'] = Path
-            self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels'])
+            if len(ROOTFiles) >= 1:
+                self.Attributes['ROOTFiles']['RetrimHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
+                self.Attributes['RetrimHotPixelsPath'] = Path
+                self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels'])
             break
 
 
@@ -433,6 +434,34 @@ class TestResult(GeneralTestResult):
                 },
                 'InitialAttributes': {
                     'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            })
+
+        for Rate in self.Attributes['Rates']['HRData']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'HotPixelRetrimming_{Rate}'.format(Rate=Rate),
+                'Module': 'HotPixelRetrimming',
+                'DisplayOptions': {
+                    'Width': 4,
+                    'Order': 60,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'HotPixelRetrimming_{Rate}'.format(Rate=Rate)
+                },
+            })
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'HotPixelRetrimSummary_{Rate}'.format(Rate=Rate),
+                'Module': 'HotPixelRetrimSummary',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 60,
+                },
+                'InitialAttributes': {
+                    'Rate': Rate,
+                    'NumberOfChips': self.Attributes['NumberOfChips'],
+                    'StorageKey': 'HotPixelRetrimSummary_{Rate}'.format(Rate=Rate)
                 },
             })
        

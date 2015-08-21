@@ -63,6 +63,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for Rate in self.ParentObject.ParentObject.Attributes['Rates']['HRData']:
             self.ResultData['SubTestResultDictList'] += [
                 {
+                    'Key':'HotPixelRetrimming_{Rate}'.format(Rate=Rate),
+                    'Module':'HotPixelRetrimming',
+                    'InitialAttributes':{
+                        'Rate':Rate,
+                        'StorageKey':'HotPixelRetrimming_{Rate}'.format(Rate=Rate),
+                    },
+                    'DisplayOptions':{
+                        'Order':40+i
+                    },
+                },
+                {
                     'Key':'HotPixelMap_{Rate}'.format(Rate=Rate),
                     'Module':'HotPixelMap',
                     'InitialAttributes':{
