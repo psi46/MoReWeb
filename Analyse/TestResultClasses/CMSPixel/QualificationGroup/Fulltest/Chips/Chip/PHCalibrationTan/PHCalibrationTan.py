@@ -7,7 +7,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_PHCalibrationTan_TestResult'
         self.NameSingle = 'PHCalibrationTan'
         self.Show = False
-    
+        self.Par1DefectsList = set()
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         
 
@@ -33,22 +33,29 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             DeadPixelList = set([])
 
+        par1Min = self.TestResultEnvironmentObject.GradingParameters['par1Min']
+        par1Max = self.TestResultEnvironmentObject.GradingParameters['par1Max']
+
         if PHCalibrationFitTanFile:
             
             # for (int i = 0 i < 2 i++) fgets(string, 200, phLinearFile)
             for i in range(3):
                 PHCalibrationFitTanFile.readline() #Omit first three lines
             
-            for i in range(self.nCols): #Columns
-                for j in range(self.nRows): #Rows
+            for col in range(self.nCols):
+                for row in range(self.nRows):
                     Line = PHCalibrationFitTanFile.readline()
                     if Line:
                         LineArray = Line.strip().split()
                         try:
-                            float(LineArray[1])
-                            if (ChipNo, i, j) not in DeadPixelList:
-                                self.ResultData['Plot']['ROOTObject'].Fill(float(LineArray[1]))
-                        
+                            par1 = float(LineArray[1])
+                            if (ChipNo, col, row) not in DeadPixelList:
+                                self.ResultData['Plot']['ROOTObject'].Fill(par1)
+
+                                # parameter 1 defects
+                                if par1 > par1Max or par1 < par1Min:
+                                    self.Par1DefectsList.add((ChipNo, col, row))
+
                         except (ValueError, TypeError, IndexError):
                             pass
                     
@@ -82,13 +89,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'sigma':{
                     'Value':'{0:1.2f}'.format(RMSPar1), 
                     'Label':'σ'
-                }
+                },
+                'Par1Defects':{
+                    'Value': self.Par1DefectsList,
+                    'Label':'Par1 defects'
+                },
+                'NPar1Defects':{
+                    'Value': '{0:1.0f}'.format(len(self.Par1DefectsList)),
+                    'Label':'# Par1 defects'
+                },
             }
-            self.ResultData['KeyList'] = ['N','mu','sigma']
+            self.ResultData['KeyList'] = ['N','mu','sigma','NPar1Defects']
             if under:
                 self.ResultData['KeyValueDictPairs']['under'] = {'Value':'{0:1.2f}'.format(under), 'Label':'<='}
                 self.ResultData['KeyList'].append('under')
             if over:
                 self.ResultData['KeyValueDictPairs']['over'] = {'Value':'{0:1.2f}'.format(over), 'Label':'>='}
                 self.ResultData['KeyList'].append('over')
-
