@@ -94,20 +94,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['HiddenData']['ThrDefectList']
         )
 
-        if True or (len(self.ResultData['HiddenData']['TotalList']) > 0) :
-            print '\nChip %d'%self.chipNo
 
-            print '\ttotal: %4d'%len(self.ResultData['HiddenData']['TotalList'])
-            print '\tdead:  %4d'%len(self.ResultData['HiddenData']['DeadPixelList'])
-            print '\tinef:  %4d'%len(self.ResultData['HiddenData']['IneffPixelList'])
-            print '\tmask:  %4d'%len(self.ResultData['HiddenData']['MaskDefectList'])
-            print '\taddr:  %4d'%len(self.ResultData['HiddenData']['AddressProblemList'])
-            print '\tbump:  %4d' % len(self.ResultData['HiddenData']['DeadBumpList'])
-            print '\ttrim:  %4d'%len(self.ResultData['HiddenData']['ThrDefectList'])
-            print '\ttbit:  %4d'%len(self.ResultData['HiddenData']['DeadTrimbitsList'])
-            print '\tnois:  %4d'%len(self.ResultData['HiddenData']['NoiseDefectList'])
-            print '\tgain:  %4d'%len(self.ResultData['HiddenData']['GainDefectList'])
-            print '\tpar1:  %4d'%len(self.ResultData['HiddenData']['Par1DefectList'])
 
         # total defects grading
         PixelDefectsGradeALimit = self.TestResultEnvironmentObject.GradingParameters['defectsB']
@@ -129,8 +116,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if maskDefects >= MaskDefectsGradeBLimit:
             pixelDefectsGrade = 3
 
+        GradeMapping = {1:'A', 2:'B', 3:'C'}
+        Grade = 'None'
+        try:
+            Grade = GradeMapping[pixelDefectsGrade]
+        except:
+            pass
+        print '\nChip %d Grade %s'%(self.chipNo, Grade)
 
-        print '\tGrade: %s'%pixelDefectsGrade
+        print '\ttotal: %4d'%len(self.ResultData['HiddenData']['TotalList'])
+        print '\tdead:  %4d'%len(self.ResultData['HiddenData']['DeadPixelList'])
+        print '\tinef:  %4d'%len(self.ResultData['HiddenData']['IneffPixelList'])
+        print '\tmask:  %4d'%len(self.ResultData['HiddenData']['MaskDefectList'])
+        print '\taddr:  %4d'%len(self.ResultData['HiddenData']['AddressProblemList'])
+        print '\tbump:  %4d' % len(self.ResultData['HiddenData']['DeadBumpList'])
+        print '\ttrim:  %4d'%len(self.ResultData['HiddenData']['ThrDefectList'])
+        print '\ttbit:  %4d'%len(self.ResultData['HiddenData']['DeadTrimbitsList'])
+        print '\tnois:  %4d'%len(self.ResultData['HiddenData']['NoiseDefectList'])
+        print '\tgain:  %4d'%len(self.ResultData['HiddenData']['GainDefectList'])
+        print '\tpar1:  %4d'%len(self.ResultData['HiddenData']['Par1DefectList'])
+
+        print '-'*78
+
         self.ResultData['KeyValueDictPairs'] = {
             'PixelDefectsGrade':{
                 'Value': '%d'%pixelDefectsGrade,

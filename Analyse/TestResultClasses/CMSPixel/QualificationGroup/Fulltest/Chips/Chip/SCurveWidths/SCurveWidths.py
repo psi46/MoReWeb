@@ -37,7 +37,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(1)
-        print 'SCurveWidth'
 
         self.ResultData['Plot']['ROOTObject'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) # hw
         self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) #Noise in unbonded pixel (not displayed) # hd
@@ -82,7 +81,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             raise Exception('Cannot find SCurveFile "%s"'%SCurveFileName)
         else:
             #Omit the first two lines
-            print 'read file',SCurveFileName
+            #print 'read file',SCurveFileName
             Line = SCurveFile.readline()
             Line = SCurveFile.readline()
 

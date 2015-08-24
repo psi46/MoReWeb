@@ -15,10 +15,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gStyle.SetOptStat(0)
         try:
             histname = self.ParentObject.HistoDict.get(self.NameSingle, 'AnalogCurrent')
-            print histname
-            object = HistoGetter.get_histo(self.ParentObject.FileHandle, histname)
-            print object
-            self.ResultData['Plot']['ROOTHisto'] = object
+            self.ResultData['Plot']['ROOTHisto'] = HistoGetter.get_histo(self.ParentObject.FileHandle, histname)
         except Exception as e:
             print e
             raise e

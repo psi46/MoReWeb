@@ -138,7 +138,8 @@ class PH_Fitting():
             if chi2[0] ==-1:
                 print 'Failed to fit in chip %s'%chi2[1]
             elif chi2[2] == -2:
-                print 'File already exists in chip %s'%chi2[1]
+                pass
+                #print 'File already exists in chip %s'%chi2[1]
             else:
                 if chi2[0] > maxChi2[0]:
                     maxChi2 = chi2
@@ -161,7 +162,6 @@ class PH_Fitting():
         else:
             inputFileName += 'phCalibration_C%i.dat'%(chip)
         inputFileName = os.path.abspath(inputFileName)
-        print inputFileName
 
         try:
             inputFile = open(inputFileName,'r')
