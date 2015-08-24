@@ -36,6 +36,8 @@ parser.add_argument('-norev','--no-revisionnumber',dest='norev',action='store_tr
                     help='deactivates the revsion sting with in the path')
 parser.add_argument('-f', '--force', dest = 'force', action = 'store_true', default = False,
                     help = 'Forces runnig analysis even if checksums agree')
+parser.add_argument('-r', '--refit', dest = 'refit', action = 'store_true', default = False,
+                    help = 'Forces refitting even if files exist')
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
 verbose = args.verbose
@@ -97,6 +99,9 @@ TestResultEnvironmentInstance.SQLiteDBPath = SQLiteDBPath
 TestResultEnvironmentInstance.GlobalOverviewPath = GlobalOverviewPath
 TestResultEnvironmentInstance.OpenDBConnection()
 TestResultEnvironmentInstance.GlobalDataDirectory = GlobalDataDirectory
+
+if args.refit:
+    TestResultEnvironmentInstance.Configuration['Fitting']['refit'] = True
 
 if Configuration.has_option('Paths','AbsoluteOverviewPage'):
     TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'] = Configuration.get('Paths','AbsoluteOverviewPage')
