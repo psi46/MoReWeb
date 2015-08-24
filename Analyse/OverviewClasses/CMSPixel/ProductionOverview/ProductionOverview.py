@@ -20,6 +20,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         SysConfiguration = ConfigParser.ConfigParser()
         SysConfiguration.read(['Configuration/ProductionOverview.cfg'])
 
+        try:
+            self.ModuleQualificationFinalDate = SysConfiguration.get('ProductionOverview','ModuleQualificationFinalDate').lower()
+            if self.ModuleQualificationFinalDate not in ['first', 'last']:
+                self.ModuleQualificationFinalDate = 'last'
+        except:
+            self.ModuleQualificationFinalDate = 'last'
+
         if int(SysConfiguration.get('ProductionOverview','GenerateTotalOverview'))>0:
             self.SubPages.append(
                 {

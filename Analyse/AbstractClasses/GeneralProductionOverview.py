@@ -10,7 +10,7 @@ import json
 class GeneralProductionOverview:
     LastUniqueIDCounter = 1
 
-    def __init__(self, TestResultEnvironmentObject = None, InitialAttributes = None):
+    def __init__(self, TestResultEnvironmentObject = None, InitialAttributes = None, ParentObject=None):
         if TestResultEnvironmentObject:
             self.TestResultEnvironmentObject = TestResultEnvironmentObject
             self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
@@ -52,6 +52,7 @@ class GeneralProductionOverview:
         self.Canvas = ROOT.TCanvas()
         self.Canvas.Clear()
         self.Canvas.cd()
+        self.ParentObject = ParentObject
 
         ### custom init
         self.CustomInit()
@@ -209,7 +210,7 @@ class GeneralProductionOverview:
             InitialAttributes['BasePath'] = self.Attributes['BasePath']
 
             ### instanciate submodule
-            SubPageClass = SubPage['ProductionOverview'].ProductionOverview(TestResultEnvironmentObject=self.TestResultEnvironmentObject, InitialAttributes = InitialAttributes)
+            SubPageClass = SubPage['ProductionOverview'].ProductionOverview(TestResultEnvironmentObject=self.TestResultEnvironmentObject, InitialAttributes = InitialAttributes, ParentObject = self)
 
             ### generate html overview of submodule
             #try:

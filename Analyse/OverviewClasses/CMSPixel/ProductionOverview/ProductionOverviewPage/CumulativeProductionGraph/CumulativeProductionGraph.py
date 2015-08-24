@@ -87,7 +87,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
             Module['ModuleID'] = ModuleID
             Module['Grade'] = FinalGrade
-            Module['TestDate'] = min(TestDates) #datetime.datetime.fromtimestamp(max(TestDates)).strftime("%Y-%m-%d %H:%m")
+            if self.ParentObject.ParentObject.ModuleQualificationFinalDate == 'first':
+                Module['TestDate'] = min(TestDates)
+            else:
+                Module['TestDate'] = max(TestDates)
             ModuleData.append(Module)
 
         ModuleData.sort(key=lambda x: x['TestDate'], reverse=True)
