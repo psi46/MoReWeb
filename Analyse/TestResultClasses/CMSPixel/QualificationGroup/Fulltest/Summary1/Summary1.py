@@ -53,13 +53,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             pass
 
-
-        
         nPixelDefectsTotal  = 0
         PixelDefectsRocsA = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsA']['Value'])
         PixelDefectsRocsB = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsB']['Value'])
         PixelDefectsRocsC = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsRocsC']['Value'])
         ModuleGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Value'])
+        ElectricalGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ElectricalGrade']['Value'])
+        IVGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['IVGrade']['Value'])
         
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -67,8 +67,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Module'
             },
             'Grade': {
-                'Value':GradeMapping[ModuleGrade], 
+                'Value':GradeMapping[ModuleGrade] if ModuleGrade in GradeMapping else 'None',
                 'Label':'Grade'
+            },
+            'ElectricalGrade': {
+                'Value':GradeMapping[ElectricalGrade] if ElectricalGrade in GradeMapping else 'None',
+                'Label':'Electrical Grade'
+            },
+            'IVGrade': {
+                'Value':GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None',
+                'Label':'IV Grade'
             },
             'PixelDefectsRocsA': {
                 'Value':'{0:1.0f}'.format(PixelDefectsRocsA), 
@@ -95,7 +103,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Threshold Defects'
             },
             'PixelDefects': {
-#                'Value':'%d - %d/%d/%d'%(TotalDefects,nPixelDefectsGradeA,nPixelDefectsGradeB,nPixelDefectsGradeC)
                 'Value':'%d - %d/%d/%d'%(TotalDefects,PixelDefectsRocsA,PixelDefectsRocsB,PixelDefectsRocsC),
                 'Label':'Pixel Defects - A/B/C',
                 'NumericValue':TotalDefects,
@@ -129,7 +136,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'PH Parameter1 Defects'
             },
         }
-        self.ResultData['KeyList'] = ['Module','Grade','PixelDefects', 'DeadPixels','AddressProblems', 'ThresholdDefects', 'MaskDefects', 'DeadBumps', 'NoisyPixels', 'TrimProblems', 'PHGainDefects', 'PHPedestalDefects', 'PHPar1Defects']
+        self.ResultData['KeyList'] = ['Module','Grade','ElectricalGrade', 'IVGrade', 'PixelDefects', 'DeadPixels','AddressProblems', 'ThresholdDefects', 'MaskDefects', 'DeadBumps', 'NoisyPixels', 'TrimProblems', 'PHGainDefects', 'PHPedestalDefects', 'PHPar1Defects']
 
 
 	SubGradings = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGradings']

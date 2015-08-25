@@ -24,6 +24,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             2: 'B',
             3: 'C'
         }
+
+
         PixelDefectsRocsA = 0
         PixelDefectsRocsB = 0
         PixelDefectsRocsC = 0
@@ -43,8 +45,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
                     'PixelDefectsGrade']['Value'] for i in chipResults])
         SubGradings['PixelDefects'] = SubGrading
+
         # Grading
 
+        # performance parameters grading
         for i in ['Noise', 'VcalThresholdWidth', 'RelativeGainWidth', 'PedestalSpread', 'Parameter1']:
             if not self.ParentObject.ResultData['SubTestResults'].has_key(i):
                 continue
@@ -53,10 +57,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ChipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
             for j in ChipResults:
                 ChipGradingTestResultObject = j['TestResultObject'].ResultData['SubTestResults']['Grading']
-
-                # Value= TestResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(j+1)
-                # nValue = TestResultObject.ResultData['Plot']['ROOTObject_h2'].GetBinContent(j+1)
-
 
                 # Grading 
                 ChipGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
@@ -77,11 +77,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print '%s: %s'%(i,SubGrading)
             SubGradings[i] = SubGrading
 
+
+        # IV Grading
+        IVGrade = 0
         CurrentAtVoltage150V = 0
         RecalculatedCurrentAtVoltage150V = 0
         RecalculatedCurrentVariation = 0
         CurrentVariation = 0
         if self.ParentObject.ResultData['SubTestResults'].has_key('IVCurve'):
+            IVGrade = 1
             IVTestResult = self.ParentObject.ResultData['SubTestResults']['IVCurve']
             CurrentAtVoltage150V = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
             if IVTestResult.ResultData['KeyValueDictPairs'].has_key('recalculatedCurrentAtVoltage150V'):
@@ -90,67 +94,50 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if IVTestResult.ResultData['KeyValueDictPairs'].has_key('recalculatedCurrentVariation'):
                 RecalculatedCurrentVariation = float(
                     IVTestResult.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation']['Value'])
-
             CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
+
+            # current
+            if self.ParentObject.Attributes['TestType'] == 'p17_1':
+                if IVGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentB']:
+                    IVGrade = 2
+                if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
+                    IVGrade = 3
+            else:
+                if IVGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
+                    IVGrade = 2
+                if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
+                    IVGrade = 3
+
+            # slope
+            if IVGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
+                IVGrade = 2
+            if CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivC']:
+                IVGrade = 3
+
         else:
             pass
 
         if self.verbose or True:
             print 'SubGradings:'
+            print "IV: %s"%(GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None')
             for i in SubGradings:
                 print '%s: %s/%s/%s' % (
                     i, self.getNumberOfRocsWithGrade('1', SubGradings[i]),
                     self.getNumberOfRocsWithGrade('2', SubGradings[i]),
                     self.getNumberOfRocsWithGrade('3', SubGradings[i]))
 
-                # print 'PixelDefects: %s'%SubGradings['PixelDefects']
-        # print 'A:',self.getNumberOfRocsWithGrade('1',SubGradings['PixelDefects'])
-        #         print 'B:',self.getNumberOfRocsWithGrade('2',SubGradings['PixelDefects'])
-        #         print 'C:',self.getNumberOfRocsWithGrade('3',SubGradings['PixelDefects'])
-        # TODO
+        # add pixel defects grading to final grade
+        if ModuleGrade == 1 and PixelDefectsRocsB > 0:
+            ModuleGrade = 2
+        if PixelDefectsRocsC > 0:
+            ModuleGrade = 3
 
+        # electrical grade = ModuleGrade before IV
+        ElectricalGrade = ModuleGrade
 
-        if self.ParentObject.Attributes['TestType'] == 'p17_1':
-            # Grading
-            if ModuleGrade == 1 and PixelDefectsRocsB > 0:
-                ModuleGrade = 2
-            if ModuleGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters[
-                'currentB']:
-                ModuleGrade = 2;
-            if ModuleGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
-                ModuleGrade = 2
-            if PixelDefectsRocsC > 0:
-                ModuleGrade = 3
-            if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
-                ModuleGrade = 3;
-
-            '''
-            // Failures reasons...
-            if( (i150> currentB) && (i150 < currentC) ) currentProblemB++;
-            if( (i150> currentC) ) currentProblemC++;
-            if( (ratio > slopeivB) ) slopeProblemB++;
- '''
-        else:
-            # Grading
-            if ModuleGrade == 1 and PixelDefectsRocsB > 0:
-                ModuleGrade = 2
-            if ModuleGrade == 1 and RecalculatedCurrentAtVoltage150V and RecalculatedCurrentAtVoltage150V > \
-                    self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
-                ModuleGrade = 2
-            if ModuleGrade == 1 and RecalculatedCurrentVariation and RecalculatedCurrentVariation > \
-                    self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
-                ModuleGrade = 2
-            if PixelDefectsRocsC > 0:
-                ModuleGrade = 3
-            if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
-                ModuleGrade = 3
-
-            '''
-            # Failures reasons...
-            if (i150> 1.5*currentB and i150 < 1.5*currentC)currentProblemB++;
-            if (i150> 1.5*currentC) ){ currentProblemC++;}
-            if (ratio > slopeivB) ){ slopeProblemB++;}
-            '''
+        # combine with IV grade
+        if IVGrade > ModuleGrade:
+            ModuleGrade = IVGrade
 
         nPixelDefectsTotal = 0
         try:
@@ -170,6 +157,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ModuleGrade': {
                 'Value': '{0:1.0f}'.format(ModuleGrade),
                 'Label': 'Grade'
+            },
+            'ElectricalGrade': {
+                'Value': '{0:1.0f}'.format(ElectricalGrade),
+                'Label': 'Electrical Grade'
+            },
+            'IVGrade': {
+                'Value': '{0:1.0f}'.format(IVGrade),
+                'Label': 'IV Grade'
             },
             'PixelDefectsRocsA': {
                 'Value': '{0:1.0f}'.format(PixelDefectsRocsA),
@@ -197,10 +192,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
         }
         self.ResultData['HiddenData']['SubGradings'] = SubGradings
-        #self.ResultData['HiddenData']['nPixelDefectsGradeA'] = nPixelDefectsGradeA
-        #self.ResultData['HiddenData']['nPixelDefectsGradeB'] = nPixelDefectsGradeB
-        #self.ResultData['HiddenData']['nPixelDefectsGradeC'] = nPixelDefectsGradeC
-
         self.ResultData['KeyList'] = ['Module', 'ModuleGrade', 'PixelDefectsRocsB']
 
 
