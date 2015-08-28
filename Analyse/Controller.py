@@ -41,6 +41,8 @@ parser.add_argument('-c', '--comment', dest = 'comment', action = 'store_true', 
                     help = 'Add a comment to a local db row.')
 parser.add_argument('-d', '--delete-row', dest = 'deleterow', action = 'store_true', default = False,
                     help = 'Let you select a row in the local database to delete.')
+parser.add_argument('-r', '--refit', dest = 'refit', action = 'store_true', default = False,
+                    help = 'Forces refitting even if files exist')
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -103,6 +105,9 @@ TestResultEnvironmentInstance.SQLiteDBPath = SQLiteDBPath
 TestResultEnvironmentInstance.GlobalOverviewPath = GlobalOverviewPath
 TestResultEnvironmentInstance.OpenDBConnection()
 TestResultEnvironmentInstance.GlobalDataDirectory = GlobalDataDirectory
+
+if args.refit:
+    TestResultEnvironmentInstance.Configuration['Fitting']['refit'] = True
 
 if Configuration.has_option('Paths','AbsoluteOverviewPage'):
     TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'] = Configuration.get('Paths','AbsoluteOverviewPage')

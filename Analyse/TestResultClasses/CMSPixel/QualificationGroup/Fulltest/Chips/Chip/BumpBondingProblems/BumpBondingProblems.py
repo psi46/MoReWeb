@@ -50,7 +50,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         threshold = self.CheckBumpBondingProblems()
 
         if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].SetTitle("");
+            self.ResultData['Plot']['ROOTObject'].SetTitle("")
             if not self.isDigitalROC:
                 self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(
                     self.TestResultEnvironmentObject.GradingParameters['minThrDiff'],

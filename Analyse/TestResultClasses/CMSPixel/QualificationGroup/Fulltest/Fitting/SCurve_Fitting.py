@@ -9,7 +9,6 @@ class SCurve_Fitting():
     nCols = 52
     nRows = 80
     def __init__(self, refit = True, HistoDict = None, chi2Limit = 2.0, ePerVcal = 50.0, verbose = False, ParallelProcessing = False):
-        print 'SCURVE Fitting'
         ROOT.gStyle
         self.verbose = verbose
         self.refit = refit
@@ -24,10 +23,10 @@ class SCurve_Fitting():
         self.chiLimit = chi2Limit
         self.ePerVcal = ePerVcal
         self.slope = self.getVcal(0,255)/256
-        print "parallel processing ", self.ParallelProcessing
-        print "ePerVcal ",self.ePerVcal
-        print 'slope: ',self.slope
-        print 'nTrigs',self.nReadouts
+        print "  parallel processing: ".ljust(24), self.ParallelProcessing
+        print "  ePerVcal: ".ljust(24),self.ePerVcal
+        print "  slope: ".ljust(24),self.slope
+        print "  nTrigs:".ljust(24),self.nReadouts
         self.InitFit()
 #         self.InitResultHistos()
 
@@ -72,7 +71,8 @@ class SCurve_Fitting():
             if chi2[0] ==-1:
                 print 'Failed to to fit in chip %s'%chi2[1]
             elif chi2[2] == -2:
-                print 'File already exists in chip %s'%chi2[1]
+                pass
+                #print 'File already exists in chip %s'%chi2[1]
             else:
                 if chi2[0] > maxChi2[0]:
                     maxChi2 = chi2
@@ -103,7 +103,6 @@ class SCurve_Fitting():
         else:
             inputFileName += 'SCurveData_C%i.dat'%(chip)
         inputFileName = os.path.abspath(inputFileName)
-        print inputFileName
         try:
             inputFile = open(inputFileName,'r')
         except IOError as e:
@@ -190,9 +189,9 @@ class SCurve_Fitting():
 
         self.scurveFit.SetParameters(self.nReadouts/2., graph.GetMean(), 167., self.nReadouts/2.)         #// half amplitude, threshold (50% point), width, offset
         graph.Fit(self.scurveFit, "Q", "", 0.0, 0.3);
-#         if row ==0 and col == 0:
-#             graph.Draw('APL')
-        chi2 = self.scurveFit.GetChisquare() / self.scurveFit.GetNDF();
+
+        ndf = self.scurveFit.GetNDF()
+        chi2 = self.scurveFit.GetChisquare() / ndf if ndf > 0 else 0
 
         notConverged = ("FAILED    " in ROOT.gMinuit.fCstatu) or (ROOT.gMinuit.fEDM > 1.e-4)    #//if fEDM very small, convergence failed only due to limited machine accuracy
         fitFailed = notConverged or chi2> self.chiLimit

@@ -9,6 +9,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Key':'Noise',
                 'DataKey':'PHCalibrationTan', # which sub test result to take the data from
                 'DataParameterKey':'mu', # which part of key value dict pairs
+                'DefectsKey': 'NPar1Defects',
                 'YLimitB':self.TestResultEnvironmentObject.GradingParameters['par1B'],# limit for grading
                 'YLimitC':self.TestResultEnvironmentObject.GradingParameters['par1C'],# limit for grading
                 'MarkerColor':ROOT.kBlue,

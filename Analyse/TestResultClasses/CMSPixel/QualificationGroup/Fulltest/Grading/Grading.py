@@ -122,7 +122,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print "IV: %s"%(GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None')
             for i in SubGradings:
                 print '%s: %s/%s/%s' % (
-                    i, self.getNumberOfRocsWithGrade('1', SubGradings[i]),
+                    i.ljust(22), self.getNumberOfRocsWithGrade('1', SubGradings[i]),
                     self.getNumberOfRocsWithGrade('2', SubGradings[i]),
                     self.getNumberOfRocsWithGrade('3', SubGradings[i]))
 

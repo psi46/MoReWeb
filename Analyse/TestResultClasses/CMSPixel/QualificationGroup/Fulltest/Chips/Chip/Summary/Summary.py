@@ -29,7 +29,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'nNoisy1Pixel': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noisy1PixelList'])),
-                'Label':'Noisy Pixels 1'
+                'Label':'>10 hits in alive map'
             },
             'nMaskDefect': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MaskDefectList'])),
@@ -48,8 +48,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':' - Address Problems'
             },
             'nNoisy2Pixel': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoisyPixelSCurveList'])),
-                'Label':'Noisy Pixels 2'
+                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefectList'])),
+                'Label':'Noisy Pixels'
             },
             'nThrDefect': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ThrDefectList'])),

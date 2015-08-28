@@ -26,10 +26,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadPixelList'])),
                 'Label':' - Dead Pixels'
             },
-            'nNoisy1Pixel': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noisy1PixelList'])),
-                'Label':'Noisy Pixels 1'
-            },
             'nMaskDefect': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MaskDefectList'])),
                 'Label':' - Mask Defects'
@@ -46,9 +42,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['AddressProblemList'])),
                 'Label':' - Address Problems'
             },
+            'nNoisy1Pixel': {
+                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noisy1PixelList'])),
+                'Label':'>10 hits in alive map'
+            },
             'nNoisy2Pixel': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoisyPixelSCurveList'])),
-                'Label':'Noisy Pixels 2'
+                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefectList'])),
+                'Label':'Noisy Pixels'
             },
             'nThrDefect': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ThrDefectList'])),

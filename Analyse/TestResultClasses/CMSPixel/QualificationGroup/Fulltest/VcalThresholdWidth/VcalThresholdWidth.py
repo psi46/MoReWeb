@@ -10,6 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['SpecialPopulateDataParameters'] = {
                 'Key':'Vcal Threshold Width',
                 'DataKey':'VcalThresholdTrimmed', # which sub test result to take the data from
+                'DefectsKey': 'NTrimProblems',
                 'DataParameterKey':'sigma', # which part of key value dict pairs
                 'DataFactor':self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor'],
                 'YLimitB':self.TestResultEnvironmentObject.GradingParameters['trimmingB'],# limit for grading
