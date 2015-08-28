@@ -115,6 +115,7 @@ class ModuleResultOverview:
              {
                 'Label':'initial Current',
                 'DBColumnName':'initialCurrent',
+                'InGlobalOverviewList': True,
              },
              {
                 'Label':'Comments',
@@ -124,19 +125,19 @@ class ModuleResultOverview:
              {
                 'Label':'no of Cycles',
                 'DBColumnName':'nCycles',
-                'InGlobalOverviewList': True,
+                'InGlobalOverviewList': False,
                 'InFullList': False
              },
              {
                 'Label':'CycleTempLow',
                 'DBColumnName':'CycleTempLow',
-                'InGlobalOverviewList': True,
+                'InGlobalOverviewList': False,
                 'InFullList': False,
              },
              {
                 'Label':'CycleTempHigh',
                 'DBColumnName':'CycleTempHigh',
-                'InGlobalOverviewList': True,
+                'InGlobalOverviewList': False,
                 'InFullList': False,
              },
 

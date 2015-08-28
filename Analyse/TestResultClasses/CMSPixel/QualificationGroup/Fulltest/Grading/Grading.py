@@ -103,9 +103,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
                     IVGrade = 3
             else:
-                if IVGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
+                if IVGrade == 1 and RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
                     IVGrade = 2
-                if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
+                if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
                     IVGrade = 3
 
             # slope
