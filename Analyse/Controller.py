@@ -8,6 +8,7 @@ import TestResultClasses.CMSPixel.QualificationGroup.QualificationGroup
 import os, time,shutil, sys
 # import errno
 import ConfigParser
+import datetime
 
 #arg parse to analyse a single Fulltest
 parser = argparse.ArgumentParser(description='MORE web Controller: an analysis software for CMS pixel modules and ROCs')
@@ -37,7 +38,10 @@ parser.add_argument('-norev','--no-revisionnumber',dest='norev',action='store_tr
 parser.add_argument('-f', '--force', dest = 'force', action = 'store_true', default = False,
                     help = 'Forces runnig analysis even if checksums agree')
 parser.add_argument('-c', '--comment', dest = 'comment', action = 'store_true', default = False,
-                    help = 'Add a comment to a module')
+                    help = 'Add a comment to a local db row.')
+parser.add_argument('-d', '--delete-row', dest = 'deleterow', action = 'store_true', default = False,
+                    help = 'Let you select a row in the local database to delete.')
+
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
 verbose = args.verbose
@@ -371,10 +375,11 @@ if args.comment:
 
             Comments = raw_input("Enter new comment: ")
             result = TestResultEnvironmentInstance.LocalDBConnectionCursor.execute( 
-                'UPDATE ModuleTestResults SET Comments = :Comments WHERE ModuleID = :ModuleID AND TestType = :TestType AND QualificationType = :QualificationType',
+                'UPDATE ModuleTestResults SET Comments = :Comments WHERE ModuleID = :ModuleID AND TestType = :TestType AND TestDate = :TestDate AND QualificationType = :QualificationType',
                 {
                     'ModuleID': Rows[RowID]['ModuleID'],
                     'TestType': Rows[RowID]['TestType'],
+                    'TestDate': Rows[RowID]['TestDate'],
                     'QualificationType': Rows[RowID]['QualificationType'],
                     'Comments': Comments
                 }
@@ -387,6 +392,73 @@ if args.comment:
         else:
             print "row id not found!"
 
+
+# allows to delete a row in local db file
+if args.deleterow:
+    print "First enter module ID and then select one of the existing rows to delete or type 'all' to delete all of them."
+    ModuleID = raw_input("Enter module ID (eg. M1234): ")
+
+    if TestResultEnvironmentInstance.Configuration['Database']['UseGlobal']:
+        print "--delete option not supported for global db"
+    else:
+        AdditionalWhere = ''
+        if ModuleID:
+            AdditionalWhere += ' AND ModuleID=:ModuleID '
+        TestResultEnvironmentInstance.LocalDBConnectionCursor.execute(
+            'SELECT * FROM ModuleTestResults '+
+            'WHERE 1=1 '+
+            AdditionalWhere+
+            'ORDER BY ModuleID ASC,TestType ASC,TestDate ASC ',
+            {
+                'ModuleID':ModuleID
+            }
+        )
+        Rows = TestResultEnvironmentInstance.LocalDBConnectionCursor.fetchall()
+
+        print "Available qualifications for module %s:"%ModuleID
+        print "  ", 'ID'.ljust(6),  ' TestDate'.ljust(25),  'QualificationType'.ljust(30), 'TestType'.ljust(30), 'Grade'.ljust(3), 'Comments'.ljust(30)
+        RowID = 0
+        for Row in Rows:
+            print " ", "\x1b[31m", ("%d"%RowID).ljust(6), "\x1b[0m", datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S').ljust(25), Row['QualificationType'].ljust(30), Row['TestType'].ljust(30), ("%s"%Row['Grade']).ljust(3), ("%s"%Row['Comments']).ljust(30)
+            RowID += 1
+
+        RowID = raw_input("Select row: ")
+        if RowID.lower().strip() == 'all':
+            print "delete module %s from local DB?"%ModuleID
+            confirmation = raw_input("(y/N)")
+            if confirmation.lower().strip() == 'y':
+                result = TestResultEnvironmentInstance.LocalDBConnectionCursor.execute( 
+                    'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID',
+                    {
+                        'ModuleID': ModuleID,
+                    }
+                )
+                if TestResultEnvironmentInstance.LocalDBConnection:
+                    TestResultEnvironmentInstance.LocalDBConnection.commit()
+                else:
+                    print "no connection to local db!"
+        elif int(RowID) >= 0 and int(RowID) < len(Rows) and Rows[int(RowID)]:
+            RowID = int(RowID)
+            Row = Rows[RowID]
+            print "delete? ", ("%d"%RowID), datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S'), Row['QualificationType'], Row['TestType'], ("%s"%Row['Grade']), ("%s"%Row['Comments'])
+            confirmation = raw_input("(y/N)")
+            if confirmation.lower().strip() == 'y':
+                result = TestResultEnvironmentInstance.LocalDBConnectionCursor.execute( 
+                    'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType = :TestType AND TestDate = :TestDate AND QualificationType = :QualificationType',
+                    {
+                        'ModuleID': Rows[RowID]['ModuleID'],
+                        'TestType': Rows[RowID]['TestType'],
+                        'TestDate': Rows[RowID]['TestDate'],
+                        'QualificationType': Rows[RowID]['QualificationType']
+                    }
+                )
+                if TestResultEnvironmentInstance.LocalDBConnection:
+                    TestResultEnvironmentInstance.LocalDBConnection.commit()
+                else:
+                    print "no connection to local db!"
+
+        else:
+            print "row id not found!"
 
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
