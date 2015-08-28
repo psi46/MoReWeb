@@ -28,10 +28,7 @@ class GeneralTestResult(object):
     nCols = 52
     nTotalChips = 16
 
-    try:
-        MoReWebVersion = subprocess.check_output(["git", "describe"])
-    except:
-        MoReWebVersion = 'unknown MoReWeb version'
+    MoReWebVersion = 'unknown MoReWeb version'
 
     '''
         Initialization function
@@ -716,10 +713,13 @@ class GeneralTestResult(object):
         # Title
         if not TestResultObject.Title:
             TestResultObject.Title = TestResultObject.NameSingle
+
         MyObjectTestDate = ''
+        VersionInfo = ''
         if RecursionLevel == 0 and TestResultObject.Attributes['TestDate']:
             MyObjectTestDate = 'Test Date: ' + datetime.datetime.fromtimestamp(
-                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%M") + '<br><span style="font-size:10.5pt;" title="' + GeneralTestResult.MoReWebVersion + '">Analysis date: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + '</span>'
+                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%M") + '<br><span style="font-size:10.5pt;" title="' + self.TestResultEnvironmentObject.MoReWebVersion + '">Analysis date: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + '</span>'
+            VersionInfo = self.TestResultEnvironmentObject.MoReWebVersion + " on branch " + self.TestResultEnvironmentObject.MoReWebBranch
 
         MainTestResultAdditionalClasses = ''
 
@@ -734,6 +734,7 @@ class GeneralTestResult(object):
                 '###TITLE###': HtmlParser.MaskHTML(TestResultObject.Title),
                 '###TESTDATE###': MyObjectTestDate,
                 '###MAINTESTRESULTADDITIONALCLASSES###': MainTestResultAdditionalClasses,
+                '###VERSIONINFO###': VersionInfo,
             }
         )
         # Plot

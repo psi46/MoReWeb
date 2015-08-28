@@ -125,6 +125,9 @@ class TestResultEnvironment:
 
     LastUniqueIDCounter = 0;
 
+    MoReWebVersion = 'unknown MoReWeb version'
+    MoReWebBranch = 'unknown branch'
+
     #Error Handling
     ErrorList = []
 

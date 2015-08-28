@@ -106,6 +106,33 @@ TestResultEnvironmentInstance.GlobalOverviewPath = GlobalOverviewPath
 TestResultEnvironmentInstance.OpenDBConnection()
 TestResultEnvironmentInstance.GlobalDataDirectory = GlobalDataDirectory
 
+MoReWebVersion = None
+try:
+    MoReWebVersion = subprocess.check_output(["git", "describe"])
+except:
+    try:
+        import commands
+        MoReWebVersion = commands.getstatusoutput('git describe')[1]
+    except:
+        pass
+
+MoReWebBranch = None
+try:
+    MoReWebBranch = subprocess.check_output(["git", "rev-parse --abbrev-ref HEAD"])
+except:
+    try:
+        import commands
+        MoReWebBranch = commands.getstatusoutput('git rev-parse --abbrev-ref HEAD')[1]
+    except:
+        pass
+
+if MoReWebVersion:
+    TestResultEnvironmentInstance.MoReWebVersion = MoReWebVersion
+
+if MoReWebBranch:
+    TestResultEnvironmentInstance.MoReWebBranch = MoReWebBranch
+
+
 if args.refit:
     TestResultEnvironmentInstance.Configuration['Fitting']['refit'] = True
 
