@@ -189,7 +189,7 @@ class TestResult(GeneralTestResult):
             {
                 'Key': 'SummaryROCs',
                 'DisplayOptions': {
-                    'Width': 4,
+                    'Width': 5,
                 }
             },
         ]

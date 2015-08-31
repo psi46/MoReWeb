@@ -134,6 +134,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'PHCalibrationPedestal_mu':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['mu']['Value'],
                 'Label': 'PHCalibrationPedestal μ',
+            },            
+            'PedestalSpread':{
+                'Value': '{0:1.0f}'.format(float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['sigma']['Value']) * self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']),
+                'Label': 'PedestalSpread [e-]',
             },
             'PHCalibrationPedestal_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['sigma']['Value'],

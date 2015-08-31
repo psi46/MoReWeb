@@ -94,8 +94,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['HiddenData']['ThrDefectList']
         )
 
-
-
         # total defects grading
         PixelDefectsGradeALimit = self.TestResultEnvironmentObject.GradingParameters['defectsB']
         PixelDefectsGradeBLimit = self.TestResultEnvironmentObject.GradingParameters['defectsC']
@@ -122,6 +120,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Grade = GradeMapping[pixelDefectsGrade]
         except:
             pass
+
         print '\nChip %d Grade %s'%(self.chipNo, Grade)
 
         print '\ttotal: %4d'%len(self.ResultData['HiddenData']['TotalList'])
@@ -129,7 +128,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         print '\tinef:  %4d'%len(self.ResultData['HiddenData']['IneffPixelList'])
         print '\tmask:  %4d'%len(self.ResultData['HiddenData']['MaskDefectList'])
         print '\taddr:  %4d'%len(self.ResultData['HiddenData']['AddressProblemList'])
-        print '\tbump:  %4d' % len(self.ResultData['HiddenData']['DeadBumpList'])
+        print '\tbump:  %4d'%len(self.ResultData['HiddenData']['DeadBumpList'])
         print '\ttrim:  %4d'%len(self.ResultData['HiddenData']['ThrDefectList'])
         print '\ttbit:  %4d'%len(self.ResultData['HiddenData']['DeadTrimbitsList'])
         print '\tnois:  %4d'%len(self.ResultData['HiddenData']['NoiseDefectList'])
