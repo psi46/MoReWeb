@@ -125,7 +125,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             raise Exception('Cannot read from configparser')
 
     def analyse_test_list(self, testList):
-        print 'analyse_test_list'
         tests = []
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
         test = testchain.next()
