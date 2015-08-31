@@ -346,9 +346,12 @@ class GeneralTestResult(object):
             lines = []
             for filename in fileNames:
                 fileName = '%s/%s' % (self.RawTestSessionDataPath, filename)
-                f = open(fileName)
-                lines.extend(f.readlines())
-                f.close()
+                try:
+                    f = open(fileName)
+                    lines.extend(f.readlines())
+                    f.close()
+                except:
+                    warnings.warn('cannot open config parameters dat file {file}'.format(file=fileName))
             version = 'none'
             for line in lines:
                 if line.strip().startswith('rocType'):

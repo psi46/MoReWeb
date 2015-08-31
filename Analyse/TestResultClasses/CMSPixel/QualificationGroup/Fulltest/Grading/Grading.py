@@ -117,27 +117,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             pass
 
-        if self.verbose or True:
-            print 'SubGradings:'
-            print "IV: %s"%(GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None')
-            for i in SubGradings:
-                print '%s: %s/%s/%s' % (
-                    i.ljust(22), self.getNumberOfRocsWithGrade('1', SubGradings[i]),
-                    self.getNumberOfRocsWithGrade('2', SubGradings[i]),
-                    self.getNumberOfRocsWithGrade('3', SubGradings[i]))
-
         # add pixel defects grading to final grade
         if ModuleGrade == 1 and PixelDefectsRocsB > 0:
             ModuleGrade = 2
         if PixelDefectsRocsC > 0:
             ModuleGrade = 3
-
-        # electrical grade = ModuleGrade before IV
-        ElectricalGrade = ModuleGrade
-
-        # combine with IV grade
-        if IVGrade > ModuleGrade:
-            ModuleGrade = IVGrade
 
         nPixelDefectsTotal = 0
         try:
@@ -148,6 +132,34 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print 'Errror', e
             print SubGradings.keys()
             raise e
+
+        # missing subtest results
+        MissingSubtests = False
+        nChips = len(self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList'])
+        if nChips < 16:
+            print "nChips: ", nChips
+            MissingSubtests = True
+            ModuleGrade = 3
+
+        # electrical grade = ModuleGrade before IV
+        ElectricalGrade = ModuleGrade
+
+        # combine with IV grade
+        if IVGrade > ModuleGrade:
+            ModuleGrade = IVGrade
+
+        print 'Fulltest Summary:'
+        if MissingSubtests:
+            print "\x1b[31mMISSING TESTS!\x1b[0m"
+        print " %s: %s"%('Grade'.ljust(23), GradeMapping[ModuleGrade] if ModuleGrade in GradeMapping else 'None')
+        print " SubGradings:"
+        print "  %s: %s"%('Electrical'.ljust(22), GradeMapping[ElectricalGrade] if ElectricalGrade in GradeMapping else 'None')
+        print "  %s: %s"%('IV'.ljust(22), GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None')
+        for i in SubGradings:
+            print '  %s: %s/%s/%s' % (
+                i.ljust(22), self.getNumberOfRocsWithGrade('1', SubGradings[i]),
+                self.getNumberOfRocsWithGrade('2', SubGradings[i]),
+                self.getNumberOfRocsWithGrade('3', SubGradings[i]))
 
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -192,6 +204,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
         }
         self.ResultData['HiddenData']['SubGradings'] = SubGradings
+        self.ResultData['HiddenData']['MissingSubtests'] = {'Label': 'Missing Subtests', 'Value': '1' if MissingSubtests else '0'}
         self.ResultData['KeyList'] = ['Module', 'ModuleGrade', 'PixelDefectsRocsB']
 
 

@@ -247,7 +247,8 @@ class TestResult(GeneralTestResult):
                 print 'There exist no ROOT file in "%s"' % self.RawTestSessionDataPath
 
     def PopulateResultData(self):
-        self.FileHandle.Close()
+        if self.FileHandle:
+            self.FileHandle.Close()
 
     def GradeIV(self, i1,i2, slope, temp):
         grade = ''
@@ -437,6 +438,8 @@ class TestResult(GeneralTestResult):
         }
 
         SubtestMissing = False
+        if self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData'].has_key('MissingSubtests'):
+            SubtestMissing = (int(self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MissingSubtests']['Value']) > 0)
         Comment = ''
 
         # pixel defects and performance parameters
@@ -536,11 +539,11 @@ class TestResult(GeneralTestResult):
         except:
             warnings.warn("Fulltest is incomplete! Module will be graded C")
             SubtestMissing = True
-            Comment += 'Fulltest incomplete, graded C'
 
         # check if any data is missing
         if SubtestMissing:
             grade = 'C'
+            Comment += 'Fulltest incomplete, graded C'
 
         # fill final grade and comments
         Comment = Comment.strip().strip('/')

@@ -61,17 +61,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ElectricalGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ElectricalGrade']['Value'])
         IVGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['IVGrade']['Value'])
         
+        GradeText = GradeMapping[ModuleGrade] if ModuleGrade in GradeMapping else 'None'
+
+        if self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData'].has_key('MissingSubtests') and int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MissingSubtests']['Value'])>0:
+            GradeText = GradeText + "\n(incomplete test)"
+
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
                 'Value':self.ParentObject.Attributes['ModuleID'], 
                 'Label':'Module'
             },
             'Grade': {
-                'Value':GradeMapping[ModuleGrade] if ModuleGrade in GradeMapping else 'None',
+                'Value': GradeText,
                 'Label':'Grade'
             },
             'ElectricalGrade': {
-                'Value':GradeMapping[ElectricalGrade] if ElectricalGrade in GradeMapping else 'None',
+                'Value': GradeMapping[ElectricalGrade] if ElectricalGrade in GradeMapping else 'None',
                 'Label':'Electrical Grade'
             },
             'IVGrade': {
