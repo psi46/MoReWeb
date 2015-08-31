@@ -18,6 +18,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except ValueError as e:
             print 'testdate',self.Attributes['TestDate']
             raise e
+
+        TBM1status = 'ok'
+        TBM2status = 'ok'
+
+        try:
+            corea_basea = self.ParentObject.ResultData['SubTestResults']['TBM'].ResultData['KeyValueDictPairs']['Core0a_basea']['Value']
+            coreb_basea = self.ParentObject.ResultData['SubTestResults']['TBM'].ResultData['KeyValueDictPairs']['Core0b_basea']['Value']
+            corea_basee = self.ParentObject.ResultData['SubTestResults']['TBM'].ResultData['KeyValueDictPairs']['Core0a_basee']['Value']
+            coreb_basee = self.ParentObject.ResultData['SubTestResults']['TBM'].ResultData['KeyValueDictPairs']['Core0b_basee']['Value']
+
+            TBM1status = "ok, %s %s"%(corea_basee, corea_basea)
+            TBM2status = "ok, %s %s"%(coreb_basee, coreb_basea)
+
+        except:
+            pass
+
         self.ResultData['KeyValueDictPairs'] = {
             'TestDate': {
                 'Value':test_date,
@@ -41,11 +57,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Term. Cycl.'
             },
             'TBM1':{
-                'Value':'ok', 
+                'Value': TBM1status, 
                 'Label':'TBM1'
             },
             'TBM2':{
-                'Value':'ok', 
+                'Value': TBM2status, 
                 'Label':'TBM2'
             },
         
