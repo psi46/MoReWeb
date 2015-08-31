@@ -18,13 +18,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         SubGradings = {}
-        ModuleGrade = 1  # 1 = A, 2 = B, 3 = C
+        ModuleGrade = 1
         GradeMapping = {
             1: 'A',
             2: 'B',
             3: 'C'
         }
-
 
         PixelDefectsRocsA = 0
         PixelDefectsRocsB = 0
@@ -66,17 +65,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 ModuleGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
                     TestResultObject.Attributes['SpecialPopulateDataParameters'], ModuleGrade)
 
-                '''
-                # Failures reasons...
-                if Value > criteriaB[i] and Value < criteriaC[i]:
-                    fitsProblemB[i]++
-                if Value > criteriaC[i]:
-                    fitsProblemC[i]++
-                '''
             if self.verbose:
                 print '%s: %s'%(i,SubGrading)
             SubGradings[i] = SubGrading
-
 
         # IV Grading
         IVGrade = 0

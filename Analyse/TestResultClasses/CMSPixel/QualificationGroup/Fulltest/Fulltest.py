@@ -162,6 +162,13 @@ class TestResult(GeneralTestResult):
                 }
             },
             {
+                'Key': 'TBM',
+                'DisplayOptions': {
+                    'Order': 100,
+                    'Width': 1,
+                }
+            },
+            {
                 'Key': 'Summary1',
                 'DisplayOptions': {
                     'Order': 4,
