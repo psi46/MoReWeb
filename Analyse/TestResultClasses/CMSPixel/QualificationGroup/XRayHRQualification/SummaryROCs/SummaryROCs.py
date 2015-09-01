@@ -19,7 +19,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
       for Rate in self.ParentObject.Attributes['Rates']['HRData']:
         TableHeader.append('Rate "{Rate}"'.format(Rate=Rate))
-        TableHeader.append('BB def'.format(Rate=Rate))
+        # display bb defects only for highest rate = best statistics
+        if Rate == max(self.ParentObject.Attributes['Rates']['HRData']):
+          TableHeader.append('BB def'.format(Rate=Rate))
         TableHeader.append('RO prob '.format(Rate=Rate))
 
       TableHeader.append('Unif. prob'.format(Rate=Rate))
@@ -79,12 +81,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
           TableRow.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value']))
           BumpBondingDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=Rate)])
           
-          if BumpBondingDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
-            TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=BumpBondingDefects)))
-          elif BumpBondingDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B']:
-            TableRow.append(GradeBHTMLTemplate%("{Value:1.0f}".format(Value=BumpBondingDefects)))
-          else:
-            TableRow.append("{Value:1.0f}".format(Value=BumpBondingDefects))
+          # display bb defects only for highest rate = best statistics
+          if Rate == max(self.ParentObject.Attributes['Rates']['HRData']):
+            if BumpBondingDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_C']:
+              TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=BumpBondingDefects)))
+            elif BumpBondingDefects >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_missing_xray_pixels_B']:
+              TableRow.append(GradeBHTMLTemplate%("{Value:1.0f}".format(Value=BumpBondingDefects)))
+            else:
+              TableRow.append("{Value:1.0f}".format(Value=BumpBondingDefects))
 
           NonUniformEvents = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)])
           if NonUniformEvents > 0:
