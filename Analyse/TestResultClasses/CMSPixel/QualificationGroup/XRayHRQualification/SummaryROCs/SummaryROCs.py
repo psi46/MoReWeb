@@ -27,6 +27,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
       TableHeader.append('Unif. prob'.format(Rate=Rate))
 
       for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
+        TableHeader.append('Thr [e-] "{Rate}"'.format(Rate=Rate))
         TableHeader.append('Noise "{Rate}"'.format(Rate=Rate))
         TableHeader.append('Noisy pix "{Rate}"'.format(Rate=Rate))
 
@@ -78,7 +79,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
           RateIndex += 1
 
         for Rate in self.ParentObject.Attributes['Rates']['HRData']:
-          TableRow.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value']))
+          RealHitrate = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value'])
+          TableRow.append("{RealHitrate:1.1f}".format(RealHitrate=RealHitrate))
           BumpBondingDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=Rate)])
           
           # display bb defects only for highest rate = best statistics
@@ -103,6 +105,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
           TableRow.append("{Value:1.0f}".format(Value=NonUniformColumns))
 
         for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
+          Threshold = self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor'] * float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['threshold']['Value'])
+          TableRow.append("{Value:1.0f}".format(Value=Threshold))
           Noise = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
           if Noise >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
             TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=Noise)))
