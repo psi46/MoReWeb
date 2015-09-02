@@ -21,8 +21,6 @@ class TestResultEnvironment:
     }
 
     GradingParameters = {
-        'noiseMin':50,
-        'noiseMax':400,
         'tthrTol':10,
         'gainMin':1.,
         'gainMax': 4.5,

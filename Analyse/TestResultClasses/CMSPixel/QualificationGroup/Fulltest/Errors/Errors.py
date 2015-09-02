@@ -40,9 +40,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs'] = {}
         self.ResultData['KeyList'] = []
 
-        print "try to open logfile: %s"%self.ParentObject.logfilePath
-
-
         with open(self.ParentObject.logfilePath, 'r') as logfile:
             for line in logfile:
                 ErrorObject = {}
@@ -90,5 +87,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['KeyList'] = (['nCriticals', 'nErrors', 'nWarnings', 'channel_0_count', 'channel_1_count', 'channel_2_count', 'channel_3_count', 'message_tokenchain_count', 
             'message_eventid_count', 'message_readback_count', 'message_notokenpass_count', 'message_datasize_count', 'message_missingevents_count', 'message_usbtimeout_count'])
-
 
