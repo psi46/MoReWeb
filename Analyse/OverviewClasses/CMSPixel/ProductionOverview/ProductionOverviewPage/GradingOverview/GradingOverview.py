@@ -109,7 +109,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         ### Final
         TableData.append(    
-            [{'Class' : 'Header', 'Value' : 'Final'}, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='A']) }, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='B']) }, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='C']) }]
+            [{'Class' : 'Header', 'Value' : '<div title="all tests completed">Final</div>'}, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='A']) }, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='B']) }, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='C']) }]
         )
 
         nFinalA = len([x for x in Final_Grades if x=='A'])
@@ -120,7 +120,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TotalYield = '{0:1.1f}%'.format((nFinalA + nFinalB)/nTotal*100) if nTotal > 0 else "-"
 
 
-        HTML += self.Table(TableData) + self.BoxFooter("<div style='height:10px;'></div><div style='text-align:center;'><b>Yield: %s</b></div><div style='height:10px;'></div><b>Final</b> only counts modules with all necessary tests done."%TotalYield)
+        HTML += self.Table(TableData) + self.BoxFooter("<div style='height:10px;'></div><div style='text-align:center;' title='fraction of A+B modules'><b>Yield: %s</b></div><div style='height:10px;'></div>"%TotalYield)
 
         return self.Boxed(HTML)
 
