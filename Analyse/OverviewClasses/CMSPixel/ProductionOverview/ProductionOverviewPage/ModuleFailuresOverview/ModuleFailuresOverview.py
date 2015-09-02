@@ -33,7 +33,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         ModuleIDsList.sort()
-        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'BadROCs', 'AddressProblems', 'trimbitDefects', 'defectiveBumps', 'maskDefects', 'deadPixel', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems'][::-1]
+        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'BB_X-ray', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         BinNumber = 1
@@ -52,6 +52,12 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         ColorB = 0.84
         ColorC = 1.00
 
+        GradePixelDefectsAB = float(self.TestResultEnvironmentObject.GradingParameters['defectsB'])
+        GradePixelDefectsBC = float(self.TestResultEnvironmentObject.GradingParameters['defectsC'])
+
+        GradeMaskDefectsAB = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsB'])
+        GradeMaskDefectsBC = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsC'])
+
         for ModuleID in ModuleIDsList:
 
             Summary.GetXaxis().SetBinLabel(BinNumber, ModuleID)
@@ -64,9 +70,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         GradeC = 15*1e-6
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'KeyValueDictPairs.json', 'LeakageCurrent', 'Value'])
                         if Value is not None and float(Value) > GradeC:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('LCStartup') + 0, ColorC)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('LCStartup') + 1, ColorC)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('LCStartup') + 2, ColorC)
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('LCStartup') + i, ColorC)
 
             ### IV slope
             for RowTuple in Rows:
@@ -75,8 +80,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
+                        GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['slopeivC'])
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'Variation', 'Value'])
-                        if Value is not None and float(Value) > GradeAB:
+                        if Value is not None and float(Value) > GradeBC:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVSlope') + TestIndex, ColorC)
+                        elif Value is not None and float(Value) > GradeAB:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVSlope') + TestIndex, ColorB)
 
             ### IV 150
@@ -86,8 +94,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
-                        GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
-                        GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
+                        if int(RowTuple['Temperature']) == 17:
+                            #  grading criteria for measured currents
+                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
+                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
+                        else:
+                            # grading criteria for recalculated currents
+                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentBm10'])
+                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentCm10'])
+
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
                         if Value is not None and float(Value) > GradeBC:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorC)
@@ -157,19 +172,80 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             ### deadPixel
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
+                        RocGrades = []
+                        for Chip in range(0,16):
+                            NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'PixelMap', 'KeyValueDictPairs.json', 'NDeadPixels', 'Value'])
+                            if NDefects:
+                                NDefects = int(NDefects)
+                                if NDefects >= GradePixelDefectsBC:
+                                    RocGrades.append('C')
+                                elif  NDefects >= GradePixelDefectsAB:
+                                    RocGrades.append('B')
+                        if 'C' in RocGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixels') + TestIndex, ColorC)
+                        elif 'B' in RocGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixels') + TestIndex, ColorB)
 
-                        ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsGradeBROCs', 'Value'])
-                        ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsGradeCROCs', 'Value'])
+            ### AddressDefects
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    if RowTuple['TestType'] in FullTests:
+                        TestIndex = FullTests.index(RowTuple['TestType'])
+                        RocGrades = []
+                        for Chip in range(0,16):
+                            NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'AddressDecoding', 'KeyValueDictPairs.json', 'NAddressDecodingProblems', 'Value'])
+                            if NDefects:
+                                NDefects = int(NDefects)
+                                if NDefects >= GradePixelDefectsBC:
+                                    RocGrades.append('C')
+                                elif  NDefects >= GradePixelDefectsAB:
+                                    RocGrades.append('B')
+                        if 'C' in RocGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('AddressDefects') + TestIndex, ColorC)
+                        elif 'B' in RocGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('AddressDefects') + TestIndex, ColorB)
 
-                        if ValueC is not None and float(ValueC) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixel') + TestIndex, ColorC)
-                        elif ValueB is not None and float(ValueB) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixel') + TestIndex, ColorB)
+            ### maskDefects
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    if RowTuple['TestType'] in FullTests:
+                        TestIndex = FullTests.index(RowTuple['TestType'])
+                        RocGrades = []
+                        for Chip in range(0,16):
+                            NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'PixelMap', 'KeyValueDictPairs.json', 'NMaskDefects', 'Value'])
+                            if NDefects:
+                                NDefects = int(NDefects)
+                                if NDefects >= GradeMaskDefectsBC:
+                                    RocGrades.append('C')
+                                elif  NDefects >= GradeMaskDefectsAB:
+                                    RocGrades.append('B')
+                        if 'C' in RocGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('maskDefects') + TestIndex, ColorC)
+                        elif 'B' in RocGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('maskDefects') + TestIndex, ColorB)
 
-            ### BadROCs
+            ### trimbitDefects
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    if RowTuple['TestType'] in FullTests:
+                        TestIndex = FullTests.index(RowTuple['TestType'])
+                        RocGrades = []
+                        for Chip in range(0,16):
+                            NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'TrimBitProblems', 'KeyValueDictPairs.json', 'nDeadTrimbits', 'Value'])
+                            if NDefects:
+                                NDefects = int(NDefects)
+                                if NDefects >= GradePixelDefectsBC:
+                                    RocGrades.append('C')
+                                elif  NDefects >= GradePixelDefectsAB:
+                                    RocGrades.append('B')
+                        if 'C' in RocGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('trimbitDefects') + TestIndex, ColorC)
+                        elif 'B' in RocGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('trimbitDefects') + TestIndex, ColorB)
+
+            ### TotalDefects
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     
@@ -180,10 +256,30 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsC', 'Value'])
 
                         if ValueC is not None and float(ValueC) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BadROCs') + TestIndex, ColorC)
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('TotalDefects') + TestIndex, ColorC)
                         elif ValueB is not None and float(ValueB) > 0:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BadROCs') + TestIndex, ColorB)
-            ### defectiveBumps
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('TotalDefects') + TestIndex, ColorB)
+
+            ### defectiveBumps Fulltest
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    if RowTuple['TestType'] in FullTests:
+                        TestIndex = FullTests.index(RowTuple['TestType'])
+                        BBGrades = []
+                        for Chip in range(0,16):
+                            NDefectiveBumps = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'BumpBonding', 'KeyValueDictPairs.json', 'nBumpBondingProblems', 'Value'])
+                            if NDefectiveBumps:
+                                NDefectiveBumps = int(NDefectiveBumps)
+                                if NDefectiveBumps >= GradePixelDefectsBC:
+                                    BBGrades.append('C')
+                                elif  NDefectiveBumps >= GradePixelDefectsAB:
+                                    BBGrades.append('B')
+                        if 'C' in BBGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BB_Fulltest') + TestIndex, ColorC)
+                        elif 'B' in BBGrades:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BB_Fulltest') + TestIndex, ColorB)
+
+            ### defectiveBumps X-ray
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     
@@ -198,13 +294,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                         BBGrades.append(BBGradeROC)
 
                         if 'C' in BBGrades:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 0, ColorC)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 1, ColorC)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 2, ColorC)
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BB_X-ray') + i, ColorC)
                         elif 'B' in BBGrades:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 0, ColorB)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 1, ColorB)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('defectiveBumps') + 2, ColorB)
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BB_X-ray') + i, ColorB)
 
             ### lowEfficiency
             for RowTuple in Rows:
@@ -220,13 +314,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 EfficiencyGrades += Grades
 
                         if 'C' in EfficiencyGrades:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 0, ColorC)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 1, ColorC)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 2, ColorC)
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + i, ColorC)
                         elif 'B' in EfficiencyGrades:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 0, ColorB)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 1, ColorB)
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + 2, ColorB)
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + i, ColorB)
 
             ### r/o problems
             for RowTuple in Rows:
@@ -235,9 +327,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithReadoutProblems', 'Value'])
                         if Value is not None and Value > 0:
-                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('ReadoutProblems') + 0, ColorC)
-                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('ReadoutProblems') + 1, ColorC)
-                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('ReadoutProblems') + 2, ColorC)
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('ReadoutProblems') + i, ColorC)
 
             ### unif problems
             for RowTuple in Rows:
@@ -246,9 +337,56 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithUniformityProblems', 'Value'])
                         if Value is not None and Value > 0:
-                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('UniformityProblems') + 0, ColorC)
-                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('UniformityProblems') + 1, ColorC)
-                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('UniformityProblems') + 2, ColorC)
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('UniformityProblems') + i, ColorC)
+
+            ### X-ray noise
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    if RowTuple['TestType'] == TestTypeXrayHR:
+
+                        RocGrades = []
+                        for Chip in range(0,16):
+                            # pixel
+                            NDefects = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'HiddenData.json', 'NoiseDefects', 'Value'])
+                            if NDefects:
+                                NDefects = int(NDefects)
+                                if NDefects >= GradePixelDefectsBC:
+                                    RocGrades.append('C')
+                                elif  NDefects >= GradePixelDefectsAB:
+                                    RocGrades.append('B')
+                            # mean
+                            MeanNoiseGrade = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'NoiseGrade', 'Value'])
+                            if MeanNoiseGrade:
+                                RocGrades.append(MeanNoiseGrade)
+
+                        if 'C' in RocGrades:
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('Noise_X-ray') + i, ColorC)
+                        elif 'B' in RocGrades:
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('Noise_X-ray') + i, ColorB)
+
+            ### totalDefects X-ray
+            for RowTuple in Rows:
+                if RowTuple['ModuleID'] == ModuleID:
+                    if RowTuple['TestType'] == TestTypeXrayHR:
+                        RocGrades = []
+                        for Chip in range(0,16):
+                            NDefects = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            if NDefects:
+                                NDefects = int(NDefects)
+                                if NDefects >= GradePixelDefectsBC:
+                                    RocGrades.append('C')
+                                elif  NDefects >= GradePixelDefectsAB:
+                                    RocGrades.append('B')
+
+                        if 'C' in RocGrades:
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('TotalDefects_X-ray') + i, ColorC)
+                        elif 'B' in RocGrades:
+                            for i in range(3):
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('TotalDefects_X-ray') + i, ColorB)
 
             BinNumber += 1
 
@@ -256,7 +394,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         ROOT.gPad.SetRightMargin(0.03)
 
         Summary.Draw("col")
-        Summary.GetYaxis().SetLabelSize(0.07)
+        Summary.GetZaxis().SetRangeUser(0, 1.0)
+        Summary.GetYaxis().SetLabelSize(0.055)
 
 
         Summary.GetXaxis().LabelsOption("v")
@@ -291,7 +430,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         self.SaveCanvas()
-        HTML = self.Image(self.Attributes['ImageFile'], {'height': '250px'})
+        HTML = self.Image(self.Attributes['ImageFile'], {'height': '350px'})
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
         return self.Boxed(HTML)
