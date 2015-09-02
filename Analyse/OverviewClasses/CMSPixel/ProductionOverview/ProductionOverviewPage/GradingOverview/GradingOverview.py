@@ -112,7 +112,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             [{'Class' : 'Header', 'Value' : 'Final'}, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='A']) }, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='B']) }, {'Class' : 'Value', 'Value' : "%d"%len([x for x in Final_Grades if x=='C']) }]
         )
 
-        HTML += self.Table(TableData) + self.BoxFooter("<div style='height:10px;'></div><b>Final</b> only counts modules with all necessary tests done.")
+        nFinalA = len([x for x in Final_Grades if x=='A'])
+        nFinalB = len([x for x in Final_Grades if x=='B'])
+        nFinalC = len([x for x in Final_Grades if x=='C'])
+        nTotal = nFinalA + nFinalB + nFinalC
+
+        TotalYield = '{0:1.1f}%'.format((nFinalA + nFinalB)/nTotal*100) if nTotal > 0 else "-"
+
+
+        HTML += self.Table(TableData) + self.BoxFooter("<div style='height:10px;'></div><div style='text-align:center;'><b>Yield: %s</b></div><div style='height:10px;'></div><b>Final</b> only counts modules with all necessary tests done."%TotalYield)
 
         return self.Boxed(HTML)
 
