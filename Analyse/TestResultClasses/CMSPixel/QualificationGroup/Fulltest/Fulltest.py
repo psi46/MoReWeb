@@ -169,6 +169,13 @@ class TestResult(GeneralTestResult):
                 }
             },
             {
+                'Key': 'Errors',
+                'DisplayOptions': {
+                    'Order': 101,
+                    'Width': 1,
+                }
+            },
+            {
                 'Key': 'Summary1',
                 'DisplayOptions': {
                     'Order': 4,
@@ -252,6 +259,18 @@ class TestResult(GeneralTestResult):
                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
             else:
                 print 'There exist no ROOT file in "%s"' % self.RawTestSessionDataPath
+
+        # find pxar logfile of fulltest
+        logfilePath = ("%s.log"%fileHandlePath[:-5]) if len(fileHandlePath) > 4 else ''
+        if os.path.isfile(logfilePath):
+            self.logfilePath = logfilePath
+        else:
+            files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+            if len(files) == 1:
+                self.logfilePath = files[0]
+            else:
+                print "either no or multiple .log files found! some features are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
+                self.logfilePath = None
 
     def PopulateResultData(self):
         if self.FileHandle:
