@@ -100,18 +100,115 @@ class TestResult(GeneralTestResult):
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
+            'Grade': gradeMapping[grade] if grade in gradeMapping else None,
+            'initialCurrent': leakageCurrent,
+            'PixelDefects': None,
+            'ROCsLessThanOnePercent': None,
+            'ROCsMoreThanOnePercent': None,
+            'ROCsMoreThanFourPercent': None,
+            'Noise': None,
+            'Trimming': None,
+            'PHCalibration': None,
+            'CurrentAtVoltage150V': None,
+            'CurrentAtVoltage100V': None,
+            'RecalculatedCurrentAtVoltage150V': None,
+            'RecalculatedCurrentAtVoltage100V': None,
+            'RecalculatedToTemperature': None,
+            'IVSlope': None,
+            'IVCurveFilePath': None,
+            'TestTemperature': None,
+            'Temperature': self.Attributes['Temperature'] if 'Temperature' in self.Attributes else None,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
                                                  self.TestResultEnvironmentObject.FinalModuleResultsPath),
-            'initialCurrent': leakageCurrent,
-            'Temperature': self.Attributes['Temperature'],
-            'Grade': gradeMapping[grade]
+            # needed for PixelDB
+            'AbsModuleFulltestStoragePath': self.TestResultEnvironmentObject.FinalModuleResultsPath,
+            'AbsFulltestSubfolder': self.FinalResultsStoragePath,
+            'InputTarFile': os.environ.get('TARFILE', None),
+            'MacroVersion': os.environ.get('MACROVERSION', None),
+            #
+
+            'nCycles': None,
+            'CycleTempLow': None,
+            'CycleTempHigh': None,
+
+            #
+            # added by Tommaso
+            #
+            'nMaskDefects': None,
+            'nDeadPixels': None,
+            'nBumpDefects': None,
+            'nTrimDefects': None,
+            'nNoisyPixels': None,
+            'nGainDefPixels': None,
+            'nPedDefPixels': None,
+            'nPar1DefPixels': None,
+
+            'TestCenter': self.Attributes['TestCenter'],
+            'Hostname': self.Attributes['Hostname'],
+            'Operator': self.Attributes['Operator'],
+            #
+            # added by Felix for the new Overview Table
+            #
+            # for A/B/C sub gradings
+            'PixelDefectsNGradeA': None,
+            'PixelDefectsNGradeB': None,
+            'PixelDefectsNGradeC': None,
+
+            'NoiseNGradeA': None,
+            'NoiseNGradeB': None,
+            'NoiseNGradeC': None,
+
+            'VcalWidthNGradeA': None,
+            'VcalWidthNGradeB': None,
+            'VcalWidthNGradeC': None,
+
+            'GainNGradeA': None,
+            'GainNGradeB': None,
+            'GainNGradeC': None,
+
+            'PedSpreadNGradeA': None,
+            'PedSpreadNGradeB': None,
+            'PedSpreadNGradeC': None,
+
+            'Par1NGradeA': None,
+            'Par1NGradeB': None,
+            'Par1NGradeC': None,
         }
         print 'fill row end'
 
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
-            pass
+
+            # only fill if grade is C and no FullQualification has to be done
+            if grade > 2:
+
+                # copied from the fulltest
+                #
+                # THIS PART IS UNTESTED!
+                #
+                # ----------------------------------------------------------------------------------------------------
+                from PixelDB import *
+
+                pdb = PixelDBInterface(operator="tommaso", center="pisa")
+                pdb.connectToDB()
+
+                OPERATOR = os.environ['PIXEL_OPERATOR']
+                CENTER = os.environ['PIXEL_CENTER']
+                s = Session(CENTER, OPERATOR)
+                pdb.insertSession(s)
+                print "--------------------"
+                print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, Row
+                print "--------------------"
+                pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
+
+                if pp is None:
+                    print "INSERTION FAILED!"
+                    sys.exit(31)
+                insertedID=pp.TEST_ID
+                # ----------------------------------------------------------------------------------------------------
+
+
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
