@@ -259,6 +259,7 @@ class TestResult(GeneralTestResult):
             }
         }
         self.ResultData['KeyList'].append('Slope')
+        self.CloseSubTestResultFileHandles()
 
     def CustomWriteToDatabase(self, ParentID):
         print 'fill row'

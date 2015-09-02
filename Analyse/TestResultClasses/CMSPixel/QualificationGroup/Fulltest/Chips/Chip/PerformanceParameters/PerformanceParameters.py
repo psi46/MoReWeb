@@ -26,10 +26,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadPixelList'])),
                 'Label':' - Dead Pixels'
             },
-            'nNoisy1Pixel': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noisy1PixelList'])),
-                'Label':'Noisy Pixels 1'
-            },
             'nMaskDefect': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MaskDefectList'])),
                 'Label':' - Mask Defects'
@@ -46,9 +42,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['AddressProblemList'])),
                 'Label':' - Address Problems'
             },
+            'nNoisy1Pixel': {
+                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noisy1PixelList'])),
+                'Label':'>10 hits in alive map'
+            },
             'nNoisy2Pixel': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoisyPixelSCurveList'])),
-                'Label':'Noisy Pixels 2'
+                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefectList'])),
+                'Label':'Noisy Pixels'
             },
             'nThrDefect': {
                 'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ThrDefectList'])),
@@ -78,6 +78,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['KeyValueDictPairs']['sigma']['Value'],
                 'Label': 'SCurveWidth σ',
             },
+            'Noise':{
+                'Value': self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['KeyValueDictPairs']['mu']['Value'],
+                'Label': 'Mean Noise',
+                'Unit': 'e-',
+            },
             'ThresholdTrimmed_mu':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['mu']['Value'],
                 'Label': 'ThresholdTrimmed μ',
@@ -85,6 +90,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ThresholdTrimmed_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['sigma']['Value'],
                 'Label': 'ThresholdTrimmed σ',
+            },
+            'Threshold':{
+                'Value': '{0:1.0f}'.format(float(self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['mu']['Value'])
+                        * self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']),
+                'Label': 'Threshold',
+                'Unit': 'e-',
+            },
+            'ThresholdWidth':{
+                'Value': '{0:1.0f}'.format(float(self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['sigma']['Value'])
+                        * self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']),
+                'Label': 'Threshold Width',
+                'Unit': 'e-',
             },
             'BumpBonding_mu':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Mean']['Value'],
@@ -117,10 +134,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'PHCalibrationPedestal_mu':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['mu']['Value'],
                 'Label': 'PHCalibrationPedestal μ',
+            },            
+            'PedestalSpread':{
+                'Value': '{0:1.0f}'.format(float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['sigma']['Value']) * self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']),
+                'Label': 'PedestalSpread [e-]',
             },
             'PHCalibrationPedestal_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['sigma']['Value'],
                 'Label': 'PHCalibrationPedestal σ',
+            },
+            'RelativeGainWidth':{
+                'Value': '{0:1.2f}'.format(float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['sigma']['Value']) / float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['mu']['Value']) if float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['mu']['Value']) > 0 else 0),
+                'Label': 'RelativeGainWidth',
             },
             'TrimBits_mu':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['TrimBits'].ResultData['KeyValueDictPairs']['mu']['Value'],
@@ -131,6 +156,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label': 'TrimBits σ',
             }
         }
+        self.ResultData['KeyList'] = ['Noise', 'Threshold', 'ThresholdWidth', 'RelativeGainWidth', 'TrimBits_mu', 'TrimBits_sigma']
         # self.ResultData['KeyList'] = ['Total', 'nDeadPixel', 'nMaskDefect', 'nDeadBumps', 'nDeadTrimbits', 'nAddressProblems', 'empty',
         #                               'nNoisy1Pixel', 'nNoisy2Pixel', 'nThrDefect', 'nGainDefect', 'nPedDefect', 'nPar1Defect', 'PixelDefectsGrade',
         #                               'SCurveWidth_mu','SCurveWidth_sigma','ThresholdTrimmed_mu','ThresholdTrimmed_sigma','BumpBonding_mu',

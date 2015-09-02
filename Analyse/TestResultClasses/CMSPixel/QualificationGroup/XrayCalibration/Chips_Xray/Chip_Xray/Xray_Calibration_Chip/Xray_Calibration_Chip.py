@@ -47,7 +47,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print target
                 print all_targets[i].ResultData['Plot']['ROOTObject']
             self.ResultData['Plot']['ROOTObject'] = all_targets[i].ResultData['Plot']['ROOTObject'].Clone(id)
-            print all_targets[i].ResultData['KeyValueDictPairs'].keys()
             slope = all_targets[i].ResultData['KeyValueDictPairs']['Slope']
             offset = all_targets[i].ResultData['KeyValueDictPairs']['Offset']
             chi2 =   all_targets[i].ResultData['KeyValueDictPairs']['chi2']
@@ -64,4 +63,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.SaveCanvas()
         
         self.ResultData['KeyList'] = ['Slope', 'Offset']
+        print ("ROC %d"%self.chipNo).ljust(6) + " Slope = " + ("%.2f"%slope['Value']).ljust(5) + " +/- " + ("%.1f"%slope['Sigma']).ljust(4) + " Offset = " + ("%.1f"%offset['Value']).ljust(8)
         self.ResultData['KeyValueDictPairs'] = {'Slope': slope,'Offset': offset,'chi2': chi2}

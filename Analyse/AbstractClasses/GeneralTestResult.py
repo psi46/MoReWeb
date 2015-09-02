@@ -7,7 +7,7 @@ import warnings
 import os
 import ConfigParser
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
-
+import subprocess
 
 try:
     set
@@ -17,17 +17,25 @@ except NameError:
 import Helper.ROOTConfiguration as ROOTConfiguration
 import glob
 
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
 
 class GeneralTestResult(object):
     nRows = 80
     nCols = 52
     nTotalChips = 16
+
+    MoReWebVersion = 'unknown MoReWeb version'
+
     '''
         Initialization function
         @param ParentObject Reference to the Parent Object
         @param InitialModulePath Starting point of modules
     '''
-
+    
     def __init__(self, TestResultEnvironmentObject, ParentObject=None, InitialModulePath=None,
                  InitialFinalResultsStoragePath=None, InitialAttributes=None, Key=None, DisplayOptions=None):
         ROOTConfiguration.initialise_ROOT()
@@ -106,7 +114,8 @@ class GeneralTestResult(object):
             # Key / ValueDict (dict with {Value, Unit, Label}, if Label not specified, the key is used as label) Pairs
             # 'KeyValueDictPairs':{
             # 'MyKey':{
-            # 'Value':25,
+            # 'Value':'25',
+            # 'NumericValue':25,
             # 'Unit': 'kg',
             # 'Label': 'My Key'
             # }
@@ -261,22 +270,38 @@ class GeneralTestResult(object):
             i['TestResultObject'] = self.ResultData['SubTestResults'][i['Key']]
             i2 += 1
 
-    def check_Test_Software(self):
-        # file = self.RawTestSessionDataPath + '/test.cfg'
-        # print file
+    def check_Test_Software_Pyxar(self):
         self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
         files = glob.glob(self.RawTestSessionDataPath + '/test.cfg') + \
                 glob.glob(self.RawTestSessionDataPath + '/*/test.cfg')
-        # print 'pyxar:',files
-        if len(files) > 0:
-            self.testSoftware = 'pyxar'
-        else:
-            data = glob.glob(self.RawTestSessionDataPath + '/*[p,P][x,X][a,A][r,R]*.*') + \
+        return len(files) > 0
+
+    def check_Test_Software_Pxar(self):
+        data = glob.glob(self.RawTestSessionDataPath + '/*[p,P][x,X][a,A][r,R]*.*') + \
                    glob.glob(self.RawTestSessionDataPath + '/*/*[p,P][x,X][a,A][r,R]*.*')
-            if len(data):
-                self.testSoftware = 'pxar'
-            else:
-                self.testSoftware = 'psi46expert'
+        if len(data):
+            return True
+
+        LogFileNames = glob.glob(self.RawTestSessionDataPath + '/*.log') + glob.glob(self.RawTestSessionDataPath + '/*/*.log')
+
+        for LogFileName in LogFileNames:
+            LogFile = open(LogFileName, "r")
+            FirstLine = LogFile.readline()
+            LogFile.close()
+            if FirstLine.lower().find("welcome to pxar") > -1:
+                return True
+
+        return False
+
+    def check_Test_Software(self):
+
+        if self.check_Test_Software_Pyxar():
+            self.testSoftware = 'pyxar'
+        elif self.check_Test_Software_Pxar():
+            self.testSoftware = 'pxar'
+        else:
+            self.testSoftware = 'psi46expert'
+
         self.HistoDict = BetterConfigParser()
         fileName = 'Configuration/Software/%s.cfg' % self.testSoftware
         self.HistoDict.read(fileName)
@@ -321,9 +346,12 @@ class GeneralTestResult(object):
             lines = []
             for filename in fileNames:
                 fileName = '%s/%s' % (self.RawTestSessionDataPath, filename)
-                f = open(fileName)
-                lines.extend(f.readlines())
-                f.close()
+                try:
+                    f = open(fileName)
+                    lines.extend(f.readlines())
+                    f.close()
+                except:
+                    warnings.warn('cannot open config parameters dat file {file}'.format(file=fileName))
             version = 'none'
             for line in lines:
                 if line.strip().startswith('rocType'):
@@ -433,14 +461,22 @@ class GeneralTestResult(object):
 
         if Level:
             if self.FileHandle:
-                try:
-                    self.FileHandle.close()
-                except:
-                    print '\x1b[33m warning: can not close file "%s" \x1b[0m'%repr(self.FileHandle)
+
+                if not type(self.FileHandle) == list:
+                    self.FileHandle = [self.FileHandle]
+
+                for SingleFileHandle in self.FileHandle:
                     try:
-                        self.FileHandle.Close()
+                        if "ROOT.TFile" in repr(SingleFileHandle):
+                            if self.verbose:
+                                print '\x1b[35mclose ROOT file "%s" ...\x1b[0m'%repr(SingleFileHandle)
+                            SingleFileHandle.Close()
+                        else:
+                            if self.verbose:
+                                print '\x1b[32mclose file "%s" ...\x1b[0m'%repr(SingleFileHandle)
+                            SingleFileHandle.close()
                     except:
-                        pass
+                        print '\x1b[33m warning: can not close file "%s" \x1b[0m'%repr(SingleFileHandle)
 
     '''
         Reads all attributes and writes it to the memory
@@ -502,10 +538,14 @@ class GeneralTestResult(object):
         if self.SavePlotFile:
             if self.Canvas:
                 self.Canvas.SaveAs(self.GetPlotFileName())
+                if not self.ResultData['Plot']['Caption']:
+                    self.ResultData['Plot']['Caption'] = self.Title
                 for Suffix in self.ResultData['Plot']['AdditionalFormats']:
-                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
                 	if Suffix == 'pdf':
                 		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName(Suffix)
+                		if self.ResultData['Plot']['ROOTObject']:
+                		    self.ResultData['Plot']['ROOTObject'].SetTitle(self.ResultData['Plot']['Caption'])
+                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
                 self.ResultData['Plot']['Enabled'] = 1
                 self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''
@@ -676,10 +716,13 @@ class GeneralTestResult(object):
         # Title
         if not TestResultObject.Title:
             TestResultObject.Title = TestResultObject.NameSingle
+
         MyObjectTestDate = ''
+        VersionInfo = ''
         if RecursionLevel == 0 and TestResultObject.Attributes['TestDate']:
             MyObjectTestDate = 'Test Date: ' + datetime.datetime.fromtimestamp(
-                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%m")
+                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%M") + '<br><span style="font-size:10.5pt;" title="' + self.TestResultEnvironmentObject.MoReWebVersion + '">Analysis date: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + '</span>'
+            VersionInfo = self.TestResultEnvironmentObject.MoReWebVersion + " on branch " + self.TestResultEnvironmentObject.MoReWebBranch
 
         MainTestResultAdditionalClasses = ''
 
@@ -694,6 +737,7 @@ class GeneralTestResult(object):
                 '###TITLE###': HtmlParser.MaskHTML(TestResultObject.Title),
                 '###TESTDATE###': MyObjectTestDate,
                 '###MAINTESTRESULTADDITIONALCLASSES###': MainTestResultAdditionalClasses,
+                '###VERSIONINFO###': VersionInfo,
             }
         )
         # Plot
@@ -939,26 +983,34 @@ class GeneralTestResult(object):
     def GenerateDataFileJSON(self):
         data = None
         key = None
-        try:
-            data = self.ResultData['KeyValueDictPairs']
-            for key in data:
-                # {'NotAlivePixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'MaskDefects': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'NoisyPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}, 'DeadPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([(0, 21, 31)]), 'Label': 'Pixels'}, 'InefficentPixels': {'SigmaOutput': '', 'Unit': '', 'Value': Set([]), 'Label': 'Pixels'}}
-                if data[key].has_key('Value'):
-                    value = data[key]['Value']
-                    if type(value) == set:
-                        value = list(value)
-                        data[key]['Value'] = value
-                pass
-            # self.ResultData['KeyValueDictPairs']
-            f = open(self.FinalResultsStoragePath + '/KeyValueDictPairs.json', 'w')
-            f.write(json.dumps(self.ResultData['KeyValueDictPairs'], sort_keys=True, indent=4, separators=(',', ': ')))
-            f.close()
-        except (KeyError,IOError):
-            if data and key in data:
-                warnings.warn(
-                    'Cannot create JSON for %s, %s' % (type(data[key]['Value']), self.ResultData['KeyValueDictPairs']))
-            else:
-                warnings.warn('Cannot create JSON for %s, %s' % (type(data), self.ResultData['KeyValueDictPairs']))
+        DataKeys = ['KeyValueDictPairs', 'HiddenData']
+        for DataKey in DataKeys:
+            try:
+                data = self.ResultData[DataKey]
+                for key in data:
+                    if type(data[key])==dict and data[key].has_key('Value'):
+                        value = data[key]['Value']
+                        if type(value) == set:
+                            value = list(value)
+                            data[key]['Value'] = value
+                    elif type(data[key])==dict:
+                        data[key] = list(data[key])
+                    else:
+                        data_value = data[key]
+                        data[key] = {'Value': str(data_value)}
+
+                f = open(self.FinalResultsStoragePath + '/'+DataKey+'.json', 'w')
+                f.write(json.dumps(self.ResultData[DataKey], sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
+                f.close()
+            except (KeyError,IOError,TypeError):
+                if data and key in data:
+                    if type(data[key])==dict:
+                        warnings.warn(
+                            'Cannot create JSON for %s, %s' % (type(data[key]['Value']), str(self.ResultData[DataKey])))
+                    else:
+                        warnings.warn('Cannot create JSON for %s.' % (repr(data)))
+                else:
+                    warnings.warn('Cannot create JSON for %s.' % (repr(data)))
 
     '''
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in ASCII format

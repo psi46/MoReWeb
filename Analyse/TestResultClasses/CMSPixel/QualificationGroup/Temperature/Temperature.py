@@ -18,12 +18,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
     def OpenFileHandle(self):
-        self.FileHandle = ConfigParser.ConfigParser()
-        fileName = self.RawTestSessionDataPath + '/elComandante.ini'
-        if not os.path.isfile(fileName):
-            fileName = self.RawTestSessionDataPath + '/Tests.ini'
-        # print 'open ConfigFile "%s"'%fileName
-        self.FileHandle.read(fileName)
+        pass
 
     def analyseTemp(self, fileName):
         print 'analyse Temp for "%s"' % fileName
@@ -111,14 +106,16 @@ class TestResult(GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.Canvas = canvas
+            this_file.close()
 
     def PopulateResultData(self):
-        fileHandlePath = self.RawTestSessionDataPath
-        print fileHandlePath
-        self.analyseTemp(fileHandlePath + '/temperature.log')
+        LogFileName = self.Attributes['LogFileName']
+        if LogFileName is not None:
+            print LogFileName
+            self.analyseTemp(LogFileName)
+
         if self.verbose: raw_input('Press enter')
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Temperature'
-        
+        self.SaveCanvas()        
     def CustomWriteToDatabase(self, ParentID):
         pass

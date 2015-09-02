@@ -67,8 +67,18 @@ class ModuleResultOverview:
                 'InGlobalOverviewList': True
              },
              {
+                'Label':'ROCs < 1%',
+                'DBColumnName':'ROCsLessThanOnePercent',
+                'InGlobalOverviewList': True
+             },
+             {
                 'Label':'ROCs > 1%',
                 'DBColumnName':'ROCsMoreThanOnePercent',
+                'InGlobalOverviewList': True
+             },
+             {
+                'Label':'ROCs > 4%',
+                'DBColumnName':'ROCsMoreThanFourPercent',
                 'InGlobalOverviewList': True
              },
              {
@@ -105,6 +115,7 @@ class ModuleResultOverview:
              {
                 'Label':'initial Current',
                 'DBColumnName':'initialCurrent',
+                'InGlobalOverviewList': True,
              },
              {
                 'Label':'Comments',
@@ -114,19 +125,19 @@ class ModuleResultOverview:
              {
                 'Label':'no of Cycles',
                 'DBColumnName':'nCycles',
-                'InGlobalOverviewList': True,
+                'InGlobalOverviewList': False,
                 'InFullList': False
              },
              {
                 'Label':'CycleTempLow',
                 'DBColumnName':'CycleTempLow',
-                'InGlobalOverviewList': True,
+                'InGlobalOverviewList': False,
                 'InFullList': False,
              },
              {
                 'Label':'CycleTempHigh',
                 'DBColumnName':'CycleTempHigh',
-                'InGlobalOverviewList': True,
+                'InGlobalOverviewList': False,
                 'InFullList': False,
              },
 
@@ -180,19 +191,15 @@ class ModuleResultOverview:
                 ResultHTMLFileName = 'TestResult.html'
                 QualificationGroupSubfolder = 'QualificationGroup'
 
-
                 if GlobalOverviewList:
-                	Link = os.path.relpath(
-				self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/'+ResultHTMLFileName,
-				self.TestResultEnvironmentObject.GlobalOverviewPath
-			)
+                    Link = os.path.relpath(
+                        self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/'+ResultHTMLFileName,
+                        self.TestResultEnvironmentObject.GlobalOverviewPath
+                        )
                 else:
-			CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
-			# change directory one level up since we are in QualificationGroup folder and FulltestSubfolder is relative to ModuleFinalResultsPath...
-                	Link = '../'+RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
-
-
-
+                    CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
+                    # change directory one level up since we are in QualificationGroup folder and FulltestSubfolder is relative to ModuleFinalResultsPath...
+                    Link = '../'+RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
 
                 #Link the module ID
 
@@ -218,32 +225,32 @@ class ModuleResultOverview:
                     raise e
 
             else:
-#                TestType
-                 FinalModuleRowsDict[Identificator]['TestType'] += ' & %s'%RowTuple['TestType']
-                 if ( FinalModuleRowsDict[Identificator]['Grade'] < RowTuple['Grade']):
-                      FinalModuleRowsDict[Identificator]['Grade'] = RowTuple['Grade']
-                 MaxCompareList = ['PixelDefects','ROCsMoreThanOnePercent','Noise','Trimming','PHCalibration']
-                 for item in MaxCompareList:
-                     FinalModuleRowsDict[Identificator][item] = max( FinalModuleRowsDict[Identificator][item],RowTuple[item])
-                 if RowTuple['Temperature'] and FinalModuleRowsDict[Identificator].has_key('Temperature'):
-                       if FinalModuleRowsDict[Identificator]['Temperature']:
-                           FinalModuleRowsDict[Identificator]['Temperature'] += " / %s"%RowTuple['Temperature']
-                       else:
-                           FinalModuleRowsDict[Identificator]['Temperature'] = "%s" % RowTuple['Temperature']
-                 if RowTuple['initialCurrent'] and FinalModuleRowsDict[Identificator].has_key('initialCurrent'):
-                       if FinalModuleRowsDict[Identificator]['initialCurrent']:
-                           FinalModuleRowsDict[Identificator]['initialCurrent'] += " / %s"%RowTuple['initialCurrent']
-                       else:
-                           FinalModuleRowsDict[Identificator]['initialCurrent'] = "%s" % RowTuple['initialCurrent']
-                 if RowTuple['Comments'] and FinalModuleRowsDict[Identificator].has_key('Comments'):
-                       if FinalModuleRowsDict[Identificator]['Comments']:
-                           FinalModuleRowsDict[Identificator]['Comments'] += " / %s"%RowTuple['Comments']
-                       else:
-                           FinalModuleRowsDict[Identificator]['Comments'] = "%s"%RowTuple['Comments']
-                 if RowTuple['nCycles'] and FinalModuleRowsDict[Identificator].has_key('nCycles'):
-                       FinalModuleRowsDict[Identificator]['nCycles'] = RowTuple['nCycles']
-                       FinalModuleRowsDict[Identificator]['CycleTempLow'] = RowTuple['CycleTempLow']
-                       FinalModuleRowsDict[Identificator]['CycleTempHigh'] = RowTuple['CycleTempHigh']
+                #TestType
+                FinalModuleRowsDict[Identificator]['TestType'] += ' & %s'%RowTuple['TestType']
+                if ( FinalModuleRowsDict[Identificator]['Grade'] < RowTuple['Grade']):
+                  FinalModuleRowsDict[Identificator]['Grade'] = RowTuple['Grade']
+                MaxCompareList = ['PixelDefects','ROCsMoreThanOnePercent','Noise','Trimming','PHCalibration']
+                for item in MaxCompareList:
+                 FinalModuleRowsDict[Identificator][item] = max( FinalModuleRowsDict[Identificator][item],RowTuple[item])
+                if RowTuple['Temperature'] and FinalModuleRowsDict[Identificator].has_key('Temperature'):
+                   if FinalModuleRowsDict[Identificator]['Temperature']:
+                       FinalModuleRowsDict[Identificator]['Temperature'] += " / %s"%RowTuple['Temperature']
+                   else:
+                       FinalModuleRowsDict[Identificator]['Temperature'] = "%s" % RowTuple['Temperature']
+                if RowTuple['initialCurrent'] and FinalModuleRowsDict[Identificator].has_key('initialCurrent'):
+                   if FinalModuleRowsDict[Identificator]['initialCurrent']:
+                       FinalModuleRowsDict[Identificator]['initialCurrent'] = "%s / %s"%(str(FinalModuleRowsDict[Identificator]['initialCurrent']), RowTuple['initialCurrent'])
+                   else:
+                       FinalModuleRowsDict[Identificator]['initialCurrent'] = "%s" % RowTuple['initialCurrent']
+                if RowTuple['Comments'] and FinalModuleRowsDict[Identificator].has_key('Comments'):
+                   if FinalModuleRowsDict[Identificator]['Comments']:
+                       FinalModuleRowsDict[Identificator]['Comments'] += " / %s"%RowTuple['Comments']
+                   else:
+                       FinalModuleRowsDict[Identificator]['Comments'] = "%s"%RowTuple['Comments']
+                if RowTuple['nCycles'] and FinalModuleRowsDict[Identificator].has_key('nCycles'):
+                   FinalModuleRowsDict[Identificator]['nCycles'] = RowTuple['nCycles']
+                   FinalModuleRowsDict[Identificator]['CycleTempLow'] = RowTuple['CycleTempLow']
+                   FinalModuleRowsDict[Identificator]['CycleTempHigh'] = RowTuple['CycleTempHigh']
 
         for ModuleID in ModuleIDList:
             RowDict = FinalModuleRowsDict[ModuleID]

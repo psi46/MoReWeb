@@ -21,15 +21,15 @@ class TestResultEnvironment:
     }
 
     GradingParameters = {
-        'noiseMin':50,
-        'noiseMax':400,
         'tthrTol':10,
         'gainMin':1.,
         'gainMax': 4.5,
         'par1Min':0.,
-        'par1Max':7.,
+        'par1Max':2.,
         'noiseB':500,
         'noiseC':1000,
+        'pixelNoiseMin':50,
+        'pixelNoiseMax':400,
         'noiseDistribution': 1.0,
         'trimmingB':200,
         'trimmingC':400,
@@ -45,11 +45,16 @@ class TestResultEnvironment:
         'par1Distribution': 1.0,
         'defectsB':42,
         'defectsC':168,
+        'maskDefectsB':1,
+        'maskDefectsC':1,
         'currentB':2,
-        'currentBm10':3,
+        'currentBm10':10,
         'currentC':10,
-        'currentCm10':15,
+        'currentCm10':999,
         'slopeivB': 2,
+        'slopeivC': 999,
+        'leakageCurrentPON_B': 5,
+        'leakageCurrentPON_C': 15,
         # check
         'minThrDiff':-5,
         'maxThrDiff':5,
@@ -61,9 +66,31 @@ class TestResultEnvironment:
         'PixelMapMaxValue':10,
         'PixelMapMinValue':0,
         'PixelMapMaskDefectUpperThreshold': 0,
-        'BumpBondingProblemsNSigma': 5
+        'BumpBondingProblemsNSigma': 5,
+        'XRayHighRateEfficiency_NInterpolationRates': 2,
+        'XRayHighRateEfficiency_InterpolationRate1': 50,
+        'XRayHighRateEfficiency_InterpolationRate2': 120,
+        'XRayHighRateEfficiency_max_allowed_loweff_A_Rate1':98,
+        'XRayHighRateEfficiency_max_allowed_loweff_A_Rate2':98,
+        'XRayHighRateEfficiency_max_allowed_loweff_B_Rate1':95,
+        'XRayHighRateEfficiency_max_allowed_loweff_B_Rate2':95,
+        'XRayHighRateHotPixels_max_allowed_hot':100,
+        'XRayHighRateHotPixels_Threshold':1,
+        'XRayHighRate_factor_dcol_uniformity_low':0.5,
+        'XRayHighRate_factor_dcol_uniformity_high':1.5,
+        'XRayHighRate_factor_readout_uniformity':7,
+        'XRayHighRate_SCurve_Noise_Threshold_B':400,
+        'XRayHighRate_SCurve_Noise_Threshold_C':800,
+        'XRayHighRate_missing_xray_pixels_B':42,
+        'XRayHighRate_missing_xray_pixels_C':168,
+        'XRayHighRate_pixel_defects_B':42,
+        'XRayHighRate_pixel_defects_C':168,
     }
-
+    XRayHRQualificationConfiguration = {
+        'OmitGradesInFinalGrading':'HotPixelGrade',
+        'TimeConstant':1,
+        'Area':1,
+    }
 
     # Database connection
     GlobalDBConnection = None
@@ -94,6 +121,9 @@ class TestResultEnvironment:
 
     LastUniqueIDCounter = 0;
 
+    MoReWebVersion = 'unknown MoReWeb version'
+    MoReWebBranch = 'unknown branch'
+
     #Error Handling
     ErrorList = []
 
@@ -117,7 +147,12 @@ class TestResultEnvironment:
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
             for i in self.GradingParameters:
                 self.GradingParameters[i] = float(Configuration.get('GradingParameters', i))
-
+            if Configuration.has_option('XRayHRQualification','OmitGradesInFinalGrading'):
+                self.XRayHRQualificationConfiguration['OmitGradesInFinalGrading'] = [x.strip() for x in Configuration.get('XRayHRQualification','OmitGradesInFinalGrading').split(',')]
+            if Configuration.has_option('XRayHRQualification','TimeConstant'):
+                self.XRayHRQualificationConfiguration['TimeConstant'] = float(Configuration.get('XRayHRQualification','TimeConstant').strip())
+            if Configuration.has_option('XRayHRQualification','Area'):
+                self.XRayHRQualificationConfiguration['Area'] = float(Configuration.get('XRayHRQualification','Area').strip())
 
         self.MainStylesheet = open('HTML/Main.css').read()
 
@@ -173,7 +208,9 @@ class TestResultEnvironment:
                         QualificationType TEXT,
                         Grade TEXT,
                         PixelDefects TEXT,
+                        ROCsLessThanOnePercent INT,
                         ROCsMoreThanOnePercent INT,
+                        ROCsMoreThanFourPercent INT,
                         Noise INT,
                         Trimming INT,
                         PHCalibration INT,
@@ -216,7 +253,7 @@ class TestResultEnvironment:
             self.LocalDBConnection.close()
 
     def existInDB(self,moduleID,QualificationType):
-        print 'check wheather module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
+        print 'check whether module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
         AdditionalWhere =""
         AdditionalWhere += ' AND ModuleID=:ModuleID '
         AdditionalWhere += ' AND QualificationType=:QualificationType '

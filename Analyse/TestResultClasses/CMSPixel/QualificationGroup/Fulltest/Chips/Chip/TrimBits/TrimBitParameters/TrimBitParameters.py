@@ -62,6 +62,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             }
         }
         self.ResultData['KeyList'] = ['mu', 'sigma']
-        self.SaveCanvas()
         self.Title = 'Trim Bits - Trim '+self.Attributes['TrimValue']
-        
+        self.SaveCanvas()        

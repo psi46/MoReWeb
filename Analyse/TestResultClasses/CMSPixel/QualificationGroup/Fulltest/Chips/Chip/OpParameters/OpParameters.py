@@ -39,16 +39,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             vcalTrim =-1
             i = ''
-        print 'newest file: ', name, 'Vcal: ', i
 
         if os.path.exists(DacParametersFileName):
-#            if not vcalTrim:
-#                try:
-#                    vcalTrim = int(i)
-#                except:
-#                    vcalTrim  = -1
             DacParametersFile = open(DacParametersFileName, "r")
-            print 'DacParametersFile', DacParametersFile
             self.ResultData['HiddenData']['DacParameters']['File'+i] = DacParametersFile
 
             if DacParametersFile :

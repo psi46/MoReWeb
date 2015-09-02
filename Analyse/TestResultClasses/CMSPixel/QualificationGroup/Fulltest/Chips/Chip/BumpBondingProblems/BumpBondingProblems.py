@@ -30,25 +30,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         self.HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
 
+        if self.isDigitalROC:
+            ModuleTypes = ['Digital', 'Analog']
+        else:
+            ModuleTypes = ['Analog', 'Digital']
+
         try:
-            histname = self.HistoDict.get(self.NameSingle, 'Analog')
+            histname = self.HistoDict.get(self.NameSingle, ModuleTypes[0])
             self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle,
                                                                           histname, rocNo=ChipNo).Clone(
                 self.GetUniqueID())
         except:
-            histname = self.HistoDict.get(self.NameSingle, 'Digital')
+            histname = self.HistoDict.get(self.NameSingle, ModuleTypes[1])
             self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle,
                                                                           histname, rocNo=ChipNo).Clone(
                 self.GetUniqueID())
-            # if not isDigitalROC:
-        #                 print "ERROR Cannot find vcals_xtal_CXXX but is analog Module..."
-        #             elif isDigitalROC:
-        #                 print "ERROR: FOound vcals_xtal_CXXX but is digital Module..."
+
 
         threshold = self.CheckBumpBondingProblems()
 
         if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].SetTitle("");
+            self.ResultData['Plot']['ROOTObject'].SetTitle("")
             if not self.isDigitalROC:
                 self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(
                     self.TestResultEnvironmentObject.GradingParameters['minThrDiff'],

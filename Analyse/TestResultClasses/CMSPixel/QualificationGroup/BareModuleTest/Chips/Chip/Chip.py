@@ -49,31 +49,41 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':9,
                     }
                 },
-                {'Key':'BareBBMap',
-                    'DisplayOptions':{
-                        'Order':1,
-                    }
-                },
+#                {'Key':'BareBBMap',
+#                    'DisplayOptions':{
+#                        'Order':1,
+#                    }
+#                },
                 {'Key':'BareBBScan',
-                    'DisplayOptions':{
+                 'DisplayOptions':{
                         'Order':1,
-                    }
-                },
+                        }
+                 },
                 {'Key':'BareBBWidth',
-                    'DisplayOptions':{
+                 'DisplayOptions':{
                         'Order':1,
-                    }
-                },
+                        }
+                 },
+                {'Key':'BareBBMap',
+                 'DisplayOptions':{
+                        'Order':1,
+                        }
+                 },
 #                {'Key':'PixelMapNew',
 #                    'DisplayOptions':{
 #                        'Order':1,
 #                    }
 #                },
-                 {'Key':'PixelMap',
-                    'DisplayOptions':{
+                {'Key':'PixelMap',
+                 'DisplayOptions':{
                         'Order':1,
-                    }
-                },                
+                        }
+                 },
+                {'Key':'DigChipCurrent',
+                 'DisplayOptions':{
+                        'Order':1,
+                        }
+                 },                
                 ]
             
             
@@ -84,6 +94,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 {'Key':'OpParameters',
                  'DisplayOptions':{
                         'Order':16,
+                        }
+                 },
+                {'Key':'BareBBWidth',
+                 'DisplayOptions':{
+                        'Order':1,
                         }
                  },
                 {
@@ -102,11 +117,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':1,
                         }
                  },
-                {'Key':'BareBBWidth',
-                 'DisplayOptions':{
-                        'Order':1,
-                        }
-                 },
+#                {'Key':'BareBBWidth',
+#                 'DisplayOptions':{
+#                        'Order':1,
+#                        }
+#                 },
                 
                 
                 ]

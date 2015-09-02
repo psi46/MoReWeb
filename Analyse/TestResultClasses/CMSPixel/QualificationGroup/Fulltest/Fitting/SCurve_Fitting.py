@@ -8,8 +8,7 @@ import time
 class SCurve_Fitting():
     nCols = 52
     nRows = 80
-    def __init__(self, refit = True, HistoDict = None, chi2Limit = 2.0, ePerVcal = 50.0, verbose = False):
-        print 'SCURVE Fitting'
+    def __init__(self, refit = True, HistoDict = None, chi2Limit = 2.0, ePerVcal = 50.0, verbose = False, ParallelProcessing = False):
         ROOT.gStyle
         self.verbose = verbose
         self.refit = refit
@@ -19,12 +18,15 @@ class SCurve_Fitting():
             self.nReadouts = self.HistoDict.getint('SCurveFitting','nTrigs')
         else:
             self.nReadouts = 50
+
+        self.ParallelProcessing = ParallelProcessing
         self.chiLimit = chi2Limit
         self.ePerVcal = ePerVcal
         self.slope = self.getVcal(0,255)/256
-        print "ePerVcal ",self.ePerVcal
-        print 'slope: ',self.slope
-        print 'nTrigs',self.nReadouts
+        print "  parallel processing: ".ljust(24), self.ParallelProcessing
+        print "  ePerVcal: ".ljust(24),self.ePerVcal
+        print "  slope: ".ljust(24),self.slope
+        print "  nTrigs:".ljust(24),self.nReadouts
         self.InitFit()
 #         self.InitResultHistos()
 
@@ -46,21 +48,38 @@ class SCurve_Fitting():
         print "Fitting SCurves %s"%dir
         maxChi2 = [-1]*4
         results = []
-#             p = Process(target=self.FitPHCurve, args=(dir,chip,result))
-        for chip in range(0,nRocs):
-            results.append(self.FitSCurve(dir, chip))
-            #
+
+        if self.ParallelProcessing:
+            Processes = []
+            q = Queue()
+            # start 16 processes
+            for chip in range(0,nRocs):
+                p = Process(target=self.FitSCurve, args=(dir, chip, q,))
+                p.start()
+                Processes.append(p)
+            # read back data
+            for chip in range(0,nRocs):
+                results.append(q.get())
+            # wait for all to finish
+            for chip in range(0,nRocs):
+                Processes[chip].join()
+        else:
+            for chip in range(0,nRocs):
+                results.append(self.FitSCurve(dir, chip))
+            
         for chi2,histos in results :
             if chi2[0] ==-1:
                 print 'Failed to to fit in chip %s'%chi2[1]
             elif chi2[2] == -2:
-                print 'File already exists in chip %s'%chi2[1]
+                pass
+                #print 'File already exists in chip %s'%chi2[1]
             else:
                 if chi2[0] > maxChi2[0]:
                     maxChi2 = chi2
                 self.AddToHistos(histos)
 
-        print "Total Max Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
+        if maxChi2[1] > -1:
+            print "Total Max Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
         self.SaveResultHistos()
         if self.verbose:
             raw_input('done with SCurve fitting for all ROCs. Press enter.')
@@ -77,11 +96,13 @@ class SCurve_Fitting():
             dir = self.HistoDict.get('SCurveFitting','dir')
             filename = self.HistoDict.get('SCurveFitting','inputFileName')
             inputFileName += dir+'/'
-            inputFileName += filename%chip
+            if filename.find("{ChipNo}") > -1:
+                inputFileName += filename.format(ChipNo=chip)
+            else:
+                inputFileName += filename%chip
         else:
             inputFileName += 'SCurveData_C%i.dat'%(chip)
         inputFileName = os.path.abspath(inputFileName)
-        print inputFileName
         try:
             inputFile = open(inputFileName,'r')
         except IOError as e:
@@ -105,13 +126,16 @@ class SCurve_Fitting():
         outputFile.write("Threshold Sigma\n\n")
         return outputFile
 
-    def FitSCurve(self,dirName,chip):
+    def FitSCurve(self,dirName,chip, q = None):
         print "Fitting SCurve for chip %i"%chip
         inputFile = self.getInputFile(dirName,chip)
         if type(inputFile)==list:
+            if q: q.put(inputFile)
             return inputFile
         outputFile = self.getOutputFile(dirName,chip)
-        if type(outputFile) == list: return outputFile
+        if type(outputFile) == list: 
+            if q: q.put(outputFile)
+            return outputFile
 
         dataSet = inputFile.readlines()
         if self.verbose:
@@ -150,6 +174,7 @@ class SCurve_Fitting():
         print badPixels
         inputFile.close()
         outputFile.close()
+        if q: q.put([chi2,[]])
         return [chi2,[]]
 
 
@@ -157,16 +182,16 @@ class SCurve_Fitting():
         if self.verbose:
             print 'fit Scurve data ROC %d %2d/%2d' % (chip, row, col)
         isValid, calibrationPoints = self.extractSCurveData(data)
-        if not isValid:
+        if not isValid and not self.HistoDict.has_option('SCurveFitting','ignoreValidityCheck'):
             print '\tnot Valid'
             return [[-3,chip,row,col],[]]
         graph = self.GetGraph(calibrationPoints)
 
         self.scurveFit.SetParameters(self.nReadouts/2., graph.GetMean(), 167., self.nReadouts/2.)         #// half amplitude, threshold (50% point), width, offset
         graph.Fit(self.scurveFit, "Q", "", 0.0, 0.3);
-#         if row ==0 and col == 0:
-#             graph.Draw('APL')
-        chi2 = self.scurveFit.GetChisquare() / self.scurveFit.GetNDF();
+
+        ndf = self.scurveFit.GetNDF()
+        chi2 = self.scurveFit.GetChisquare() / ndf if ndf > 0 else 0
 
         notConverged = ("FAILED    " in ROOT.gMinuit.fCstatu) or (ROOT.gMinuit.fEDM > 1.e-4)    #//if fEDM very small, convergence failed only due to limited machine accuracy
         fitFailed = notConverged or chi2> self.chiLimit

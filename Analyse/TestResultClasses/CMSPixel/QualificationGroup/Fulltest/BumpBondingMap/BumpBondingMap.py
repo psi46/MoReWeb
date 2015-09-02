@@ -7,48 +7,45 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='BumpBondingMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
-
-
     def PopulateResultData(self):
-        ROOT.gPad.SetLogy(0);
+        ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
+
+        # initialize data
         xBins = 8 * self.nCols + 1
         yBins = 2 * self.nRows + 1
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins);  # mBumps
-        isDigital = False
+
+        # fill plot
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            isDigital = ChipTestResultObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs'].has_key('Threshold')
-            if isDigital:
-                thr = ChipTestResultObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Threshold']['Value']
-            deadBumps = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['DeadBumps']
-            histo = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject']
+            histo = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingMap'].ResultData['Plot']['ROOTObject']
+
+            try:
+                if 'BB4' in ChipTestResultObject.ResultData['SubTestResults'] and ChipTestResultObject.ResultData['SubTestResults']['BB4'].ResultData['Plot']['ROOTObject']:
+                    histo = ChipTestResultObject.ResultData['SubTestResults']['BB4'].ResultData['Plot']['ROOTObject']
+                    self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = 'BB4'
+            except:
+                pass
+                
             if not histo:
                 print 'cannot get BumpBondingProblems histo for chip ',ChipTestResultObject.Attributes['ChipNo']
                 continue
             chipNo = ChipTestResultObject.Attributes['ChipNo']
-            for col in range(self.nCols):  # Columns
-                for row in range(self.nRows):  # Rows
+            for col in range(self.nCols):
+                for row in range(self.nRows):
                     result = histo.GetBinContent(col + 1, row + 1)
-                    if isDigital:
-                        result = not (result < thr)
                     self.UpdatePlot(chipNo, col, row, result)
+
+        # draw
         if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].SetTitle("");
-            if isDigital:
-                self.ResultData['Plot']['ROOTObject'].Draw('colz');
-                self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, 1);
-            else:
-                self.ResultData['Plot']['ROOTObject'].SetMaximum(2.);
-                self.ResultData['Plot']['ROOTObject'].SetMinimum(-2.);
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("#Delta Threshold [DAC]");
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw('colz');
+            self.ResultData['Plot']['ROOTObject'].SetTitle("")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
 
         boxes = []
@@ -90,9 +87,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['Format'] = 'png'
 
-        self.SaveCanvas()
-        self.Title = 'Bump Bonding Map'
-        
+        self.Title = 'Bump Bonding Map' + (' (%s)'%self.ResultData['HiddenData']['SpecialBumpBondingTestName']) if 'SpecialBumpBondingTestName' in self.ResultData['HiddenData'] else ''
+        self.SaveCanvas()        
     def UpdatePlot(self, chipNo, col, row, value):
         result = value
         if chipNo < 8:

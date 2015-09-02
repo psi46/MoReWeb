@@ -13,6 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle = 'PHCalibrationGain'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.verbose = False
+        self.GainDefectsList = set()
 
     def fill_histograms(self):
         Directory = self.RawTestSessionDataPath
@@ -23,17 +24,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         PHCalibrationFitFile = open(PHCalibrationFitFileName, "r")
         self.FileHandle = PHCalibrationFitFile  # needed in summary
 
-        # PHCalibrationFitFile.seek(2*200) # omit the first 400 bytes
         if not PHCalibrationFitFile:
             warnings.warn('Cannot find File')
             return False
 
-        # for (int i = 0 i < 2 i++) fgets(string, 200, phLinearFile)
-
         n_lines = 0
         for i in range(3):
-            # Line = \
             PHCalibrationFitFile.readline()  # Omit first four lines
+
         n_dead_pixels = 0
         n_errors = 0
         n_warnings = 0
@@ -60,6 +58,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     par3 = float(Parameters[3])
                     if self.verbose:
                         print '%2d %2d: %5f %5f '%(row,col,par2,par3)
+
                     if abs(par2) < 1e-10:  # dead pixels have par2 == 0.
                         n_dead_pixels += 1
                     else:
@@ -73,11 +72,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             continue
                         self.ResultData['Plot']['ROOTObject_hPedestal'].Fill(pedestal)
                         self.ResultData['Plot']['ROOTObject_hGain'].Fill(gain)
-                        self.ResultData['Plot']['ROOTObject_hGainMap'].SetBinContent(col + 1, row + 1,
-                                                                                     min(max(0, gain),
-                                                                                         5.5))  # Column, Row, Gain
-                        self.ResultData['Plot']['ROOTObject_hPedestalMap'].SetBinContent(col + 1, row + 1,
-                                                                                         pedestal)  # Column, Row, Gain
+                        self.ResultData['Plot']['ROOTObject_hGainMap'].SetBinContent(col + 1, row + 1, gain)
+                        self.ResultData['Plot']['ROOTObject_hPedestalMap'].SetBinContent(col + 1, row + 1, pedestal)
+                        if gain > self.TestResultEnvironmentObject.GradingParameters['gainMax'] or gain < self.TestResultEnvironmentObject.GradingParameters['gainMin']:
+                            self.GainDefectsList.add((chip, col, row))
 
                 except (ValueError, TypeError, IndexError):
                     n_errors += 1
@@ -153,16 +151,39 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'sigma': {
                     'Value': '{0:1.2f}'.format(RMSGain),
                     'Label': 'σ'
-                }
+                },
+                'GainDefects': {
+                    'Value': self.GainDefectsList,
+                    'Label': 'Gain defects'
+                },
+                'NGainDefects': {
+                    'Value': '{0:1.0f}'.format(len(self.GainDefectsList)),
+                    'Label': '# Gain defects'
+                },
+
             }
-            self.ResultData['KeyList'] = ['N', 'mu', 'sigma']
+            self.ResultData['KeyList'] = ['N', 'mu', 'sigma', 'NGainDefects']
             if under:
                 self.ResultData['KeyValueDictPairs']['under'] = {'Value': '{0:1.2f}'.format(under), 'Label': '<='}
                 self.ResultData['KeyList'].append('under')
             if over:
                 self.ResultData['KeyValueDictPairs']['over'] = {'Value': '{0:1.2f}'.format(over), 'Label': '>='}
                 self.ResultData['KeyList'].append('over')
-                
+
+            self.ResultData['Plot']['ROOTObject_LowEdge'] = ROOT.TCutG('lLower', 2)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['gainMin'], -1e6)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['gainMin'], +1e6)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].SetLineColor(ROOT.kRed)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].SetLineStyle(2)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].Draw('same')
+
+            self.ResultData['Plot']['ROOTObject_UpEdge'] = ROOT.TCutG('lUpper', 2)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['gainMax'], -1e6)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['gainMax'], +1e6)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].SetLineColor(ROOT.kRed)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].SetLineStyle(2)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].Draw('same')
+
             self.SaveCanvas()
             self.ResultData['Plot']['Caption'] = 'PH Calibration: Gain (Vcal/ADC)'
             ROOT.gPad.SetLogy(0)

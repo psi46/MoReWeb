@@ -31,7 +31,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("");
-            self.ResultData['Plot']['ROOTObject'].SetAxisRange(0., 60.);
+            self.ResultData['Plot']['ROOTObject'].SetAxisRange(0., 40.);
             self.ResultData['Plot']['ROOTObject'].SetMinimum(0.5);
             self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlack);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold difference");
@@ -53,6 +53,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject_TrimBit7'].SetLineColor(ROOT.kGreen);
             self.ResultData['Plot']['ROOTObject_TrimBit7'].Draw('same');
 
+            cut = self.TestResultEnvironmentObject.GradingParameters['TrimBitDifference'] 
+            self.Cut = ROOT.TCutG('bumpBondingThreshold', 2)
+            self.Cut.SetPoint(0, cut, -1e9)
+            self.Cut.SetPoint(1, cut, +1e9)
+            self.Cut.SetLineWidth(2)
+            self.Cut.SetLineStyle(2)
+            self.Cut.SetLineColor(ROOT.kRed)
+            self.Cut.Draw('PL')
+
             Legend = ROOT.TLegend(0.5, 0.67, 0.84, 0.89, '', 'brNDC')
             Legend.AddEntry(self.ResultData['Plot']['ROOTObject'], 'Trim Value 14', 'l')
             Legend.AddEntry(self.ResultData['Plot']['ROOTObject_TrimBit13'], 'Trim Value 13', 'l')
@@ -61,6 +70,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Legend.Draw()
 
 
-        self.SaveCanvas()
         self.Title = 'Trim Bit Test'
-        
+        self.SaveCanvas()        

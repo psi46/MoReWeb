@@ -40,16 +40,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'] = self.ResultData['Plot']['ROOTObject_Calibrate'].Clone(self.GetUniqueID())
             nXbins = self.ResultData['Plot']['ROOTObject'].GetNbinsX()
             nYbins = self.ResultData['Plot']['ROOTObject'].GetNbinsY()
-            if self.ParentObject.ParentObject.ParentObject.testSoftware=='pxar':
-                comperateTo =1
-            else:
-                comperateTo=0
 
             for xbin in range(1,nXbins+1):
                 for ybin in range(1,nYbins+1):
                     binContent = self.ResultData['Plot']['ROOTObject_Mask'].GetBinContent(xbin,ybin)
 
-                    if binContent != comperateTo:
+                    if (self.ParentObject.ParentObject.ParentObject.testSoftware == 'pxar' and binContent < -0.5) or (self.ParentObject.ParentObject.ParentObject.testSoftware != 'pxar' and binContent != 0):
                         if self.verbose: print 'MaskProblem with %d/%d'%(xbin,ybin)
                         self.ResultData['Plot']['ROOTObject'].SetBinContent(xbin,ybin,-1)
 
@@ -65,9 +61,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
 
-        self.SaveCanvas()
         self.Title = 'Pixel Map: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        
+        self.SaveCanvas()        
     def CheckPixelAlive(self):
         for column in range(self.nCols): #Column
             for row in range(self.nRows): #Row

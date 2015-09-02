@@ -29,8 +29,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             TrimBitHistograms.append(tmpHistogram)
         for col in range(self.nCols):  # Column
             for row in range(self.nRows):  # Row
-                deadTrimBits = self.GetDeadTrimBits(col, row, TrimBitHistograms)
-                self.ResultData['Plot']['ROOTObject'].Fill(col, row, deadTrimBits)
+                if (ChipNo, col, row) not in self.PixelNotAliveList:
+                    deadTrimBits = self.GetDeadTrimBits(col, row, TrimBitHistograms)
+                    self.ResultData['Plot']['ROOTObject'].Fill(col, row, deadTrimBits)
 
         if self.ResultData['Plot']['ROOTObject']:
 
@@ -46,8 +47,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
 
 
-        self.SaveCanvas()
         self.Title = 'Trim Bit Problems'
+        self.SaveCanvas()
         self.ResultData['KeyValueDictPairs'] = {
             'DeadTrimbits': {
                 'Value':self.DeadTrimbitsList,
@@ -59,7 +60,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'nDeadPixels': {
                 'Value':'{0:1.0f}'.format(len(self.PixelNotAliveList)),
-                'Label':'including Dead Pixels'
+                'Label':'Dead Pixels'
             },
 
                                                 }
@@ -72,12 +73,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for k in range(1, 5):
             trimBit0 = TrimBitHistograms[0].GetBinContent(column + 1, row + 1)
             trimBitK = TrimBitHistograms[k].GetBinContent(column + 1, row + 1)
-            if excludeTrimBit14 and k == 1:
+            if excludeTrimBit14 and k == 4:
                 continue
             TrimBitDifference = abs(trimBitK - trimBit0)
             if TrimBitDifference <= gradingCriteria :
                 self.DeadTrimbitsList.add((self.chipNo, column, row))
-                retVal += 2 ** (4 - (k - 1))
+                retVal += [0, 8, 4, 2, 1][k]
                 if self.verbose:
                     print 'Dead TrimBit: added %2d,%2d %d' % (column, row, k), trimBitK, trimBit0, TrimBitDifference, gradingCriteria, (TrimBitDifference <= gradingCriteria), retVal
         return retVal

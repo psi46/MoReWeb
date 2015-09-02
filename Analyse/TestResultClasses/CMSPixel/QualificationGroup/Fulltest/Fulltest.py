@@ -1,6 +1,7 @@
 import os
 import sys
 import ROOT
+import warnings
 
 import AbstractClasses
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
@@ -161,6 +162,20 @@ class TestResult(GeneralTestResult):
                 }
             },
             {
+                'Key': 'TBM',
+                'DisplayOptions': {
+                    'Order': 100,
+                    'Width': 1,
+                }
+            },
+            {
+                'Key': 'Errors',
+                'DisplayOptions': {
+                    'Order': 101,
+                    'Width': 1,
+                }
+            },
+            {
                 'Key': 'Summary1',
                 'DisplayOptions': {
                     'Order': 4,
@@ -181,7 +196,7 @@ class TestResult(GeneralTestResult):
             {
                 'Key': 'SummaryROCs',
                 'DisplayOptions': {
-                    'Width': 4,
+                    'Width': 5,
                 }
             },
         ]
@@ -245,8 +260,21 @@ class TestResult(GeneralTestResult):
             else:
                 print 'There exist no ROOT file in "%s"' % self.RawTestSessionDataPath
 
+        # find pxar logfile of fulltest
+        logfilePath = ("%s.log"%fileHandlePath[:-5]) if len(fileHandlePath) > 4 else ''
+        if os.path.isfile(logfilePath):
+            self.logfilePath = logfilePath
+        else:
+            files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+            if len(files) == 1:
+                self.logfilePath = files[0]
+            else:
+                print "either no or multiple .log files found! some features are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
+                self.logfilePath = None
+
     def PopulateResultData(self):
-        self.FileHandle.Close()
+        if self.FileHandle:
+            self.FileHandle.Close()
 
     def GradeIV(self, i1,i2, slope, temp):
         grade = ''
@@ -359,27 +387,22 @@ class TestResult(GeneralTestResult):
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
-            'Grade': grade,
-            'PixelDefects': '{PixelDefects:d}'.format(PixelDefects=self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefects'][
-                'NumericValue']),
-            'ROCsMoreThanOnePercent':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['BadRocs']['Value'],
-            'Noise': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels'][
-                'Value'],
-            'Trimming': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['TrimProblems'][
-                'Value'],
-            'PHCalibration':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
+            'PixelDefects': None,
+            'ROCsLessThanOnePercent': None,
+            'ROCsMoreThanOnePercent': None,
+            'ROCsMoreThanFourPercent': None,
+            'Noise': None,
+            'Trimming': None,
+            'PHCalibration': None,
             'CurrentAtVoltage150V': IVCurveData['CurrentAtVoltage150V'],
             'CurrentAtVoltage100V':IVCurveData['CurrentAtVoltage100V'],
-        	'RecalculatedCurrentAtVoltage150V': IVCurveData['RecalculatedCurrentAtVoltage150V'],
+            'RecalculatedCurrentAtVoltage150V': IVCurveData['RecalculatedCurrentAtVoltage150V'],
             'RecalculatedCurrentAtVoltage100V': IVCurveData['RecalculatedCurrentAtVoltage100V'],
             'RecalculatedToTemperature': IVCurveData['RecalculatedToTemperature'],
             'IVSlope': IVCurveData['IVSlope'],
             'IVCurveFilePath':IVCurveData['IVCurveFilePath'],
-        	'TestTemperature':IVCurveData['TestTemperature'],
-            'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][
-                'Value'],
+            'TestTemperature':IVCurveData['TestTemperature'],
+            'Temperature': None,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -392,7 +415,6 @@ class TestResult(GeneralTestResult):
             #
 
             'initialCurrent': initialCurrent,
-            'Comments': '',
             'nCycles': None,
             'CycleTempLow': None,
             'CycleTempHigh': None,
@@ -400,23 +422,14 @@ class TestResult(GeneralTestResult):
             #
             # added by Tommaso
             #
-            'nMaskDefects':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['MaskDefects']['Value'],
-            'nDeadPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadPixels'][
-                'Value'],
-            'nBumpDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadBumps'][
-                'Value'],
-            'nTrimDefects':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['TrimProblems']['Value'],
-            'nNoisyPixels':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'],
-            'nGainDefPixels':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
-            'nPedDefPixels':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPedestalDefects'][
-                    'Value'],
-            'nPar1DefPixels':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPar1Defects']['Value'],
+            'nMaskDefects': None,
+            'nDeadPixels': None,
+            'nBumpDefects': None,
+            'nTrimDefects': None,
+            'nNoisyPixels': None,
+            'nGainDefPixels': None,
+            'nPedDefPixels': None,
+            'nPar1DefPixels': None,
 
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
@@ -425,57 +438,146 @@ class TestResult(GeneralTestResult):
             # added by Felix for the new Overview Table
             #
             # for A/B/C sub gradings
-            'PixelDefectsNGradeA':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeAROCs'][
-                    'Value'],
-            'PixelDefectsNGradeB':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeBROCs'][
-                    'Value'],
-            'PixelDefectsNGradeC':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeCROCs'][
-                    'Value'],
+            'PixelDefectsNGradeA': None,
+            'PixelDefectsNGradeB': None,
+            'PixelDefectsNGradeC': None,
 
-            'NoiseNGradeA':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeAROCs'][
-                    'Value'],
-            'NoiseNGradeB':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeBROCs'][
-                    'Value'],
-            'NoiseNGradeC':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeCROCs'][
-                    'Value'],
+            'NoiseNGradeA': None,
+            'NoiseNGradeB': None,
+            'NoiseNGradeC': None,
 
-            'VcalWidthNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'VcalThresholdWidthGradeAROCs']['Value'],
-            'VcalWidthNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'VcalThresholdWidthGradeBROCs']['Value'],
-            'VcalWidthNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'VcalThresholdWidthGradeCROCs']['Value'],
+            'VcalWidthNGradeA': None,
+            'VcalWidthNGradeB': None,
+            'VcalWidthNGradeC': None,
 
-            'GainNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'RelativeGainWidthGradeAROCs']['Value'],
-            'GainNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'RelativeGainWidthGradeBROCs']['Value'],
-            'GainNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'RelativeGainWidthGradeCROCs']['Value'],
+            'GainNGradeA': None,
+            'GainNGradeB': None,
+            'GainNGradeC': None,
 
-            'PedSpreadNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'PedestalSpreadGradeAROCs']['Value'],
-            'PedSpreadNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'PedestalSpreadGradeBROCs']['Value'],
-            'PedSpreadNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
-                'PedestalSpreadGradeCROCs']['Value'],
+            'PedSpreadNGradeA': None,
+            'PedSpreadNGradeB': None,
+            'PedSpreadNGradeC': None,
 
-            'Par1NGradeA':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeAROCs'][
-                    'Value'],
-            'Par1NGradeB':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeBROCs'][
-                    'Value'],
-            'Par1NGradeC':
-                self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeCROCs'][
-                    'Value'],
+            'Par1NGradeA': None,
+            'Par1NGradeB': None,
+            'Par1NGradeC': None,
         }
+
+        SubtestMissing = False
+        if self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData'].has_key('MissingSubtests'):
+            SubtestMissing = (int(self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MissingSubtests']['Value']) > 0)
+        Comment = ''
+
+        # pixel defects and performance parameters
+        try:
+            Row.update({
+                'PixelDefects': '{PixelDefects:d}'.format(PixelDefects=self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefects'][
+                    'NumericValue']),
+                'ROCsLessThanOnePercent':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsRocsA']['Value'],
+                'ROCsMoreThanOnePercent':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsRocsB']['Value'],
+                'ROCsMoreThanFourPercent':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsRocsC']['Value'],
+                'Noise': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels'][
+                    'Value'],
+                'Trimming': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['TrimProblems'][
+                    'Value'],
+                'PHCalibration':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
+                #
+                # added by Tommaso
+                #
+                'nMaskDefects':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['MaskDefects']['Value'],
+                'nDeadPixels': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadPixels'][
+                    'Value'],
+                'nBumpDefects': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['DeadBumps'][
+                    'Value'],
+                'nTrimDefects':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['TrimProblems']['Value'],
+                'nNoisyPixels':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'],
+                'nGainDefPixels':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHGainDefects']['Value'],
+                'nPedDefPixels':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPedestalDefects'][
+                        'Value'],
+                'nPar1DefPixels':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PHPar1Defects']['Value'],
+                #
+                # added by Felix for the new Overview Table
+                #
+                # for A/B/C sub gradings
+                'PixelDefectsNGradeA':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeAROCs'][
+                        'Value'],
+                'PixelDefectsNGradeB':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeBROCs'][
+                        'Value'],
+                'PixelDefectsNGradeC':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefectsGradeCROCs'][
+                        'Value'],
+
+                'NoiseNGradeA':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeAROCs'][
+                        'Value'],
+                'NoiseNGradeB':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeBROCs'][
+                        'Value'],
+                'NoiseNGradeC':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['NoiseGradeCROCs'][
+                        'Value'],
+
+                'VcalWidthNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'VcalThresholdWidthGradeAROCs']['Value'],
+                'VcalWidthNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'VcalThresholdWidthGradeBROCs']['Value'],
+                'VcalWidthNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'VcalThresholdWidthGradeCROCs']['Value'],
+
+                'GainNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'RelativeGainWidthGradeAROCs']['Value'],
+                'GainNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'RelativeGainWidthGradeBROCs']['Value'],
+                'GainNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'RelativeGainWidthGradeCROCs']['Value'],
+
+                'PedSpreadNGradeA': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'PedestalSpreadGradeAROCs']['Value'],
+                'PedSpreadNGradeB': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'PedestalSpreadGradeBROCs']['Value'],
+                'PedSpreadNGradeC': self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs'][
+                    'PedestalSpreadGradeCROCs']['Value'],
+
+                'Par1NGradeA':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeAROCs'][
+                        'Value'],
+                'Par1NGradeB':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeBROCs'][
+                        'Value'],
+                'Par1NGradeC':
+                    self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['Parameter1GradeCROCs'][
+                        'Value'],
+                'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][
+                    'Value']
+                })
+        except:
+            warnings.warn("Fulltest is incomplete! Module will be graded C")
+            SubtestMissing = True
+
+        # check if any data is missing
+        if SubtestMissing:
+            grade = 'C'
+            Comment += 'Fulltest incomplete, graded C'
+
+        # fill final grade and comments
+        Comment = Comment.strip().strip('/')
+        Row.update({
+            'Grade': grade,
+            'Comments': Comment,
+            })
+
         print 'fill row end'
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             from PixelDB import *
@@ -511,7 +613,7 @@ class TestResult(GeneralTestResult):
 #
 #
             print "IVCURVEDATA ", IVCurveData
-            if IVCurveData['CurrentAtVoltage150V'] != -1 :
+            if IVCurveData['CurrentAtVoltage150V'] != -1 and IVCurveData['IVCurveFilePath'] != ""  :
                 # extract Sensor name
               module = pdb.getFullModule(Row['ModuleID'])
               if module is None:
@@ -686,7 +788,9 @@ class TestResult(GeneralTestResult):
                         QualificationType,
                         Grade,
                         PixelDefects,
+                        ROCsLessThanOnePercent,
                         ROCsMoreThanOnePercent,
+                        ROCsMoreThanFourPercent,
                         Noise,
                         Trimming,
                         PHCalibration,
@@ -709,7 +813,9 @@ class TestResult(GeneralTestResult):
                         :QualificationType,
                         :Grade,
                         :PixelDefects,
+                        :ROCsLessThanOnePercent,
                         :ROCsMoreThanOnePercent,
+                        :ROCsMoreThanFourPercent,
                         :Noise,
                         :Trimming,
                         :PHCalibration,

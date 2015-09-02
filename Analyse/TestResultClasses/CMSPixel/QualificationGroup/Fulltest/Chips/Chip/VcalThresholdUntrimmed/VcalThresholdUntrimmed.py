@@ -12,10 +12,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
 
-        ROOT.gPad.SetLogy(0);
+        ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
 
         self.ResultData['Plot']['ROOTObject'] =  self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['Plot']['ROOTObject_ht'].Clone(self.GetUniqueID())
+
         #self.ResultData['Plot']['ROOTObject_ht'] = self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['Plot']['ROOTObject_ht'];
         #
         # #mG
@@ -60,16 +61,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #
 
         if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['htmin'], self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['htmax']);
-            self.ResultData['Plot']['ROOTObject'].SetAxisRange(0, 100);
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw('colz');
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['htmin'], self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['htmax'])
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
 
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Vcal Threshold Untrimmed'
-        
+        self.SaveCanvas()        

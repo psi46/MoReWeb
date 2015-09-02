@@ -92,7 +92,7 @@ class TestResult(GeneralTestResult):
             graph.GetYaxis().SetTitleOffset(1.5)
             graph.GetYaxis().CenterTitle()
             graph.Draw("APL")
-            print self.ParentObject.Attributes['TestTemperature']
+            #print self.ParentObject.Attributes['TestTemperature']
             setPoint = \
                 self.ParentObject.Attributes['TestTemperature']
 
@@ -131,10 +131,10 @@ class TestResult(GeneralTestResult):
 
             # tuple.Draw("time:temp","","APL")
             # get
-        print 'Analysed "%s"' % fileName
-        print 'Temp: %2.2f +/- %2.2f °C, Min: %2.2f, Max %2.2f' % (temp, tempError, tempMin, tempMax)
-        print 'duration: %s - %s, %s, %s' % (
-            str(datetime.timedelta(seconds=duration)), timeMax - timeMin, timeMax, timeMin)
+        #print 'Analysed "%s"' % fileName
+        #print 'Temp: %2.2f +/- %2.2f °C, Min: %2.2f, Max %2.2f' % (temp, tempError, tempMin, tempMax)
+        #print 'duration: %s - %s, %s, %s' % (
+        #    str(datetime.timedelta(seconds=duration)), timeMax - timeMin, timeMax, timeMin)
         return duration, temp, tempError, tempMin, tempMax
 
     def createTemperaturePlot(self):
@@ -260,6 +260,5 @@ class TestResult(GeneralTestResult):
         }
         self.ResultData['KeyList'] = ['Temperature', 'Duration']
         self.createTemperaturePlot()
-        self.SaveCanvas()
         self.ResultData['Plot']['Caption'] = 'Temperature'
-        
+        self.SaveCanvas()        

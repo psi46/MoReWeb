@@ -9,6 +9,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['SpecialPopulateDataParameters'] = {
                 'Key':'RelativeGainWidth',
                 'DataKey':'PHCalibrationGain', # which sub test result to take the data from
+                'DefectsKey': 'NGainDefects',
                 'DataParameterKey':'mu', # which part of key value dict pairs
                 'CalcFunction':lambda Value, KeyValueDictPairs: float(KeyValueDictPairs['sigma']['Value']) / float(KeyValueDictPairs['mu']['Value']) if float(KeyValueDictPairs['mu']['Value'])>0 else 0,
                 'YLimitB':self.TestResultEnvironmentObject.GradingParameters['gainB'],# limit for grading

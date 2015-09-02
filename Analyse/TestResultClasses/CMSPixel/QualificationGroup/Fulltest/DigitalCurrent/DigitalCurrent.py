@@ -16,10 +16,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gStyle.SetOptStat(0)
         try:
             histname = self.ParentObject.HistoDict.get(self.NameSingle, 'DigitalCurrent')
-            print histname
-            object = HistoGetter.get_histo(self.ParentObject.FileHandle, histname)
-            print object
-            self.ResultData['Plot']['ROOTHisto'] = object
+            self.ResultData['Plot']['ROOTHisto'] = HistoGetter.get_histo(self.ParentObject.FileHandle, histname)
         except Exception as e:
             print e
             raise e
@@ -33,14 +30,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             currents = []
             title = ROOTObject.GetTitle()
             seconds = float(title.split(':')[-1])
-            print title,seconds
+            #print title,seconds
             seconds = 0
             # raw_input()
             for bin in range(1,ROOTObject.GetNbinsX()+1):
                 if ROOTObject.GetBinContent(bin)>0:
                     times.append(ROOTObject.GetXaxis().GetBinCenter(bin)+seconds)
                     currents.append(ROOTObject.GetBinContent(bin))
-                    print bin,times[-1],currents[-1]
+                    #print bin,times[-1],currents[-1]
             times = array.array('d',times)
             currents = array.array('d',currents)
             graph = ROOT.TGraph(len(times),times,currents)
@@ -57,7 +54,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             graph.GetYaxis().SetRangeUser(0,graph.GetYaxis().GetXmax()*1.1)
 
             delta = datetime.timedelta(seconds = max(times)-min(times))
-            print str(delta)
+            #print str(delta)
             TestResultObject.ResultData['KeyValueDictPairs'] = {
                 'Duration': {
                     'Value': '{0}'.format(str(delta)),
@@ -75,6 +72,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Unit': 'A'
                 }
             }
+            TestResultObject.ResultData['HiddenData'] = {
+                'Duration': {
+                    'Value': "%d"%(max(times)-min(times)),
+                    'Unit': 'seconds',
+                    'Label': 'Fulltest duration',
+                }
+            }
             TestResultObject.ResultData['KeyList'] = ['Duration','MinCurrent','MaxCurrent']
             TestResultObject.ResultData['Plot']['ROOTGraph'] = graph
 
@@ -89,8 +93,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 TestResultObject.ResultData['Plot']['ROOTObject'] = TestResultObject.ResultData['Plot']['ROOTGraph']
             TestResultObject.ResultData['Plot']['Enabled'] = 1
             TestResultObject.ResultData['Plot']['ImageFile'] = TestResultObject.GetPlotFileName()
-            print TestResultObject.GetPlotFileName()
-            TestResultObject.Title = 'Digital Current'
+            #print TestResultObject.GetPlotFileName()
+            TestResultObject.Title = Parameters['name'] if Parameters.has_key('name') else 'Digital Current'
             TestResultObject.SaveCanvas()
 
         except Exception as e:
