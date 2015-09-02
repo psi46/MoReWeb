@@ -47,7 +47,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             for line in logfile:
                 ErrorObject = {}
 
-                if 'WARNING:' in line:
+                if 'WARNING:' in line and not 'Not unmasking DUT' in line:
                     ErrorObject['type'] = 'warning'
                 if 'ERROR:' in line:
                     ErrorObject['type'] = 'error'
