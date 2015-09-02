@@ -29,7 +29,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
       for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
         TableHeader.append('Thr [e-] "{Rate}"'.format(Rate=Rate))
         TableHeader.append('Noise "{Rate}"'.format(Rate=Rate))
-        TableHeader.append('Noisy pix'`)
+        TableHeader.append('Noisy pix')
 
       self.ResultData['Table'] = {
          'HEADER': [TableHeader],
