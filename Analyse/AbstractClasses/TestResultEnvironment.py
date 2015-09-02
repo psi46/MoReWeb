@@ -36,8 +36,6 @@ class TestResultEnvironment:
         'trmDistribution':1.0,
         'gainB': 0.1,
         'gainC': 0.2,
-        'pixelAbsoluteGainMax': 4.5,
-        'pixelAbsoluteGainMin': 1,
         'gainDistribution': 1.0,
         'pedestalB':2500,
         'pedestalC':5000,

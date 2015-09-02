@@ -74,7 +74,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         self.ResultData['Plot']['ROOTObject_hGain'].Fill(gain)
                         self.ResultData['Plot']['ROOTObject_hGainMap'].SetBinContent(col + 1, row + 1, gain)
                         self.ResultData['Plot']['ROOTObject_hPedestalMap'].SetBinContent(col + 1, row + 1, pedestal)
-                        if gain > self.TestResultEnvironmentObject.GradingParameters['pixelAbsoluteGainMax'] or gain < self.TestResultEnvironmentObject.GradingParameters['pixelAbsoluteGainMin']:
+                        if gain > self.TestResultEnvironmentObject.GradingParameters['gainMax'] or gain < self.TestResultEnvironmentObject.GradingParameters['gainMin']:
                             self.GainDefectsList.add((chip, col, row))
 
                 except (ValueError, TypeError, IndexError):
@@ -169,6 +169,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if over:
                 self.ResultData['KeyValueDictPairs']['over'] = {'Value': '{0:1.2f}'.format(over), 'Label': '>='}
                 self.ResultData['KeyList'].append('over')
+
+            self.ResultData['Plot']['ROOTObject_LowEdge'] = ROOT.TCutG('lLower', 2)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['gainMin'], -1e6)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['gainMin'], +1e6)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].SetLineColor(ROOT.kRed)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].SetLineStyle(2)
+            self.ResultData['Plot']['ROOTObject_LowEdge'].Draw('same')
+
+            self.ResultData['Plot']['ROOTObject_UpEdge'] = ROOT.TCutG('lUpper', 2)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['gainMax'], -1e6)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['gainMax'], +1e6)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].SetLineColor(ROOT.kRed)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].SetLineStyle(2)
+            self.ResultData['Plot']['ROOTObject_UpEdge'].Draw('same')
 
             self.SaveCanvas()
             self.ResultData['Plot']['Caption'] = 'PH Calibration: Gain (Vcal/ADC)'

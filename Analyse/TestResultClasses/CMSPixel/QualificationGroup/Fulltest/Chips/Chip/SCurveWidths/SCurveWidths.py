@@ -162,4 +162,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyList'].append('NNoiseDefects')
 
         self.ResultData['Plot']['Caption'] = 'S-Curve widths: Noise (e^{-})'
+
+        self.ResultData['Plot']['ROOTObject_LowEdge'] = ROOT.TCutG('lLower', 2)
+        self.ResultData['Plot']['ROOTObject_LowEdge'].SetPoint(0, NoiseMin, -1e6)
+        self.ResultData['Plot']['ROOTObject_LowEdge'].SetPoint(1, NoiseMin, +1e6)
+        self.ResultData['Plot']['ROOTObject_LowEdge'].SetLineColor(ROOT.kRed)
+        self.ResultData['Plot']['ROOTObject_LowEdge'].SetLineStyle(2)
+        self.ResultData['Plot']['ROOTObject_LowEdge'].Draw('same')
+
+        self.ResultData['Plot']['ROOTObject_UpEdge'] = ROOT.TCutG('lUpper', 2)
+        self.ResultData['Plot']['ROOTObject_UpEdge'].SetPoint(0, NoiseMax, -1e6)
+        self.ResultData['Plot']['ROOTObject_UpEdge'].SetPoint(1, NoiseMax, +1e6)
+        self.ResultData['Plot']['ROOTObject_UpEdge'].SetLineColor(ROOT.kRed)
+        self.ResultData['Plot']['ROOTObject_UpEdge'].SetLineStyle(2)
+        self.ResultData['Plot']['ROOTObject_UpEdge'].Draw('same')
+
         self.SaveCanvas()        
