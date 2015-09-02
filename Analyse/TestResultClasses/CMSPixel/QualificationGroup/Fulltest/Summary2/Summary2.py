@@ -34,6 +34,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             pass
 
+        try:
+            TestDuration = self.ParentObject.ResultData['SubTestResults']['DigitalCurrent'].ResultData['KeyValueDictPairs']['Duration']['Value']
+        except:
+            try:
+                TestDuration = self.ParentObject.ResultData['SubTestResults']['AnalogCurrent'].ResultData['KeyValueDictPairs']['Duration']['Value']
+            except:
+                TestDuration = ''
+
         self.ResultData['KeyValueDictPairs'] = {
             'TestDate': {
                 'Value':test_date,
@@ -42,6 +50,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'TestTime': {
                 'Value':datetime.datetime.fromtimestamp(float(self.Attributes['TestDate'])).strftime("%H:%m"), 
                 'Label':'Test Time'
+            },
+            'TestDuration': {
+                'Value': TestDuration,
+                'Label':'Test Duration'
             },
             'TempC': {
                 'Value':'{0:1.0f}'.format(self.ParentObject.Attributes['TestTemperature']),
@@ -67,5 +79,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         }
         
-        self.ResultData['KeyList'] = ['TestDate','TestTime','TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
+        self.ResultData['KeyList'] = ['TestDate','TestTime', 'TestDuration', 'TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
 

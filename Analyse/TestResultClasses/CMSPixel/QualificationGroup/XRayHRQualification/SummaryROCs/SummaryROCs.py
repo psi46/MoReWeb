@@ -105,7 +105,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
           TableRow.append("{Value:1.0f}".format(Value=NonUniformColumns))
 
         for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
-          Threshold = self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor'] * float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['threshold']['Value'])
+          Threshold = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['threshold']['Value'])
           TableRow.append("{Value:1.0f}".format(Value=Threshold))
           Noise = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['mu']['Value'])
           if Noise >= self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:

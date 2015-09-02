@@ -72,6 +72,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Unit': 'A'
                 }
             }
+            TestResultObject.ResultData['HiddenData'] = {
+                'Duration': {
+                    'Value': "%d"%(max(times)-min(times)),
+                    'Unit': 'seconds',
+                    'Label': 'Fulltest duration',
+                }
+            }
             TestResultObject.ResultData['KeyList'] = ['Duration','MinCurrent','MaxCurrent']
             TestResultObject.ResultData['Plot']['ROOTGraph'] = graph
 
