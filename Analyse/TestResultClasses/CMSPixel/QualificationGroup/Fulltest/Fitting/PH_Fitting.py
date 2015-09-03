@@ -29,7 +29,7 @@ class PH_Fitting():
             LimitProcesses = 1
         self.LimitProcesses = LimitProcesses
         print "  parallel processing ".ljust(30), self.ParallelProcessing
-        if LimitProcesses:
+        if self.ParallelProcessing and LimitProcesses:
             print "  max number of subprocesses: ".ljust(30), self.LimitProcesses
 
         self.InitFit()

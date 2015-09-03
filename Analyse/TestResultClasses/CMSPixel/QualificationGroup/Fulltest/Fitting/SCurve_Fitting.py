@@ -28,7 +28,7 @@ class SCurve_Fitting():
         self.ePerVcal = ePerVcal
         self.slope = self.getVcal(0,255)/256
         print "  parallel processing: ".ljust(30), self.ParallelProcessing
-        if LimitProcesses:
+        if self.ParallelProcessing and LimitProcesses:
             print "  max number of subprocesses: ".ljust(30), self.LimitProcesses
         print "  ePerVcal: ".ljust(30),self.ePerVcal
         print "  slope: ".ljust(30),self.slope, " V/Vcal"
@@ -167,7 +167,6 @@ class SCurve_Fitting():
 #                     raw_input('Mode: %d' % self.mode)
             if 'ntrig' in i.lower():
                 index = header.index(i)
-                print index, len(header), index + 1,
                 if len(header) > index + 1:
                     self.nReadouts = int(header[index + 1])
 #                     raw_input('Ntrig: %d' % self.nReadouts)
@@ -187,8 +186,10 @@ class SCurve_Fitting():
                     badPixels.append((chip,col,row))
                     if self.verbose:
                         print 'problem with chip %s, col %s, row %s'%(chip,col,row)
-        print 'Problem with %s / %s Pixels: '%(len(badPixels),self.nRows*self.nCols)
-        print badPixels
+        nBadPixels = len(badPixels)
+        if nBadPixels>0:
+            print 'ROC%d: problem with %s / %s Pixels: '%(chip, nBadPixels,self.nRows*self.nCols)
+            print badPixels
         inputFile.close()
         outputFile.close()
         if q: q.put([chi2,[]])
@@ -200,7 +201,7 @@ class SCurve_Fitting():
             print 'fit Scurve data ROC %d %2d/%2d' % (chip, row, col)
         isValid, calibrationPoints = self.extractSCurveData(data)
         if not isValid and not self.HistoDict.has_option('SCurveFitting','ignoreValidityCheck'):
-            print '\tnot Valid'
+            #print '\tnot Valid'
             return [[-3,chip,row,col],[]]
         graph = self.GetGraph(calibrationPoints)
 
