@@ -308,16 +308,24 @@ class PH_Fitting():
         phFitClone.SetParameter(1, 1.4)
         phFitClone.SetParameter(2, 1000)
         phFitClone.SetParameter(3, 0)
-        print repr(x)
+
+        # find first point with >0 PH
         if len(x)>0:
-            phFitClone.SetRange(min(x), max(x))
+            MinPoint = 0
+            MaxPoint = len(self.vcalLow)-1  #include last point
+            for i in range(0, len(x)):
+                if x[i]>0:
+                    MinPoint = i
+                    break
+            MinVcal = self.vcalLow[MinPoint]
+            MaxVcal = self.vcalLow[MaxPoint]
+
+            phFitClone.SetRange(MinVcal, MaxVcal)
 
         if self.verbose:
             graph.Fit(phFitClone, "R", "")
         else:
             graph.Fit(phFitClone, "RQ")
-
-#         for (int i = 0; i < nFitParams; i++) {histoFit[i]->Fill(phFitClone.GetParameter(i))}
 
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
         try:
@@ -334,16 +342,32 @@ class PH_Fitting():
         n,x,y,ex,ey = self.getArrayOfCalibrationPoints(calibration)
         graph = self.GetGraph([n,x,y,ex,ey])
         phFitClone = self.phFit
-        phFitClone.SetRange(self.vcalLow[0], self.vcalLow[-2])
 
-        #What is the reason?
-        upperPoint = self.vcalSteps + 2 - 1;
-        lowerPoint = self.vcalSteps / 3 - 1;
+        # find first point with >0 PH and last point with <255 PH
+        MinPoint = 0
+        MinPointFound = False
+        MaxPoint = len(self.vcalLow)-2
+        for i in range(0, len(y)):
+            if not MinPointFound and x[i]>0:
+                MinPoint = i
+                MinPointFound = True
+            if x[i]>254:
+                MaxPoint = i-1
+                break
 
-        if (upperPoint in range (0,n) ) and (lowerPoint in range(0,n) ) and ((x[upperPoint] - x[lowerPoint]) != 0):
-            slope = (y[upperPoint] - y[lowerPoint]) / (x[upperPoint] - x[lowerPoint])
+        MinVcal = self.vcalLow[MinPoint]
+        MaxVcal = self.vcalLow[MaxPoint]
+
+        phFitClone.SetRange(MinVcal, MaxVcal)
+
+        # set start parameters for fit
+        upperPoint = MaxPoint
+        lowerPoint = MinPoint
+
+        if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((y[upperPoint] - y[lowerPoint]) != 0):
+            slope = float(x[upperPoint] - x[lowerPoint]) / (y[upperPoint] - y[lowerPoint]) #really!
         else:
-            slope = 0.5;
+            slope = 0.5
 
         phFitClone.SetParameter(2, slope)
         phFitClone.SetParameter(3, y[upperPoint] - slope * x[upperPoint])
@@ -374,21 +398,42 @@ class PH_Fitting():
         return retVal
 
     def FitLin(self,calibration):
+        # x: PHs
+        # y: VCALs
+        # todo: change it
         n,x,y,ex,ey = self.getArrayOfCalibrationPoints(calibration)
         graph = self.GetGraph([n,x,y,ex,ey])
 
         phFitClone = self.phFit
-        phFitClone.SetRange(self.vcalLow[0], self.vcalLow[-2])
 
-        upperPoint = self.vcalSteps + 2 - 1;
-        lowerPoint = self.vcalSteps / 3 - 1;
+        # find first point with >0 PH and last point with <255 PH
+        MinPoint = 0
+        MinPointFound = False
+        MaxPoint = len(self.vcalLow)-2
+        for i in range(0, len(y)):
+            if not MinPointFound and x[i]>0:
+                MinPoint = i
+                MinPointFound = True
+            if x[i]>254:
+                MaxPoint = i-1
+                break
 
-        if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((x[upperPoint] - x[lowerPoint]) != 0):
-            slope = (y[upperPoint] - y[lowerPoint]) / (x[upperPoint] - x[lowerPoint])
+        MinVcal = self.vcalLow[MinPoint]
+        MaxVcal = self.vcalLow[MaxPoint]
+
+        phFitClone.SetRange(MinVcal, MaxVcal)
+
+        # set start parameters for fit
+        upperPoint = MaxPoint
+        lowerPoint = MinPoint
+
+        if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((y[upperPoint] - y[lowerPoint]) != 0):
+            slope = float(x[upperPoint] - x[lowerPoint]) / (y[upperPoint] - y[lowerPoint]) #really!
         else:
-            slope = 0.5;
+            slope = 0.5
 
         phFitClone.SetParameter(2, slope)
+
         try:
             phFitClone.SetParameter(3, y[upperPoint] - slope * x[upperPoint])
         except:
