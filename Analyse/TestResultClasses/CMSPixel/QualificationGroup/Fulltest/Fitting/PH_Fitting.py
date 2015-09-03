@@ -308,6 +308,7 @@ class PH_Fitting():
         phFitClone.SetParameter(1, 1.4)
         phFitClone.SetParameter(2, 1000)
         phFitClone.SetParameter(3, 0)
+        print repr(x)
         if len(x)>0:
             phFitClone.SetRange(min(x), max(x))
 
