@@ -16,7 +16,7 @@ class PH_Fitting():
     vcalSteps = 5
     rangeConversion = 7
 
-    def __init__(self,fitMode,refit=True,HistoDict = None, ParallelProcessing = False):
+    def __init__(self,fitMode,refit=True,HistoDict = None, ParallelProcessing = False, LimitProcesses = None):
         self.k = 0
         # ROOT.gStyle
         self.verbose = False
@@ -25,7 +25,12 @@ class PH_Fitting():
         self.DrawHistos = False
         self.HistoDict = HistoDict
         self.ParallelProcessing = ParallelProcessing
-        print "parallel processing ", self.ParallelProcessing
+        if LimitProcesses and LimitProcesses < 1:
+            LimitProcesses = 1
+        self.LimitProcesses = LimitProcesses
+        print "  parallel processing ".ljust(30), self.ParallelProcessing
+        if LimitProcesses:
+            print "  max number of subprocesses: ".ljust(30), self.LimitProcesses
 
         self.InitFit()
         self.InitResultHistos()
@@ -60,26 +65,26 @@ class PH_Fitting():
     def SaveResultHistos(self):
         if not self.DrawHistos:
             return
-        self.c1 = ROOT.TCanvas();
-        self.c1.Divide(3, 2);
+        self.c1 = ROOT.TCanvas()
+        self.c1.Divide(3, 2)
 
-        self.c1.cd(1);
-        self.histoFits[0].Draw();
+        self.c1.cd(1)
+        self.histoFits[0].Draw()
 
-        self.c1.cd(2);
-        self.histoFits[1].Draw();
+        self.c1.cd(2)
+        self.histoFits[1].Draw()
 
-        self.c1.cd(3);
-        self.histoFits[2].Draw();
+        self.c1.cd(3)
+        self.histoFits[2].Draw()
 
-        self.c1.cd(4);
-        self.histoFits[3].Draw();
+        self.c1.cd(4)
+        self.histoFits[3].Draw()
 
-        self.c1.cd(5);
-        self.histoFits[4].Draw();
+        self.c1.cd(5)
+        self.histoFits[4].Draw()
 
-        self.c1.cd(6);
-        self.histoChi.Draw();
+        self.c1.cd(6)
+        self.histoChi.Draw()
 
     def FillResultHistos(self,results):
 
@@ -98,10 +103,6 @@ class PH_Fitting():
             self.histoFits[i].Add(histos[1][i])
 
     def FitAllPHCurves(self, dir, nRocs):
-#         FILE * inputFile, *outputFile;
-#     char fname[1000], string[500];
-#     int ph[2 * vcalSteps], a, b, maxRoc, maxCol, maxRow;
-#     double chiSquare, maxChiSquare = 0.;
 
         print "Fitting PH Curves %s"%dir
         maxChi2 = [-1]*4
@@ -110,19 +111,29 @@ class PH_Fitting():
         if self.ParallelProcessing:
             Processes = []
             q = Queue()
-            # start 16 processes
-            for chip in range(0,nRocs):
-                p = Process(target=self.FitPHCurve, args=(dir, chip, q,))
-                p.start()
-                Processes.append(p)
 
-            # read back data
-            for chip in range(0,nRocs):
-                results.append(q.get())
+            if self.LimitProcesses:
+                FullRocRange = range(0,nRocs)
+                RocRanges = [FullRocRange[x:x+self.LimitProcesses] for x in xrange(0, len(FullRocRange), self.LimitProcesses)]
+                pass
+            else:
+                RocRanges = [range(0,nRocs)]
 
-            # wait for all to finish
-            for chip in range(0,nRocs):
-                Processes[chip].join()
+            for RocRange in RocRanges:
+                # start n processes
+                for chip in RocRange:
+                    p = Process(target=self.FitPHCurve, args=(dir, chip, q,))
+                    p.start()
+                    Processes.append(p)
+
+                # read back data
+                for chip in RocRange:
+                    results.append(q.get())
+
+                # wait for all to finish
+                for chip in RocRange:
+                    Processes[chip].join()
+
         else:
             # use old way for compatibility
             threads = []
