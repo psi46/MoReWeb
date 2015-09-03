@@ -95,20 +95,29 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     i['InitialAttributes']['TestCenter']
 
     def analyseTestIniFile(self):
-        absPath = self.TestResultEnvironmentObject.ModuleDataDirectory + '/configfiles'
-        if not os.path.isdir(absPath):
-            raise Exception('dir for Tests.ini / elComandante.ini: %s does not exist' % absPath)
-            pass
-        self.initParser = AbstractClasses.Helper.BetterConfigParser.BetterConfigParser()
-        fileName = absPath + '/elComandante.ini'
-        fileName2 = absPath + '/Tests.ini'
-        if os.path.isfile(fileName):
-            self.initParser.read(fileName)
-        elif os.path.isfile(fileName2):
-            self.initParser.read(fileName2)
-        else:
-            raise Exception("file %s doesn't exist, cannot extract Tests from ini file" % fileName)
-
+        try:
+            absPath = self.TestResultEnvironmentObject.ModuleDataDirectory + '/configfiles'
+            if not os.path.isdir(absPath):
+                raise Exception('dir for Tests.ini / elComandante.ini: %s does not exist' % absPath)
+                pass
+            self.initParser = AbstractClasses.Helper.BetterConfigParser.BetterConfigParser()
+            fileName = absPath + '/elComandante.ini'
+            fileName2 = absPath + '/Tests.ini'
+            if os.path.isfile(fileName):
+                self.initParser.read(fileName)
+            elif os.path.isfile(fileName2):
+                self.initParser.read(fileName2)
+            else:
+                raise Exception("file %s doesn't exist, cannot extract Tests from ini file" % fileName)
+        except Exception as inst:
+            self.TestResultEnvironmentObject.ErrorList.append(
+               {'ModulePath': self.TestResultEnvironmentObject.ModuleDataDirectory,
+                'ErrorCode': inst,
+                'FinalResultsStoragePath':'unkown'
+                }
+            )
+            print "\x1b[31mProblems in directory structure detected, skip qualification directory! %s\x1b[0m"%self.TestResultEnvironmentObject.ModuleDataDirectory
+            return []
         return self.extractTests()
 
 
