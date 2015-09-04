@@ -47,7 +47,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         gaus.SetParLimits(1, 0., 2.*self.ResultData['Plot']['ROOTObject'].GetMean())
         gaus.SetParLimits(2, 0., 2.*self.ResultData['Plot']['ROOTObject'].GetRMS())
         #mG
-        self.ResultData['Plot']['ROOTObject'].Fit(gaus, 'QBR', '', 0., 255.)
+        #switching to gaussian fit so that width is not driven by outliers (counted separately as pixel defects)
+        self.ResultData['Plot']['ROOTObject'].Fit(gaus, 'QBR', '', 0., 255.
         #MeanVcalThr = self.ResultData['Plot']['ROOTObject'].GetMean()
         MeanVcalThr = gaus.GetParameter(1)
         #sG
