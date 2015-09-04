@@ -39,10 +39,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(bin_min-1,bin_max+1)
 
         self.ResultData['Plot']['ROOTObject_Map'] = ThresholdMap.Clone(self.GetUniqueID())
+        gaus = ROOT.TF1('gaus', 'gaus(0)', 0, 255)
+        gaus.SetParameters(1600., 
+                           self.ResultData['Plot']['ROOTObject'].GetMean(),
+                           self.ResultData['Plot']['ROOTObject'].GetRMS())
+        gaus.SetParLimits(0, 0., 4160.)
+        gaus.SetParLimits(1, 0., 2.*self.ResultData['Plot']['ROOTObject'].GetMean())
+        gaus.SetParLimits(2, 0., 2.*self.ResultData['Plot']['ROOTObject'].GetRMS())
         #mG
-        MeanVcalThr = self.ResultData['Plot']['ROOTObject'].GetMean()
+        #switching to gaussian fit so that width is not driven by outliers (counted separately as pixel defects)
+        self.ResultData['Plot']['ROOTObject'].Fit(gaus, 'QBR', '', 0., 255.)
+        #MeanVcalThr = self.ResultData['Plot']['ROOTObject'].GetMean()
+        MeanVcalThr = gaus.GetParameter(1)
         #sG
-        RMSVcalThr = self.ResultData['Plot']['ROOTObject'].GetRMS()
+        #RMSVcalThr = self.ResultData['Plot']['ROOTObject'].GetRMS()
+        RMSVcalThr = gaus.GetParameter(2)
         #nG
         first = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst()
         last = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()
