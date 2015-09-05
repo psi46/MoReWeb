@@ -62,7 +62,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     TestResultObject.Attributes['SpecialPopulateDataParameters'], 1)
                 SubGrading.append('%d' % ChipGrade)
 
-                self.ResultData['HiddenData']['SubGrading_%s_C%d'%(i, j['TestResultObject'].Attributes["ChipNo"])] = {'Label': 'Subgrade', 'Value': ChipGrade}
+                ChipGradeMean = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
+                    TestResultObject.Attributes['SpecialPopulateDataParameters'], 1, False)
+                self.ResultData['HiddenData']['SubGrading_%s_Mean_C%d'%(i, j['TestResultObject'].Attributes["ChipNo"])] = {'Label': 'Subgrade', 'Value': ChipGradeMean}
 
                 ModuleGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
                     TestResultObject.Attributes['SpecialPopulateDataParameters'], ModuleGrade)

@@ -144,7 +144,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label': 'PHCalibrationPedestal σ',
             },
             'RelativeGainWidth':{
-                'Value': '{0:1.2f}'.format(float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['sigma']['Value']) / float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['mu']['Value']) if float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['mu']['Value']) > 0 else 0),
+                'Value': '{0:1.3f}'.format(float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['sigma']['Value']) / float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['mu']['Value']) if float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['mu']['Value']) > 0 else 0),
                 'Label': 'RelativeGainWidth',
             },
             'TrimBits_mu':{

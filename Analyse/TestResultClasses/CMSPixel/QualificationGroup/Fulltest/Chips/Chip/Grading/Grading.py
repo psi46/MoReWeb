@@ -26,7 +26,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['TotalList'] = set()
         self.isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
 
-    def GetSingleChipSubtestGrade(self, SpecialPopulateDataParameters, CurrentGrade):
+    def GetSingleChipSubtestGrade(self, SpecialPopulateDataParameters, CurrentGrade, IncludeDefects = True):
         Value = float(self.ParentObject.ResultData['SubTestResults'][SpecialPopulateDataParameters['DataKey']].ResultData['KeyValueDictPairs'][SpecialPopulateDataParameters['DataParameterKey']]['Value'])
 
         nDefects = 0
@@ -47,11 +47,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if Value > SpecialPopulateDataParameters['YLimitC']:
             ChipGrade = 3
 
-        # number of pixel defects based grading
-        if ChipGrade == 1 and nDefects >= self.TestResultEnvironmentObject.GradingParameters['defectsB']:
-            ChipGrade = 2
-        if nDefects >= self.TestResultEnvironmentObject.GradingParameters['defectsC']:
-            ChipGrade = 3
+        if IncludeDefects:
+            # number of pixel defects based grading
+            if ChipGrade == 1 and nDefects >= self.TestResultEnvironmentObject.GradingParameters['defectsB']:
+                ChipGrade = 2
+            if nDefects >= self.TestResultEnvironmentObject.GradingParameters['defectsC']:
+                ChipGrade = 3
 
         return ChipGrade
 
@@ -121,7 +122,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             pass
 
-        print '\nChip %d Grade %s'%(self.chipNo, Grade)
+        print '\nChip %d Pixel Defects Grade %s'%(self.chipNo, Grade)
 
         print '\ttotal: %4d'%len(self.ResultData['HiddenData']['TotalList'])
         print '\tdead:  %4d'%len(self.ResultData['HiddenData']['DeadPixelList'])
