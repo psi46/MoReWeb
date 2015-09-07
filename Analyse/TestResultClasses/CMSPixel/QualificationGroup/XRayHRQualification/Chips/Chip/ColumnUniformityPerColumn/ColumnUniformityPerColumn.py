@@ -78,6 +78,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Mean = ROOT.TMath.Mean(len(ColumnRatios), ColumnRatios)
             RMS = ROOT.TMath.RMS(len(ColumnRatios), ColumnRatios)
 
+            lineCLow = ROOT.TLine().DrawLine(
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
+            )
+            lineCLow.SetLineWidth(2)
+            lineCLow.SetLineStyle(2)
+            lineCLow.SetLineColor(ROOT.kRed)
+
             lineCHigh = ROOT.TLine().DrawLine(
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'],
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'],
@@ -86,13 +94,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             lineCHigh.SetLineStyle(2)
             lineCHigh.SetLineColor(ROOT.kRed)
 
-            lineCLow = ROOT.TLine().DrawLine(
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast(), self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'],
-            )
-            lineCLow.SetLineWidth(2)
-            lineCLow.SetLineStyle(2)
-            lineCLow.SetLineColor(ROOT.kRed)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, 1.05*self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high'])
 
             self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(Mean)
             self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMS)

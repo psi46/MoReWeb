@@ -26,23 +26,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'sigma':{
                 'Value':'{0:1.2f}'.format(-1),
-                'Label':'σ'
+                'Label':'RMS'
             },
             'threshold':{
                 'Value':'{0:1.2f}'.format(-1),
                 'Label':'thr'
             },
+            'fit': {
+                'Value':'Gaussian',
+                'Label':'fit'
+            },
             'fit_peak': {
                 'Value':'{0:1.2f}'.format(-999),
-                'Label':'fit peak'
+                'Label':'μ fit'
             },
             'fit_sigma':{
                 'Value':'{0:1.2f}'.format(-1),
                 'Label':'σ fit'
-            },
-            'fit_skewness':{
-                'Value':'{0:1.2f}'.format(-1),
-                'Label':'​ɣ​1'
             },
         }
 
@@ -69,16 +69,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ePerVcal = self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
 
         SCurveFileName = Directory + '/' + self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveFileName').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-
-        SysConfiguration = ConfigParser.ConfigParser()
-        SysConfiguration.read(['Configuration/SystemConfiguration.cfg'])
-        ParallelProcessing = False
-        try:
-            if SysConfiguration.get('SystemConfiguration', 'ParallelProcessing')>0:
-                ParallelProcessing = True
-        except:
-            print "no 'ParallelProcessing' option found, running sequentially..."
-            pass
 
         SCurveFile = open(SCurveFileName, "r")
         self.FileHandle = SCurveFile # needed in summary
@@ -160,13 +150,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         over = self.ResultData['Plot']['ROOTObject'].GetBinContent(self.ResultData['Plot']['ROOTObject_hd'].GetNbinsX()+1)
 
         #fit peak
-        GaussFitFunction = ROOT.TF1("peakfit","[0]*exp(-0.5*((x-[1])/[2])**2)*0.5*(1.0+TMath::Erf([3]*((x-[1])/[2])/sqrt(2)))", 30, 1000)
+        GaussFitFunction = ROOT.TF1("peakfit","[0]*exp(-0.5*((x-[1])/[2])**2)", 30, 1000)
         GaussFitFunction.SetParameter(0, 1.5*self.ResultData['Plot']['ROOTObject'].GetMaximum())
-        GaussFitFunction.SetParameter(1, MeanSCurve*0.70)
+        GaussFitFunction.SetParameter(1, MeanSCurve)
         GaussFitFunction.SetParLimits(1, 0, 1000)
         GaussFitFunction.SetParameter(2, RMSSCurve)
-        GaussFitFunction.SetParameter(3, 1)
-        GaussFitFunction.SetParLimits(3, -20, 20)
 
         self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "BQRM")
 
@@ -178,11 +166,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(MeanSCurve)
         self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMSSCurve)
         self.ResultData['KeyValueDictPairs']['threshold']['Value'] = '{0:1.2f}'.format(ThresholdMean)
-        self.ResultData['KeyValueDictPairs']['fit_peak']['Value'] = '{0:1.0f}'.format(GaussFitFunction.GetMaximumX(30, 1000))
-        self.ResultData['KeyValueDictPairs']['fit_sigma']['Value'] = '{0:1.0f}'.format(GaussFitFunction.GetParameter(2))
-        self.ResultData['KeyValueDictPairs']['fit_skewness']['Value'] = '{0:1.2e}'.format(FitSkewness)
+        self.ResultData['KeyValueDictPairs']['fit_peak']['Value'] = '{0:1.2f}'.format(GaussFitFunction.GetMaximumX(30, 1000))
+        self.ResultData['KeyValueDictPairs']['fit_sigma']['Value'] = '{0:1.2f}'.format(GaussFitFunction.GetParameter(2))
 
-        self.ResultData['KeyList'] = ['N','mu','sigma','threshold','fit_peak', 'fit_skewness']
+        self.ResultData['KeyList'] = ['N','mu','sigma','threshold','fit', 'fit_peak', 'fit_sigma']
         if under:
             self.ResultData['KeyValueDictPairs']['under'] = {'Value':'{0:1.2f}'.format(under), 'Label':'<='}
             self.ResultData['KeyList'].append('under')

@@ -18,7 +18,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'sigma':{
                 'Value':'{0:1.2f}'.format(-1),
-                'Label':'σ'
+                'Label':'RMS'
             },
             'NoiseDefects':{
                 'Value':'',
