@@ -107,9 +107,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     if Line:
                         LineArray = Line.strip().split()
                         Threshold = float(LineArray[0])
-                        ThresholdMean += Threshold
-                        NPix += 1
                         Width = float(LineArray[1])
+
+                        if not math.isnan(Threshold):
+                            ThresholdMean += Threshold
+                            NPix += 1
                         
                         self.ResultData['Plot']['ROOTObject'].Fill(Width)
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
