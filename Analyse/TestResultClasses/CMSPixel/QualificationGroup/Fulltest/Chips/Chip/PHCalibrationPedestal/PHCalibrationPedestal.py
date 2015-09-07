@@ -133,7 +133,7 @@ class TestResult(GeneralTestResult):
             },
             'sigma': {
                 'Value': '{0:1.2f}'.format(RMSPedestal),
-                'Label': 'σ'
+                'Label': 'RMS'
             }
         }
         self.ResultData['KeyList'] = ['N', 'mu', 'sigma', 'mu_electrons', 'sigma_electrons']

@@ -82,7 +82,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'sigma':{
                 'Value':'{0:1.2f}'.format(RMSVcalThr),
-                'Label':'σ'
+                'Label':'σ_fit'
             },
             'vcal':{
                 'Value':'{0:1.2f}'.format(self.vcalTrim),

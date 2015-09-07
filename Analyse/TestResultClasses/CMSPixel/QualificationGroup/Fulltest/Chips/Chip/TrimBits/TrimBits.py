@@ -94,7 +94,7 @@ class TestResult(GeneralTestResult):
             },
             'sigma': {
                 'Value': '{0:1.2f}'.format(rms),
-                'Label': 'σ'
+                'Label': 'RMS'
             }
         }
         self.ResultData['KeyList'] = ['mu', 'sigma']

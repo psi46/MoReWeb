@@ -150,7 +150,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 },
                 'sigma': {
                     'Value': '{0:1.2f}'.format(RMSGain),
-                    'Label': 'σ'
+                    'Label': 'RMS'
                 },
                 'GainDefects': {
                     'Value': self.GainDefectsList,

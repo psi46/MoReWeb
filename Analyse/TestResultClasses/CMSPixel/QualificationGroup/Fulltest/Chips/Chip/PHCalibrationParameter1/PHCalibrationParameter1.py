@@ -44,7 +44,7 @@ class TestResult(GeneralTestResult):
             'Par1sigma': {
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData[
                     'KeyValueDictPairs']['sigma']['Value'],
-                'Label': 'Par1 σ'
+                'Label': 'Par1 RMS'
             }
         })
         self.ResultData['KeyList'] += ['Par1N', 'Par1mu', 'Par1sigma']

@@ -88,7 +88,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 },
                 'sigma':{
                     'Value':'{0:1.2f}'.format(RMSPar1), 
-                    'Label':'σ'
+                    'Label':'RMS'
                 },
                 'Par1Defects':{
                     'Value': self.Par1DefectsList,
