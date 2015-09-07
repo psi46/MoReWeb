@@ -25,6 +25,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'datasize': ['Data size does not correspond to'],
             'missingevents': ['Incomplete DAQ data readout'],
             'usbtimeout': ['Timeout reading from USB buffer after'],
+            'deser400': ['header reports DESER400 failure'],
+            'daqerror': ['Error in DAQ. Aborting test.'],
         }
 
         ErrorNames = {
@@ -35,6 +37,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'datasize': 'Data size criticals',
             'missingevents': 'Missing Event criticals ',
             'usbtimeout': 'USB criticals',
+            'deser400': 'DESER400 failure',
+            'daqerror': 'DAQ error',
         }
 
         self.ResultData['KeyValueDictPairs'] = {}
@@ -86,5 +90,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['message_%s_count'%errorSubtype] = {'Label': ErrorNames[errorSubtype] if errorSubtype in ErrorNames else errorSubtype, 'Value': '%d'%len([True for ErrorObject in ErrorObjects if ErrorObject['subtype'] == errorSubtype])}
 
         self.ResultData['KeyList'] = (['nCriticals', 'nErrors', 'nWarnings', 'channel_0_count', 'channel_1_count', 'channel_2_count', 'channel_3_count', 'message_tokenchain_count', 
-            'message_eventid_count', 'message_readback_count', 'message_notokenpass_count', 'message_datasize_count', 'message_missingevents_count', 'message_usbtimeout_count'])
+            'message_eventid_count', 'message_readback_count', 'message_notokenpass_count', 'message_datasize_count', 'message_missingevents_count', 'message_usbtimeout_count', 'message_deser400_count', 'message_daqerror_count'])
 
