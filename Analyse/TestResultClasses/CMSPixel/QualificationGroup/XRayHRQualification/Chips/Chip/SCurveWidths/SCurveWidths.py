@@ -44,6 +44,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value':'{0:1.2f}'.format(-1),
                 'Label':'σ fit'
             },
+            'MeasuredHitrate':{
+                'Value':'-',
+                'Label':'Measured hitrate:'
+            },            
         }
 
         self.ResultData['HiddenData']['htmax'] = 255.;
@@ -57,11 +61,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(1)
         ChipNo=self.ParentObject.Attributes['ChipNo']
-        
+
+        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'NoiseBackgroundMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate = self.Attributes['Rate'])]
+        self.ResultData['Plot']['ROOTObject_bg'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+        if self.ResultData['Plot']['ROOTObject_bg']:
+            # calculate real hitrate
+            TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
+            Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
+            NPixels = 80*52
+            NTriggersPerPixel = 50
+            NTriggers = NTriggersPerPixel * NPixels
+            NHits = self.ResultData['Plot']['ROOTObject_bg'].GetEntries()
+            RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6 # in MHz/cm2
+            self.ResultData['KeyValueDictPairs']['MeasuredHitrate']['Value'] = '{0:1.1f}'.format(RealHitrate)
+
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 1000.) # hw
         self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 1000.) #Noise in unbonded pixel (not displayed) # hd
         self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # ht
-        
+
         Rate = self.Attributes['Rate']
         Directory = self.ParentObject.ParentObject.ParentObject.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)]
         SCurveDataFileName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveDataFileName')
@@ -158,10 +176,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "BQRM")
 
-
-        FitDelta = GaussFitFunction.GetParameter(3) / math.sqrt(1 + GaussFitFunction.GetParameter(3)*GaussFitFunction.GetParameter(3))
-        FitSkewness = (4-math.pi)/2 * pow(FitDelta * math.sqrt(2/math.pi),3)/pow(1-2*FitDelta*FitDelta/math.pi, 1.5)
-
         self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(IntegralSCurve)
         self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.2f}'.format(MeanSCurve)
         self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMSSCurve)
@@ -169,7 +183,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['fit_peak']['Value'] = '{0:1.2f}'.format(GaussFitFunction.GetMaximumX(30, 1000))
         self.ResultData['KeyValueDictPairs']['fit_sigma']['Value'] = '{0:1.2f}'.format(GaussFitFunction.GetParameter(2))
 
-        self.ResultData['KeyList'] = ['N','mu','sigma','threshold','fit', 'fit_peak', 'fit_sigma']
+        self.ResultData['KeyList'] = ['N','mu','sigma','threshold','fit', 'fit_peak', 'fit_sigma', 'MeasuredHitrate']
         if under:
             self.ResultData['KeyValueDictPairs']['under'] = {'Value':'{0:1.2f}'.format(under), 'Label':'<='}
             self.ResultData['KeyList'].append('under')
