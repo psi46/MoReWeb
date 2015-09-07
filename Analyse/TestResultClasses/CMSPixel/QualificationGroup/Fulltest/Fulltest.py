@@ -48,6 +48,13 @@ class TestResult(GeneralTestResult):
                     'Order': 20,
                     'Width': 2
                 }
+            },            
+            {
+                'Key': 'GradingParameters',
+                'DisplayOptions': {
+                    'Order': 110,
+                    'Width': 1
+                }
             },
             {
                 'Key': 'AnalogCurrent',
