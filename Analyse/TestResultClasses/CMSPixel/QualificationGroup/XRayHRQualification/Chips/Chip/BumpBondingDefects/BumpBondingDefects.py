@@ -29,12 +29,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) 
 
+        try:
+            NtrigAlive = self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['PixelAlive']
+        except:
+            NtrigAlive = 10
+
         if histoHitMap:
             for Row in range(self.nRows):
                 for Column in range(self.nCols):
-
                     PixelHits = histoHitMap.GetBinContent(Column+1, Row+1)
-                    PixelAlive = (not histoAlive) or (histoAlive.GetBinContent(Column+1, Row+1) == 10)
+                    PixelAlive = (not histoAlive) or (histoAlive.GetBinContent(Column+1, Row+1) == NtrigAlive)
                     PixelUnmasked = (not histoHot) or (histoHot.GetBinContent(Column+1, Row+1) < 1)
 
                     if PixelHits < 1 and PixelAlive and PixelUnmasked:

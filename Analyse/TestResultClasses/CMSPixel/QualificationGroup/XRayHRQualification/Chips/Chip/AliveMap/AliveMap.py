@@ -25,13 +25,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
 
             if self.ResultData['Plot']['ROOTObject']:
-                self.ResultData['Plot']['ROOTObject'].SetTitle("");
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column");
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row");
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-                self.ResultData['Plot']['ROOTObject'].Draw('colz');
+                self.ResultData['Plot']['ROOTObject'].SetTitle("")
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column")
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row")
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+                self.ResultData['Plot']['ROOTObject'].Draw('colz')
                 
 
         self.Title = 'Alive Map: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
