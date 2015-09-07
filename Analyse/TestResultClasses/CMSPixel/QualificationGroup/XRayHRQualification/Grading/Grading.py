@@ -46,6 +46,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         MeanEfficiency50List = []
         MeanEfficiency120List = []
 
+        HotPixelsList = set()
+        BumpBondingDefectPixelsList = set()
+        NoiseDefectPixelsList = set()
+        TotalDefectPixelsList = set()
+
         for i in chipResults:
             ROCGrade = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value']
             GradeHistogram[ROCGrade] += 1
@@ -73,10 +78,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             else:
                 ROCsLessThanOnePercent += 1
 
-            # count pixel defects per module
+            # count number of pixel defects per module
             BumpBondingDefects += BumpBondingDefectsROC
             NoiseDefects += NoiseDefectsROC
             HotPixelDefects += HotPixelDefectsROC
+
+            # get ROC pixel defect lists
+            HotPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefectsList']['Value']
+            BumpBondingDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefectsList']['Value']
+            NoiseDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoisePixelsList']['Value']
+            TotalDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['TotalPixelDefectsList']['Value']
+
+            # append to pixel defects list for module
+            HotPixelsList = HotPixelsList | HotPixelsListROC
+            BumpBondingDefectPixelsList = BumpBondingDefectPixelsList | BumpBondingDefectPixelsListROC
+            NoiseDefectPixelsList = NoiseDefectPixelsList | NoiseDefectPixelsListROC
+            TotalDefectPixelsList = TotalDefectPixelsList | TotalDefectPixelsListROC
 
             # mean efficiency
             MeanEfficiency50List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency50']['Value']))
@@ -90,7 +107,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # readout uniformity
             NonUniformEventsROC = 0
             for Rate in self.ParentObject.Attributes['Rates']['HRData']:
-                NonUniformEventsROC += int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)])
+                NonUniformEventsROC += int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]['Value'])
             if NonUniformEventsROC > 0:
                 ROCsWithReadoutProblems += 1
 
@@ -171,9 +188,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label': 'Mean Noise'
             },
         }
+
         self.ResultData['HiddenData']['SubGradings'] = SubGradings
         self.ResultData['KeyList'] = ['Module', 'ModuleGrade', 'ROCGrades']
 
+        # add pixel defect lists
+        self.ResultData['HiddenData']['HotPixelsList'] = {
+            'Label': 'HotPixelsList',
+            'Value': HotPixelsList
+        }
+        self.ResultData['HiddenData']['BumpBondingDefectPixelsList'] = {
+            'Label': 'BumpBondingDefectPixelsList',
+            'Value': BumpBondingDefectPixelsList
+        }
+        self.ResultData['HiddenData']['NoiseDefectPixelsList'] = {
+            'Label': 'NoiseDefectPixelsList',
+            'Value': NoiseDefectPixelsList
+        }
+        self.ResultData['HiddenData']['TotalDefectPixelsList'] = {
+            'Label': 'TotalDefectPixelsList',
+            'Value': TotalDefectPixelsList
+        }
 
         # needed in summary1
         if self.verbose:

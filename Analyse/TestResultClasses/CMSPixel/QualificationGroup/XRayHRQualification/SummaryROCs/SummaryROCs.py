@@ -81,7 +81,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for Rate in self.ParentObject.Attributes['Rates']['HRData']:
           RealHitrate = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value'])
           TableRow.append("{RealHitrate:1.1f}".format(RealHitrate=RealHitrate))
-          BumpBondingDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=Rate)])
+          BumpBondingDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=Rate)]['Value'])
           
           # display bb defects only for highest rate = best statistics
           if Rate == max(self.ParentObject.Attributes['Rates']['HRData']):
@@ -92,7 +92,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             else:
               TableRow.append("{Value:1.0f}".format(Value=BumpBondingDefects))
 
-          NonUniformEvents = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)])
+          NonUniformEvents = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]['Value'])
           if NonUniformEvents > 0:
             TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=NonUniformEvents)))
           else:

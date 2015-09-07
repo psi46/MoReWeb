@@ -135,9 +135,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for RateType in RateTypes:
             for Rate in RateData[RateType]['Rates']:
                 for NumberKey in self.Attributes['NumberKeys'][RateType]:
-                    self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = -1
+                    self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = {'Value': '-1'}
                 for GradeKey in self.Attributes['GradeKeys'][RateType]:
-                    self.ResultData['HiddenData'][GradeKey+'_{Rate}'.format(Rate=Rate)] = -1
+                    self.ResultData['HiddenData'][GradeKey+'_{Rate}'.format(Rate=Rate)] = {'Value': '-1'}
 
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             self.ResultData['HiddenData']['Efficiency_{Rate}'.format(Rate=Rate)] = {
@@ -150,6 +150,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '',
                 'Unit': '',
             }
+
+            self.ResultData['HiddenData']['NumberOfNonUniformColumns'] = {'Value': '-1'}
+            self.ResultData['HiddenData']['ColumnUniformityGrade'] = {'Value': 'None'}
             
 	
     def PopulateResultData(self):
@@ -301,7 +304,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             ### Grade/Values summary for different rates ###
             for NumberKey in self.Attributes['NumberKeys']['HRData']:
-                self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = NumberValues[NumberKey]
+                self.ResultData['HiddenData'][NumberKey+'_{Rate}'.format(Rate=Rate)] = {'Value': NumberValues[NumberKey]}
                 self.ResultData['KeyValueDictPairs'][NumberKey]['Value'] = (self.ResultData['KeyValueDictPairs'][NumberKey]['Value']+'/{Rate}'.format(Rate=NumberValues[NumberKey])).strip('/')
 
             for GradeKey in self.Attributes['GradeKeys']['HRData']:
@@ -320,9 +323,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 or ColumnHitRatio > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']):
                 NumberValues['NumberOfNonUniformColumns'] += 1
                 Grades['ColumnUniformityGrade'] = 3
-        self.ResultData['HiddenData']['NumberOfNonUniformColumns'] = NumberValues['NumberOfNonUniformColumns']
+        self.ResultData['HiddenData']['NumberOfNonUniformColumns']['Value'] = NumberValues['NumberOfNonUniformColumns']
         self.ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'] = '{Value}'.format(Value=NumberValues['NumberOfNonUniformColumns'])
-        self.ResultData['HiddenData']['ColumnUniformityGrade'] = Grades['ColumnUniformityGrade']
+        self.ResultData['HiddenData']['ColumnUniformityGrade']['Value'] = Grades['ColumnUniformityGrade']
         self.ResultData['KeyValueDictPairs']['ColumnUniformityGrade']['Value'] = GradeMapping[Grades['ColumnUniformityGrade']]
 
         if not 'ColumnUniformityGrade' in OmitGradesInFinalGrading:
@@ -383,6 +386,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         TotalPixelDefectsList = BumpBondingDefectPixelsList | NoisePixelsList | HotPixelsList
         TotalPixelDefects = len(TotalPixelDefectsList)
 
+        self.ResultData['HiddenData']['BumpBondingDefectsList'] = {
+            'Label': 'Bump Bonding Defects list',
+            'Value': BumpBondingDefectPixelsList,
+        }
+        self.ResultData['HiddenData']['HotPixelDefectsList'] = {
+            'Label': 'HotPixelDefectsList',
+            'Value': HotPixelsList,
+        }
+        self.ResultData['HiddenData']['NoisePixelsList'] = {
+            'Label': 'NoisePixelsList',
+            'Value': NoisePixelsList,
+        }
+        self.ResultData['HiddenData']['TotalPixelDefectsList'] = {
+            'Label': 'TotalPixelDefectsList',
+            'Value': TotalPixelDefectsList,
+        }
         self.ResultData['HiddenData']['BumpBondingDefects'] = {
             'Label': 'Bump Bonding Defects',
             'Value': len(BumpBondingDefectPixelsList),

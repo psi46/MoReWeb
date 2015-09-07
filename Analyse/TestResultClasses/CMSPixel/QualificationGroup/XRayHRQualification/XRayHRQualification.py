@@ -3,7 +3,7 @@ import sys
 import ROOT
 import os.path
 import glob
-
+import copy
 import AbstractClasses
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 
@@ -94,6 +94,9 @@ class TestResult(GeneralTestResult):
             Rate = int(FolderName.split('_')[2])
             self.Attributes['Rates']['HRSCurves'].append(Rate)
             self.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)] = Path
+            ROOTFiles = glob.glob(Path+'/*.root')
+            self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
+            self.FileHandle.append(self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)])
 
 
         HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
@@ -473,6 +476,14 @@ class TestResult(GeneralTestResult):
         self.CloseSubTestResultFileHandles()
         pass
 
+    def PrintDatabaseRow(self, Row):
+        print '-'*100
+        print ' ROW'
+        print '-'*100
+        for i in Row:
+            print ("%s: "%i).ljust(32),Row[i]
+        print '-'*100
+
     def CustomWriteToDatabase(self, ParentID):
         if self.verbose:
             print 'Write to DB: ',ParentID
@@ -535,62 +546,288 @@ class TestResult(GeneralTestResult):
         }
 
         print 'fill row end'
-        if False and self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
 
-            HighRateData = Row.deepcopy()
-
-            HighRateData['HRGrade'] = grade
-            del(HighRateData['Grade'])
+        if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
+            DebugGlobalDB = True
+            GlobalDBRowTemplate = copy.deepcopy(Row)
+            del(GlobalDBRowTemplate['Grade'])
+            del(GlobalDBRowTemplate['Noise'])
+            del(GlobalDBRowTemplate['PixelDefects'])
+            del(GlobalDBRowTemplate['ROCsLessThanOnePercent'])
+            del(GlobalDBRowTemplate['ROCsMoreThanOnePercent'])
+            del(GlobalDBRowTemplate['ROCsMoreThanFourPercent'])
 
             GradingTestResultObject = self.ResultData['SubTestResults']['Grading']
 
-            # '#Pix NoHit'
-            HighRateData['BumpBondingDefects'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['BumpBondingDefects']['Value']
+            # first fill all fields which do not correspond to a specific rate, e.g. ratios of two rates, final grade etc.
+            if True:
+                HighRateData = copy.deepcopy(Row)
 
-            # '#Pix Hot'
-            HighRateData['HotPixelDefects'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['HotPixelDefects']['Value']
+                #GRADE
+                del(HighRateData['Grade'])
+                HighRateData['HRGrade'] = grade
 
-            # 'Eff @50'
-            HighRateData['Efficiency50'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['Efficiency_50']['Value']
+                # N_ROCS_READOUT_PROBLEM <- new
+                HighRateData['ROCsWithReadoutProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithReadoutProblems']['Value']
 
-            # efficiency at 120 MHz/cm2
-            HighRateData['Efficiency120'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['Efficiency_120']['Value']
+                # N_COL_NONUNIFORM
+                HighRateData['ROCsWithUniformityProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithUniformityProblems']['Value']
 
-            #### some more variables that would be nice to have
+                # ADDR_PIXELS_BAD
+                HighRateData['AddrPixelsBad'] = GradingTestResultObject.ResultData['HiddenData']['TotalDefectPixelsList']['Value']
 
-            # number of ROCs with readout problems
-            HighRateData['ROCsWithReadoutProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithReadoutProblems']['Value']
-            
-            # number of ROCs with uniformity problems
-            HighRateData['ROCsWithUniformityProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithUniformityProblems']['Value']
+                # ADDR_PIXELS_HOT
+                HighRateData['AddrPixelsHot'] = GradingTestResultObject.ResultData['HiddenData']['HotPixelsList']['Value']
 
-            # mean noise
-            HighRateData['MeanNoise'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['MeanNoise']['Value']
+                # N_HOT_PIXEL
+                HighRateData['NHotPixel'] = len(GradingTestResultObject.ResultData['HiddenData']['HotPixelsList']['Value'])
+
+                #-------------------------------------------------
+                # <--- here comes the code for pixel db upload
+                #-------------------------------------------------
+                if DebugGlobalDB:
+                    self.PrintDatabaseRow(HighRateData)
+
+                ROCNumbers = []
+                TotalPixelDefectsLists = []
+                HotPixelsLists = []
+                ChipsSubTestResult = self.ResultData['SubTestResults']['Chips']
+                for i in ChipsSubTestResult.ResultData['SubTestResultDictList']:
+                    ChipNo = i['TestResultObject'].Attributes['ChipNo']
+                    ROCNumbers.append(ChipNo)
+                    TotalPixelDefectsLists.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['TotalPixelDefectsList']['Value'])
+                    HotPixelsLists.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefectsList']['Value'])
+          
+                # ROC rows
+                for i in range(0, len(ROCNumbers)):
+                    # remove grade from individual rows
+                    HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+
+                    #ROC_POS
+                    HighRateData['RocPos'] = ROCNumbers[i]
+
+                    # ADDR_PIXELS_BAD
+                    HighRateData['AddrPixelsBad'] = TotalPixelDefectsLists[i]
+
+                    # ADDR_PIXELS_HOT
+                    HighRateData['AddrPixelsHot'] = HotPixelsLists[i]
+
+                    # N_HOT_PIXEL
+                    HighRateData['NHotPixel'] = len(HotPixelsLists[i])
+
+                    #-------------------------------------------------
+                    # <--- here comes the code for pixel db upload
+                    #-------------------------------------------------
+                    if DebugGlobalDB:
+                        self.PrintDatabaseRow(HighRateData)
 
 
-            from PixelDB import *
-            # modified by Tommaso
-            #
-            # try and speak directly with PixelDB
-            #
-            pdb = PixelDBInterface(operator="tommaso", center="pisa")
-            pdb.connectToDB()
-            
-            OPERATOR = os.environ['PIXEL_OPERATOR']
-            CENTER = os.environ['PIXEL_CENTER']
-            s = Session(CENTER, OPERATOR)
-            pdb.insertSession(s)
-            print "--------------------"
-            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID, HighRateData
-            print "--------------------"
-            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, HighRateData)
-               
-            if pp is None:
-                print "INSERTION FAILED!"
-                sys.exit(31)
-            insertedID=pp.TEST_ID
+            # all hitmap rates  ("50", "150")
+            for Rate in self.Attributes['Rates']['HRData']:
 
-            # here comes the code for pixel db upload
+                # prepare data
+                MeasuredHitrates = []
+                NonUniformEventBins = []
+                BumpBondingDefects = []
+                ROCNumbers = []
+                ChipsSubTestResult = self.ResultData['SubTestResults']['Chips']
+                for i in ChipsSubTestResult.ResultData['SubTestResultDictList']:
+                    ChipNo = i['TestResultObject'].Attributes['ChipNo']
+                    ROCNumbers.append(ChipNo)
+                    MeasuredHitrates.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['RealHitrate']['Value']))
+                    NonUniformEventBins.append(int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]['Value']))
+                    BumpBondingDefects.append(int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=Rate)]['Value']))
+          
+                # apply aggregation function
+                ModuleMeanHitrate = sum(MeasuredHitrates) / float(len(MeasuredHitrates))
+                ModuleNonUniformEventBins = sum(NonUniformEventBins)
+                ModuleBumpBondingDefects = sum(BumpBondingDefects)
+
+                # remove grade from individual rows
+                HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+
+                #HITRATENOMINAL
+                HighRateData['HitrateNominal'] = Rate
+
+                # MEASURED_HITRATE
+                HighRateData['MeasuredHitrate'] = ModuleMeanHitrate
+
+                # N_BINS_LOWHIGH
+                HighRateData['NBinsLowHigh'] = ModuleNonUniformEventBins
+
+                # N_PIXEL_NO_HIT
+                HighRateData['NPixelNoHit'] = ModuleBumpBondingDefects
+
+                #-------------------------------------------------
+                # <--- here comes the code for pixel db upload
+                #-------------------------------------------------
+                if DebugGlobalDB:
+                    self.PrintDatabaseRow(HighRateData)
+
+                # ROC rows
+                for i in range(0, len(ROCNumbers)):
+                    # remove grade from individual rows
+                    HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+
+                    #HITRATENOMINAL
+                    HighRateData['HitrateNominal'] = Rate
+
+                    #ROC_POS
+                    HighRateData['RocPos'] = ROCNumbers[i]
+
+                    # MEASURED_HITRATE
+                    HighRateData['MeasuredHitrate'] = MeasuredHitrates[i]
+
+                    # N_BINS_LOWHIGH
+                    HighRateData['NBinsLowHigh'] = NonUniformEventBins[i]
+
+                    # N_PIXEL_NO_HIT
+                    HighRateData['NPixelNoHit'] = BumpBondingDefects[i]
+
+                    #-------------------------------------------------
+                    # <--- here comes the code for pixel db upload
+                    #-------------------------------------------------
+                    if DebugGlobalDB:
+                        self.PrintDatabaseRow(HighRateData)
+
+
+            # all noise rates
+            for Rate in self.Attributes['Rates']['HRSCurves']:
+
+                # prepare data
+                MeasuredHitrates = []
+                NoiseMeans = []
+                NoiseWidths = []
+                ROCNumbers = []
+                NoisePixelsLists = []
+
+                ChipsSubTestResult = self.ResultData['SubTestResults']['Chips']
+                for i in ChipsSubTestResult.ResultData['SubTestResultDictList']:
+                    ChipNo = i['TestResultObject'].Attributes['ChipNo']
+                    ROCNumbers.append(ChipNo)
+                    NoiseMeans.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['mu']['Value']))
+                    NoiseWidths.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['sigma']['Value']))
+                    MeasuredHitrates.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['MeasuredHitrate']['Value']))
+                    NoisePixelsLists.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=Rate)].ResultData['HiddenData']['ListOfNoisyPixels']['Value'])
+
+                # apply aggregation function
+                ModuleMeanHitrate = sum(MeasuredHitrates) / float(len(MeasuredHitrates)) if len(MeasuredHitrates) > 0 else -1
+                ModuleNoiseMean = sum(NoiseMeans) / float(len(NoiseMeans)) if len(NoiseMeans) > 0 else -1
+                ModuleNoiseWidth = sum(NoiseWidths) / float(len(NoiseWidths)) if len(NoiseWidths) > 0 else -1
+
+                # remove grade from individual rows
+                HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+
+                #HITRATENOMINAL
+                HighRateData['HitrateNominal'] = Rate
+
+                # MEASURED_HITRATE
+                HighRateData['MeasuredHitrate'] = ModuleMeanHitrate
+
+                # MEAN_NOISE_ALLPIXELS
+                HighRateData['MeanNoiseAllPixels'] = ModuleNoiseMean
+
+                # WIDTH_NOISE_ALLPIXELS
+                HighRateData['WidthNoiseAllPixels'] = ModuleNoiseWidth
+
+                # ADDR_PIXELS_NOISE
+                HighRateData['AddrPixelsNoise'] = self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefectPixelsList']
+
+                # N_PIXELS_NOISE  (or N_PIXELS_NOISE_ABOVETH)
+                HighRateData['NPixelsNoise'] = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NoiseDefects']
+
+                #-------------------------------------------------
+                # <--- here comes the code for pixel db upload
+                #-------------------------------------------------
+                if DebugGlobalDB:
+                    self.PrintDatabaseRow(HighRateData)
+
+
+                # ROC rows
+                for i in range(0, len(ROCNumbers)):
+                    # remove grade from individual rows
+                    HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+
+                    #HITRATENOMINAL
+                    HighRateData['HitrateNominal'] = Rate
+
+                    #ROC_POS
+                    HighRateData['RocPos'] = ROCNumbers[i]
+
+                    # MEASURED_HITRATE
+                    HighRateData['MeasuredHitrate'] = MeasuredHitrates[i]
+
+                    # MEAN_NOISE_ALLPIXELS
+                    HighRateData['MeanNoiseAllPixels'] = NoiseMeans[i]
+
+                    # WIDTH_NOISE_ALLPIXELS
+                    HighRateData['WidthNoiseAllPixels'] = NoiseWidths[i]
+
+                    # ADDR_PIXELS_NOISE
+                    HighRateData['AddrPixelsNoise'] = NoisePixelsLists[i]
+
+                    # N_PIXELS_NOISE  (or N_PIXELS_NOISE_ABOVETH)
+                    HighRateData['NPixelsNoise'] = len(NoisePixelsLists[i])
+
+                    #-------------------------------------------------
+                    # <--- here comes the code for pixel db upload
+                    #-------------------------------------------------
+                    if DebugGlobalDB:
+                        self.PrintDatabaseRow(HighRateData)
+
+
+            # all efficiency interpolation rates
+            for Rate in self.Attributes['InterpolatedEfficiencyRates']:
+
+                # prepare data
+                MeasuredEfficiencies = []
+                ROCNumbers = []
+
+                ChipsSubTestResult = self.ResultData['SubTestResults']['Chips']
+                for i in ChipsSubTestResult.ResultData['SubTestResultDictList']:
+                    ChipNo = i['TestResultObject'].Attributes['ChipNo']
+                    ROCNumbers.append(ChipNo)
+                    MeasuredEfficiencies.append(float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value']))
+          
+                # apply aggregation function
+                ModuleMeanEfficiency= sum(MeasuredEfficiencies) / float(len(MeasuredEfficiencies)) if len(MeasuredEfficiencies) > 0 else -1
+
+                # remove grade from individual rows
+                HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+
+                # HITRATENOMINAL
+                HighRateData['HitrateNominal'] = Rate
+
+                # INTERP_EFF_TESTPOINT
+                HighRateData['InterpEffTestpoint'] = ModuleMeanEfficiency
+
+                #-------------------------------------------------
+                # <--- here comes the code for pixel db upload
+                #-------------------------------------------------
+                if DebugGlobalDB:
+                    self.PrintDatabaseRow(HighRateData)
+
+                # ROC rows
+                for i in range(0, len(ROCNumbers)):
+                    # remove grade from individual rows
+                    HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+
+                    #HITRATENOMINAL
+                    HighRateData['HitrateNominal'] = Rate
+
+                    #ROC_POS
+                    HighRateData['RocPos'] = ROCNumbers[i]
+
+                    # INTERP_EFF_TESTPOINT
+                    HighRateData['InterpEffTestpoint'] = MeasuredEfficiencies[i]
+
+                    #-------------------------------------------------
+                    # <--- here comes the code for pixel db upload
+                    #-------------------------------------------------
+                    if DebugGlobalDB:
+                        self.PrintDatabaseRow(HighRateData)
+
+
             pass
             
         else:
