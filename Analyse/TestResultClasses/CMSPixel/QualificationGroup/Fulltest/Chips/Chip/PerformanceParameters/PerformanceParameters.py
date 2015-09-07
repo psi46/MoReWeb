@@ -76,7 +76,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'SCurveWidth_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['KeyValueDictPairs']['sigma']['Value'],
-                'Label': 'SCurveWidth σ',
+                'Label': 'SCurveWidth RMS',
             },
             'Noise':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['KeyValueDictPairs']['mu']['Value'],
@@ -89,7 +89,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'ThresholdTrimmed_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['sigma']['Value'],
-                'Label': 'ThresholdTrimmed σ',
+                'Label': 'ThresholdTrimmed σ_fit',
             },
             'Threshold':{
                 'Value': '{0:1.0f}'.format(float(self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['mu']['Value'])
@@ -109,7 +109,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'BumpBonding_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['RMS']['Value'],
-                'Label': 'BumpBonding σ',
+                'Label': 'BumpBonding RMS',
             },
             'BumpBonding_threshold':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Threshold']['Value'],
@@ -121,7 +121,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'PHCalibrationGain_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['sigma']['Value'],
-                'Label': 'PHCalibrationGain σ',
+                'Label': 'PHCalibrationGain RMS',
             },
             'PHCalibrationPar1_mu':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationParameter1'].ResultData['KeyValueDictPairs']['Par1mu']['Value'],
@@ -129,7 +129,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'PHCalibrationPar1_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationParameter1'].ResultData['KeyValueDictPairs']['Par1sigma']['Value'],
-                'Label': 'PHCalibrationParameter1 σ',
+                'Label': 'PHCalibrationParameter1 RMS',
             },
             'PHCalibrationPedestal_mu':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['mu']['Value'],
@@ -141,7 +141,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'PHCalibrationPedestal_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['PHCalibrationPedestal'].ResultData['KeyValueDictPairs']['sigma']['Value'],
-                'Label': 'PHCalibrationPedestal σ',
+                'Label': 'PHCalibrationPedestal RMS',
             },
             'RelativeGainWidth':{
                 'Value': '{0:1.3f}'.format(float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['sigma']['Value']) / float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['mu']['Value']) if float(self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['mu']['Value']) > 0 else 0),
@@ -153,7 +153,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'TrimBits_sigma':{
                 'Value': self.ParentObject.ResultData['SubTestResults']['TrimBits'].ResultData['KeyValueDictPairs']['sigma']['Value'],
-                'Label': 'TrimBits σ',
+                'Label': 'TrimBits RMS',
             }
         }
         self.ResultData['KeyList'] = ['Noise', 'Threshold', 'ThresholdWidth', 'RelativeGainWidth', 'TrimBits_mu', 'TrimBits_sigma']

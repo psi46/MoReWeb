@@ -28,7 +28,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             return GradeCHTMLTemplate%(Style,value)
         else:
             return value
-        
+
+    def GradeColoredDefectsValue(self, value):
+      limitB = self.TestResultEnvironmentObject.GradingParameters['defectsB']
+      limitC = self.TestResultEnvironmentObject.GradingParameters['defectsC']
+      if int(value) >= limitC:
+        return self.GradeColoredValue(value, 3)
+      elif int(value) >= limitB:
+        return self.GradeColoredValue(value, 2)
+      else:
+        return self.GradeColoredValue(value, 1)
+
     def PopulateResultData(self):
         self.ResultData['Table'] = {
            'HEADER':[
@@ -94,16 +104,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                    ),
                    RocGradeFormatted,
                    PixelDefectsTotal,
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadPixel']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nMaskDefect']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadBumps']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadTrimbits']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nAddressProblems']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nNoisy2Pixel']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nThrDefect']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nGainDefect']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nPedDefect']['Value'],
-                   i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nPar1Defect']['Value'],
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadPixel']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nMaskDefect']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadBumps']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nDeadTrimbits']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nAddressProblems']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nNoisy2Pixel']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nThrDefect']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nGainDefect']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nPedDefect']['Value']),
+                   self.GradeColoredDefectsValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['nPar1Defect']['Value']),
                    Noise,
                    Threshold,
                    ThresholdWidth,
