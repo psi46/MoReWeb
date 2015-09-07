@@ -125,8 +125,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.initParser:
             print 'Extract Tests from config file'
             test_list = []
-            tests = self.initParser.get('Tests', 'Test')
-            test_list = self.analyse_test_list(tests)
+            try:
+                tests = self.initParser.get('Tests', 'Test')
+                test_list = self.analyse_test_list(tests)
+            except Exception as inst:
+                self.TestResultEnvironmentObject.ErrorList.append(
+                   {'ModulePath': self.TestResultEnvironmentObject.ModuleDataDirectory,
+                    'ErrorCode': inst,
+                    'FinalResultsStoragePath':'unkown'
+                    }
+                )
+                print "\x1b[31mProblems test list '%s', skip qualification directory! %s\x1b[0m"%(tests, self.TestResultEnvironmentObject.ModuleDataDirectory)
+
             print 'done with extraction'
             return test_list
             pass
