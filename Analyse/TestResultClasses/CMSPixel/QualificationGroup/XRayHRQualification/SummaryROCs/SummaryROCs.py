@@ -52,7 +52,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                  self.TestResultEnvironmentObject.HtmlParser.substituteMarkerArray(
                      LinkHTMLTemplate,
                      {
-                         '###LABEL###':'Chip '+str(ChipNo),
+                         '###LABEL###':'<div style="width:55px;">Chip '+str(ChipNo)+'</div>',
                          '###URL###':os.path.relpath(i['TestResultObject'].FinalResultsStoragePath, self.ParentObject.FinalResultsStoragePath)+'/TestResult.html'
                      }
                  ), 
