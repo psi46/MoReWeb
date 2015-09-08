@@ -393,7 +393,7 @@ class PH_Fitting():
             graph.Fit("phFit", "RQ", "")
 
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
-        retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF())
+        retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF() if phFitClone.GetNDF() > 0 else 0)
         print retVal
         return retVal
 
@@ -451,7 +451,7 @@ class PH_Fitting():
             graph.Fit("phFit", "RQ", "")
 
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
-        retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF())
+        retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF() if phFitClone.GetNDF() > 0 else 0)
         return retVal
 
 if __name__=='__main__':
