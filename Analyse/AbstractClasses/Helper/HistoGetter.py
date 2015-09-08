@@ -62,7 +62,7 @@ def get_histo(rootfile,name,rocNo = None):
             for i in dir.GetListOfKeys():
                 all_names.append(i.GetName())
             try:
-                raise NameError("Didn't found any possible candidate for the Xray spectrum: {Name} in {Names}".format(Name=name,Names=all_names))
+                raise NameError("Didn't find any possible candidate for the Xray spectrum: {Name} in {Names}".format(Name=name,Names=all_names))
             except NameError:
                 print 'The histogram ',histoname , ' was not found'
 
