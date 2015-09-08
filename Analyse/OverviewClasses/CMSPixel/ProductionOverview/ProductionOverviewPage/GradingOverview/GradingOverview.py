@@ -117,7 +117,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         nFinalC = len([x for x in Final_Grades if x=='C'])
         nTotal = nFinalA + nFinalB + nFinalC
 
-        TotalYield = '{0:1.1f}%'.format((nFinalA + nFinalB)/nTotal*100) if nTotal > 0 else "-"
+        TotalYield = '{0:1.1f}%'.format(float(nFinalA + nFinalB)/nTotal*100) if nTotal > 0 else "-"
 
 
         HTML += self.Table(TableData) + self.BoxFooter("<div style='height:10px;'></div><div style='text-align:center;' title='fraction of A+B modules'><b>Yield: %s</b></div><div style='height:10px;'></div>"%TotalYield)

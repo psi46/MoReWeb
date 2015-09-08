@@ -57,6 +57,11 @@ class GeneralProductionOverview:
         ### custom init
         self.CustomInit()
 
+        try:
+            print " ", self.NameSingle
+        except:
+            pass
+
         ### create submodule folder
         self.Attributes['BasePath'] += self.GetStorageKey() + '/'
         directory = self.GlobalOverviewPath + '/' + self.Attributes['BasePath']

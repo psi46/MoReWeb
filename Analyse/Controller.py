@@ -44,6 +44,8 @@ parser.add_argument('-d', '--delete-row', dest = 'deleterow', action = 'store_tr
                     help = 'Let you select a row in the local database to delete.')
 parser.add_argument('-r', '--refit', dest = 'refit', action = 'store_true', default = False,
                     help = 'Forces refitting even if files exist')
+parser.add_argument('-p', '--production-overview', dest = 'production_overview', action = 'store_true', default = False,
+                    help = 'Creates production overview page in the end')
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -498,7 +500,7 @@ if args.deleterow:
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
 
-if int(Configuration.get('SystemConfiguration', 'GenerateProductionOverview')) > 0:
+if args.production_overview:
     print "production overview:"
     ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
     ProductionOverviewObject.GenerateOverview()

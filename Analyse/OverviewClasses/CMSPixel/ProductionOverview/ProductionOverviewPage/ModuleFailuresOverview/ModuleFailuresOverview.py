@@ -94,7 +94,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
-                        print RowTuple['Temperature']
                         if not RowTuple['Temperature'] or int(RowTuple['Temperature']) == 17:
                             #  grading criteria for measured currents
                             GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
