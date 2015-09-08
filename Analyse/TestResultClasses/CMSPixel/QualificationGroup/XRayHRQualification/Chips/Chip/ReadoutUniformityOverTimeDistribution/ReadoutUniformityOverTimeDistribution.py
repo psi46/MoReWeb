@@ -21,6 +21,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'sigma_th':{
                 'Value':'{0:1.2f}'.format(-1),
                 'Label':'σ_th'
+            },
+            'expectation':{
+                'Value':'Poisson',
+                'Label':'Red curve (expected)'
             }
         }
         
@@ -42,7 +46,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             poisson = ROOT.TF1("poisson", "TMath::PoissonI(x,%f)*%f"%(distribution.GetMean(),float(UniformityOverTimePlot.GetNbinsX())*distribution.GetBinWidth(1)),0,EventsMaximum)
             
-            sigma = distribution.GetRMS()
+            RMS = distribution.GetRMS()
             sigma_th = math.sqrt(distribution.GetMean())
 
             chi2 = 0
@@ -85,10 +89,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
             self.ResultData['KeyValueDictPairs']['chi2/ndf']['Value'] = '{0:1.2f}'.format(chi2ndf)
-            self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(sigma)
+            self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMS)
             self.ResultData['KeyValueDictPairs']['sigma_th']['Value'] = '{0:1.2f}'.format(sigma_th)
 
-            self.ResultData['KeyList'] += ['chi2/ndf', 'sigma', 'sigma_th']
+            self.ResultData['KeyList'] += ['chi2/ndf', 'sigma', 'sigma_th','expectation']
 
         self.Title = 'Time unif. distribution {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         self.SaveCanvas() 
