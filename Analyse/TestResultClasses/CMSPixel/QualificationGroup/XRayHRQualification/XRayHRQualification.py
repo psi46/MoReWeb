@@ -95,8 +95,9 @@ class TestResult(GeneralTestResult):
             self.Attributes['Rates']['HRSCurves'].append(Rate)
             self.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)] = Path
             ROOTFiles = glob.glob(Path+'/*.root')
-            self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
-            self.FileHandle.append(self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)])
+            if len(ROOTFiles) == 1:
+                self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
+                self.FileHandle.append(self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)])
 
 
         HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
