@@ -294,13 +294,37 @@ def AnalyseSingleQualification(Folder):
         AnalyseTestData(ModuleInformationRaw, Folder)
 
 def AnalyseAllTestDataInDirectory(GlobalDataDirectory):
-    for Folder in os.listdir(GlobalDataDirectory):
+    Folders = os.listdir(GlobalDataDirectory)
+    FoldersToBeAnalyzed = []
+
+    for Folder in Folders:
+
         absPath = GlobalDataDirectory+'/'+Folder
         if not os.path.isdir(absPath):
             continue
+
         ModuleInformationRaw = Folder.split('_')
         if len(ModuleInformationRaw) >= 5:
-            AnalyseTestData(ModuleInformationRaw,Folder)
+            ModuleInformation = extractModuleInformation(ModuleInformationRaw)
+
+            if not args.singleQualificationPath == '':
+                TestResultEnvironmentInstance.ModuleDataDirectory = Folder
+                FinalModuleResultsPath = GetFinalModuleResultsPath(Folder)
+            else:
+                FinalModuleResultsPath = GetFinalModuleResultsPath(Folder)
+                TestResultEnvironmentInstance.ModuleDataDirectory = GlobalDataDirectory+'/'+Folder
+            TestResultEnvironmentInstance.FinalModuleResultsPath = FinalModuleResultsPath
+
+            if NeedsToBeAnalyzed(TestResultEnvironmentInstance.FinalModuleResultsPath ,ModuleInformation):
+                FoldersToBeAnalyzed.append(Folder)
+
+    print "\x1b[34mINFO: %d folder%s found that needs to be analyzed!\x1b[0m"%(len(FoldersToBeAnalyzed), 's' if len(FoldersToBeAnalyzed)!=1 else '')
+    Counter = 1
+    for Folder in FoldersToBeAnalyzed:
+        ModuleInformationRaw = Folder.split('_')
+        print "\x1b[34mINFO: Analyzing folder %d/%d (%s %s)\x1b[0m"%(Counter, len(FoldersToBeAnalyzed),ModuleInformationRaw[1],ModuleInformationRaw[0])
+        AnalyseTestData(ModuleInformationRaw,Folder)
+        Counter += 1
 
 def AnalyseSingleFullTest(singleFulltestPath):
     print 'analysing a single Fulltest at destination: "%s"' % args.singleFulltestPath
