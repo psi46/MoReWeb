@@ -227,11 +227,21 @@ class ModuleResultOverview:
             else:
                 #TestType
                 FinalModuleRowsDict[Identificator]['TestType'] += ' & %s'%RowTuple['TestType']
-                if ( FinalModuleRowsDict[Identificator]['Grade'] < RowTuple['Grade']):
-                  FinalModuleRowsDict[Identificator]['Grade'] = RowTuple['Grade']
+                if (FinalModuleRowsDict[Identificator]['Grade'] < RowTuple['Grade']):
+                    FinalModuleRowsDict[Identificator]['Grade'] = RowTuple['Grade']
                 MaxCompareList = ['PixelDefects','ROCsMoreThanOnePercent','Noise','Trimming','PHCalibration']
                 for item in MaxCompareList:
-                 FinalModuleRowsDict[Identificator][item] = max( FinalModuleRowsDict[Identificator][item],RowTuple[item])
+                    RowValue = RowTuple[item]
+                    FinalValue = FinalModuleRowsDict[Identificator][item]
+                    try:
+                        RowValue = int(RowValue)
+                    except:
+                        pass
+                    try:
+                        FinalValue = int(FinalValue)
+                    except:
+                        pass
+                    FinalModuleRowsDict[Identificator][item] = max(FinalValue, RowValue)
                 if RowTuple['Temperature'] and FinalModuleRowsDict[Identificator].has_key('Temperature'):
                    if FinalModuleRowsDict[Identificator]['Temperature']:
                        FinalModuleRowsDict[Identificator]['Temperature'] += " / %s"%RowTuple['Temperature']
