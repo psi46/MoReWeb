@@ -2,6 +2,8 @@ import AbstractClasses.Helper.HtmlParser
 import re
 import datetime
 import os
+import json
+
 class ModuleResultOverview:
     def __init__(self, TestResultEnvironmentObject):
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
@@ -59,6 +61,11 @@ class ModuleResultOverview:
              {
                 'Label':'Test Date',
                 'DBColumnName':'TestDate',
+                'InGlobalOverviewList': True
+             },
+             {
+                'Label':'Analysis',
+                'DBColumnName':'KeyValueDictPairs/AnalysisDate',
                 'InGlobalOverviewList': True
              },
              {
@@ -195,17 +202,27 @@ class ModuleResultOverview:
                 ModuleIDList.append(Identificator)
 #                print 'added'
 
+                ResultHTMLFileName = 'TestResult.html'
+                QualificationGroupSubfolder = 'QualificationGroup'
+
                 RowDict = FinalModuleRowsDict[Identificator]
                 for Key in TableColumnList:
                     try:
-                        RowDict[Key] = RowTuple[Key]
+                        if Key.startswith('KeyValueDictPairs/'):
+                            try:
+                                KeyValueDictPairsFileName = self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/KeyValueDictPairs.json'
+                                with open(KeyValueDictPairsFileName) as data_file:    
+                                    KeyValueDictPairs = json.load(data_file)
+                                RowDict[Key] = KeyValueDictPairs[Key.split('/')[1]]['Value']
+                            except:
+                                RowDict[Key] = ''
+                        else:
+                            RowDict[Key] = RowTuple[Key]
                     except IndexError as e:
                         print 'searched Key:  ',Key
                         print 'existing Keys: ',RowTuple.keys()
                         raise e
 
-                ResultHTMLFileName = 'TestResult.html'
-                QualificationGroupSubfolder = 'QualificationGroup'
 
                 if GlobalOverviewList:
                     Link = os.path.relpath(
@@ -234,11 +251,17 @@ class ModuleResultOverview:
                         time = int(re.match(r'\d+', RowTuple['TestDate']).group())
                     else:
                         time = RowTuple['TestDate']
-                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(time).strftime("%Y-%m-%d %H:%m")
+                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(time).strftime("%Y-%m-%d %H:%M")
                 except TypeError as e:
                     print e,'\nerror',type(RowTuple['TestDate']),RowTuple['TestDate']
-                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(1).strftime("%Y-%m-%d %H:%m")
+                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(1).strftime("%Y-%m-%d %H:%M")
                     raise e
+
+                try:
+                    time = float(RowDict['KeyValueDictPairs/AnalysisDate'])
+                    RowDict['KeyValueDictPairs/AnalysisDate'] = datetime.datetime.fromtimestamp(time).strftime("%Y-%m-%d %H:%M")
+                except:
+                    pass
 
             else:
                 #TestType
