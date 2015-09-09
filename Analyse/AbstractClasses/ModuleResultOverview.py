@@ -13,6 +13,22 @@ class ModuleResultOverview:
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             Rows = {}
         else:
+            SortMode = self.TestResultEnvironmentObject.Configuration['QualificationOverviewSort'].strip().split(',')
+            SortClause = ''
+            if len(SortMode) > 0:
+                for i in range(0, len(SortMode)):
+                    parts = SortMode[i].strip().split(' ')
+                    if len(parts) > 0:
+                        if parts[0] in ['ModuleID', 'TestType', 'TestDate']:
+                            SortClause = SortClause + parts[0]
+                        if len(parts) > 1:
+                            if parts[1].upper() in ['ASC', 'DESC']:
+                                SortClause = SortClause + ' ' + parts[1]
+                        SortClause = SortClause + ','
+                SortClause = SortClause.strip(',')
+            else:
+                SortClause = 'ModuleID ASC,TestType ASC,TestDate ASC'
+
             AdditionalWhere = ''
             if ModuleID:
                 AdditionalWhere += ' AND ModuleID=:ModuleID '
@@ -22,7 +38,7 @@ class ModuleResultOverview:
                 'SELECT * FROM ModuleTestResults '+
                 'WHERE 1=1 '+
                 AdditionalWhere+
-                'ORDER BY ModuleID ASC,TestType ASC,TestDate ASC ',
+                'ORDER BY ' + SortClause,
                 {
                     'ModuleID':ModuleID,
                     'TestDate':TestDate
