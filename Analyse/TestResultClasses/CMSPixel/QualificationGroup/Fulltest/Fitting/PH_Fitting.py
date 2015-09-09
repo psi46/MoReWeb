@@ -279,7 +279,7 @@ class PH_Fitting():
         xErr = [8]*len(self.vcalLow)
         i = 0
         for ph in calibration:
-            if ph > 0:
+            if ph > 0 and ph <255:
                 n+=1
                 x.append(ph)
                 ex.append(xErr[i])
@@ -301,7 +301,9 @@ class PH_Fitting():
     def FitTanh(self,calibration):
 
         calibrationPoints = self.getArrayOfCalibrationPoints(calibration)
-        x = calibrationPoints[2]
+        n = calibrationPoints[0]
+        phs = calibrationPoints[1]
+        vcals = calibrationPoints[2]
         graph = self.GetGraph(calibrationPoints)
         phFitClone = self.phFit
         phFitClone.SetParameter(0, 0.004)
@@ -309,25 +311,25 @@ class PH_Fitting():
         phFitClone.SetParameter(2, 1000)
         phFitClone.SetParameter(3, 0)
 
-        # find first point with >0 PH
-        if len(x)>0:
-            MinPoint = 0
-            MaxPoint = len(self.vcalLow)-1  #include last point
-            for i in range(0, len(x)):
-                if x[i]>0:
-                    MinPoint = i
-                    break
-            MinVcal = self.vcalLow[MinPoint]
-            MaxVcal = self.vcalLow[MaxPoint]
+        # set start parameters for fit
+        upperPoint = n-1
+        lowerPoint = 0
+
+        try:
+            MinVcal = vcals[lowerPoint]
+            MaxVcal = vcals[upperPoint]
 
             phFitClone.SetRange(MinVcal, MaxVcal)
 
-        if self.verbose:
-            graph.Fit(phFitClone, "R", "")
-        else:
-            graph.Fit(phFitClone, "RQ")
+            if self.verbose:
+                graph.Fit(phFitClone, "R", "")
+            else:
+                graph.Fit(phFitClone, "RQ")
 
-        retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
+            retVal = [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
+        except:
+            retVal = [-1 for i in range(0,self.nFitParams)]
+
         try:
             retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF())
         except:
@@ -343,26 +345,14 @@ class PH_Fitting():
         graph = self.GetGraph([n,x,y,ex,ey])
         phFitClone = self.phFit
 
-        # find first point with >0 PH and last point with <255 PH
-        MinPoint = 0
-        MinPointFound = False
-        MaxPoint = len(self.vcalLow)-2
-        for i in range(0, len(y)):
-            if not MinPointFound and x[i]>0:
-                MinPoint = i
-                MinPointFound = True
-            if x[i]>254:
-                MaxPoint = i-1
-                break
+        # set start parameters for fit
+        upperPoint = n-1
+        lowerPoint = 0
 
-        MinVcal = self.vcalLow[MinPoint]
-        MaxVcal = self.vcalLow[MaxPoint]
+        MinVcal = y[lowerPoint]
+        MaxVcal = y[upperPoint]
 
         phFitClone.SetRange(MinVcal, MaxVcal)
-
-        # set start parameters for fit
-        upperPoint = MaxPoint
-        lowerPoint = MinPoint
 
         if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((y[upperPoint] - y[lowerPoint]) != 0):
             slope = float(x[upperPoint] - x[lowerPoint]) / (y[upperPoint] - y[lowerPoint]) #really!
@@ -394,7 +384,8 @@ class PH_Fitting():
 
         retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
         retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF() if phFitClone.GetNDF() > 0 else 0)
-        print retVal
+        if self.verbose:
+            print retVal
         return retVal
 
     def FitLin(self,calibration):
@@ -406,35 +397,22 @@ class PH_Fitting():
 
         phFitClone = self.phFit
 
-        # find first point with >0 PH and last point with <255 PH
-        MinPoint = 0
-        MinPointFound = False
-        MaxPoint = len(self.vcalLow)-2
-        for i in range(0, len(y)):
-            if not MinPointFound and x[i]>0:
-                MinPoint = i
-                MinPointFound = True
-            if x[i]>254:
-                MaxPoint = i-1
-                break
-
-        MinVcal = self.vcalLow[MinPoint]
-        MaxVcal = self.vcalLow[MaxPoint]
-
-        phFitClone.SetRange(MinVcal, MaxVcal)
-
         # set start parameters for fit
-        upperPoint = MaxPoint
-        lowerPoint = MinPoint
-
-        if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((y[upperPoint] - y[lowerPoint]) != 0):
-            slope = float(x[upperPoint] - x[lowerPoint]) / (y[upperPoint] - y[lowerPoint]) #really!
-        else:
-            slope = 0.5
-
-        phFitClone.SetParameter(2, slope)
+        upperPoint = n-1
+        lowerPoint = 0
 
         try:
+            MinVcal = y[lowerPoint]
+            MaxVcal = y[upperPoint]
+
+            phFitClone.SetRange(MinVcal, MaxVcal)
+
+            if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((y[upperPoint] - y[lowerPoint]) != 0):
+                slope = float(x[upperPoint] - x[lowerPoint]) / (y[upperPoint] - y[lowerPoint]) #really!
+            else:
+                slope = 0.5
+
+            phFitClone.SetParameter(2, slope)
             phFitClone.SetParameter(3, y[upperPoint] - slope * x[upperPoint])
         except:
             #data is missing, or N/A
@@ -450,7 +428,7 @@ class PH_Fitting():
         else:
             graph.Fit("phFit", "RQ", "")
 
-        retVal =  [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
+        retVal = [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
         retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF() if phFitClone.GetNDF() > 0 else 0)
         return retVal
 

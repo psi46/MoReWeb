@@ -1,7 +1,7 @@
 [GradingParameters]
 tthrTol = 10
-gainMin = 1.7
-gainMax = 5.2
+gainMin = 1.0
+gainMax = 4.5
 par1Min = 0.
 par1Max = 7.
 noiseB = 500
