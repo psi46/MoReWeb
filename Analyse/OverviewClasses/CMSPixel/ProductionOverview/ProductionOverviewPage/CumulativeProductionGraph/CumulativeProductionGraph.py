@@ -39,51 +39,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             TestDates = []
             ModuleGrades = []
 
-            FTMinus20BTC = ''
-            FTMinus20ATC = ''
-            FT17 = ''
-            XrayCal = ''
-            XrayHR = ''
-            Complete = ''
-            LeakageCurrent = ''
-
             for RowTuple in Rows:
                 if RowTuple['ModuleID']==ModuleID:
-                    TestType = RowTuple['TestType']
                     TestDates.append(RowTuple['TestDate'])
-                    if TestType == 'm20_1':
-                        FTMinus20BTC = RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
-                        ModuleGrades.append(RowTuple['Grade'])
-                    if TestType == 'm20_2':
-                        FTMinus20ATC = RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
-                        ModuleGrades.append(RowTuple['Grade'])
-                    if TestType == 'p17_1':
-                        FT17 =  RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
-                        ModuleGrades.append(RowTuple['Grade'])
-                    if TestType == 'XrayCalibration_Spectrum':
-                        XrayCal = RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
-                        ModuleGrades.append(RowTuple['Grade'])
-                    if TestType == 'XRayHRQualification':
-                        XrayHR = RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
-                        ModuleGrades.append(RowTuple['Grade'])
-                    if TestType == 'LeakageCurrentPON':
-                        LeakageCurrent = RowTuple['Grade'] if RowTuple['Grade'] is not None else ''
-                        ModuleGrades.append(RowTuple['Grade'])
-
 
             FinalGrade = 'None'
-            if len(FTMinus20BTC) > 0 and len(FTMinus20ATC) > 0 and len(FT17) > 0 and len(XrayHR) > 0:
-                if 'C' in ModuleGrades:
-                    FinalGrade = 'C'
-                elif 'B' in ModuleGrades:
-                    FinalGrade = 'B'
-                elif 'A' in ModuleGrades:
-                    FinalGrade = 'A'
-
-            # only use leakage current grade as final grade if it is C
-            if len(LeakageCurrent) > 0:
-                if LeakageCurrent.upper() == 'C':
-                    FinalGrade = 'C'
+            if self.ModuleQualificationIsComplete(ModuleID, Rows):
+                FinalGrade = self.GetFinalGrade(ModuleID, Rows)
 
             Module['ModuleID'] = ModuleID
             Module['Grade'] = FinalGrade

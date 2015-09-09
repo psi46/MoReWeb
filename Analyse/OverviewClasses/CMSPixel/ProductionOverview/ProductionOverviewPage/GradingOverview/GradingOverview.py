@@ -62,14 +62,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         ModuleGrades.append(RowTuple['Grade'])
 
 
-            if len(FTMinus20BTC) > 0 and len(FTMinus20ATC) > 0 and len(FT17) > 0 and len(XrayHR) > 0:
-                FinalGrade = 'None'
-                if 'C' in ModuleGrades:
-                    FinalGrade = 'C'
-                elif 'B' in ModuleGrades:
-                    FinalGrade = 'B'
-                elif 'A' in ModuleGrades:
-                    FinalGrade = 'A'
+            if self.ModuleQualificationIsComplete(ModuleID, Rows):
+                FinalGrade = self.GetFinalGrade(ModuleID, Rows)
                 Final_Grades.append(FinalGrade)
 
             FTMinus20BTC_Grades.append(FTMinus20BTC)
@@ -80,7 +74,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         TableData = [
             [{'Class' : 'Header', 'Value' : 'Tested modules:'}, {'Class' : 'Value', 'Value' : "%d"%len(ModuleIDsList)}],
-            [{'Class' : 'Header', 'Value' : 'Fully tested:'}, {'Class' : 'Value', 'Value' : "%d"%len(Final_Grades)}],
+            [{'Class' : 'Header', 'Value' : 'Qualification complete:'}, {'Class' : 'Value', 'Value' : "%d"%len(Final_Grades)}],
         ]
         HTML = self.Table(TableData)
 

@@ -158,6 +158,65 @@ class GeneralProductionOverview:
 
         return Rows
 
+    def GetModuleQualificationRows(self, ModuleID):
+        if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
+            Rows = {}
+            print "-not implemented for global db-"
+        else:
+            AdditionalParams = {'ModuleID': ModuleID}
+            Query = 'SELECT * FROM ModuleTestResults WHERE ModuleID=:ModuleID'
+            if self.Debug:
+                self.PrintInfo("Query: %s"%Query)
+
+            self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(Query, AdditionalParams)
+            self.TestResultEnvironmentObject.LocalDBConnectionCursor.row_factory = self.dict_factory
+            Rows = self.TestResultEnvironmentObject.LocalDBConnectionCursor.fetchall()
+        return Rows
+
+    def ModuleQualificationIsComplete(self, ModuleID, Rows = None):
+
+        if not Rows:
+            Rows = self.GetModuleQualificationRows(ModuleID)
+        RequiredQualificationTypes = self.TestResultEnvironmentObject.Configuration['RequiredTestTypesForComplete'].strip().split(',')
+        FoundQualificationTypes = []
+        for RowTuple in Rows:
+            if RowTuple['ModuleID']==ModuleID:
+                FoundQualificationTypes.append(RowTuple['TestType'])
+                #exception: bad leakage current at startup!
+                if RowTuple['TestType'] == 'LeakageCurrentPON' and RowTuple['Grade'] == 'C':
+                    return True
+
+        Complete = True
+        for RequiredQualificationType in RequiredQualificationTypes:
+            if RequiredQualificationType not in FoundQualificationTypes:
+                Complete = False
+                break
+
+        return Complete
+
+    def GetFinalGrade(self, ModuleID, Rows = None):
+        if not Rows:
+            Rows = self.GetModuleQualificationRows(ModuleID)
+        if self.ModuleQualificationIsComplete(ModuleID, Rows):
+            ModuleGrades = []
+            GradedTestTypes = ['m20_1', 'm20_2', 'p17_1', 'XrayCalibration_Spectrum', 'XRayHRQualification']
+            for RowTuple in Rows:
+                if RowTuple['ModuleID']==ModuleID:
+                    if RowTuple['TestType'] in GradedTestTypes:
+                        ModuleGrades.append(RowTuple['Grade'])
+                    elif RowTuple['TestType'] == 'LeakageCurrentPON' and RowTuple['Grade'] == 'C':
+                        ModuleGrades.append(RowTuple['Grade'])
+
+        FinalGrade = 'None'
+        if 'C' in ModuleGrades:
+            FinalGrade = 'C'
+        elif 'B' in ModuleGrades:
+            FinalGrade = 'B'
+        elif 'A' in ModuleGrades:
+            FinalGrade = 'A'
+        
+        return FinalGrade
+
     def GenerateOverviewHTML(self):
 
         ModuleData = self.FetchData()

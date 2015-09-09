@@ -145,6 +145,7 @@ class TestResultEnvironment:
             }
             self.Configuration['GzipSVG'] = int(Configuration.get('SystemConfiguration', 'GzipSVG'))
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
+            self.Configuration['RequiredTestTypesForComplete'] = Configuration.get('ProductionOverview', 'RequiredTestTypesForComplete')
             for i in self.GradingParameters:
                 self.GradingParameters[i] = float(Configuration.get('GradingParameters', i))
             if Configuration.has_option('XRayHRQualification','OmitGradesInFinalGrading'):

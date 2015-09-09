@@ -49,37 +49,26 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
                     if TestType == 'm20_1':
                         FTMinus20BTC = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
-                        ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'm20_2':
                         FTMinus20ATC = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
-                        ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'p17_1':
                         FT17 = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
-                        ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'XrayCalibration_Spectrum':
                         XrayCal = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
-                        ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'XRayHRQualification':
                         XrayHR = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
-                        ModuleGrades.append(RowTuple['Grade'])
                     if TestType == 'LeakageCurrentPON':
                         LCTest = "<a href='{url}'>{text}</a>".format(text=self.DateFromTimestamp(RowTuple['TestDate']), url=Url)
                         ModuleGrades.append(RowTuple['Grade'])
                         LCGrade = RowTuple['Grade']
 
-            if len(FTMinus20BTC) > 0 and len(FTMinus20ATC) > 0 and len(FT17) > 0 and len(XrayHR) > 0:
-                if len(XrayCal) > 0:
-                    Complete = '<div style="text-align:center;" title="FullQualification, HR Test and Calibration done">&#x2713;</div>'
-                if 'C' in ModuleGrades:
-                    FinalGrade = 'C'
-                elif 'B' in ModuleGrades:
-                    FinalGrade = 'B'
-                elif 'A' in ModuleGrades:
-                    FinalGrade = 'A'
-
-            if LCGrade == 'C' and not (len(FTMinus20BTC) > 0 and len(FTMinus20ATC) > 0 and len(FT17) > 0 and len(XrayHR) > 0 and len(XrayCal) > 0):
-                Complete = '<div style="text-align:center;color:#999;" title="High leakage current, no qualification to be done">&#x2713;</div>'
+            if LCGrade == 'C':
+                Complete = '<div style="text-align:center;color:#999;" title="Grade C due to high leakage current">&#x2713;</div>'
                 FinalGrade = 'C'
+            elif self.ModuleQualificationIsComplete(ModuleID, Rows):
+                Complete = '<div style="text-align:center;" title="FullQualification, HR Test and Calibration done">&#x2713;</div>'
+                FinalGrade = self.GetFinalGrade(ModuleID, Rows)
+
 
             TableData.append(
                 [
