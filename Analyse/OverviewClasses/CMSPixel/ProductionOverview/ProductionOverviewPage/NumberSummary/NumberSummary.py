@@ -46,7 +46,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
             Module['ModuleID'] = ModuleID
             Module['Grade'] = FinalModuleGrade
-            Module['TestDate'] = max(TestDates) #datetime.datetime.fromtimestamp(max(TestDates)).strftime("%Y-%m-%d %H:%m")
+            Module['TestDate'] = max(TestDates)
             ModuleData.append(Module)
 
         ModuleData.sort(key=lambda x: x['TestDate'], reverse=True)

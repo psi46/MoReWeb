@@ -223,7 +223,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             )
 
         ### per pixel ###
-        self.SubPages.append({"InitialAttributes" : {"Anchor": "PerPixel", "Title": "Per pixel quantities"}, "Key": "Section","Module": "Section"})
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "PerPixel", "Title": "Pixel-based quantities"}, "Key": "Section","Module": "Section"})
         for Test in TestsList:
             self.SubPages.append(
                 {
@@ -232,6 +232,45 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "InitialAttributes" : {
                         "Test": "{Test}".format(Test = Test),
                         "StorageKey" : "GainPerPixel__{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "PedestalPerPixel_{Test}".format(Test = Test),
+                    "Module": "PedestalPerPixel",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "PedestalPerPixel__{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "SCurveWidthsPerPixel_{Test}".format(Test = Test),
+                    "Module": "SCurveWidthsPerPixel",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "SCurveWidthsPerPixel__{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "VcalThresholdTrimmedPerPixel_{Test}".format(Test = Test),
+                    "Module": "VcalThresholdTrimmedPerPixel",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "VcalThresholdTrimmedPerPixel__{Test}".format(Test = Test),
                         "DateBegin": self.Attributes['DateBegin'],
                         "DateEnd": self.Attributes['DateEnd'],
                     }
