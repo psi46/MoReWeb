@@ -48,7 +48,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'Test Date'
             },
             'TestTime': {
-                'Value':datetime.datetime.fromtimestamp(float(self.Attributes['TestDate'])).strftime("%H:%m"), 
+                'Value':datetime.datetime.fromtimestamp(float(self.Attributes['TestDate'])).strftime("%H:%M"), 
                 'Label':'Test Time'
             },
             'TestDuration': {
