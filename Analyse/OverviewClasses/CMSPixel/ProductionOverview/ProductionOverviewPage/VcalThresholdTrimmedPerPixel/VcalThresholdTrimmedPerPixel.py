@@ -9,7 +9,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         self.NameSingle='VcalThresholdTrimmedPerPixel'
     	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
-        self.Title = 'Vcal Threshold Trimmed {Test}'.format(Test=self.Attributes['Test'])
+        self.Title = 'Vcal Thr Trimmed {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
             'Width': 1,
         }

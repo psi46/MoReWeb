@@ -33,8 +33,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         HTML = ""
 
-        HistogramMax = 120
-        NBins = 120
+        HistogramMax = 140
+        NBins = 140
         NFullTests = 0
 
         TestDurations = {
@@ -50,28 +50,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     TestType = RowTuple['TestType']
                     # only count Fulltests
                     if TestDurations.has_key(TestType):
-
-                        Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Temperature', 'KeyValueDictPairs.json'])
-                        JSONFiles = glob.glob(Path)
-                        if len(JSONFiles) > 1:
-                            print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
-                        elif len(JSONFiles) < 1:
-                            print "WARNING: %s json file not found: '%s"%(self.Name, Path)
-                        else:
-                            
-                            with open(JSONFiles[0]) as data_file:    
-                                JSONData = json.load(data_file)
-                            
-                            
-                            TestDurationString = JSONData["Duration"]['Value']
-                            if len(TestDurationString.split(':')) == 3:
-                                Hours = float(TestDurationString.split(':')[0])
-                                Minutes = float(TestDurationString.split(':')[1])
-                                Seconds = float(TestDurationString.split(':')[2])
-
-                                TestDurations[TestType].append(Hours*60.0 + Minutes + Seconds/60.0)
-
-                        NFullTests += 1
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'DigitalCurrent', 'HiddenData.json', 'Duration', 'Value'])
+                        
+                        if Value:
+                            TestDurations[TestType].append(float(Value)/60.0)
+                            NFullTests += 1
 
         # create plot
 
@@ -110,7 +93,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         
         self.SaveCanvas()
 
-        HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of Fulltestss: %d"%NFullTests)
+        HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of Fulltests: %d"%NFullTests)
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
         ROOT.gPad.SetLogy(0)
