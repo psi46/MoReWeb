@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>MORE-Web changelog</title>
+	</head>
+
+	<body>
+	<h1>MoReWeb changelog</h1>
+	last updated: September 9, 2015
+	<h2>v0.6.0</h2>
+	This list should give an overview of new features and bugfixes from the last few months, but is not complete.
+	<h3>New Features</h3>
+
+	<h4>Fulltest analysis</h4>
+	<ul>
+		<li>
+			new grading implemented
+		</li>
+		<li>
+			fit Vcal threshold with Gaussian instead of taking RMS
+		</li>
+		<li>
+			show separate IV and electrical grades
+		</li>
+		<li>
+			readback calibration results added
+		</li>
+		<li>
+			improve ROC summary table, include grades, performance parameters and reason of degrading
+		</li>
+		<li>
+			add new boxes for TBM parameters
+		</li>
+		<li>
+			r/o errors and criticals counting added
+		</li>
+		<li>
+			display analysis date, MoReWeb version and branch
+		</li>
+		<li>
+			display changes of GradingParameters.cfg wrt GradingParameters.cfg.default in FT summary
+		</li>
+		<li>
+			show a more verbose summary of ROC pixel defects in the logfile and also a fulltest summary in the end including grades
+		</li>
+		<li>
+			include BB4 test, if BB4 and BB test are both present, BB4 has priority
+		</li>
+		<li>
+			include 'tornado' plot
+		</li>
+	</ul>
+	<h4>X-ray HR tests</h4>
+	<ul>
+		<li>
+			analysis of HR tests has been implemented, including			
+			<ul>
+				<li>efficiency maps and interpolation</li>
+				<li>hitmaps to check for missing bump bonds</li>
+				<li>readout uniformity</li>
+				<li>double column uniformity</li>
+				<li>SCurves under X-rays</li>
+			</ul>
+		</li>
+	</ul>
+	<h4>Vcal calibration</h4>
+	<ul>
+		<li>
+			improve fit of spectra with a large backgroun with <i>SpectrumFitImproveInitialGuess</i> and <i>SpectrumFitAdditionalConstraints</i> options
+		</li>
+		<li>
+			improve fit of PH vs Vcal line with <i>LinearFitAdditionalConstraints</i> option
+		</li>
+		<li>
+			display module hitmap and hits per pixel distribution on vcal calibration page
+		</li>
+	</ul>
+	<h4>Leakage current at startup test</h4>
+	<ul>
+		<li>
+			added LeakageCurrentPON test analysis
+		</li>
+	</ul>	
+	<h4>Production overview page</h4>
+	<ul>
+		<li>
+			an overview page of tested modules can be produced with <strong>./Controller.py -p</strong>, including:
+			<ul>
+				<li>total and weekly grading summary</li>
+				<li>cumulative plot of tested modules</li>
+				<li>distribution of ROC performance parameters like RelativeGainWidth, Noise, PedestalSpread etc.</li>
+				<li>distribution of pixel parameters like Gain, Noise, Threshold etc.</li>
+				<li>distribution of DAC parameters and sensor properties</li>
+				<li>module failure overview which shows reason for degrading</li>
+			</ul>
+		</li>
+	</ul>
+	<h4>General features</h4>
+	<ul>
+		<li>
+			several improvements for analysis of large amounts of data
+		</li>
+		<ul>
+			<li>
+				improved exception handling, errors in one qualification folder should not stop analysis of other folders but just skip this folder
+			</li>
+			<li>
+				show progress of analysis
+			</li>
+		</ul>
+		<li>
+			added &quot;-r&quot; parameter to force re-fitting of SCurve and PH data
+		</li>
+		<li>
+			parallelization of fitting: in the SystemConfiguration <i>ParallelProcessing = 1</i> can be set to enable parallel fitting, <i>LimitProcesses</i> can be used to limit number of threads
+		</li>
+		<li>
+			if fulltests fail, an empty row with grade C is written to database instead of writing nothing
+		</li>
+		<li>
+			removed not used or constant column from qualification overview page
+		</li>
+		<li>
+			denote which fit function is used if fit curve is displayed in histogram
+		</li>
+		<li>
+			improved pXar/pyxar software detection
+		</li>
+		<li>
+			add analysis date to overview page
+		</li>
+		<li>
+			option to sort the qualification list
+		</li>
+	</ul>
+
+	<h2>Bug fixes</h2>
+
+	<h3>Grading</h3>
+	<ul>
+		<li>fixed bug through which many pixel defects were not leading to a degrading above the intended value</li>
+		<li>fixed double counting of pixel defects (maily due to dead pixels)</li>
+		<li>threshold defects are now properly counted</li>
+	</ul>
+
+	<h3>Analysis</h3>
+	<ul>
+		<li>fixed white pixels that appeared in vcal threshold map</li>
+		<li>fixed bug which caused linear PH fit to fail sometimes leading to Gain defects</li>
+		<li>fixed bug where hitmaps for all targets were the same in vcal calibration</li>
+		<li>fixed 'ignore least significant trimbit' option in TrimBits test</li>
+		<li>fixed bugs where mean values were nan because they included nan's</li>
+	</ul>
+
+	<h3>General</h3>
+	<ul>
+		<li>fixed crashes due to exceeding max number of open file handles if analyzing many folders at once</li>
+		<li>exception handling of wrong directory structure, wrong folder names, missing .ini files ...</li>
+		<li>exception handling of bad modules, especially dead ROCs or double columns</li>
+		<li>fixed serialization of json files</li>
+		<li>fixed bug which on qualifications overview page did not display the max number of pixel defects from the fulltests</li>
+		<li>fixed bug with not correctly displayed times (month instead of minutes)</li>
+	</ul>
+
+
+	</body>
+</html>
