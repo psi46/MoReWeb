@@ -48,7 +48,20 @@ class TestResult(GeneralTestResult):
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
         self.Attributes['Ntrig'] = {}
-            
+
+        try:
+            self.AnalyzeHRQualificationFolder()
+        except Exception as inst:
+            self.TestResultEnvironmentObject.ErrorList.append(
+               {'ModulePath': self.TestResultEnvironmentObject.ModuleDataDirectory,
+                'ErrorCode': inst,
+                'FinalResultsStoragePath':'unkown'
+                }
+            )
+            print "\x1b[31mProblems in X-ray HR directory structure detected, skip qualification directory! %s\x1b[0m"%self.TestResultEnvironmentObject.ModuleDataDirectory
+
+    def AnalyzeHRQualificationFolder(self):
+
         HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
         for Path in HREfficiencyPaths:
             FolderName = os.path.basename(Path)

@@ -66,22 +66,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         DoubleColumnRateList.append(DoubleColumnRate / DoubleColumnMeanEfficiency)
                         DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
                     except:
-                        print "could not fit double column efficiency: ROC", ChipNo, " DC:", DoubleColumn
-                        print "  ",repr(PixelRateList)
-                        print "  ",repr(PixelEfficiencyList)
-                        pass
+                        print "could not calculate double column efficiency: ROC", ChipNo, " DC:", DoubleColumn
 
+                try:
+                    cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 40, 150)
+                    cubicFit.SetParameter(1, 100)
+                    cubicFit.SetParameter(2, 5e-7)
 
-                cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 40, 150)
-                cubicFit.SetParameter(1, 100)
-                cubicFit.SetParameter(2, 5e-7)
+                    EfficiencyGraph = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList)
+                    EfficiencyGraph.Fit(cubicFit, 'QR')
 
-                EfficiencyGraph = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList)
-                EfficiencyGraph.Fit(cubicFit, 'QR')
-
-                RootHistogram.Fill(cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor))
-                cubicFit.Delete()
-                EfficiencyGraph.Delete()
+                    RootHistogram.Fill(cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor))
+                    cubicFit.Delete()
+                    EfficiencyGraph.Delete()
+                except:
+                    print "warning: ROC",ChipNo," double column ", DoubleColumn, ": efficiency fit failed!"
 
             if RootHistogram:
                 RootHistogram.SetLineColor(CurveColors[ColorIndex])
