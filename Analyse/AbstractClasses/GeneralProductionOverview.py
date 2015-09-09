@@ -158,6 +158,13 @@ class GeneralProductionOverview:
 
         return Rows
 
+    def GetModuleIDsList(self, Rows):
+        ModuleIDsList = []
+        for RowTuple in Rows:
+            if not RowTuple['ModuleID'] in ModuleIDsList:
+                ModuleIDsList.append(RowTuple['ModuleID'])
+        return ModuleIDsList
+
     def GetModuleQualificationRows(self, ModuleID):
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             Rows = {}
@@ -467,10 +474,10 @@ class GeneralProductionOverview:
 
         MultipleFilesWarning = False
         if len(RootFileNames) > 1:
-            print "More than 1 root file found! Using the first one which contains the histogram."
+            print "    More than 1 root file found! Using the first one which contains the histogram."
             MultipleFilesWarning = True
         elif len(RootFileNames) < 1:
-            print ".root file for histogram %s not found!"%HistName
+            print "    .root file for histogram %s not found!"%HistName
             return None
 
         HistogramFound = False
@@ -489,7 +496,7 @@ class GeneralProductionOverview:
             if HistogramFound:
                 self.FileHandles.append(RootFile)
                 if MultipleFilesWarning:
-                    print " => Histogram '%s' found in file '%s"%(HistName, RootFile)
+                    print "      => Histogram '%s' found in file '%s"%(HistName, RootFile)
                 break
             else:
                 RootFile.Close()

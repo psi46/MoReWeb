@@ -222,8 +222,23 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             )
 
-        ### DACs ###
+        ### per pixel ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "PerPixel", "Title": "Per pixel quantities"}, "Key": "Section","Module": "Section"})
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "GainPerPixel_{Test}".format(Test = Test),
+                    "Module": "GainPerPixel",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "GainPerPixel__{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
 
+        ### DACs ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "DACs", "Title": "DAC Parameters"}, "Key": "Section","Module": "Section"})
         TrimThresholds = ['', '35']
         DACs = ['caldel', 'phoffset', 'phscale', 'vana', 'vthrcomp', 'vtrim']

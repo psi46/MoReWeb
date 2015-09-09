@@ -51,7 +51,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                         if ROOTObject.GetBinContent(1+col, 1+row) < 1:
                                             self.UpdatePlot(SummaryMap, Chip, col, row, 1)
                             else:
-                                print "Dead Pixel map not found for module '%s'"%ModuleID
+                                print "    Dead Pixel map not found for module '%s'"%ModuleID
                     
                         NModules += 1
 
