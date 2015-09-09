@@ -1,7 +1,10 @@
 Info
 =======
 
-##### There will be a new major version of MoReWeb 0.6 mid of September, including a changelog and short explanation of all important changes done in the last months. All test should then be re-analyzed with the new version when it is available.
+##### There will be a new major version of MoReWeb 0.6 mid of September, including a changelog and short explanation of all important changes done in the last months. All test should then be re-analyzed (incl. re-fitting) with the new version when it is available with:
+
+    ./Controller.py -r -f
+
 
 
 MoReWeb
