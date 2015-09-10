@@ -71,32 +71,35 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         PlotMaximum = Histogram.GetMaximum()*1.1
         Histogram.SetMaximum(PlotMaximum)
 
-        CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
-        for i in range(1,NBins):
-            if i >= CloneHistogram.GetXaxis().FindBin(GradeBC) and i <= CloneHistogram.GetXaxis().FindBin(GradeAB):
-                CloneHistogram.SetBinContent(i, PlotMaximum)
-          
-        CloneHistogram.SetFillColorAlpha(ROOT.kBlue, 0.12)
-        CloneHistogram.SetFillStyle(1001)
-        CloneHistogram.Draw("same")
+            try:
+            CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+            for i in range(1,NBins):
+                if i >= CloneHistogram.GetXaxis().FindBin(GradeBC) and i <= CloneHistogram.GetXaxis().FindBin(GradeAB):
+                    CloneHistogram.SetBinContent(i, PlotMaximum)
+              
+            CloneHistogram.SetFillColorAlpha(ROOT.kBlue, 0.12)
+            CloneHistogram.SetFillStyle(1001)
+            CloneHistogram.Draw("same")
 
-        CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
-        for i in range(1,NBins):
-            if i < CloneHistogram.GetXaxis().FindBin(GradeBC):
-                CloneHistogram2.SetBinContent(i, PlotMaximum)
-          
-        CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
-        CloneHistogram2.SetFillStyle(1001)
-        CloneHistogram2.Draw("same")
+            CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+            for i in range(1,NBins):
+                if i < CloneHistogram.GetXaxis().FindBin(GradeBC):
+                    CloneHistogram2.SetBinContent(i, PlotMaximum)
+              
+            CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
+            CloneHistogram2.SetFillStyle(1001)
+            CloneHistogram2.Draw("same")
 
-        CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
-        for i in range(1,NBins):
-            if i > CloneHistogram.GetXaxis().FindBin(GradeAB):
-                CloneHistogram3.SetBinContent(i, PlotMaximum)
-          
-        CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)
-        CloneHistogram3.SetFillStyle(1001)
-        CloneHistogram3.Draw("same")
+            CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+            for i in range(1,NBins):
+                if i > CloneHistogram.GetXaxis().FindBin(GradeAB):
+                    CloneHistogram3.SetBinContent(i, PlotMaximum)
+              
+            CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)
+            CloneHistogram3.SetFillStyle(1001)
+            CloneHistogram3.Draw("same")
+        except:
+            pass
 
         # subtitle
         title = ROOT.TText()

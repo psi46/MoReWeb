@@ -76,32 +76,35 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         PlotMaximum = Histogram.GetMaximum()*1.1
         Histogram.SetMaximum(PlotMaximum)
 
-        CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
-        for i in range(1,NBins):
-            if i > GradeAB/NoiseMax*NBins and i < GradeBC/NoiseMax*NBins:
-                CloneHistogram.SetBinContent(i, PlotMaximum)
-          
-        CloneHistogram.SetFillColorAlpha(ROOT.kBlue, 0.12)
-        CloneHistogram.SetFillStyle(1001)
-        CloneHistogram.Draw("same")
+        try:
+            CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
+            for i in range(1,NBins):
+                if i > GradeAB/NoiseMax*NBins and i < GradeBC/NoiseMax*NBins:
+                    CloneHistogram.SetBinContent(i, PlotMaximum)
+              
+            CloneHistogram.SetFillColorAlpha(ROOT.kBlue, 0.12)
+            CloneHistogram.SetFillStyle(1001)
+            CloneHistogram.Draw("same")
 
-        CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
-        for i in range(1,NBins):
-            if i >= GradeBC/NoiseMax*NBins:
-                CloneHistogram2.SetBinContent(i, PlotMaximum)
-          
-        CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
-        CloneHistogram2.SetFillStyle(1001)
-        CloneHistogram2.Draw("same")
+            CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
+            for i in range(1,NBins):
+                if i >= GradeBC/NoiseMax*NBins:
+                    CloneHistogram2.SetBinContent(i, PlotMaximum)
+              
+            CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
+            CloneHistogram2.SetFillStyle(1001)
+            CloneHistogram2.Draw("same")
 
-        CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
-        for i in range(1,NBins):
-            if i <= GradeAB/NoiseMax*NBins:
-                CloneHistogram3.SetBinContent(i, PlotMaximum)
-          
-        CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)
-        CloneHistogram3.SetFillStyle(1001)
-        CloneHistogram3.Draw("same")
+            CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, NoiseMax)
+            for i in range(1,NBins):
+                if i <= GradeAB/NoiseMax*NBins:
+                    CloneHistogram3.SetBinContent(i, PlotMaximum)
+              
+            CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)
+            CloneHistogram3.SetFillStyle(1001)
+            CloneHistogram3.Draw("same")
+        except:
+            pass
 
         # mean, rms and gauss fit sigma
         GaussFitFunction = ROOT.TF1("GaussFitFunction", "gaus(0)")
