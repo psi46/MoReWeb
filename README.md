@@ -1,9 +1,19 @@
 Info
 =======
 
-##### There will be a new major version of MoReWeb 0.6 mid of September, including a changelog and short explanation of all important changes done in the last months. All test should then be re-analyzed (incl. re-fitting) with the new version when it is available with:
+##### New version 0.6.0 is available!
+see the changelog at:
+http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
+All test should be re-analyzed (incl. re-fitting) with the new version with:
 
     ./Controller.py -r -f
+    
+to create the production overview page, run
+
+    ./Controller.py -p
+    
+##### Please test this feature and report any bugs or other feedback!
+
 
 
 
