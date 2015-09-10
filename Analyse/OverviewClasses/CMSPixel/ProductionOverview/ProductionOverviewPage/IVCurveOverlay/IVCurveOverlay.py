@@ -46,7 +46,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         if len(RootFiles) > 1:
                             print "more than 1 root file found"
                         elif len(RootFiles) < 1:
-                            print "root file not found in: '%s"%Path
+                            if '_m20_1' not in Path:
+                                print "root file not found in: '%s"%Path
                         else:
                             ROOTObject = self.GetHistFromROOTFile(RootFiles[0], "Graph")
                             if ROOTObject:

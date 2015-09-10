@@ -556,10 +556,11 @@ class GeneralProductionOverview:
 
     def CloseFileHandles(self):
         for FileHandle in self.FileHandles:
-             if repr(FileHandle).find('ROOT.TFile') > -1:
-                 FileHandle.Close()
-             else:
-                 FileHandle.close()
+            if FileHandle:
+                if repr(FileHandle).find('ROOT.TFile') > -1:
+                    FileHandle.Close()
+                else:
+                    FileHandle.close()
 
     def GetCumulative(self, ROOTHist):
         nbinsx = ROOTHist.GetNbinsX()

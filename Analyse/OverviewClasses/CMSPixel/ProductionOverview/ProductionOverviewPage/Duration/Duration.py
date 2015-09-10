@@ -34,7 +34,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HTML = ""
 
         HistogramMax = 140
-        NBins = 140
+        NBins = 38
         NFullTests = 0
 
         TestDurations = {

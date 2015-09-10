@@ -42,16 +42,26 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             RootFiles = glob.glob(Path)
                             ROOTObject = self.GetHistFromROOTFile(RootFiles, "PHCalibrationGain") # (called PHCalibrationGain) todo: name consistently
                             if ROOTObject:
+                                ROOTObject.SetDirectory(0)
                                 if not Histogram:
-                                    Histogram = ROOTObject.Clone(self.GetUniqueID())
+                                    Histogram = ROOTObject
                                 else:
                                     try:
                                         Histogram.Add(ROOTObject)
                                     except:
                                         print "histogram could not be added, (did you try to use results of different MoReWeb versions?)"
+                                self.CloseFileHandles()
         
         if Histogram:
             Histogram.Draw("")
+            Histogram.SetStats(ROOT.kTRUE)
+
+            ROOT.gPad.Update()
+            PaveStats = Histogram.FindObject("stats")
+            PaveStats.SetX1NDC(0.7)
+            PaveStats.SetX2NDC(0.9)
+            PaveStats.SetY1NDC(0.7)
+            PaveStats.SetY2NDC(0.9)
             self.SaveCanvas()
             NPix = Histogram.GetEntries()
 

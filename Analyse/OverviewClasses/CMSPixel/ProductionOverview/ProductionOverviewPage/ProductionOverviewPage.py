@@ -14,6 +14,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         self.SaveHTML = True
 
+        TestsList = ['m20_1', 'm20_2', 'p17_1']
+
         self.SubPages.append({
             "InitialAttributes" : {
                 "Sections": ["BumpBonding", "DeadPixel", "PerformanceParameters", "DACs", "IVCurves", "HighRate", "VcalCalibration"],
@@ -136,8 +138,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             }
         )
-
-        TestsList = ['m20_1', 'm20_2', 'p17_1']
 
         ### dead pixels ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "DeadPixel", "Title": "Dead Pixels"}, "Key": "Section","Module": "Section"})

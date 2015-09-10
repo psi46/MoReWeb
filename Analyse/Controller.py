@@ -46,6 +46,8 @@ parser.add_argument('-r', '--refit', dest = 'refit', action = 'store_true', defa
                     help = 'Forces refitting even if files exist')
 parser.add_argument('-p', '--production-overview', dest = 'production_overview', action = 'store_true', default = False,
                     help = 'Creates production overview page in the end')
+parser.add_argument('-new', '--new-folders-only', dest = 'no_re_analysis', action = 'store_true', default = False,
+                    help = 'Do not analyze folder if it already exists in DB, even if MoReWeb version has changed')
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -196,7 +198,7 @@ def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):
             if verbose: print 'use Global DataBase: ',Configuration.get('SystemConfiguration','UseGlobalDatabase')
             bExistInDB = False
         if verbose: print 'same file: %s / exists in DB: %s'%(bSameFiles,bExistInDB)
-        if bSameFiles and bExistInDB:
+        if (bSameFiles or args.no_re_analysis) and bExistInDB:
             print 'do not analyse folder '+ FinalModuleResultsPath +'\n'
             retVal = False
     return retVal

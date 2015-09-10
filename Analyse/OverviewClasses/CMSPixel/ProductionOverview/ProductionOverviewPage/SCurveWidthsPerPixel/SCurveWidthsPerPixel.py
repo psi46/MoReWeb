@@ -42,16 +42,41 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             RootFiles = glob.glob(Path)
                             ROOTObject = self.GetHistFromROOTFile(RootFiles, "SCurveWidths")
                             if ROOTObject:
+                                ROOTObject.SetDirectory(0)
                                 if not Histogram:
-                                    Histogram = ROOTObject.Clone(self.GetUniqueID())
+                                    Histogram = ROOTObject
                                 else:
                                     try:
                                         Histogram.Add(ROOTObject)
                                     except:
                                         print "histogram could not be added, (did you try to use results of different MoReWeb versions?)"
+                                self.CloseFileHandles()
         
         if Histogram:
             Histogram.Draw("")
+
+            CutLow = ROOT.TCutG('lLower', 2)
+            CutLow.SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['pixelNoiseMin'], -1e6)
+            CutLow.SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['pixelNoiseMin'], +1e6)
+            CutLow.SetLineColor(ROOT.kRed)
+            CutLow.SetLineStyle(2)
+            CutLow.Draw('same')
+
+            CutHigh = ROOT.TCutG('lUpper', 2)
+            CutHigh.SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['pixelNoiseMax'], -1e6)
+            CutHigh.SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['pixelNoiseMax'], +1e6)
+            CutHigh.SetLineColor(ROOT.kRed)
+            CutHigh.SetLineStyle(2)
+            CutHigh.Draw('same')
+
+            Histogram.SetStats(ROOT.kTRUE)
+
+            ROOT.gPad.Update()
+            PaveStats = Histogram.FindObject("stats")
+            PaveStats.SetX1NDC(0.7)
+            PaveStats.SetX2NDC(0.9)
+            PaveStats.SetY1NDC(0.7)
+            PaveStats.SetY2NDC(0.9)
             self.SaveCanvas()
             NPix = Histogram.GetEntries()
 

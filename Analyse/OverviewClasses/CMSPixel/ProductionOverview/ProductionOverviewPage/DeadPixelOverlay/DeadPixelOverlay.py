@@ -33,7 +33,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         nRowsModule = 2 * self.nRows
         SummaryMap = ROOT.TH2D(self.GetUniqueID(), "", nColsModule, 0, nColsModule, nRowsModule, 0, nRowsModule)
 
-
         NModules = 0
         for ModuleID in ModuleIDsList:
 
@@ -50,10 +49,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                     for row in range(0, self.nRows):
                                         if ROOTObject.GetBinContent(1+col, 1+row) < 1:
                                             self.UpdatePlot(SummaryMap, Chip, col, row, 1)
+                                ROOTObject.Delete()
                             else:
-                                print "    Dead Pixel map not found for module '%s'"%ModuleID
-                    
+                                print "      Dead Pixel map not found for module '%s' Chip '%d'"%(ModuleID, Chip)
+
                         NModules += 1
+
+            self.CloseFileHandles()
 
         SummaryMap.Draw("colz")
 
@@ -69,7 +71,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         title.DrawText(0.15,0.965,Subtitle)
 
         self.SaveCanvas()
-        self.CloseFileHandles()
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of modules: %d"%NModules)
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
