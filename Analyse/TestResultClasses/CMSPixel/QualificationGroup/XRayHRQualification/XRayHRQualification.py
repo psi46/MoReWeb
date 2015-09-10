@@ -603,9 +603,6 @@ class TestResult(GeneralTestResult):
                 # N_ROCS_READOUT_PROBLEM <- new
                 HighRateData['ROCsWithReadoutProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithReadoutProblems']['Value']
 
-                # N_COL_NONUNIFORM
-                HighRateData['ROCsWithUniformityProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithUniformityProblems']['Value']
-
                 # ADDR_PIXELS_BAD
                 HighRateData['AddrPixelsBad'] = GradingTestResultObject.ResultData['HiddenData']['TotalDefectPixelsList']['Value']
 
@@ -624,12 +621,16 @@ class TestResult(GeneralTestResult):
                 ROCNumbers = []
                 TotalPixelDefectsLists = []
                 HotPixelsLists = []
+                RocGrades = []
+                NColNonUniform = []
                 ChipsSubTestResult = self.ResultData['SubTestResults']['Chips']
                 for i in ChipsSubTestResult.ResultData['SubTestResultDictList']:
                     ChipNo = i['TestResultObject'].Attributes['ChipNo']
                     ROCNumbers.append(ChipNo)
                     TotalPixelDefectsLists.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['TotalPixelDefectsList']['Value'])
                     HotPixelsLists.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefectsList']['Value'])
+                    RocGrades.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value'])
+                    NColNonUniform.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
           
                 # ROC rows
                 for i in range(0, len(ROCNumbers)):
@@ -647,6 +648,12 @@ class TestResult(GeneralTestResult):
 
                     # N_HOT_PIXEL
                     HighRateData['NHotPixel'] = len(HotPixelsLists[i])
+
+                    # GRADE
+                    HighRateData['Grade'] = RocGrades[i]
+
+                    # N_COL_NONUNIFORM
+                    HighRateData['NColNonUniform'] = NColNonUniform[i]
 
                     #-------------------------------------------------
                     # <--- here comes the code for pixel db upload
