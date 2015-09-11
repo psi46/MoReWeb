@@ -71,7 +71,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         PlotMaximum = Histogram.GetMaximum()*1.1
         Histogram.SetMaximum(PlotMaximum)
 
-            try:
+        try:
             CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
             for i in range(1,NBins):
                 if i >= CloneHistogram.GetXaxis().FindBin(GradeBC) and i <= CloneHistogram.GetXaxis().FindBin(GradeAB):
