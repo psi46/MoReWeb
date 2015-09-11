@@ -139,7 +139,6 @@ if MoReWebVersion:
 if MoReWebBranch:
     TestResultEnvironmentInstance.MoReWebBranch = MoReWebBranch
 
-
 if args.refit:
     TestResultEnvironmentInstance.Configuration['Fitting']['refit'] = True
 

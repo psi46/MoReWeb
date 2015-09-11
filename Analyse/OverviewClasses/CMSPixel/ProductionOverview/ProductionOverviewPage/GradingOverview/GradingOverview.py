@@ -1,5 +1,6 @@
 import ROOT
 import AbstractClasses
+import time
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
@@ -113,8 +114,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         TotalYield = '{0:1.1f}%'.format(float(nFinalA + nFinalB)/nTotal*100) if nTotal > 0 else "-"
 
+        VersionInfo = time.strftime("%Y-%m-%d %H:%M:%S") + "<br>"
+        try:
+            VersionInfo = VersionInfo + self.TestResultEnvironmentObject.MoReWebVersion + " on branch " + self.TestResultEnvironmentObject.MoReWebBranch 
+        except:
+            VersionInfo = VersionInfo + "unknown version"
 
-        HTML += self.Table(TableData) + self.BoxFooter("<div style='height:10px;'></div><div style='text-align:center;' title='fraction of A+B modules'><b>Yield: %s</b></div><div style='height:10px;'></div>"%TotalYield)
+        HTML += self.Table(TableData) + self.BoxFooter("<div style='height:10px;'></div><div style='text-align:center;' title='fraction of A+B modules'><b>Yield: %s</b></div><div style='height:10px;'></div><div>%s</div>"%(TotalYield, VersionInfo))
 
         return self.Boxed(HTML)
 
