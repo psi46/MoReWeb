@@ -144,6 +144,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Module':'ColumnUniformityEventsPerColumn',
                     'InitialAttributes':{
                         'Rate':Rate,
+                        'StorageKey':'ColumnUniformityEventsPerColumn_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':90+i
