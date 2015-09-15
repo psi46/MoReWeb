@@ -255,21 +255,26 @@ class TestResultEnvironment:
         else:
             self.LocalDBConnection.close()
 
-    def existInDB(self,moduleID,QualificationType):
+    def existInDB(self,moduleID,QualificationType,TestDate=None):
         print 'check whether module %s with QualificationType %s exists in DB: '%(moduleID,QualificationType)
         AdditionalWhere =""
         AdditionalWhere += ' AND ModuleID=:ModuleID '
         AdditionalWhere += ' AND QualificationType=:QualificationType '
+        AdditionalParameters = {
+                    'ModuleID':moduleID,
+                    'QualificationType':QualificationType
+                    }
+        if TestDate:
+            AdditionalWhere += ' AND TestDate>=:TestDate '
+            AdditionalParameters['TestDate'] = TestDate
+
         if self.LocalDBConnectionCursor:
             self.LocalDBConnectionCursor.execute(
                 'SELECT * FROM ModuleTestResults '+
                 'WHERE 1=1 '+
                 AdditionalWhere+
                 'ORDER BY ModuleID ASC,TestType ASC, TestDate ASC ',
-                {
-                    'ModuleID':moduleID,
-                    'QualificationType':QualificationType
-                }
+                AdditionalParameters
             )
             Rows = self.LocalDBConnectionCursor.fetchall()
             return len(Rows)>0

@@ -191,7 +191,11 @@ def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):
         if verbose: print 'md5 sum exists %s'%md5FileName
         bSameFiles = hasher.compare_two_files('checksum.md5',md5FileName)
         if not Configuration.getboolean('SystemConfiguration','UseGlobalDatabase'):
-            bExistInDB = TestResultEnvironmentInstance.existInDB(ModuleInformation['ModuleID'],ModuleInformation['QualificationType'])
+            if args.no_re_analysis:
+                # if -new parameter is specified, check if there if a file with same date or even a newer file in db
+                bExistInDB = TestResultEnvironmentInstance.existInDB(ModuleInformation['ModuleID'],ModuleInformation['QualificationType'],ModuleInformation['TestDate'])
+            else:
+                bExistInDB = TestResultEnvironmentInstance.existInDB(ModuleInformation['ModuleID'],ModuleInformation['QualificationType'])
             if verbose: print 'check if Module exists: %s'%bExistInDB
         else:
             if verbose: print 'use Global DataBase: ',Configuration.get('SystemConfiguration','UseGlobalDatabase')
