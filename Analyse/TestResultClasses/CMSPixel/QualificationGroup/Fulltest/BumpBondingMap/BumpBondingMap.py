@@ -25,6 +25,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if 'BB4' in ChipTestResultObject.ResultData['SubTestResults'] and ChipTestResultObject.ResultData['SubTestResults']['BB4'].ResultData['Plot']['ROOTObject']:
                     histo = ChipTestResultObject.ResultData['SubTestResults']['BB4'].ResultData['Plot']['ROOTObject']
                     self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = 'BB4'
+                    #print 'bla bla bla',ChipTestResultObject.ResultData['SubTestResults']
+                
+                elif 'BB2Map' in ChipTestResultObject.ResultData['SubTestResults'] and ChipTestResultObject.ResultData['SubTestResults']['BB2Map'].ResultData['Plot']['ROOTObject']:
+                    histo = ChipTestResultObject.ResultData['SubTestResults']['BB2Map'].ResultData['Plot']['ROOTObject']
+                    self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = 'BB2'
             except:
                 pass
                 
