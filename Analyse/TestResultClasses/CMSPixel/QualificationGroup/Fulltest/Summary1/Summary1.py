@@ -122,7 +122,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'NoisyPixels':{
                 'Value':'{0:1.0f}'.format(NoisyPixels), 
-                'Label':'Noisy Pixels'
+                'Label':'Noise Defects'
             },
             'TrimProblems':{
                 'Value':'{0:1.0f}'.format(TrimProblems), 

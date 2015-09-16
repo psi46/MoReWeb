@@ -7,8 +7,6 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.BareModuleTest.Ch
     def CustomInit(self):
         # Call Overridden CustomInit()
         super(TestResult, self).CustomInit()
-        self.Title = 'BB2 Scan: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        self.SaveCanvas()
 
         #self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_BareBBMap_TestResult'
         #self.NameSingle='BareBBMap'
