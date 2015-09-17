@@ -44,7 +44,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
             self.ResultData['Plot']['ROOTObject'].Draw('colz');
             self.ResultData['KeyValueDictPairs']['NHits']['Value'] = '{NHits:1.0f}'.format(NHits=self.ResultData['Plot']['ROOTObject'].GetEntries())
-
+            
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()
         
         TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])

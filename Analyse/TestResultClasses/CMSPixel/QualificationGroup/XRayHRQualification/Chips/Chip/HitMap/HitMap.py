@@ -70,6 +70,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()
         self.ResultData['KeyValueDictPairs']['NumberOfDefectivePixels']['Value'] = '{NumberOfDefectivePixels:1.0f}'.format(NumberOfDefectivePixels=NumberOfDefectivePixels)
         self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{RealHitrate:1.2f}'.format(RealHitrate=RealHitrate)
