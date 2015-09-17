@@ -1,5 +1,9 @@
 Info
 =======
+##### New version 0.6.2 is available!
+
+reduce size of FinalResults folders by changing some chip maps from SVG to PNG.
+
 ##### New version 0.6.1 is available!
 
 includes now BB2 test, takes number of triggers for PixelAlive from testParameters.dat if available and few small fixes for displayed values. Grading is not affected (unless BB2 is used, then bump defects are taken from BB2 now!).
