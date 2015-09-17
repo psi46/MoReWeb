@@ -889,10 +889,10 @@ class TestResult(GeneralTestResult):
                     HighRateDataRoc[i]['NHotPixel'] = len(HotPixelsLists[i])
 
                     # GRADE
-                    HighRateDataRoc['Grade'] = RocGrades[i]
+                    HighRateDataRoc[i]['Grade'] = RocGrades[i]
 
                     # N_COL_NONUNIFORM
-                    HighRateDataRoc['NColNonUniform'] = NColNonUniform[i]
+                    HighRateDataRoc[i]['NColNonUniform'] = NColNonUniform[i]
 
                     #-------------------------------------------------
                     # <--- here comes the code for pixel db upload
