@@ -144,6 +144,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Module':'ColumnUniformityEventsPerColumn',
                     'InitialAttributes':{
                         'Rate':Rate,
+                        'StorageKey':'ColumnUniformityEventsPerColumn_{Rate}'.format(Rate=Rate),
                     },
                     'DisplayOptions':{
                         'Order':90+i
@@ -174,7 +175,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'InitialAttributes':{
                     },
                     'DisplayOptions':{
-                        'Order':80+i   
+                        'Order':80+i
                     },
                     
                 },
@@ -183,7 +184,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'InitialAttributes':{
                     },
                     'DisplayOptions':{
-                        'Order':2    
+                        'Order':2
+                    },
+                },
+                {
+                    'Key':'DoubleColumnEfficiencyDistribution',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':200
                     },
                     
                 },
@@ -200,11 +209,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'InitialAttributes':{
                     },
                     'DisplayOptions':{
-                        'Order':0    
+                        'Order':0,
+                        'Width':2
                     },
-                    
+
                 },
             ]
-        
+
     def PopulateResultData(self):
         self.CloseSubTestResultFileHandles()

@@ -1,7 +1,23 @@
 Info
 =======
+##### New version 0.6.1 is available!
 
-##### There will be a new major version of MoReWeb 0.6 mid of September, including a changelog and short explanation of all important changes done in the last months. All test should then be re-analyzed with the new version when it is available.
+includes now BB2 test, takes number of triggers for PixelAlive from testParameters.dat if available and few small fixes for displayed values. Grading is not affected (unless BB2 is used, then bump defects are taken from BB2 now!).
+
+##### New version 0.6.0 is available!
+see the changelog at:
+http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
+All test should be re-analyzed (incl. re-fitting) with the new version with:
+
+    ./Controller.py -r -f
+    
+to create the production overview page, run
+
+    ./Controller.py -p
+    
+##### Please test this feature and report any bugs or other feedback!
+
+
 
 
 MoReWeb

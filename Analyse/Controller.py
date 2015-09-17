@@ -1,10 +1,11 @@
 #!/usr/bin/env python
  # -*- coding: utf-8 -*-
-from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview
+from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview, GeneralProductionOverview
 import AbstractClasses.Helper.hasher as hasher
 import argparse
 # from AbstractClasses import Helper
 import TestResultClasses.CMSPixel.QualificationGroup.QualificationGroup
+from OverviewClasses.CMSPixel.ProductionOverview import ProductionOverview
 import os, time,shutil, sys
 # import errno
 import ConfigParser
@@ -43,6 +44,10 @@ parser.add_argument('-d', '--delete-row', dest = 'deleterow', action = 'store_tr
                     help = 'Let you select a row in the local database to delete.')
 parser.add_argument('-r', '--refit', dest = 'refit', action = 'store_true', default = False,
                     help = 'Forces refitting even if files exist')
+parser.add_argument('-p', '--production-overview', dest = 'production_overview', action = 'store_true', default = False,
+                    help = 'Creates production overview page in the end')
+parser.add_argument('-new', '--new-folders-only', dest = 'no_re_analysis', action = 'store_true', default = False,
+                    help = 'Do not analyze folder if it already exists in DB, even if MoReWeb version has changed')
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -57,7 +62,9 @@ Configuration.read([
     'Configuration/GradingParameters.cfg',
     'Configuration/SystemConfiguration.cfg',
     'Configuration/Paths.cfg',
-    'Configuration/ModuleInformation.cfg'])
+    'Configuration/ModuleInformation.cfg',
+    'Configuration/ProductionOverview.cfg'
+    ])
 
 if args.revision != -1:
     revisionNumber = int(args.revision)
@@ -132,7 +139,6 @@ if MoReWebVersion:
 if MoReWebBranch:
     TestResultEnvironmentInstance.MoReWebBranch = MoReWebBranch
 
-
 if args.refit:
     TestResultEnvironmentInstance.Configuration['Fitting']['refit'] = True
 
@@ -191,7 +197,7 @@ def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):
             if verbose: print 'use Global DataBase: ',Configuration.get('SystemConfiguration','UseGlobalDatabase')
             bExistInDB = False
         if verbose: print 'same file: %s / exists in DB: %s'%(bSameFiles,bExistInDB)
-        if bSameFiles and bExistInDB:
+        if (bSameFiles or args.no_re_analysis) and bExistInDB:
             print 'do not analyse folder '+ FinalModuleResultsPath +'\n'
             retVal = False
     return retVal
@@ -294,13 +300,37 @@ def AnalyseSingleQualification(Folder):
         AnalyseTestData(ModuleInformationRaw, Folder)
 
 def AnalyseAllTestDataInDirectory(GlobalDataDirectory):
-    for Folder in os.listdir(GlobalDataDirectory):
+    Folders = os.listdir(GlobalDataDirectory)
+    FoldersToBeAnalyzed = []
+
+    for Folder in Folders:
+
         absPath = GlobalDataDirectory+'/'+Folder
         if not os.path.isdir(absPath):
             continue
+
         ModuleInformationRaw = Folder.split('_')
         if len(ModuleInformationRaw) >= 5:
-            AnalyseTestData(ModuleInformationRaw,Folder)
+            ModuleInformation = extractModuleInformation(ModuleInformationRaw)
+
+            if not args.singleQualificationPath == '':
+                TestResultEnvironmentInstance.ModuleDataDirectory = Folder
+                FinalModuleResultsPath = GetFinalModuleResultsPath(Folder)
+            else:
+                FinalModuleResultsPath = GetFinalModuleResultsPath(Folder)
+                TestResultEnvironmentInstance.ModuleDataDirectory = GlobalDataDirectory+'/'+Folder
+            TestResultEnvironmentInstance.FinalModuleResultsPath = FinalModuleResultsPath
+
+            if NeedsToBeAnalyzed(TestResultEnvironmentInstance.FinalModuleResultsPath ,ModuleInformation):
+                FoldersToBeAnalyzed.append(Folder)
+
+    print "\x1b[34mINFO: %d folder%s found that needs to be analyzed!\x1b[0m"%(len(FoldersToBeAnalyzed), 's' if len(FoldersToBeAnalyzed)!=1 else '')
+    Counter = 1
+    for Folder in FoldersToBeAnalyzed:
+        ModuleInformationRaw = Folder.split('_')
+        print "\x1b[34mINFO: Analyzing folder %d/%d (%s %s)\x1b[0m"%(Counter, len(FoldersToBeAnalyzed),ModuleInformationRaw[1],ModuleInformationRaw[0])
+        AnalyseTestData(ModuleInformationRaw,Folder)
+        Counter += 1
 
 def AnalyseSingleFullTest(singleFulltestPath):
     print 'analysing a single Fulltest at destination: "%s"' % args.singleFulltestPath
@@ -494,6 +524,12 @@ if args.deleterow:
 
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
+
+if args.production_overview:
+    print "production overview:"
+    ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
+    ProductionOverviewObject.GenerateOverview()
+
 # TestResultEnvironmentInstance.ErrorList.append( {'test1':'bla'})
 print '\nErrorList:'
 for i in TestResultEnvironmentInstance.ErrorList:

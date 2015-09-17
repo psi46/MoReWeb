@@ -9,14 +9,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_EfficiencyInterpolation_TestResult'
         self.NameSingle = 'EfficiencyInterpolation'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
-
+        self.FitFunction = "[0]-[1]*x^3"
         self.ResultData['KeyValueDictPairs'] = {}
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)] = {
                 'Value':'{0:1.0f}'.format(-1),
                 'Label':'Interpol. Efficiency {Rate}'.format(Rate=Rate)
             }
-        
+        self.ResultData['KeyValueDictPairs']['fitfunction'] = {
+            'Value': self.FitFunction,
+            'Label':'Fit'.format(Rate=Rate)
+        }
+        self.ResultData['KeyList'].append('fitfunction')
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
@@ -82,7 +86,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if self.ResultData['Plot']['ROOTObject']:
                 ROOT.gStyle.SetOptStat(0)
 
-                cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 40, 150)
+                cubicFit = ROOT.TF1("fitfunction", self.FitFunction, 40, 150)
                 cubicFit.SetParameter(1, 100)
                 cubicFit.SetParameter(2, 5e-7)
 

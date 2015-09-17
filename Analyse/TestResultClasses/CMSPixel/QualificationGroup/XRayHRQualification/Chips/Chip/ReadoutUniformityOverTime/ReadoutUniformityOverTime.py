@@ -21,10 +21,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'sigma_th':{
                 'Value':'{0:1.2f}'.format(-1),
                 'Label':'σ_th'
-            },
-            'expectation':{
-                'Value':'Poisson',
-                'Label':'Red curve (expected)'
             }
         }
         
@@ -98,7 +94,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['N']['Value'] = '{0:1.0f}'.format(Integral)
             self.ResultData['KeyValueDictPairs']['mu']['Value'] = '{0:1.0f}'.format(Mean)
             self.ResultData['KeyValueDictPairs']['sigma_th']['Value'] = '{0:1.2f}'.format(RMS_theoretical)
-            self.ResultData['KeyList'] += ['N','mu','sigma_th','expectation']
+            self.ResultData['KeyList'] += ['N','mu','sigma_th']
 
         self.Title = 'Read. Unif. over Time {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
         self.SaveCanvas()        

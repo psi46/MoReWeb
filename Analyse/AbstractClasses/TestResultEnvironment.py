@@ -145,6 +145,9 @@ class TestResultEnvironment:
             }
             self.Configuration['GzipSVG'] = int(Configuration.get('SystemConfiguration', 'GzipSVG'))
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
+            self.Configuration['RequiredTestTypesForComplete'] = Configuration.get('ProductionOverview', 'RequiredTestTypesForComplete')
+            self.Configuration['QualificationOverviewSort'] = Configuration.get('SystemConfiguration', 'QualificationOverviewSort')
+
             for i in self.GradingParameters:
                 self.GradingParameters[i] = float(Configuration.get('GradingParameters', i))
             if Configuration.has_option('XRayHRQualification','OmitGradesInFinalGrading'):
@@ -161,6 +164,10 @@ class TestResultEnvironment:
 
         self.OverviewHTMLTemplate = open('HTML/Overview/OverviewTemplate.html').read()
         self.OverviewStylesheet = open('HTML/Overview/OverviewTemplate.css').read()
+        self.ProductionOverviewHTMLTemplate = open('HTML/ProductionOverview/OverviewTemplate.html').read()
+        self.ProductionOverviewTableHTMLTemplate = open('HTML/ProductionOverview/Table.html').read()
+        self.ProductionOverviewPlotHTMLTemplate = open('HTML/ProductionOverview/Plot.html').read()
+        self.ProductionOverviewStylesheet = open('HTML/ProductionOverview/OverviewTemplate.css').read()
         self.HtmlParser = Helper.HtmlParser.HtmlParser()
 
         ROOT.gEnv.GetValue("Canvas.SavePrecision", -1)

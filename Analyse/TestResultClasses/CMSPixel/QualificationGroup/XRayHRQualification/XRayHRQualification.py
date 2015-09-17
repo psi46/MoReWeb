@@ -267,7 +267,20 @@ class TestResult(GeneralTestResult):
         self.Attributes['ROOTFiles'] = {}
         self.Attributes['SCurvePaths'] = {}
         self.Attributes['Ntrig'] = {}
-            
+
+        try:
+            self.AnalyzeHRQualificationFolder()
+        except Exception as inst:
+            self.TestResultEnvironmentObject.ErrorList.append(
+               {'ModulePath': self.TestResultEnvironmentObject.ModuleDataDirectory,
+                'ErrorCode': inst,
+                'FinalResultsStoragePath':'unkown'
+                }
+            )
+            print "\x1b[31mProblems in X-ray HR directory structure detected, skip qualification directory! %s\x1b[0m"%self.TestResultEnvironmentObject.ModuleDataDirectory
+
+    def AnalyzeHRQualificationFolder(self):
+
         HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
         for Path in HREfficiencyPaths:
             FolderName = os.path.basename(Path)
@@ -314,8 +327,9 @@ class TestResult(GeneralTestResult):
             self.Attributes['Rates']['HRSCurves'].append(Rate)
             self.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)] = Path
             ROOTFiles = glob.glob(Path+'/*.root')
-            self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
-            self.FileHandle.append(self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)])
+            if len(ROOTFiles) == 1:
+                self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
+                self.FileHandle.append(self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)])
 
 
         HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
@@ -845,12 +859,16 @@ class TestResult(GeneralTestResult):
                 ROCNumbers = []
                 TotalPixelDefectsLists = []
                 HotPixelsLists = []
+                RocGrades = []
+                NColNonUniform = []
                 ChipsSubTestResult = self.ResultData['SubTestResults']['Chips']
                 for i in ChipsSubTestResult.ResultData['SubTestResultDictList']:
                     ChipNo = i['TestResultObject'].Attributes['ChipNo']
                     ROCNumbers.append(ChipNo)
                     TotalPixelDefectsLists.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['TotalPixelDefectsList']['Value'])
                     HotPixelsLists.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefectsList']['Value'])
+                    RocGrades.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value'])
+                    NColNonUniform.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
           
                 # ROC rows
                 HighRateDataRoc = {}
@@ -869,6 +887,12 @@ class TestResult(GeneralTestResult):
 
                     # N_HOT_PIXEL
                     HighRateDataRoc[i]['NHotPixel'] = len(HotPixelsLists[i])
+
+                    # GRADE
+                    HighRateData['Grade'] = RocGrades[i]
+
+                    # N_COL_NONUNIFORM
+                    HighRateData['NColNonUniform'] = NColNonUniform[i]
 
                     #-------------------------------------------------
                     # <--- here comes the code for pixel db upload

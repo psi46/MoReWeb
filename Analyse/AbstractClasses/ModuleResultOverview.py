@@ -2,6 +2,8 @@ import AbstractClasses.Helper.HtmlParser
 import re
 import datetime
 import os
+import json
+
 class ModuleResultOverview:
     def __init__(self, TestResultEnvironmentObject):
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
@@ -13,6 +15,22 @@ class ModuleResultOverview:
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             Rows = {}
         else:
+            SortMode = self.TestResultEnvironmentObject.Configuration['QualificationOverviewSort'].strip().split(',')
+            SortClause = ''
+            if len(SortMode) > 0:
+                for i in range(0, len(SortMode)):
+                    parts = SortMode[i].strip().split(' ')
+                    if len(parts) > 0:
+                        if parts[0] in ['ModuleID', 'TestType', 'TestDate']:
+                            SortClause = SortClause + parts[0]
+                        if len(parts) > 1:
+                            if parts[1].upper() in ['ASC', 'DESC']:
+                                SortClause = SortClause + ' ' + parts[1]
+                        SortClause = SortClause + ','
+                SortClause = SortClause.strip(',')
+            else:
+                SortClause = 'ModuleID ASC,TestType ASC,TestDate ASC'
+
             AdditionalWhere = ''
             if ModuleID:
                 AdditionalWhere += ' AND ModuleID=:ModuleID '
@@ -22,7 +40,7 @@ class ModuleResultOverview:
                 'SELECT * FROM ModuleTestResults '+
                 'WHERE 1=1 '+
                 AdditionalWhere+
-                'ORDER BY ModuleID ASC,TestType ASC,TestDate ASC ',
+                'ORDER BY ' + SortClause,
                 {
                     'ModuleID':ModuleID,
                     'TestDate':TestDate
@@ -43,6 +61,11 @@ class ModuleResultOverview:
              {
                 'Label':'Test Date',
                 'DBColumnName':'TestDate',
+                'InGlobalOverviewList': True
+             },
+             {
+                'Label':'Analysis',
+                'DBColumnName':'KeyValueDictPairs/AnalysisDate',
                 'InGlobalOverviewList': True
              },
              {
@@ -179,17 +202,27 @@ class ModuleResultOverview:
                 ModuleIDList.append(Identificator)
 #                print 'added'
 
+                ResultHTMLFileName = 'TestResult.html'
+                QualificationGroupSubfolder = 'QualificationGroup'
+
                 RowDict = FinalModuleRowsDict[Identificator]
                 for Key in TableColumnList:
                     try:
-                        RowDict[Key] = RowTuple[Key]
+                        if Key.startswith('KeyValueDictPairs/'):
+                            try:
+                                KeyValueDictPairsFileName = self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/KeyValueDictPairs.json'
+                                with open(KeyValueDictPairsFileName) as data_file:    
+                                    KeyValueDictPairs = json.load(data_file)
+                                RowDict[Key] = KeyValueDictPairs[Key.split('/')[1]]['Value']
+                            except:
+                                RowDict[Key] = ''
+                        else:
+                            RowDict[Key] = RowTuple[Key]
                     except IndexError as e:
                         print 'searched Key:  ',Key
                         print 'existing Keys: ',RowTuple.keys()
                         raise e
 
-                ResultHTMLFileName = 'TestResult.html'
-                QualificationGroupSubfolder = 'QualificationGroup'
 
                 if GlobalOverviewList:
                     Link = os.path.relpath(
@@ -218,20 +251,36 @@ class ModuleResultOverview:
                         time = int(re.match(r'\d+', RowTuple['TestDate']).group())
                     else:
                         time = RowTuple['TestDate']
-                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(time).strftime("%Y-%m-%d %H:%m")
+                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(time).strftime("%Y-%m-%d %H:%M")
                 except TypeError as e:
                     print e,'\nerror',type(RowTuple['TestDate']),RowTuple['TestDate']
-                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(1).strftime("%Y-%m-%d %H:%m")
+                    RowDict['TestDate'] = datetime.datetime.fromtimestamp(1).strftime("%Y-%m-%d %H:%M")
                     raise e
+
+                try:
+                    time = float(RowDict['KeyValueDictPairs/AnalysisDate'])
+                    RowDict['KeyValueDictPairs/AnalysisDate'] = datetime.datetime.fromtimestamp(time).strftime("%Y-%m-%d %H:%M")
+                except:
+                    pass
 
             else:
                 #TestType
                 FinalModuleRowsDict[Identificator]['TestType'] += ' & %s'%RowTuple['TestType']
-                if ( FinalModuleRowsDict[Identificator]['Grade'] < RowTuple['Grade']):
-                  FinalModuleRowsDict[Identificator]['Grade'] = RowTuple['Grade']
+                if (FinalModuleRowsDict[Identificator]['Grade'] < RowTuple['Grade']):
+                    FinalModuleRowsDict[Identificator]['Grade'] = RowTuple['Grade']
                 MaxCompareList = ['PixelDefects','ROCsMoreThanOnePercent','Noise','Trimming','PHCalibration']
                 for item in MaxCompareList:
-                 FinalModuleRowsDict[Identificator][item] = max( FinalModuleRowsDict[Identificator][item],RowTuple[item])
+                    RowValue = RowTuple[item]
+                    FinalValue = FinalModuleRowsDict[Identificator][item]
+                    try:
+                        RowValue = int(RowValue)
+                    except:
+                        pass
+                    try:
+                        FinalValue = int(FinalValue)
+                    except:
+                        pass
+                    FinalModuleRowsDict[Identificator][item] = max(FinalValue, RowValue)
                 if RowTuple['Temperature'] and FinalModuleRowsDict[Identificator].has_key('Temperature'):
                    if FinalModuleRowsDict[Identificator]['Temperature']:
                        FinalModuleRowsDict[Identificator]['Temperature'] += " / %s"%RowTuple['Temperature']

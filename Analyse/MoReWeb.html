@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>MORE-Web</title>
+	</head>
+
+	<body>
+
+	<h1>MoReWeb v0.6.0</h1>
+	last updated: September 11, 2015
+	<h2>Changelog</h2>
+	<a href='Changelog/MoReWeb_changes.html'>see Changelog</a>
+
+	<h2>Requirements</h2>
+	<ul>
+	<li>Python 2.6 (2.7 recommended)</li>
+	<li>ROOT 5.34.19 (should also work with ROOT 6)</li>
+	<li>recent Web browser (min Firefox 4, Chrome 18, Safari 3, Opera 9, IE 10)</li>
+	</ul>
+
+	<h2>How to install</h2>
+	<ul>
+	<li>Clone from git: <strong>https://github.com/psi46/MoReWeb.git</strong></li>
+	<li>copy <strong>Paths.cfg.default</strong> to Paths.cfg and adjust paths</li>
+	</ul>
+
+	<h2>How to run</h2>
+	<ul>
+	<li>run './Controller.py' in Analyse subdirectory</li>
+	<li>run './Controller.py -p' to create production overview page if needed</li>
+	</ul>
+
+	<h2>Documentation</h2>
+	<ul>
+	<li>see Documentation.pdf in Analyse folder</li>
+	</ul>
+
+	<h2>FAQ</h2>
+	<h3>How is it decided if a folder placed in <i>GlobalDataDirectory</i> is re-analyzed when running MoReWeb?</h3>
+	<ul>
+	<li>MoReWeb places a checksum of the current code in the FinalResults folder. If the code is changed, either by git pull or manuel changes, all folders will be re-analyzed. To force re-analysis, <strong>use the --force</strong> (or -f) parameter.</li>
+	</ul>
+
+	<h3>How can one re-fit?</h3>
+	<ul>
+	<li>MoReWeb does not re-calculate the fits for S-curves and PH, use <strong>-r</strong> parameter to re-fit in something has changed in the fit procedure.</li>
+	</ul>
+
+	<h3>How can the order of the qualification list be changed?</h3>
+	<ul>
+	<li>In <strong>SystemConfiguration.cfg</strong> change the option <i>QualificationOverviewSort</i>, eg. to sort descending by module number: <strong>ModuleID DESC,TestType ASC,TestDate ASC</strong></li>
+	</ul>
+
+	<h3>How can one delete modules/qualifications from the list?</h3>
+	<ul>
+	<li>Use an sqlite editor, like <strong>sqlitebrowser</strong> or run './Controller.py -d' and then delete row by row. There will be a more user friendly way soon.</li>
+	</ul>
+
+	<h3>How can only new folders be analyzed, even if MoReWeb version changed?</h3>
+	<ul>
+	<li>Use './Controller.py -new'</li>
+	</ul>
+
+	<a href='http://cmspixel.phys.ethz.ch/'>back to ETH CMS Pixel group page</a>
+
+

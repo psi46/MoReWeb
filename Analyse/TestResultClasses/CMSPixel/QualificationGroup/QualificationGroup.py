@@ -9,7 +9,7 @@ import AbstractClasses.Helper.environment
 # as BetterConfigParser
 import AbstractClasses.Helper.testchain
 import warnings
-
+import time
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -73,6 +73,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ]
 
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
+
+        self.ResultData['KeyValueDictPairs'] = {'AnalysisDate': str(int(time.time()))}
 
     def appendOperationDetails(self, testlist):
         Operator = 'UNKNOWN'

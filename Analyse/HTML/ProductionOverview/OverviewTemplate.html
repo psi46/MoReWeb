@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>MORE-Web</title>
+		<!-- ###HEAD_STYLESHEETS### -->
+		<link rel="stylesheet" href="OverviewTemplate.css" type="text/css" />
+		<!-- ###HEAD_STYLESHEETS### -->
+		<!-- ###HEAD_STYLESHEET_TEMPLATE### -->
+		<style>###STYLESHEET###</style>
+		<!-- ###HEAD_STYLESHEET_TEMPLATE### -->
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+	</head>
+	<body>
+		<!-- ###TEMPLATE### -->
+			<div id="Page">
+				<div id="HeaderWrap">
+					<header>
+						<div id="Header"  class="Pagewidth">
+							<div id="Title">MORE-Web</div>
+							<div id="ClickpathWrap">
+								<!-- ###CLICKPATH### -->
+									<ul id="Clickpath">
+										<!-- ###CLICKPATH_ENTRY### -->
+											<li>
+												<a href="###URL###">###LABEL###</a>
+											</li>
+										<!-- ###CLICKPATH_ENTRY### -->
+									</ul>
+								<!-- ###CLICKPATH### -->
+							</div>
+						</div>
+					</header>
+				</div>
+				<div id="HeaderWrap" class="HeaderWrapGhost">
+					<div id="Header"  class="Pagewidth">
+						<div id="Title">MORE-Web</div>
+						<div id="ClickpathWrap">
+							<!-- ###CLICKPATH### -->
+								<ul id="Clickpath">
+									<!-- ###CLICKPATH_ENTRY### -->
+										<li>
+											<a href="###URL###">###LABEL###</a>
+										</li>
+									<!-- ###CLICKPATH_ENTRY### -->
+								</ul>
+							<!-- ###CLICKPATH### -->
+						</div>
+					</div>
+				</div>
+				<div id="ContentWrap">
+					<div id="Content"  class="Pagewidth">
+						<a name='PageTop' class='anchor'></a>
+						<h3>###PAGETITLE###</h3>
+						<div id="OverviewTableContainer">
+							<!-- ###PRODUCTIONOVERVIEW### -->
+								
+							<!-- ###PRODUCTIONOVERVIEW### -->
+						</div>
+					</div>
+				</div>
+			</div>
+		<!-- ###TEMPLATE### --> 
+		<script type="text/javascript">
+		function RefreshSizes(ImageLargeContainerID)
+		{
+			var Elements = [document.getElementById(ImageLargeContainerID).children[0]];
+			var DefaultWidth = 200;
+			var DefaultHeight= 300;
+			var Margin = 15;
+			var ScreenWidth = self.innerWidth;
+			var ScreenHeight = self.innerHeight;
+			for(var i in Elements)
+			{
+				if(Elements.hasOwnProperty(i))
+				{
+					if(Elements[i].getAttribute)
+					{
+						var Width = DefaultWidth * parseInt(Elements[i].getAttribute('data-width'));
+						var Height = DefaultHeight * parseInt(Elements[i].getAttribute('data-height'));
+						var ImageAspectRatio = Width / Height;
+						var ScaledWidth = ScreenWidth*0.9;
+						var ScaledHeight = ScreenHeight*0.9;
+						var ScaleTo = 'Width';
+						if(ScaledWidth / ImageAspectRatio > 0.9 * ScreenHeight){
+							ScaleTo = 'Height';
+							ScaledWidth = ImageAspectRatio * ScaledHeight;
+						}
+						else{
+							ScaleTo = 'Width';
+							ScaledHeight = ScaledWidth / ImageAspectRatio;
+						}
+						Elements[i].style.marginTop = -1* ((ScaledHeight+2*Margin)/2)+"px";
+						Elements[i].style.marginLeft = -1* ((ScaledWidth+2*Margin)/2)+"px";
+						var ImageElement = Elements[i].children[1];
+
+						ImageElement.style.max-height = '100%';
+						ImageElement.style.max-width = '100%';
+					}
+				}
+			}
+		}
+	
+		
+		
+		</script>
+	</body>
+</html>
