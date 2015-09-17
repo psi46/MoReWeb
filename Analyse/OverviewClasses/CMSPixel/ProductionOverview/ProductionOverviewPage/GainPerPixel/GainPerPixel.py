@@ -87,7 +87,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of Pixels: %d"%NPix)
             Histogram.Delete()
         else:
-            Message = "No histogram for gain per pixel found!!! %r"%ModuleID
+            Message = "No histogram for gain per pixel found!!!"
             HTML = Message
             self.PrintInfo(Message)
 

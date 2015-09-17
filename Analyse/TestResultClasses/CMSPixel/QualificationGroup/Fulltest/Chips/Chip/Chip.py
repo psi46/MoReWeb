@@ -65,7 +65,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                         'Order':5,
                     }
-                }
+                },
+                {'Key':'BB2Scan',
+                    'DisplayOptions':{ 
+                        'Order':6,
+                    }
+                },
+                {'Key':'BareBBWidth',
+                 'DisplayOptions':{ 
+                    'Order':6,
+                    }
+                 },
+                {'Key':'BB2Map',
+                 'DisplayOptions':{ 
+                    'Order':6,
+                    }
+                 }                
             ]
 
         self.ResultData['SubTestResultDictList'] += [
