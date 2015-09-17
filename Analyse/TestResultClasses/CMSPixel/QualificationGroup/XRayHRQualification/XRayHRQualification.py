@@ -889,10 +889,10 @@ class TestResult(GeneralTestResult):
                     HighRateDataRoc[i]['NHotPixel'] = len(HotPixelsLists[i])
 
                     # GRADE
-                    HighRateData['Grade'] = RocGrades[i]
+                    HighRateDataRoc['Grade'] = RocGrades[i]
 
                     # N_COL_NONUNIFORM
-                    HighRateData['NColNonUniform'] = NColNonUniform[i]
+                    HighRateDataRoc['NColNonUniform'] = NColNonUniform[i]
 
                     #-------------------------------------------------
                     # <--- here comes the code for pixel db upload
@@ -1161,7 +1161,7 @@ class TestResult(GeneralTestResult):
             print "--------------------"
 #            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
 
-            pdb.testDBFilling(s.SESSION_ID, HighRateDataModule,  HighRateDataAggr, HighRateDataAllNoise, HighRateDataInterp
+            pdb.insertHR(s.SESSION_ID, HighRateDataModule,  HighRateDataAggr, HighRateDataAllNoise, HighRateDataInterp
                                              ,HighRateDataRoc
                                              ,HighRateDataAggrRoc
                                              ,HighRateDataAllNoiseRoc
