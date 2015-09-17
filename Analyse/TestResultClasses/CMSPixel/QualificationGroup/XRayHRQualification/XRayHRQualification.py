@@ -737,7 +737,11 @@ class TestResult(GeneralTestResult):
         print '-'*100
 
     def CustomWriteToDatabase(self, ParentID):
-	import PixelDB
+        try:
+            import PixelDB
+        except:
+            pass
+
         self.verbose=True
         if self.verbose:
             print 'Write to DB: ',ParentID
