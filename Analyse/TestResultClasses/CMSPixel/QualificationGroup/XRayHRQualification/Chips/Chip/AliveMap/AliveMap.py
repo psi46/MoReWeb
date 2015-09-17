@@ -35,6 +35,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 
 
         self.Title = 'Alive Map: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()        
 
 

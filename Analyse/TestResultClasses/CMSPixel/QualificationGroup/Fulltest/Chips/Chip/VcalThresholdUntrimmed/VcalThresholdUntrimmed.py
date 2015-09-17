@@ -71,4 +71,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         self.ResultData['Plot']['Caption'] = 'Vcal Threshold Untrimmed'
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()        

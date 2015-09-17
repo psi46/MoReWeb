@@ -46,6 +46,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['NumberOfRetrimmedHotPixels'] = {'Label': 'Retrimmed Hot Pixels', 'Value': len(self.RetrimmedHotPixelsList)}
 
         self.Title = 'Retrim Hot Pix {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()        
 
 

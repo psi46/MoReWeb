@@ -40,4 +40,7 @@ class TestResult(GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
         self.Title = 'Trim Bit Map'
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()        

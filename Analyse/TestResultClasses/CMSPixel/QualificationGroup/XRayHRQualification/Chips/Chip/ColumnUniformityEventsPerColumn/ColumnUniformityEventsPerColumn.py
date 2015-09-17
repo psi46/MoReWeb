@@ -77,6 +77,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ROOT.gPad.Update()
 
         self.Title = 'Col. Uniformity per Event: C{ChipNo} {Rate}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'], Rate=self.Attributes['Rate'])
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(750, 750)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()
 
 

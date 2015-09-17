@@ -23,5 +23,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             raise Exception('PHCalibrationGainMap - ROOT Object does not exists!')
         self.Title = 'PH Calibration Gain Map'
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()        
 #

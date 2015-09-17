@@ -48,6 +48,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         self.Title = 'Trim Bit Problems'
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()
         self.ResultData['KeyValueDictPairs'] = {
             'DeadTrimbits': {

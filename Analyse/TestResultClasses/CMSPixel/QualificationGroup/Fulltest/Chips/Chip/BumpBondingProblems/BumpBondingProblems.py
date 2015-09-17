@@ -54,7 +54,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if not self.isDigitalROC:
                 self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(
                     self.TestResultEnvironmentObject.GradingParameters['minThrDiff'],
-                    self.TestResultEnvironmentObject.GradingParameters['maxThrDiff']);
+                    self.TestResultEnvironmentObject.GradingParameters['maxThrDiff'])
             else:
                 # self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0,255)
                 minZ = self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['Plot'][
@@ -62,18 +62,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 minZ = self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['Plot'][
                     'ROOTObject'].GetXaxis().GetBinLowEdge(minZ)
                 self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(minZ, threshold)
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
 
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("#Delta Threshold [DAC]");
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw("colz");
-            self.ResultData['Plot']['ROOTObject'].SaveAs(self.GetPlotFileName() + '.cpp')
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("#Delta Threshold [DAC]")
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].Draw("colz")
 
         self.ResultData['Plot']['ROOTObject2'] = self.ResultData['Plot']['ROOTObject'].Clone(self.GetUniqueID())
+        if self.Canvas:
+            self.Canvas.SetCanvasSize(500, 500)
+        self.ResultData['Plot']['Format'] = 'png'
         self.SaveCanvas()
 
         self.Title = 'Bump Bonding Problems: C{ChipNo}'.format(ChipNo=self.chipNo)
@@ -110,18 +112,3 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.DeadBumpList.add((self.chipNo, column, row))
                 return True
         return False
-
-
-'''
-    def HasBumpBondingProblems(self,column,row,threshold):
-        binContent = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
-        if self.isDigitalROC:
-            if binContent >= threshold:
-                self.DeadBumpList.add((self.chipNo,column,row))
-                return True
-        else:# is analog ROC
-            if binContent >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:#analog Roc
-                self.DeadBumpList.add((self.chipNo,column,row))
-                return True
-        return False
-'''
