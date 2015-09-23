@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 import ROOT
-import array
 import AbstractClasses
-import AbstractClasses.Helper.HistoGetter as HistoGetter
+import os
 
-import ROOT
-import datetime
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
+        self.Name='CMSPixel_QualificationGroup_Fulltest_XRayHRQualification_TestResult'
         self.NameSingle='Errors'
-        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_%s_TestResult'%self.NameSingle
+        self.Title = 'Errors'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
     def PopulateResultData(self):
 
-        # lists of strings to search for in .log file
+        # lists of strings to search for in .log file, other errors are listed in 'others' category
         DetectMessages = {
             'tokenchain': ['Token Chain Length'],
             'eventid': ['Event ID mismatch'],
@@ -40,6 +38,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'daqerror': 'DAQ error',
         }
 
-        LogfileErrors = self.AnalyzeLogfiles(self.ParentObject.logfilePath, DetectMessages, ErrorNames)
+        LogfileErrors = self.AnalyzeLogfiles(self.ParentObject.logfilePaths, DetectMessages, ErrorNames)
         self.ResultData['KeyValueDictPairs'] = LogfileErrors['KeyValueDictPairs']
         self.ResultData['KeyList'] = LogfileErrors['KeyList']
