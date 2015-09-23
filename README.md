@@ -1,15 +1,19 @@
 Info
 =======
-##### New version 0.6.2 is available!
+##### version 0.6.3
+
+HR tests DB upload
+
+##### version 0.6.2
 
 reduce size of FinalResults folders by changing some chip maps from SVG to PNG.
 
-##### New version 0.6.1 is available!
+##### version 0.6.1
 
 includes now BB2 test, takes number of triggers for PixelAlive from testParameters.dat if available and few small fixes for displayed values. Grading is not affected (unless BB2 is used, then bump defects are taken from BB2 now!).
 
-##### New version 0.6.0 is available!
-see the changelog at:
+##### version 0.6.0
+see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 All test should be re-analyzed (incl. re-fitting) with the new version with:
 
