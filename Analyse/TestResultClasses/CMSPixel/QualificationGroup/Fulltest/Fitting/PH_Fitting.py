@@ -10,13 +10,16 @@ import random
 
 class PH_Fitting():
     FitfcnTanName = "FitfcnTanName"
-    FitfcnName ="FitfcnName"
+    FitfcnName = "FitfcnName"
     nCols = 52
     nRows = 80
     vcalSteps = 5
     rangeConversion = 7
+    SaturationPH = 250
+    ErrorVcal = 2.0
+    ErrorPH = 8.0
 
-    def __init__(self,fitMode,refit=True,HistoDict = None, ParallelProcessing = False, LimitProcesses = None):
+    def __init__(self, fitMode, refit=True, HistoDict = None, ParallelProcessing = False, LimitProcesses = None):
         self.k = 0
         # ROOT.gStyle
         self.verbose = False
@@ -49,7 +52,7 @@ class PH_Fitting():
     def InitResultHistos(self):
         self.histoFits = [None]*6
         self.histoFits[0] = ROOT.TH1D(self.getUniqueID("histoFit1"), "histoFit1", 200, 0.0001, 0.0003)
-        self.histoFits[1] = ROOT.TH1D(self.getUniqueID("histoFit2"), "histoFit2", 400, 0, 2)  # 0.0000001, .0000009)
+        self.histoFits[1] = ROOT.TH1D(self.getUniqueID("histoFit2"), "histoFit2", 400, 0, 2)
         self.histoFits[2] = ROOT.TH1D(self.getUniqueID("histoFit3"), "histoFit3", 300, 0.4, 0.7)
         self.histoFits[3] = ROOT.TH1D(self.getUniqueID("histoFit4"), "histoFit4", 160, 180., 340.)
         self.histoFits[4] = ROOT.TH1D(self.getUniqueID("histoFit5"), "histoFit5", 200, -1.5, -1.3)
@@ -270,23 +273,24 @@ class PH_Fitting():
             self.phFit = ROOT.TF1("phFit", "TMath::Tan([0]*x - [4]) + [1]*x**3+ [5]*x[0]**2 + [2]*x[0] + [3]", -400., 1000.)
         self.phFit.SetNpx(1000)
 
-    def getArrayOfCalibrationPoints(self,calibration):
-        n= 0
-        x =[]
-        y = []
-        ex = []
-        ey = []
-        xErr = [8]*len(self.vcalLow)
+    def getArrayOfCalibrationPoints(self, calibration, excludeLast=False, excludeSaturated=False):
+        n = 0
+        phs =[]
+        vcals = []
+        eph = []
+        evcal = []
         i = 0
         for ph in calibration:
-            if ph > 0 and ph <255:
-                n+=1
-                x.append(ph)
-                ex.append(xErr[i])
-                y.append(self.vcalLow[i])
-                ey.append(2.0)
+            IsLast = i > (len(calibration)-2)
+            IsSaturated = ph > (self.SaturationPH - 1)
+            if ph > 0 and (not IsSaturated or not excludeSaturated) and (not IsLast or not excludeLast):
+                n += 1
+                phs.append(ph)
+                vcals.append(self.vcalLow[i])
+                eph.append(self.ErrorPH)
+                evcal.append(self.ErrorVcal)
             i += 1
-        return  [n, x, y, ex, ey]
+        return  [n, phs, vcals, eph, evcal]
 
     def GetGraph(self,calibrationPoints):
         if self.verbose:
@@ -299,8 +303,7 @@ class PH_Fitting():
         return graph
 
     def FitTanh(self,calibration):
-
-        calibrationPoints = self.getArrayOfCalibrationPoints(calibration)
+        calibrationPoints = self.getArrayOfCalibrationPoints(calibration, False, True)
         n = calibrationPoints[0]
         phs = calibrationPoints[1]
         vcals = calibrationPoints[2]
@@ -341,7 +344,7 @@ class PH_Fitting():
 
     def FitTanPol(self,calibration):
 
-        n,x,y,ex,ey = self.getArrayOfCalibrationPoints(calibration)
+        n,x,y,ex,ey = self.getArrayOfCalibrationPoints(calibration, True, False)
         graph = self.GetGraph([n,x,y,ex,ey])
         phFitClone = self.phFit
 
@@ -389,11 +392,8 @@ class PH_Fitting():
         return retVal
 
     def FitLin(self,calibration):
-        # x: PHs
-        # y: VCALs
-        # todo: change it
-        n,x,y,ex,ey = self.getArrayOfCalibrationPoints(calibration)
-        graph = self.GetGraph([n,x,y,ex,ey])
+        n,phs,vcals,eph,evcal = self.getArrayOfCalibrationPoints(calibration, False, True)
+        graph = self.GetGraph([n,phs,vcals,eph,evcal])
 
         phFitClone = self.phFit
 
@@ -402,18 +402,18 @@ class PH_Fitting():
         lowerPoint = 0
 
         try:
-            MinVcal = y[lowerPoint]
-            MaxVcal = y[upperPoint]
+            MinVcal = vcals[lowerPoint]
+            MaxVcal = vcals[upperPoint]
 
             phFitClone.SetRange(MinVcal, MaxVcal)
 
-            if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((y[upperPoint] - y[lowerPoint]) != 0):
-                slope = float(x[upperPoint] - x[lowerPoint]) / (y[upperPoint] - y[lowerPoint]) #really!
+            if (upperPoint in range (0,n)) and (lowerPoint in range(0,n)) and ((vcals[upperPoint] - vcals[lowerPoint]) != 0):
+                slope = float(phs[upperPoint] - phs[lowerPoint]) / (vcals[upperPoint] - vcals[lowerPoint])
             else:
                 slope = 0.5
 
             phFitClone.SetParameter(2, slope)
-            phFitClone.SetParameter(3, y[upperPoint] - slope * x[upperPoint])
+            phFitClone.SetParameter(3, vcals[upperPoint] - slope * phs[upperPoint])
         except:
             #data is missing, or N/A
             return [0] * (self.nFitParams + 1)
