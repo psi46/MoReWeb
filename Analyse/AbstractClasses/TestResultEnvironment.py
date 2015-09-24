@@ -55,6 +55,7 @@ class TestResultEnvironment:
         'slopeivC': 999,
         'leakageCurrentPON_B': 5,
         'leakageCurrentPON_C': 15,
+        'IanaLossThr': 15,
         # check
         'minThrDiff':-5,
         'maxThrDiff':5,

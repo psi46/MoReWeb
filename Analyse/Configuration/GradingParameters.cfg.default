@@ -31,6 +31,7 @@ currentC = 10
 currentCm10 = 999
 slopeivB = 2
 slopeivC = 999
+IanaLossThr = 15
 # check
 minThrDiff = -5
 maxThrDiff = 5
