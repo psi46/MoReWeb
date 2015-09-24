@@ -393,15 +393,6 @@ def AnalyseBareModuleTest(bareModuletestPath):
     pass
 
 
-if not args.singleFulltestPath=='':
-    AnalyseSingleFullTest(args.singleFulltestPath)
-elif not args.singleQualificationPath=='':
-    AnalyseSingleQualification(args.singleQualificationPath)
-elif not args.bareModuletestPath=='':
-    AnalyseBareModuleTest(args.bareModuletestPath)
-elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
-    AnalyseAllTestDataInDirectory(GlobalDataDirectory)
-
 # allows to add comments to local db file
 if args.comment:
     ModuleID = raw_input("Enter module ID (eg. M1234): ")
@@ -522,6 +513,19 @@ if args.deleterow:
         else:
             print "row id not found!"
 
+# test analysis
+if not args.deleterow and not args.comment:
+    if not args.singleFulltestPath=='':
+        AnalyseSingleFullTest(args.singleFulltestPath)
+    elif not args.singleQualificationPath=='':
+        AnalyseSingleQualification(args.singleQualificationPath)
+    elif not args.bareModuletestPath=='':
+        AnalyseBareModuleTest(args.bareModuletestPath)
+    elif int(Configuration.get('SystemConfiguration', 'GenerateResultData')):
+        AnalyseAllTestDataInDirectory(GlobalDataDirectory)
+
+
+# production overview page
 ModuleResultOverviewObject = ModuleResultOverview.ModuleResultOverview(TestResultEnvironmentInstance)
 ModuleResultOverviewObject.GenerateOverviewHTMLFile()
 
@@ -530,7 +534,7 @@ if args.production_overview:
     ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
     ProductionOverviewObject.GenerateOverview()
 
-# TestResultEnvironmentInstance.ErrorList.append( {'test1':'bla'})
+# display error list
 print '\nErrorList:'
 for i in TestResultEnvironmentInstance.ErrorList:
     print i
