@@ -100,8 +100,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
                         else:
                             # grading criteria for recalculated currents
-                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentBm10'])
-                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentCm10'])
+                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentBrecalculated'])
+                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentCrecalculated'])
 
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
                         if Value is not None and float(Value) > GradeBC:

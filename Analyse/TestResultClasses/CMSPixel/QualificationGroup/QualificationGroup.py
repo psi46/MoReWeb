@@ -10,6 +10,7 @@ import AbstractClasses.Helper.environment
 import AbstractClasses.Helper.testchain
 import warnings
 import time
+import traceback
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -137,7 +138,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'FinalResultsStoragePath':'unkown'
                     }
                 )
-                print "\x1b[31mProblems test list '%s', skip qualification directory! %s\x1b[0m"%(tests, self.TestResultEnvironmentObject.ModuleDataDirectory)
+                print "\x1b[31mProblems test list '%s', skip qualification directory! %s \n%s\n%s\x1b[0m"%(tests, self.TestResultEnvironmentObject.ModuleDataDirectory, inst, traceback.format_exc())
 
             print 'done with extraction'
             return test_list
@@ -193,6 +194,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 index += 1
                 test = test.next()
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
+
         return tests
 
     def appendTemperatureGraph(self, tests, test, index):
@@ -288,6 +290,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tests[-1]['InitialAttributes']['IncludeIVCurve'] = True
             tests[-1]['InitialAttributes']['IVCurveSubDirectory'] = '%03d_%s_%s' % (
             index, test.testname, test.environment.name)
+
+            if test.environment.name not in self.TestResultEnvironmentObject.IVCurveFiles:
+                self.TestResultEnvironmentObject.IVCurveFiles[test.environment.name] = []
+            self.TestResultEnvironmentObject.IVCurveFiles[test.environment.name].append('%03d_%s_%s' % (
+                index, test.testname, test.environment.name))
+
             test = test.next()
             index += 1
         return tests, test, index

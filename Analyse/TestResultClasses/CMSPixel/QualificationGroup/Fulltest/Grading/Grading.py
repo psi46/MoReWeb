@@ -98,9 +98,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
                     IVGrade = 3
             else:
-                if IVGrade == 1 and RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
+                if IVGrade == 1 and RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBrecalculated']:
                     IVGrade = 2
-                if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
+                if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCrecalculated']:
                     IVGrade = 3
 
             # slope
@@ -108,6 +108,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 IVGrade = 2
             if CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivC']:
                 IVGrade = 3
+
+            # ratio +17/-20
+            if 'CurrentRatio150V' in IVTestResult.ResultData['KeyValueDictPairs']:
+                RatioP17M20 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentRatio150V']['Value'])
+
+                RatioB = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioB'])
+                RatioC = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioC'])
+
+                if (RatioP17M20 < RatioC):
+                    IVGrade = 3
+                elif (RatioP17M20 < RatioB) and IVGrade == 1:
+                    IVGrade = 2
 
         else:
             pass
