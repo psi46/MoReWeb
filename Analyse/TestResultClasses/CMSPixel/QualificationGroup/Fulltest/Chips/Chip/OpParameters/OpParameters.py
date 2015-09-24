@@ -26,7 +26,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # try to get the value from the fulltest logfile
         if self.ParentObject.ParentObject.ParentObject.trimVcal:
             vcalTrim = self.ParentObject.ParentObject.ParentObject.trimVcal
-            print "phew, found trim value from fulltest log ..."
             DacParametersFileName = '{Directory}/dacParameters{trimVcal}_C{ChipNo}.dat'.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'],trimVcal=vcalTrim)
             if os.path.isfile(DacParametersFileName):
                 foundParametersFile = True
