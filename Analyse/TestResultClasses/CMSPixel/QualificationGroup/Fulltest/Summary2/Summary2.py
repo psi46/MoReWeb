@@ -81,3 +81,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         self.ResultData['KeyList'] = ['TestDate','TestTime', 'TestDuration', 'TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
 
+        if self.ParentObject.pxarVersion:
+            self.ResultData['KeyValueDictPairs']['PxarVersion'] = {'Label': 'pXar', 'Value': self.ParentObject.pxarVersion}
+            self.ResultData['KeyList'].append('PxarVersion')
+
+
+
+

@@ -15,11 +15,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         SysConfiguration = ConfigParser.ConfigParser()
         SysConfiguration.read(['Configuration/SystemConfiguration.cfg'])
         ParallelProcessing = False
+        LimitProcesses = None
         try:
             if int(SysConfiguration.get('SystemConfiguration', 'ParallelProcessing').strip())>0:
                 ParallelProcessing = True
         except:
             print "no 'ParallelProcessing' option found, running sequentially..."
+            pass
+
+        try:
+            if int(SysConfiguration.get('SystemConfiguration', 'LimitProcesses').strip())>0:
+                LimitProcesses = int(SysConfiguration.get('SystemConfiguration', 'LimitProcesses').strip())
+        except:
             pass
 
         nRocs = self.ParentObject.Attributes['NumberOfChips']
@@ -35,5 +42,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         HistoDict.set('SCurveFitting','inputFileName', self.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveDataFileName'))
 
         ePerVcal =  self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
-        fitter = SCurve_Fitting(refit,HistoDict = HistoDict,ePerVcal=ePerVcal, ParallelProcessing=ParallelProcessing)
+        fitter = SCurve_Fitting(refit,HistoDict = HistoDict,ePerVcal=ePerVcal, ParallelProcessing=ParallelProcessing, LimitProcesses=LimitProcesses)
         fitter.FitAllSCurve(directory, nRocs)

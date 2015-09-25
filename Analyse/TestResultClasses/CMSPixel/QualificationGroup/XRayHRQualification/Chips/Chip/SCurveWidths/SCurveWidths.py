@@ -63,18 +63,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo=self.ParentObject.Attributes['ChipNo']
 
         histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'NoiseBackgroundMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate = self.Attributes['Rate'])]
-        self.ResultData['Plot']['ROOTObject_bg'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
-        if self.ResultData['Plot']['ROOTObject_bg']:
-            # calculate real hitrate
-            TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
-            Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
-            NPixels = 80*52
-            NTriggersPerPixel = 50
-            NTriggers = NTriggersPerPixel * NPixels
-            NHits = self.ResultData['Plot']['ROOTObject_bg'].GetEntries()
-            RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6 # in MHz/cm2
-            self.ResultData['KeyValueDictPairs']['MeasuredHitrate']['Value'] = '{0:1.1f}'.format(RealHitrate)
+        rootFileKey = 'HRSCurves_{Rate}'.format(Rate = self.Attributes['Rate'])
+        if rootFileKey in self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']:
+            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles'][rootFileKey]
+            self.ResultData['Plot']['ROOTObject_bg'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+            if self.ResultData['Plot']['ROOTObject_bg']:
+                # calculate real hitrate
+                TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
+                Area = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['Area'])
+                NPixels = 80*52
+                NTriggersPerPixel = 50
+                NTriggers = NTriggersPerPixel * NPixels
+                NHits = self.ResultData['Plot']['ROOTObject_bg'].GetEntries()
+                RealHitrate = NHits / (NTriggers*TimeConstant*Area)*1e-6 # in MHz/cm2
+                self.ResultData['KeyValueDictPairs']['MeasuredHitrate']['Value'] = '{0:1.1f}'.format(RealHitrate)
 
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 1000.) # hw
         self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 1000.) #Noise in unbonded pixel (not displayed) # hd

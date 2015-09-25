@@ -9,8 +9,227 @@ from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 
 from AbstractClasses.GeneralTestResult import GeneralTestResult
 import subprocess
+#import PixelDB
 
 class TestResult(GeneralTestResult):
+    def testDBFilling2(self, HighRateDataModule , HighRateDataAggr, HighRateDataAllNoise, HighRateDataInterp
+                                             ,HighRateDataRoc
+                                             ,HighRateDataAggrRoc
+                                             ,HighRateDataAllNoiseRoc
+                                             ,HighRateDataInterpRoc):
+#            print "TOMMASO ALL DATA"
+#            print "HighRateDataModule",HighRateDataModule
+#            print "HighRateDataAggr",HighRateDataAggr
+#            print "HighRateDataAllNoise",HighRateDataAllNoise
+#            print "HighRateDataInterp",HighRateDataInterp
+#            print "HighRateDataRoc",HighRateDataRoc
+#            print "HighRateDataAggrRoc",HighRateDataAggrRoc
+#            print "HighRateDataAllNoiseRoc",HighRateDataAllNoiseRoc
+#            print "HighRateDataInterpRoc",HighRateDataInterpRoc
+
+            #
+            # MODULES
+            #
+
+            #
+            #create Module part common to all the tests
+            #
+            fullmodule_id = HighRateDataModule['ModuleID']
+            result = HighRateDataModule['HRGrade']
+            macroVersion = HighRateDataModule['MacroVersion']
+            addrPixBad = HighRateDataModule['AddrPixelsBad']
+            addrPixHot = HighRateDataModule['AddrPixelsHot']
+            n_hot_pixels = HighRateDataModule['NHotPixel']
+            n_con_nonuniform= HighRateDataModule['ROCsWithUniformityProblems']
+
+#
+# prepare
+#
+
+            interpEffTestPoint = {}
+            interpEff={}
+            nPixelsNoise={}
+            meanNoiseAllPixels = {}
+            widthNoiseAllPixels = {}
+            addrPixelNoise = {}
+            measuredHitRate = {}
+            nPixelNoHit = {}
+            nBinsLowHigh = {}
+            #
+            # these are the common parts, now I do
+            # 1- INTERP: search in HighRateDataInterp, HighRateDataInterpRoc , loop on the rates
+            #            
+
+            for rate, payload in HighRateDataInterp.iteritems():
+                  print " Studying interpolation per Rate = ", rate
+                  interpEffTestPoint[rate] = payload['InterpEffTestpoint']
+                  interpEff[rate] = payload['InterpEffTestpoint']
+                  
+            #
+            # now Noise
+            #
+            #
+            for rate, payload in HighRateDataAllNoise.iteritems():
+                  print " Studying Noise per Rate = ", rate            
+
+                  nPixelsNoise[rate] = payload['NPixelsNoise']['Value']
+                  meanNoiseAllPixels[rate] = payload['MeanNoiseAllPixels']
+                  widthNoiseAllPixels[rate] = payload['WidthNoiseAllPixels']
+                  addrPixelNoise[rate] = payload['AddrPixelsNoise']['Value']
+                  
+            #
+            # now Aggregate (which is hitmap)
+            #
+            #
+            for rate, payload in HighRateDataAggr.iteritems():
+                  print ' Studying Hitmap per Rate = ', rate
+                  measuredHitRate[rate] = payload['MeasuredHitrate']
+                  nPixelNoHit[rate] = payload['NPixelNoHit']
+                  nBinsLowHigh[rate] = payload['NBinsLowHigh']                  
+                  
+
+            #
+            # try and accumulate
+            #
+                  
+            rates = list(set(interpEffTestPoint.keys())|set(nPixelsNoise.keys())|set(measuredHitRate.keys()))
+
+            # fill a result per rate
+
+            for rate in rates:
+                  print "Filling a test for rate=", rate
+                  print "  - ModID",  fullmodule_id
+                  print '  - Grade', result 
+                  print "  - Macroversion", macroVersion
+                  print "  - Addr Bad Pixels", addrPixBad
+                  print "  - Addr HotPixels", addrPixHot
+                  print "  - Num HotPixels", n_hot_pixels
+                  print "  - Roc with Unif Prob", n_con_nonuniform
+            # now rate dependent
+                  print "   - Interp eff testpoint", interpEffTestPoint.get(rate, -99)
+                  print "   - Interp eff", interpEff.get(rate, -99)
+                  print "   - N Pixel Noise", nPixelsNoise.get(rate, -99)
+                  print "   - Mean Noise All Pixel", meanNoiseAllPixels.get(rate, -99)
+                  print "   - Width Noise All Pixel", widthNoiseAllPixels.get(rate, -99)
+                  print "   - Addr Pixel Noise", addrPixelNoise.get(rate, -99)
+                  print "   - Measered Hit Rate", measuredHitRate.get(rate, -99)
+                  print "   - N Pixel No Hit", nPixelNoHit.get(rate, -99)
+                  print "   - N Bins Low High", nBinsLowHigh.get(rate, -99)
+
+            #
+            # per roc
+            #
+            # common
+            
+            addrPixBad_roc={}
+            addrPixHot_roc = {}
+            n_hot_pixels_roc = {}
+            n_con_nonuniform_roc = {}
+
+
+            for roc, payload in HighRateDataRoc.iteritems():
+                roc_pos = payload['RocPos']
+                addrPixBad_roc[roc_pos] =  payload['AddrPixelsBad']
+                addrPixHot_roc[roc_pos] =  payload['AddrPixelsHot']
+                n_hot_pixels_roc[roc_pos] = payload['NHotPixel']
+                n_con_nonuniform_roc[roc_pos] = -99
+
+            #
+            # interp
+            #
+            interpEffTestPoint_roc = {}
+            interpEff_roc = {}
+            for rate, payload1 in HighRateDataInterpRoc.iteritems():
+                interpEffTestPoint_roc[rate] = {}
+                interpEff_roc[rate] = {}
+                for roc, payload in payload1.iteritems():
+                    roc_pos = payload['RocPos']
+                    print " Studying interpolation per Rate = ", rate, " and ROC=",roc_pos
+                    interpEffTestPoint_roc[rate][roc_pos] = payload['InterpEffTestpoint']
+                    interpEff_roc[rate][roc_pos] = payload['InterpEffTestpoint']
+                    
+                
+            #
+            # Noise
+            #
+            nPixelsNoise_roc = {}
+            meanNoiseAllPixels_roc = {}
+            widthNoiseAllPixels_roc = {}
+            addrPixelNoise_roc = {}
+    
+            for rate, payload1 in HighRateDataAllNoiseRoc.iteritems():
+                nPixelsNoise_roc [rate] = {}
+                meanNoiseAllPixels_roc[rate] = {}
+                widthNoiseAllPixels_roc[rate] = {}
+                addrPixelNoise_roc[rate] = {}
+                for roc, payload in payload1.iteritems():
+                    roc_pos = payload['RocPos']
+                    print " Studying Noise per Rate = ", rate, " and ROC=",roc_pos
+                    nPixelsNoise_roc[rate][roc_pos] = payload['NPixelsNoise']
+                    meanNoiseAllPixels_roc[rate][roc_pos] = payload['MeanNoiseAllPixels']
+                    widthNoiseAllPixels_roc[rate][roc_pos] = payload['WidthNoiseAllPixels']
+                    addrPixelNoise_roc[rate][roc_pos] = "%s"%payload['AddrPixelsNoise'] #['Value']
+            #        
+            # Aggregate (hitmap)
+            #
+            measuredHitRate_roc = {}
+            nPixelNoHit_roc = {}
+            nBinsLowHigh_roc = {}
+
+            for rate, payload1 in HighRateDataAggrRoc.iteritems():
+                measuredHitRate_roc[rate] = {}
+                nPixelNoHit_roc[rate] = {}
+                nBinsLowHigh_roc[rate] = {}
+
+                for roc, payload in payload1.iteritems():
+                    roc_pos = payload['RocPos']
+                    print " Studying Hitmap per Rate = ", rate, " and ROC=",roc_pos
+                    measuredHitRate_roc[rate][roc_pos] = payload['MeasuredHitrate']
+                    nPixelNoHit_roc[rate][roc_pos] = payload['NPixelNoHit']
+                    nBinsLowHigh_roc[rate][roc_pos] = payload['NBinsLowHigh']                  
+                    
+            #
+            # Summary!
+            #         
+
+            print " ROC SUMMARY"
+
+            for rate in rates:
+                for roc in addrPixBad_roc.keys():
+                    print " Filling ROC tests for rate", rate, " and POS=", roc
+                    print "  - ModID",  fullmodule_id
+                    print '  - Grade (WARNING!!!!!!)', result 
+                    print "  - Macroversion", macroVersion
+                    print "  - Addr Bad Pixels", addrPixBad_roc[roc]
+                    print "  - Addr HotPixels", addrPixHot_roc[roc]
+                    print "  - Num HotPixels", n_hot_pixels_roc[roc]
+                    print "  - Roc with Unif Prob", n_con_nonuniform_roc[roc]
+            # now rate dependent
+                    print "   - Interp eff testpoint", interpEffTestPoint_roc[rate][roc] if rate in interpEffTestPoint_roc else -99
+    	            print "   - Interp eff", interpEff_roc[rate][roc]  if rate in interpEff_roc else -99
+                    print "   - N Pixel Noise", nPixelsNoise_roc[rate][roc] if rate in nPixelsNoise_roc else -99
+                    print "   - Mean Noise All Pixel", meanNoiseAllPixels_roc[rate][roc] if rate in meanNoiseAllPixels_roc else -99
+                    print "   - Width Noise All Pixel", widthNoiseAllPixels_roc[rate][roc] if rate in widthNoiseAllPixels_roc else -99
+                    print "   - Addr Pixel Noise", addrPixelNoise_roc[rate][roc] if rate in addrPixelNoise_roc else -99
+                    print "   - Measered Hit Rate", measuredHitRate_roc[rate][roc] if rate in measuredHitRate_roc else -99
+                    print "   - N Pixel No Hit", nPixelNoHit_roc[rate][roc] if rate in nPixelNoHit_roc else -99
+                    print "   - N Bins Low High", nBinsLowHigh_roc[rate][roc] if rate in nBinsLowHigh_roc else -99
+
+#                    print "   - Width Noise All Pixel", widthNoiseAllPixels.get(rate, -99)
+#                    print "   - Addr Pixel Noise", addrPixelNoise.get(rate, -99)
+#                    print "   - Measered Hit Rate", measuredHitRate.get(rate, -99)
+#                    print "   - N Pixel No Hit", nPixelNoHit.get(rate, -99)
+ #                   print "   - N Bins Low High", nBinsLowHigh.get(rate, -99)
+
+                
+
+
+                  
+            return
+
+
+
+
     def CustomInit(self):
         self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_TestResult'
         self.NameSingle = 'XRayHRQualification'
@@ -518,6 +737,12 @@ class TestResult(GeneralTestResult):
         print '-'*100
 
     def CustomWriteToDatabase(self, ParentID):
+        try:
+            import PixelDB
+        except:
+            pass
+
+        self.verbose=True
         if self.verbose:
             print 'Write to DB: ',ParentID
 
@@ -552,6 +777,9 @@ class TestResult(GeneralTestResult):
             NoisyPixels = 'None'
 
         print 'fill row'
+        print" ATTRIBUTES", self.Attributes
+#        print" PATTRIBUTES", self.ParentObj.Attributes
+        
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
@@ -594,29 +822,43 @@ class TestResult(GeneralTestResult):
 
             # first fill all fields which do not correspond to a specific rate, e.g. ratios of two rates, final grade etc.
             if True:
-                HighRateData = copy.deepcopy(Row)
+                HighRateDataModule = copy.deepcopy(Row)
 
                 #GRADE
-                del(HighRateData['Grade'])
-                HighRateData['HRGrade'] = grade
+                del(HighRateDataModule ['Grade'])
+                HighRateDataModule ['HRGrade'] = grade
 
                 # N_ROCS_READOUT_PROBLEM <- new
-                HighRateData['ROCsWithReadoutProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithReadoutProblems']['Value']
+                HighRateDataModule ['ROCsWithReadoutProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithReadoutProblems']['Value']
+
+                # N_COL_NONUNIFORM
+                HighRateDataModule ['ROCsWithUniformityProblems'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['ROCsWithUniformityProblems']['Value']
 
                 # ADDR_PIXELS_BAD
-                HighRateData['AddrPixelsBad'] = GradingTestResultObject.ResultData['HiddenData']['TotalDefectPixelsList']['Value']
+                HighRateDataModule ['AddrPixelsBad'] = GradingTestResultObject.ResultData['HiddenData']['TotalDefectPixelsList']['Value']
 
                 # ADDR_PIXELS_HOT
-                HighRateData['AddrPixelsHot'] = GradingTestResultObject.ResultData['HiddenData']['HotPixelsList']['Value']
+                HighRateDataModule ['AddrPixelsHot'] = GradingTestResultObject.ResultData['HiddenData']['HotPixelsList']['Value']
 
                 # N_HOT_PIXEL
-                HighRateData['NHotPixel'] = len(GradingTestResultObject.ResultData['HiddenData']['HotPixelsList']['Value'])
+                HighRateDataModule ['NHotPixel'] = len(GradingTestResultObject.ResultData['HiddenData']['HotPixelsList']['Value'])
+
+                #
+                # tommaso
+                #
+                
+                # Temperature
+                HighRateDataModule ['TestTemp'] = self.Attributes['TestTemperature']
+                HighRateDataModule ['ModuleID'] = self.Attributes['ModuleID']
+                
+                
+
 
                 #-------------------------------------------------
                 # <--- here comes the code for pixel db upload
                 #-------------------------------------------------
                 if DebugGlobalDB:
-                    self.PrintDatabaseRow(HighRateData)
+                    self.PrintDatabaseRow(HighRateDataModule)
 
                 ROCNumbers = []
                 TotalPixelDefectsLists = []
@@ -633,38 +875,42 @@ class TestResult(GeneralTestResult):
                     NColNonUniform.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
           
                 # ROC rows
+                HighRateDataRoc = {}
                 for i in range(0, len(ROCNumbers)):
                     # remove grade from individual rows
-                    HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+                    HighRateDataRoc[i] = copy.deepcopy(GlobalDBRowTemplate)
 
                     #ROC_POS
-                    HighRateData['RocPos'] = ROCNumbers[i]
+                    HighRateDataRoc[i]['RocPos'] = ROCNumbers[i]
 
                     # ADDR_PIXELS_BAD
-                    HighRateData['AddrPixelsBad'] = TotalPixelDefectsLists[i]
+                    HighRateDataRoc[i]['AddrPixelsBad'] = TotalPixelDefectsLists[i]
 
                     # ADDR_PIXELS_HOT
-                    HighRateData['AddrPixelsHot'] = HotPixelsLists[i]
+                    HighRateDataRoc[i]['AddrPixelsHot'] = HotPixelsLists[i]
 
                     # N_HOT_PIXEL
-                    HighRateData['NHotPixel'] = len(HotPixelsLists[i])
+                    HighRateDataRoc[i]['NHotPixel'] = len(HotPixelsLists[i])
 
                     # GRADE
-                    HighRateData['Grade'] = RocGrades[i]
+                    HighRateDataRoc[i]['Grade'] = RocGrades[i]
 
                     # N_COL_NONUNIFORM
-                    HighRateData['NColNonUniform'] = NColNonUniform[i]
+                    HighRateDataRoc[i]['NColNonUniform'] = NColNonUniform[i]
 
                     #-------------------------------------------------
                     # <--- here comes the code for pixel db upload
                     #-------------------------------------------------
                     if DebugGlobalDB:
-                        self.PrintDatabaseRow(HighRateData)
-
+                        self.PrintDatabaseRow(HighRateDataRoc[i])
+#                        self.testHRCommon(HighRateData, HighRateDataRoc[i])
 
             # all hitmap rates  ("50", "150")
+            HighRateDataAggr = {}
+            HighRateDataAggrRoc={}
+            print "nonnapapera"
             for Rate in self.Attributes['Rates']['HRData']:
-
+                print 'in the loop', Rate
                 # prepare data
                 MeasuredHitrates = []
                 NonUniformEventBins = []
@@ -678,60 +924,72 @@ class TestResult(GeneralTestResult):
                     NonUniformEventBins.append(int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]['Value']))
                     BumpBondingDefects.append(int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=Rate)]['Value']))
           
+                print "GERdddddd"
+
                 # apply aggregation function
                 ModuleMeanHitrate = sum(MeasuredHitrates) / float(len(MeasuredHitrates))
+                print "GERdddddddsdsds"
                 ModuleNonUniformEventBins = sum(NonUniformEventBins)
                 ModuleBumpBondingDefects = sum(BumpBondingDefects)
-
+                print "GERdddddd0000000000"
                 # remove grade from individual rows
-                HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+                HighRateDataAggr[Rate] = copy.deepcopy(GlobalDBRowTemplate)
 
                 #HITRATENOMINAL
-                HighRateData['HitrateNominal'] = Rate
-
+                print "RATE< ETC", Rate
+                HighRateDataAggr[Rate]['HitrateNominal'] = Rate
+                print"ffffff", ModuleMeanHitrate
                 # MEASURED_HITRATE
-                HighRateData['MeasuredHitrate'] = ModuleMeanHitrate
-
+                HighRateDataAggr[Rate]['MeasuredHitrate'] = ModuleMeanHitrate
+                print "GERdddddd1111111111111"
                 # N_BINS_LOWHIGH
-                HighRateData['NBinsLowHigh'] = ModuleNonUniformEventBins
-
+                HighRateDataAggr[Rate]['NBinsLowHigh'] = ModuleNonUniformEventBins
+                print "GERdddddd22222222222222222"
                 # N_PIXEL_NO_HIT
-                HighRateData['NPixelNoHit'] = ModuleBumpBondingDefects
-
+                HighRateDataAggr[Rate]['NPixelNoHit'] = ModuleBumpBondingDefects
+                print "GERdddddd3333333333333333"
                 #-------------------------------------------------
                 # <--- here comes the code for pixel db upload
                 #-------------------------------------------------
                 if DebugGlobalDB:
-                    self.PrintDatabaseRow(HighRateData)
+#                    self.PrintDatabaseRow(HighRateDataAggr[Rate])
+                    pass
+                print "OOROROORORROROROROO"
+
+                HighRateDataAggrRoc[Rate] = {}
 
                 # ROC rows
                 for i in range(0, len(ROCNumbers)):
+                    HighRateDataAggrRoc[Rate][i] = {}
                     # remove grade from individual rows
-                    HighRateData = copy.deepcopy(GlobalDBRowTemplate)
-
+                    print "HEHEHEHEHEHEHEH",i
+                    HighRateDataAggrRoc[Rate][i] = copy.deepcopy(GlobalDBRowTemplate)
+                    print"PPPPPPP"
                     #HITRATENOMINAL
-                    HighRateData['HitrateNominal'] = Rate
+                    HighRateDataAggrRoc[Rate][i]['HitrateNominal'] = Rate
 
                     #ROC_POS
-                    HighRateData['RocPos'] = ROCNumbers[i]
+                    HighRateDataAggrRoc[Rate][i]['RocPos'] = ROCNumbers[i]
 
                     # MEASURED_HITRATE
-                    HighRateData['MeasuredHitrate'] = MeasuredHitrates[i]
+                    HighRateDataAggrRoc[Rate][i]['MeasuredHitrate'] = MeasuredHitrates[i]
 
                     # N_BINS_LOWHIGH
-                    HighRateData['NBinsLowHigh'] = NonUniformEventBins[i]
+                    HighRateDataAggrRoc[Rate][i]['NBinsLowHigh'] = NonUniformEventBins[i]
 
                     # N_PIXEL_NO_HIT
-                    HighRateData['NPixelNoHit'] = BumpBondingDefects[i]
+                    HighRateDataAggrRoc[Rate][i]['NPixelNoHit'] = BumpBondingDefects[i]
 
                     #-------------------------------------------------
                     # <--- here comes the code for pixel db upload
                     #-------------------------------------------------
-                    if DebugGlobalDB:
-                        self.PrintDatabaseRow(HighRateData)
-
+#                    if DebugGlobalDB:
+#                        self.PrintDatabaseRow(HighRateDataAggrRoc[Rate][i])
 
             # all noise rates
+            HighRateDataAllNoise = {}
+            HighRateDataAllNoiseRoc = {}
+            print "PaperinoIPPO"
             for Rate in self.Attributes['Rates']['HRSCurves']:
 
                 # prepare data
@@ -756,67 +1014,71 @@ class TestResult(GeneralTestResult):
                 ModuleNoiseWidth = sum(NoiseWidths) / float(len(NoiseWidths)) if len(NoiseWidths) > 0 else -1
 
                 # remove grade from individual rows
-                HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+                HighRateDataAllNoise[Rate] = copy.deepcopy(GlobalDBRowTemplate)
 
                 #HITRATENOMINAL
-                HighRateData['HitrateNominal'] = Rate
+                HighRateDataAllNoise[Rate]['HitrateNominal'] = Rate
 
                 # MEASURED_HITRATE
-                HighRateData['MeasuredHitrate'] = ModuleMeanHitrate
+                HighRateDataAllNoise[Rate]['MeasuredHitrate'] = ModuleMeanHitrate
 
                 # MEAN_NOISE_ALLPIXELS
-                HighRateData['MeanNoiseAllPixels'] = ModuleNoiseMean
+                HighRateDataAllNoise[Rate]['MeanNoiseAllPixels'] = ModuleNoiseMean
 
                 # WIDTH_NOISE_ALLPIXELS
-                HighRateData['WidthNoiseAllPixels'] = ModuleNoiseWidth
+                HighRateDataAllNoise[Rate]['WidthNoiseAllPixels'] = ModuleNoiseWidth
 
                 # ADDR_PIXELS_NOISE
-                HighRateData['AddrPixelsNoise'] = self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefectPixelsList']
+                HighRateDataAllNoise[Rate]['AddrPixelsNoise'] = self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefectPixelsList']
 
                 # N_PIXELS_NOISE  (or N_PIXELS_NOISE_ABOVETH)
-                HighRateData['NPixelsNoise'] = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NoiseDefects']
+                HighRateDataAllNoise[Rate]['NPixelsNoise'] = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NoiseDefects']
 
                 #-------------------------------------------------
                 # <--- here comes the code for pixel db upload
                 #-------------------------------------------------
                 if DebugGlobalDB:
-                    self.PrintDatabaseRow(HighRateData)
+                    self.PrintDatabaseRow(HighRateDataAllNoise[Rate])
 
 
                 # ROC rows
+                print "PIPPO",Rate
+                HighRateDataAllNoiseRoc[Rate] = {}
                 for i in range(0, len(ROCNumbers)):
                     # remove grade from individual rows
-                    HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+                    HighRateDataAllNoiseRoc[Rate][i] = copy.deepcopy(GlobalDBRowTemplate)
 
                     #HITRATENOMINAL
-                    HighRateData['HitrateNominal'] = Rate
+                    HighRateDataAllNoiseRoc[Rate][i]['HitrateNominal'] = Rate
 
                     #ROC_POS
-                    HighRateData['RocPos'] = ROCNumbers[i]
+                    HighRateDataAllNoiseRoc[Rate][i]['RocPos'] = ROCNumbers[i]
 
                     # MEASURED_HITRATE
-                    HighRateData['MeasuredHitrate'] = MeasuredHitrates[i]
+                    HighRateDataAllNoiseRoc[Rate][i]['MeasuredHitrate'] = MeasuredHitrates[i]
 
                     # MEAN_NOISE_ALLPIXELS
-                    HighRateData['MeanNoiseAllPixels'] = NoiseMeans[i]
+                    HighRateDataAllNoiseRoc[Rate][i]['MeanNoiseAllPixels'] = NoiseMeans[i]
 
                     # WIDTH_NOISE_ALLPIXELS
-                    HighRateData['WidthNoiseAllPixels'] = NoiseWidths[i]
+                    HighRateDataAllNoiseRoc[Rate][i]['WidthNoiseAllPixels'] = NoiseWidths[i]
 
                     # ADDR_PIXELS_NOISE
-                    HighRateData['AddrPixelsNoise'] = NoisePixelsLists[i]
+                    HighRateDataAllNoiseRoc[Rate][i]['AddrPixelsNoise'] = NoisePixelsLists[i]
 
                     # N_PIXELS_NOISE  (or N_PIXELS_NOISE_ABOVETH)
-                    HighRateData['NPixelsNoise'] = len(NoisePixelsLists[i])
+                    HighRateDataAllNoiseRoc[Rate][i]['NPixelsNoise'] = len(NoisePixelsLists[i])
 
                     #-------------------------------------------------
                     # <--- here comes the code for pixel db upload
                     #-------------------------------------------------
-                    if DebugGlobalDB:
-                        self.PrintDatabaseRow(HighRateData)
+#                    if DebugGlobalDB:
+#                        self.PrintDatabaseRow(HighRateDataAllNoiseRoc[Rate][i])
 
-
+            print "PLUTO"
             # all efficiency interpolation rates
+            HighRateDataInterp = {}
+            HighRateDataInterpRoc = {}
             for Rate in self.Attributes['InterpolatedEfficiencyRates']:
 
                 # prepare data
@@ -833,40 +1095,81 @@ class TestResult(GeneralTestResult):
                 ModuleMeanEfficiency= sum(MeasuredEfficiencies) / float(len(MeasuredEfficiencies)) if len(MeasuredEfficiencies) > 0 else -1
 
                 # remove grade from individual rows
-                HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+                HighRateDataInterp[Rate] = copy.deepcopy(GlobalDBRowTemplate)
 
                 # HITRATENOMINAL
-                HighRateData['HitrateNominal'] = Rate
+                HighRateDataInterp[Rate]['HitrateNominal'] = Rate
 
                 # INTERP_EFF_TESTPOINT
-                HighRateData['InterpEffTestpoint'] = ModuleMeanEfficiency
+                HighRateDataInterp[Rate]['InterpEffTestpoint'] = ModuleMeanEfficiency
 
                 #-------------------------------------------------
                 # <--- here comes the code for pixel db upload
                 #-------------------------------------------------
                 if DebugGlobalDB:
-                    self.PrintDatabaseRow(HighRateData)
+                    self.PrintDatabaseRow(HighRateDataInterp[Rate])
 
                 # ROC rows
+                HighRateDataInterpRoc[Rate] = {}
                 for i in range(0, len(ROCNumbers)):
                     # remove grade from individual rows
-                    HighRateData = copy.deepcopy(GlobalDBRowTemplate)
+                    HighRateDataInterpRoc[Rate][i] = copy.deepcopy(GlobalDBRowTemplate)
 
                     #HITRATENOMINAL
-                    HighRateData['HitrateNominal'] = Rate
+                    HighRateDataInterpRoc[Rate][i]['HitrateNominal'] = Rate
 
                     #ROC_POS
-                    HighRateData['RocPos'] = ROCNumbers[i]
+                    HighRateDataInterpRoc[Rate][i]['RocPos'] = ROCNumbers[i]
 
                     # INTERP_EFF_TESTPOINT
-                    HighRateData['InterpEffTestpoint'] = MeasuredEfficiencies[i]
+                    HighRateDataInterpRoc[Rate][i]['InterpEffTestpoint'] = MeasuredEfficiencies[i]
 
                     #-------------------------------------------------
                     # <--- here comes the code for pixel db upload
                     #-------------------------------------------------
-                    if DebugGlobalDB:
-                        self.PrintDatabaseRow(HighRateData)
+#                    if DebugGlobalDB:
+#                        self.PrintDatabaseRow(HighRateDataInterpRoc[Rate][i])
 
+
+#
+# Tommaso
+#
+            print "TOMMASO ALL DATA"
+            print "HighRateDataModule",HighRateDataModule
+            print "HighRateDataAggr",HighRateDataAggr
+            print "HighRateDataAllNoise",HighRateDataAllNoise
+            print "HighRateDataInterp",HighRateDataInterp
+            print "HighRateDataRoc",HighRateDataRoc
+            print "HighRateDataAggrRoc",HighRateDataAggrRoc
+            print "HighRateDataAllNoiseRoc",HighRateDataAllNoiseRoc
+            print "HighRateDataInterpRoc",HighRateDataInterpRoc
+            from PixelDB import *
+            # modified by Tommaso
+            #
+            # try and speak directly with PixelDB
+            #
+
+#            fake = int(os.environ.get('FAKE',1))
+
+#            insertedID=7
+            pdb = PixelDBInterface(operator="tommaso", center="pisa")
+            pdb.connectToDB()
+
+#            if (0 == 0):
+            OPERATOR = os.environ['PIXEL_OPERATOR']
+            CENTER = os.environ['PIXEL_CENTER']
+            s = Session(CENTER, OPERATOR)
+            pdb.insertSession(s)
+            print "--------------------"
+            print "INSERTING INTO DB", self.TestResultEnvironmentObject.FinalModuleResultsPath, s.SESSION_ID
+            print "--------------------"
+#            pp = pdb.insertTestFullModuleDirPlusMapv96Plus(s.SESSION_ID, Row)
+
+            pdb.insertHR(s.SESSION_ID, HighRateDataModule,  HighRateDataAggr, HighRateDataAllNoise, HighRateDataInterp
+                                             ,HighRateDataRoc
+                                             ,HighRateDataAggrRoc
+                                             ,HighRateDataAllNoiseRoc
+                                             ,HighRateDataInterpRoc)
 
             pass
             

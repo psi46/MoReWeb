@@ -16,33 +16,46 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
 
-
     def PopulateResultData(self):
         Directory = self.RawTestSessionDataPath
-        vcalTrim = 0
-        # get all dacParameters files
-        dacfilename = '{Directory}/dacParameters*_C{ChipNo}.dat'.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
-        names = glob.glob(dacfilename)
-        # sort by creation date
-        names.sort(key=lambda x: os.stat(os.path.join('', x)).st_mtime)
-        names = [(os.stat(os.path.join('', x)).st_mtime, x) for x in names]
-        names.sort(key = itemgetter(0))
-        # get newest file
-        name = names[-1][1]
-        DacParametersFileName = name
-        name = name.split('/')[-1]
 
-        vcalTrim = map(int, re.findall(r'\d+', name))
-        if len(vcalTrim )==2:
-            vcalTrim=vcalTrim[0]
-            i = str(vcalTrim)
-        else:
-            vcalTrim =-1
-            i = ''
+        vcalTrim = 0
+        foundParametersFile = False
+        trimVcalString = ''
+        
+        # try to get the value from the fulltest logfile
+        if self.ParentObject.ParentObject.ParentObject.trimVcal:
+            vcalTrim = self.ParentObject.ParentObject.ParentObject.trimVcal
+            DacParametersFileName = '{Directory}/dacParameters{trimVcal}_C{ChipNo}.dat'.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'],trimVcal=vcalTrim)
+            if os.path.isfile(DacParametersFileName):
+                foundParametersFile = True
+                trimVcalString = str(vcalTrim)
+
+        # otherwise pick the newest one
+        if not foundParametersFile:
+            # get all dacParameters files
+            dacfilename = '{Directory}/dacParameters*_C{ChipNo}.dat'.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
+            names = glob.glob(dacfilename)
+            # sort by creation date
+            names.sort(key=lambda x: os.stat(os.path.join('', x)).st_mtime)
+            names = [(os.stat(os.path.join('', x)).st_mtime, x) for x in names]
+            names.sort(key = itemgetter(0))
+            # get newest file
+            name = names[-1][1]
+            DacParametersFileName = name
+            name = name.split('/')[-1]
+
+            vcalTrim = map(int, re.findall(r'\d+', name))
+            if len(vcalTrim )==2:
+                vcalTrim=vcalTrim[0]
+                trimVcalString = str(vcalTrim)
+            else:
+                vcalTrim =-1
+                trimVcalString = ''
 
         if os.path.exists(DacParametersFileName):
             DacParametersFile = open(DacParametersFileName, "r")
-            self.ResultData['HiddenData']['DacParameters']['File'+i] = DacParametersFile
+            self.ResultData['HiddenData']['DacParameters']['File'+trimVcalString] = DacParametersFile
 
             if DacParametersFile :
                 for line in DacParametersFile:
@@ -61,7 +74,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 DacParametersFile.close()
 
         self.ResultData['HiddenData']['vcalTrim'] = vcalTrim
-        self.ResultData['HiddenData']['DacParameters']['vcaltrim'] = i
+        self.ResultData['HiddenData']['DacParameters']['vcaltrim'] = trimVcalString
         ParameterList = [
             'vcalTrim',
             'Vana',
@@ -74,14 +87,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['HiddenData']['DacParameters'].has_key('VoffsetOp'):
             ParameterList.append('VoffsetOp')
 
-        for i in ParameterList:
-            if self.ResultData['HiddenData']['DacParameters'].has_key(i.lower()):
-                ParameterValue = self.ResultData['HiddenData']['DacParameters'][i.lower()]
+        for trimVcalString in ParameterList:
+            if self.ResultData['HiddenData']['DacParameters'].has_key(trimVcalString.lower()):
+                ParameterValue = self.ResultData['HiddenData']['DacParameters'][trimVcalString.lower()]
             else:
                 ParameterValue = 'N/A'
 
-            self.ResultData['KeyValueDictPairs'][i] = {
+            self.ResultData['KeyValueDictPairs'][trimVcalString] = {
                 'Value':ParameterValue,
                 #'Unit':'',
             }
-            self.ResultData['KeyList'].append(i)
+            self.ResultData['KeyList'].append(trimVcalString)
