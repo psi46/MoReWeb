@@ -47,10 +47,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     Keyword = 'i(loss) [mA/ROC]:'
                     if Keyword in line:
                         splitPos = line.find(Keyword)
-                        if '->' in line and '<-' in line:
-                            IanaLossProblems = True
                         if splitPos >=0:
-                            IanaLossPerRoc = [float(x.replace('->', '').replace('<-', '').strip()) for x in line[splitPos + len(Keyword):].strip().split(' ') if len(x.replace('->', '').replace('<-', '').strip()) > 0]
+                            IanaLossString = line[splitPos + len(Keyword):]
+                            if '->' in IanaLossString and '<-' in IanaLossString:
+                                IanaLossProblems = True
+                            IanaLossPerRoc = [float(x.replace('->', '').replace('<-', '').strip()) for x in IanaLossString.strip().split(' ') if len(x.replace('->', '').replace('<-', '').strip()) > 0]
                             break
 
         # draw plot if data exists
