@@ -92,24 +92,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
 
             # current
+            #    grading is only done with the measured value at +17
             if self.ParentObject.Attributes['TestType'] == 'p17_1':
                 if IVGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentB']:
                     IVGrade = 2
                 if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
                     IVGrade = 3
-            else:
-                if IVGrade == 1 and RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBrecalculated']:
-                    IVGrade = 2
-                if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCrecalculated']:
-                    IVGrade = 3
 
             # slope
-            if IVGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
-                IVGrade = 2
-            if CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivC']:
-                IVGrade = 3
+            #    grading is only done with the measured value at +17
+            if self.ParentObject.Attributes['TestType'] == 'p17_1':
+                if IVGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
+                    IVGrade = 2
+                if CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivC']:
+                    IVGrade = 3
 
             # ratio +17/-20
+            #    grade on ratio of measured current I(+17C)/I(-20C)
+            #    (this value is stored in the fulltest at -20C)
             if 'CurrentRatio150V' in IVTestResult.ResultData['KeyValueDictPairs']:
                 RatioP17M20 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentRatio150V']['Value'])
 
