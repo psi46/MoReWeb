@@ -93,7 +93,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             # current
             #    grading is only done with the measured value at +17
-            if self.ParentObject.Attributes['TestType'] == 'p17_1':
+            if self.ParentObject.Attributes['TestType'].startswith('p17_'):
                 if IVGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentB']:
                     IVGrade = 2
                 if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
@@ -101,7 +101,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             # slope
             #    grading is only done with the measured value at +17
-            if self.ParentObject.Attributes['TestType'] == 'p17_1':
+            if self.ParentObject.Attributes['TestType'].startswith('p17_'):
                 if IVGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
                     IVGrade = 2
                 if CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivC']:
