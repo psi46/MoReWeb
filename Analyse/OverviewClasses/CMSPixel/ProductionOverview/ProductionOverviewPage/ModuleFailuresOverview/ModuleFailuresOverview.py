@@ -77,7 +77,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     
-                    if RowTuple['TestType'] in FullTests and (RowTuple['Temperature'] or int(RowTuple['Temperature']) == 17):
+                    if RowTuple['TestType'] in FullTests and (not RowTuple['Temperature'] or (len(RowTuple['Temperature'].strip()) > 0 and int(RowTuple['Temperature']) == 17)):
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
                         GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['slopeivC'])
@@ -94,7 +94,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
-                        if not RowTuple['Temperature'] or int(RowTuple['Temperature']) == 17:
+                        if not RowTuple['Temperature'] or (len(RowTuple['Temperature'].strip()) > 0 and int(RowTuple['Temperature']) == 17):
                             #  grading criteria for measured currents
                             GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
                             GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])

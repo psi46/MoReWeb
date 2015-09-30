@@ -44,7 +44,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == 'XRayHRQualification':
                         NumberOfPixelDefects = []
                         for Chip in range(0,16):
-                            NumberOfPixelDefectsROC = int(self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'BumpBondingDefects_150', 'KeyValueDictPairs.json', 'NumberOfDefectivePixels', 'Value']))
+                            try:
+                                NumberOfPixelDefectsROC = int(self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'BumpBondingDefects_150', 'KeyValueDictPairs.json', 'NumberOfDefectivePixels', 'Value']))
+                            except:
+                                NumberOfPixelDefectsROC = -1
                             NumberOfPixelDefects.append(NumberOfPixelDefectsROC)
                         ModulePixelDefects.append(sum(NumberOfPixelDefects))
                         ModuleIndex.append(NModules)
