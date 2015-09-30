@@ -161,6 +161,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         test = testchain.next()
         if not ('HREfficiency' in Testnames):
             tests, test, index = self.appendTemperatureGraph(tests, test, index)
+            tests, test, index = self.appendHumidityGraph(tests, test, index)
         HRTestAdded = False
         while test:
             if 'fulltest' in test.testname.lower():
@@ -223,6 +224,40 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'ModuleType': self.Attributes['ModuleType'],
                         'TestType': 'Temperature',
                         'LogFileName': TemperatureLogFileName,
+                    },
+                    'DisplayOptions': {
+                        'Order': len(tests) + 1,
+                        'Width': 5,
+                    }
+                })
+        return tests, test, index
+
+    def appendHumidityGraph(self, tests, test, index):
+        HumidityLogFileName = None
+
+        FileNamesToCheck = [
+            self.RawTestSessionDataPath+'/humidity.log',
+            self.RawTestSessionDataPath+'/logfiles/humidity.log',
+        ]
+
+        for FileNameToCheck in FileNamesToCheck:
+            if os.path.isfile(FileNameToCheck):
+                HumidityLogFileName = FileNameToCheck
+                break
+
+        if HumidityLogFileName is not None:
+            tests.append(
+                {
+                    'Key': 'Humidity',
+                    'Module': 'Humidity',
+                    'InitialAttributes': {
+                        'StorageKey': 'ModuleQualification_Humidity',
+                        'TestResultSubDirectory': 'logfiles',
+                        'ModuleID': self.Attributes['ModuleID'],
+                        'ModuleVersion': self.Attributes['ModuleVersion'],
+                        'ModuleType': self.Attributes['ModuleType'],
+                        'TestType': 'Humidity',
+                        'LogFileName': HumidityLogFileName,
                     },
                     'DisplayOptions': {
                         'Order': len(tests) + 1,

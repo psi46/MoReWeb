@@ -134,9 +134,13 @@ except:
         pass
 
 if MoReWebVersion:
+    if 'Not a git repository' in MoReWebVersion:
+        MoReWebVersion = 'MoReWeb version not detectable, no git repository'
     TestResultEnvironmentInstance.MoReWebVersion = MoReWebVersion
 
 if MoReWebBranch:
+    if 'Not a git repository' in MoReWebBranch:
+        MoReWebBranch = '-'
     TestResultEnvironmentInstance.MoReWebBranch = MoReWebBranch
 
 if args.refit:
