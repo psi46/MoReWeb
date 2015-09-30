@@ -249,30 +249,34 @@ class TestResult(GeneralTestResult):
             IVCurveFilesListLowT = []
 
         #only for the first IV at low T
-        if self.ParentObject.Attributes['IVCurveSubDirectory'] == IVCurveFilesListLowT[0]:
-            if HighTemperatureEnvironment in self.TestResultEnvironmentObject.IVCurveFiles:
-                IVCurveFilesListHighT = sorted(self.TestResultEnvironmentObject.IVCurveFiles[HighTemperatureEnvironment])
-            else:
-                IVCurveFilesListHighT = []
+        if len(IVCurveFilesListLowT) > 0:
+            if self.ParentObject.Attributes['IVCurveSubDirectory'] == IVCurveFilesListLowT[0]:
+                if HighTemperatureEnvironment in self.TestResultEnvironmentObject.IVCurveFiles:
+                    IVCurveFilesListHighT = sorted(self.TestResultEnvironmentObject.IVCurveFiles[HighTemperatureEnvironment])
+                else:
+                    IVCurveFilesListHighT = []
 
-            if len(IVCurveFilesListHighT) > 1:
-                print "more than 1 IV curves for %s found, using first one: %s"%(HighTemperatureEnvironment, IVCurveFilesListHighT[0])
+                if len(IVCurveFilesListHighT) > 1:
+                    print "more than 1 IV curves for %s found, using first one: %s"%(HighTemperatureEnvironment, IVCurveFilesListHighT[0])
 
-            if len(IVCurveFilesListHighT) > 0:
-                IVCurveFileNameHighT = "{Directory}/ivCurve.log".format(Directory=self.TestResultEnvironmentObject.ModuleDataDirectory + '/' + IVCurveFilesListHighT[0])
-                IVDataHighT = self.AnalyzeIVCurveFile(IVCurveFileNameHighT)
-                CurrentAtVoltage100VHighT = IVDataHighT[2]
-                CurrentAtVoltage150VHighT = IVDataHighT[3]
+                if len(IVCurveFilesListHighT) > 0:
+                    IVCurveFileNameHighT = "{Directory}/ivCurve.log".format(Directory=self.TestResultEnvironmentObject.ModuleDataDirectory + '/' + IVCurveFilesListHighT[0])
+                    IVDataHighT = self.AnalyzeIVCurveFile(IVCurveFileNameHighT)
+                    CurrentAtVoltage100VHighT = IVDataHighT[2]
+                    CurrentAtVoltage150VHighT = IVDataHighT[3]
 
-                CurrentRatio100V = CurrentAtVoltage100VHighT / CurrentAtVoltage100V if abs(CurrentAtVoltage100V) > 0 else -1
-                CurrentRatio150V = CurrentAtVoltage150VHighT / CurrentAtVoltage150V if abs(CurrentAtVoltage150V) > 0 else -1
+                    CurrentRatio100V = CurrentAtVoltage100VHighT / CurrentAtVoltage100V if abs(CurrentAtVoltage100V) > 0 else -1
+                    CurrentRatio150V = CurrentAtVoltage150VHighT / CurrentAtVoltage150V if abs(CurrentAtVoltage150V) > 0 else -1
 
-                self.ResultData['KeyValueDictPairs']['CurrentRatio100V'] = {'Label': 'I(+17C)/I(-20C) 100V', 'Value': '{0:1.2f}'.format(CurrentRatio100V)}
-                self.ResultData['KeyValueDictPairs']['CurrentRatio150V'] = {'Label': 'I(+17C)/I(-20C) 150V', 'Value': '{0:1.2f}'.format(CurrentRatio150V)}
-                self.ResultData['KeyList'].append('CurrentRatio100V')
-                self.ResultData['KeyList'].append('CurrentRatio150V')
-            else:
-                print "no %s IV for current ratio found :-("%HighTemperatureEnvironment
+                    self.ResultData['KeyValueDictPairs']['CurrentRatio100V'] = {'Label': 'I(+17C)/I(-20C) 100V', 'Value': '{0:1.2f}'.format(CurrentRatio100V)}
+                    self.ResultData['KeyValueDictPairs']['CurrentRatio150V'] = {'Label': 'I(+17C)/I(-20C) 150V', 'Value': '{0:1.2f}'.format(CurrentRatio150V)}
+                    self.ResultData['KeyList'].append('CurrentRatio100V')
+                    self.ResultData['KeyList'].append('CurrentRatio150V')
+                else:
+                    print "no %s IV for current ratio found :-("%HighTemperatureEnvironment
+        else:
+            # if IV curve at low T is missing, ignore grading on ratio, bu print warning
+            print "#"*80,"\nWARNING: IV curve at low temperature is missing, no grading on ratio is done!\n","#"*80
 
         # plot
         if len(Voltage_List) == 0:
