@@ -48,13 +48,14 @@ class TestResultEnvironment:
         'maskDefectsB':1,
         'maskDefectsC':1,
         'currentB':2,
-        'currentBm10':10,
         'currentC':10,
-        'currentCm10':999,
+        'leakageCurrentRatioB':20,
+        'leakageCurrentRatioC':-999,
         'slopeivB': 2,
         'slopeivC': 999,
         'leakageCurrentPON_B': 5,
         'leakageCurrentPON_C': 15,
+        'IanaLossThr': 15,
         # check
         'minThrDiff':-5,
         'maxThrDiff':5,
@@ -123,6 +124,8 @@ class TestResultEnvironment:
 
     MoReWebVersion = 'unknown MoReWeb version'
     MoReWebBranch = 'unknown branch'
+
+    IVCurveFiles = {}
 
     #Error Handling
     ErrorList = []

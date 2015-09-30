@@ -77,7 +77,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     
-                    if RowTuple['TestType'] in FullTests:
+                    if RowTuple['TestType'] in FullTests and (not RowTuple['Temperature'] or (len(RowTuple['Temperature'].strip()) > 0 and int(RowTuple['Temperature']) == 17)):
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
                         GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['slopeivC'])
@@ -94,20 +94,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
-                        if not RowTuple['Temperature'] or int(RowTuple['Temperature']) == 17:
+                        if not RowTuple['Temperature'] or (len(RowTuple['Temperature'].strip()) > 0 and int(RowTuple['Temperature']) == 17):
                             #  grading criteria for measured currents
                             GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
                             GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
-                        else:
-                            # grading criteria for recalculated currents
-                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentBm10'])
-                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentCm10'])
 
-                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
-                        if Value is not None and float(Value) > GradeBC:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorC)
-                        elif Value is not None and float(Value) > GradeAB:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorB)
+                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
+                            if Value is not None and float(Value) > GradeBC:
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorC)
+                            elif Value is not None and float(Value) > GradeAB:
+                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorB)
 
             ### Pedestal Spread
             for RowTuple in Rows:

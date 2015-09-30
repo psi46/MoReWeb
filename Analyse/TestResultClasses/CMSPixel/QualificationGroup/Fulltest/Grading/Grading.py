@@ -92,22 +92,39 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
 
             # current
-            if self.ParentObject.Attributes['TestType'] == 'p17_1':
+            #    grading is only done with the measured value at +17
+            if self.ParentObject.Attributes['TestType'].startswith('p17_'):
                 if IVGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentB']:
                     IVGrade = 2
                 if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
                     IVGrade = 3
-            else:
-                if IVGrade == 1 and RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentBm10']:
-                    IVGrade = 2
-                if RecalculatedCurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentCm10']:
-                    IVGrade = 3
 
             # slope
-            if IVGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
-                IVGrade = 2
-            if CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivC']:
-                IVGrade = 3
+            #    grading is only done with the measured value at +17
+            if self.ParentObject.Attributes['TestType'].startswith('p17_'):
+                if IVGrade == 1 and CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivB']:
+                    IVGrade = 2
+                if CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivC']:
+                    IVGrade = 3
+
+            # ratio +17/-20
+            #    grade on ratio of measured current I(+17C)/I(-20C)
+            #    (this value is stored in the fulltest at -20C)
+            if 'CurrentRatio150V' in IVTestResult.ResultData['KeyValueDictPairs']:
+                RatioP17M20 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentRatio150V']['Value'])
+
+                # only grade on ratio if I(-20C) could be correctly measured
+                if RatioP17M20 > 0:
+                    RatioB = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioB'])
+                    RatioC = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioC'])
+
+                    if (RatioP17M20 < RatioC):
+                        IVGrade = 3
+                    elif (RatioP17M20 < RatioB) and IVGrade == 1:
+                        IVGrade = 2
+                else:
+                    print "#"*80,"\nWARNING: could not calculate I(+17)/I(-20) ratio, no grading on ratio is done!\n","#"*80
+
 
         else:
             pass

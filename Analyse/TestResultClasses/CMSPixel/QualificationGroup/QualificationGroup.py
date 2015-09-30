@@ -10,6 +10,7 @@ import AbstractClasses.Helper.environment
 import AbstractClasses.Helper.testchain
 import warnings
 import time
+import traceback
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -137,7 +138,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'FinalResultsStoragePath':'unkown'
                     }
                 )
-                print "\x1b[31mProblems test list '%s', skip qualification directory! %s\x1b[0m"%(tests, self.TestResultEnvironmentObject.ModuleDataDirectory)
+                print "\x1b[31mProblems test list '%s', skip qualification directory! %s \n%s\n%s\x1b[0m"%(tests, self.TestResultEnvironmentObject.ModuleDataDirectory, inst, traceback.format_exc())
 
             print 'done with extraction'
             return test_list
@@ -160,6 +161,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         test = testchain.next()
         if not ('HREfficiency' in Testnames):
             tests, test, index = self.appendTemperatureGraph(tests, test, index)
+            tests, test, index = self.appendHumidityGraph(tests, test, index)
         HRTestAdded = False
         while test:
             if 'fulltest' in test.testname.lower():
@@ -193,6 +195,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 index += 1
                 test = test.next()
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
+
         return tests
 
     def appendTemperatureGraph(self, tests, test, index):
@@ -221,6 +224,40 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'ModuleType': self.Attributes['ModuleType'],
                         'TestType': 'Temperature',
                         'LogFileName': TemperatureLogFileName,
+                    },
+                    'DisplayOptions': {
+                        'Order': len(tests) + 1,
+                        'Width': 5,
+                    }
+                })
+        return tests, test, index
+
+    def appendHumidityGraph(self, tests, test, index):
+        HumidityLogFileName = None
+
+        FileNamesToCheck = [
+            self.RawTestSessionDataPath+'/humidity.log',
+            self.RawTestSessionDataPath+'/logfiles/humidity.log',
+        ]
+
+        for FileNameToCheck in FileNamesToCheck:
+            if os.path.isfile(FileNameToCheck):
+                HumidityLogFileName = FileNameToCheck
+                break
+
+        if HumidityLogFileName is not None:
+            tests.append(
+                {
+                    'Key': 'Humidity',
+                    'Module': 'Humidity',
+                    'InitialAttributes': {
+                        'StorageKey': 'ModuleQualification_Humidity',
+                        'TestResultSubDirectory': 'logfiles',
+                        'ModuleID': self.Attributes['ModuleID'],
+                        'ModuleVersion': self.Attributes['ModuleVersion'],
+                        'ModuleType': self.Attributes['ModuleType'],
+                        'TestType': 'Humidity',
+                        'LogFileName': HumidityLogFileName,
                     },
                     'DisplayOptions': {
                         'Order': len(tests) + 1,
@@ -288,6 +325,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tests[-1]['InitialAttributes']['IncludeIVCurve'] = True
             tests[-1]['InitialAttributes']['IVCurveSubDirectory'] = '%03d_%s_%s' % (
             index, test.testname, test.environment.name)
+
+            if test.environment.name not in self.TestResultEnvironmentObject.IVCurveFiles:
+                self.TestResultEnvironmentObject.IVCurveFiles[test.environment.name] = []
+            self.TestResultEnvironmentObject.IVCurveFiles[test.environment.name].append('%03d_%s_%s' % (
+                index, test.testname, test.environment.name))
+
             test = test.next()
             index += 1
         return tests, test, index

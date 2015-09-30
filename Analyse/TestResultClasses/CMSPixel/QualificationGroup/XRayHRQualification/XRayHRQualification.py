@@ -281,6 +281,10 @@ class TestResult(GeneralTestResult):
 
     def AnalyzeHRQualificationFolder(self):
 
+        self.logfilePaths = []
+
+
+
         HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
         for Path in HREfficiencyPaths:
             FolderName = os.path.basename(Path)
@@ -308,6 +312,19 @@ class TestResult(GeneralTestResult):
                     testParametersFile.close()
             if not NTriggersReadFromFile:
                 print '\x1b[31mWARNING: testParameters.dat file not found in "%s", using default number of triggers Ntrig = %d\x1b[0m'%(FolderName, self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)])
+
+            # find pxar logfile
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            if os.path.isfile(logfilePath):
+                self.logfilePaths.append(logfilePath)
+            else:
+                files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+                if len(files) == 1:
+                    self.logfilePath.append(files[0])
+                else:
+                    print "X-ray HREfficiency: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
+
+
         self.Attributes['Rates']['HREfficiency'].sort()
 
         HRDataPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRData_*')
@@ -318,6 +335,17 @@ class TestResult(GeneralTestResult):
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
             self.FileHandle.append(self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)])
+
+            # find pxar logfile
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            if os.path.isfile(logfilePath):
+                self.logfilePaths.append(logfilePath)
+            else:
+                files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+                if len(files) == 1:
+                    self.logfilePath.append(files[0])
+                else:
+                    print "X-ray HRData: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
 
         HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRS[Cc]urves_*')
@@ -331,6 +359,17 @@ class TestResult(GeneralTestResult):
                 self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
                 self.FileHandle.append(self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)])
 
+            # find pxar logfile
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            if os.path.isfile(logfilePath):
+                self.logfilePaths.append(logfilePath)
+            else:
+                files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+                if len(files) == 1:
+                    self.logfilePath.append(files[0])
+                else:
+                    print "X-ray HRSCurves: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
+
 
         HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
         if len(HRHotPixelsPaths) > 1:
@@ -343,6 +382,18 @@ class TestResult(GeneralTestResult):
                 warnings.warn("The directory '%s' contains more than one .root file, choosing first one: '%s'"%(FolderName, ROOTFiles[0]))
             self.Attributes['ROOTFiles']['MaskHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
             self.FileHandle.append(self.Attributes['ROOTFiles']['MaskHotPixels'])
+
+            # find pxar logfile
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            if os.path.isfile(logfilePath):
+                self.logfilePaths.append(logfilePath)
+            else:
+                files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+                if len(files) == 1:
+                    self.logfilePath.append(files[0])
+                else:
+                    print "X-ray MaskHotPixels: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
+
             break
 
         RetrimHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_RetrimHotPixels_*')
@@ -358,6 +409,18 @@ class TestResult(GeneralTestResult):
                 self.Attributes['ROOTFiles']['RetrimHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
                 self.Attributes['RetrimHotPixelsPath'] = Path
                 self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels'])
+
+            # find pxar logfile
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            if os.path.isfile(logfilePath):
+                self.logfilePaths.append(logfilePath)
+            else:
+                files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+                if len(files) == 1:
+                    self.logfilePath.append(files[0])
+                else:
+                    print "X-ray RetrimHotPixels: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
+
             break
 
 
@@ -384,6 +447,18 @@ class TestResult(GeneralTestResult):
                     testParametersFile.close()
             if not NTriggersReadFromFile:
                 print '\x1b[31mWARNING: testParameters.dat file not found in "%s", using default number of triggers Ntrig = 10\x1b[0m'%FolderName
+
+            # find pxar logfile
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            if os.path.isfile(logfilePath):
+                self.logfilePaths.append(logfilePath)
+            else:
+                files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+                if len(files) == 1:
+                    self.logfilePath.append(files[0])
+                else:
+                    print "X-ray PixelAlive: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
+
         
 
         CalDelScanPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_CalDel*_*')
@@ -392,6 +467,17 @@ class TestResult(GeneralTestResult):
             if len(ROOTFiles) > 0:
                 self.Attributes['ROOTFiles']['CalDelScan'] = ROOT.TFile.Open(ROOTFiles[0])
                 self.FileHandle.append(self.Attributes['ROOTFiles']['CalDelScan'])
+
+            # find pxar logfile
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            if os.path.isfile(logfilePath):
+                self.logfilePaths.append(logfilePath)
+            else:
+                files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
+                if len(files) == 1:
+                    self.logfilePath.append(files[0])
+                else:
+                    print "X-ray CalDelScan: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
         self.ResultData['SubTestResultDictList'] = []
 
@@ -689,6 +775,15 @@ class TestResult(GeneralTestResult):
                 },
                 'InitialAttributes': {
                     'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            })
+
+        self.ResultData['SubTestResultDictList'].append({
+                'Key': 'Errors',
+                'DisplayOptions': {
+                    'GroupWithNext': False,
+                    'Order': 900,
+                    'Width': 1,
                 },
             })
 

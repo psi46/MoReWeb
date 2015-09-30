@@ -4,17 +4,13 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
-##### version 0.6.3
+##### version 0.6.4
 
-HR tests DB upload and Fulltest analysis fixes for special cases
+**new grading for IV curves!**
 
-##### version 0.6.2
+All FullQualifications should be re-analyzed with the new version! Re-fitting is not necessary if it has been done already with version v0.6.3.
 
-reduce size of FinalResults folders by changing some chip maps from SVG to PNG.
-
-##### version 0.6.1
-
-includes now BB2 test, takes number of triggers for PixelAlive from testParameters.dat if available and few small fixes for displayed values. Grading is not affected (unless BB2 is used, then bump defects are taken from BB2 now!).
+...
 
 ##### version 0.6.0
 Grading adjustments and bugfixes.

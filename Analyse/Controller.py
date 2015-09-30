@@ -134,9 +134,13 @@ except:
         pass
 
 if MoReWebVersion:
+    if 'Not a git repository' in MoReWebVersion:
+        MoReWebVersion = 'MoReWeb version not detectable, no git repository'
     TestResultEnvironmentInstance.MoReWebVersion = MoReWebVersion
 
 if MoReWebBranch:
+    if 'Not a git repository' in MoReWebBranch:
+        MoReWebBranch = '-'
     TestResultEnvironmentInstance.MoReWebBranch = MoReWebBranch
 
 if args.refit:
@@ -479,8 +483,8 @@ if args.deleterow:
             print " ", "\x1b[31m", ("%d"%RowID).ljust(6), "\x1b[0m", datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S').ljust(25), Row['QualificationType'].ljust(30), Row['TestType'].ljust(30), ("%s"%Row['Grade']).ljust(3), ("%s"%Row['Comments']).ljust(30)
             RowID += 1
 
-        RowID = raw_input("Select row: ")
-        if RowID.lower().strip() == 'all':
+        RowIDs = raw_input("Select rows (separated by comma): ")
+        if RowIDs.lower().strip() == 'all':
             print "delete module %s from local DB?"%ModuleID
             confirmation = raw_input("(y/N)")
             if confirmation.lower().strip() == 'y':
@@ -494,28 +498,27 @@ if args.deleterow:
                     TestResultEnvironmentInstance.LocalDBConnection.commit()
                 else:
                     print "no connection to local db!"
-        elif int(RowID) >= 0 and int(RowID) < len(Rows) and Rows[int(RowID)]:
-            RowID = int(RowID)
-            Row = Rows[RowID]
-            print "delete? ", ("%d"%RowID), datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S'), Row['QualificationType'], Row['TestType'], ("%s"%Row['Grade']), ("%s"%Row['Comments'])
-            confirmation = raw_input("(y/N)")
-            if confirmation.lower().strip() == 'y':
-                result = TestResultEnvironmentInstance.LocalDBConnectionCursor.execute( 
-                    'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType = :TestType AND TestDate = :TestDate AND QualificationType = :QualificationType',
-                    {
-                        'ModuleID': Rows[RowID]['ModuleID'],
-                        'TestType': Rows[RowID]['TestType'],
-                        'TestDate': Rows[RowID]['TestDate'],
-                        'QualificationType': Rows[RowID]['QualificationType']
-                    }
-                )
-                if TestResultEnvironmentInstance.LocalDBConnection:
-                    TestResultEnvironmentInstance.LocalDBConnection.commit()
-                else:
-                    print "no connection to local db!"
-
         else:
-            print "row id not found!"
+            RowIDsList = [int(x.strip()) for x in RowIDs.split(',')]
+            for RowID in RowIDsList:
+                if Rows[RowID]:
+                    Row = Rows[RowID]
+                    print "delete? ", ("%d"%RowID), datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S'), Row['QualificationType'], Row['TestType'], ("%s"%Row['Grade']), ("%s"%Row['Comments'])
+                    confirmation = raw_input("(y/N)")
+                    if confirmation.lower().strip() == 'y':
+                        result = TestResultEnvironmentInstance.LocalDBConnectionCursor.execute( 
+                            'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType = :TestType AND TestDate = :TestDate AND QualificationType = :QualificationType',
+                            {
+                                'ModuleID': Rows[RowID]['ModuleID'],
+                                'TestType': Rows[RowID]['TestType'],
+                                'TestDate': Rows[RowID]['TestDate'],
+                                'QualificationType': Rows[RowID]['QualificationType']
+                            }
+                        )
+                        if TestResultEnvironmentInstance.LocalDBConnection:
+                            TestResultEnvironmentInstance.LocalDBConnection.commit()
+                        else:
+                            print "no connection to local db!"
 
 # test analysis
 if not args.deleterow and not args.comment:

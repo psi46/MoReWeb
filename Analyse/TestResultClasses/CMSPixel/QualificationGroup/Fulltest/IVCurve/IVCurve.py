@@ -131,13 +131,7 @@ class TestResult(GeneralTestResult):
         print 'read {entries} Entries from file {fileName}'.format(entries=entries, fileName=fileName)
         self.ResultData['HiddenData']['IVTuple'] = IVTuple
 
-    def PopulateResultData(self):
-        ROOT.gPad.SetLogy(1)
-
-        Directory = self.TestResultEnvironmentObject.ModuleDataDirectory + '/' + self.ParentObject.Attributes[
-            'IVCurveSubDirectory']
-
-        IVCurveFileName = "{Directory}/ivCurve.log".format(Directory=Directory)
+    def AnalyzeIVCurveFile(self, IVCurveFileName):
         IVCurveFile = open(IVCurveFileName, "r")
         
         self.ResultData['HiddenData']['IVCurveFilePath'] = IVCurveFileName
@@ -167,7 +161,6 @@ class TestResult(GeneralTestResult):
         Current_List = array.array('d', [])
         CurrentAtVoltage100V = 0
         CurrentAtVoltage150V = 0
-        recalculatedCurrentAtVoltage150V = 0
         # NoOfEntries = min(IVTuple.GetEntries(), 250)
         i = 0
         l = False
@@ -192,7 +185,6 @@ class TestResult(GeneralTestResult):
                 Current_List.append(
                     self.TestResultEnvironmentObject.GradingParameters['IVCurrentFactor'] * Entry.Current)
 
-                
                 if i > 0:
 
                     if Voltage_List[i] >= 100. >= Voltage_List[i - 1]:
@@ -206,15 +198,30 @@ class TestResult(GeneralTestResult):
 
         IVCurveFile.close()
         
+        return [Voltage_List, Current_List, CurrentAtVoltage100V, CurrentAtVoltage150V]
+
+    def PopulateResultData(self):
+        ROOT.gPad.SetLogy(1)
+
+        Directory = self.TestResultEnvironmentObject.ModuleDataDirectory + '/' + self.ParentObject.Attributes[
+            'IVCurveSubDirectory']
+        IVCurveFileName = "{Directory}/ivCurve.log".format(Directory=Directory)
+        
+        Voltage_List, Current_List, CurrentAtVoltage100V, CurrentAtVoltage150V = self.AnalyzeIVCurveFile(IVCurveFileName)
+
         self.ResultData['HiddenData']['IVCurveData'] = {
-        	'VoltageList':Voltage_List,
-        	'CurrentList':Current_List
+            'VoltageList':Voltage_List,
+            'CurrentList':Current_List
         }
         
+        # slope
         if CurrentAtVoltage100V != 0.:
             Variation = CurrentAtVoltage150V / CurrentAtVoltage100V
         else:
             Variation = 0
+
+        # recalculation
+        recalculatedCurrentAtVoltage150V = 0
         if self.ParentObject.Attributes.has_key('recalculateCurrentTo'):
             recalculatedCurrentAtVoltage150V = self.recalculate_current(CurrentAtVoltage150V,
                                                                         self.ParentObject.Attributes['TestTemperature'],
@@ -231,6 +238,47 @@ class TestResult(GeneralTestResult):
                 recalculatedCurrentVariation = recalculatedCurrentAtVoltage150V / recalculatedCurrentAtVoltage100V
             else:
                 recalculatedCurrentVariation = 0
+
+        # ratio +17 / -20 (if applicable)
+        LowTemperatureEnvironment = 'm20'
+        HighTemperatureEnvironment = 'p17'
+
+        if LowTemperatureEnvironment in self.TestResultEnvironmentObject.IVCurveFiles:
+            IVCurveFilesListLowT = sorted(self.TestResultEnvironmentObject.IVCurveFiles[LowTemperatureEnvironment])
+        else:
+            IVCurveFilesListLowT = []
+
+        #only for the first IV at low T
+        if len(IVCurveFilesListLowT) > 0:
+            if self.ParentObject.Attributes['IVCurveSubDirectory'] == IVCurveFilesListLowT[0]:
+                if HighTemperatureEnvironment in self.TestResultEnvironmentObject.IVCurveFiles:
+                    IVCurveFilesListHighT = sorted(self.TestResultEnvironmentObject.IVCurveFiles[HighTemperatureEnvironment])
+                else:
+                    IVCurveFilesListHighT = []
+
+                if len(IVCurveFilesListHighT) > 1:
+                    print "more than 1 IV curves for %s found, using first one: %s"%(HighTemperatureEnvironment, IVCurveFilesListHighT[0])
+
+                if len(IVCurveFilesListHighT) > 0:
+                    IVCurveFileNameHighT = "{Directory}/ivCurve.log".format(Directory=self.TestResultEnvironmentObject.ModuleDataDirectory + '/' + IVCurveFilesListHighT[0])
+                    IVDataHighT = self.AnalyzeIVCurveFile(IVCurveFileNameHighT)
+                    CurrentAtVoltage100VHighT = IVDataHighT[2]
+                    CurrentAtVoltage150VHighT = IVDataHighT[3]
+
+                    CurrentRatio100V = abs(CurrentAtVoltage100VHighT / CurrentAtVoltage100V) if abs(CurrentAtVoltage100V) > 0 else -1
+                    CurrentRatio150V = abs(CurrentAtVoltage150VHighT / CurrentAtVoltage150V) if abs(CurrentAtVoltage150V) > 0 else -1
+
+                    self.ResultData['KeyValueDictPairs']['CurrentRatio100V'] = {'Label': 'I(+17C)/I(-20C) 100V', 'Value': '{0:1.2f}'.format(CurrentRatio100V)}
+                    self.ResultData['KeyValueDictPairs']['CurrentRatio150V'] = {'Label': 'I(+17C)/I(-20C) 150V', 'Value': '{0:1.2f}'.format(CurrentRatio150V)}
+                    self.ResultData['KeyList'].append('CurrentRatio100V')
+                    self.ResultData['KeyList'].append('CurrentRatio150V')
+                else:
+                    print "no %s IV for current ratio found :-("%HighTemperatureEnvironment
+        else:
+            # if IV curve at low T is missing, ignore grading on ratio, bu print warning
+            print "#"*80,"\nWARNING: IV curve at low temperature is missing, no grading on ratio is done!\n","#"*80
+
+        # plot
         if len(Voltage_List) == 0:
             self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph()
         else:

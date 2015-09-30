@@ -64,6 +64,13 @@ class TestResult(GeneralTestResult):
                 }
             },
             {
+                'Key': 'IanaLoss',
+                'DisplayOptions': {
+                    'Order': 22,
+                    'Width': 1
+                }
+            },
+            {
                 'Key': 'Fitting',
                 'DisplayOptions': {
                     'GroupWithNext': False,

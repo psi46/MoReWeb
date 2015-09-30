@@ -52,7 +52,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             SummaryMap.Add(ROOTObject)
                             NModules += 1
                         else:
-                            print "BumpBonding map not found for module: '%s'"%ModuleId
+                            print "BumpBonding map not found for module: '%s'"%ModuleID
         
         SummaryMap.Draw("colz")
 
