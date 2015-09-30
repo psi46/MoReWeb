@@ -265,8 +265,8 @@ class TestResult(GeneralTestResult):
                     CurrentAtVoltage100VHighT = IVDataHighT[2]
                     CurrentAtVoltage150VHighT = IVDataHighT[3]
 
-                    CurrentRatio100V = CurrentAtVoltage100VHighT / CurrentAtVoltage100V if abs(CurrentAtVoltage100V) > 0 else -1
-                    CurrentRatio150V = CurrentAtVoltage150VHighT / CurrentAtVoltage150V if abs(CurrentAtVoltage150V) > 0 else -1
+                    CurrentRatio100V = abs(CurrentAtVoltage100VHighT / CurrentAtVoltage100V) if abs(CurrentAtVoltage100V) > 0 else -1
+                    CurrentRatio150V = abs(CurrentAtVoltage150VHighT / CurrentAtVoltage150V) if abs(CurrentAtVoltage150V) > 0 else -1
 
                     self.ResultData['KeyValueDictPairs']['CurrentRatio100V'] = {'Label': 'I(+17C)/I(-20C) 100V', 'Value': '{0:1.2f}'.format(CurrentRatio100V)}
                     self.ResultData['KeyValueDictPairs']['CurrentRatio150V'] = {'Label': 'I(+17C)/I(-20C) 150V', 'Value': '{0:1.2f}'.format(CurrentRatio150V)}

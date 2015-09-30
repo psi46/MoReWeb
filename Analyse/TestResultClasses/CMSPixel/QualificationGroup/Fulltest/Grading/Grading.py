@@ -113,13 +113,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if 'CurrentRatio150V' in IVTestResult.ResultData['KeyValueDictPairs']:
                 RatioP17M20 = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentRatio150V']['Value'])
 
-                RatioB = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioB'])
-                RatioC = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioC'])
+                # only grade on ratio if I(-20C) could be correctly measured
+                if RatioP17M20 > 0:
+                    RatioB = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioB'])
+                    RatioC = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioC'])
 
-                if (RatioP17M20 < RatioC):
-                    IVGrade = 3
-                elif (RatioP17M20 < RatioB) and IVGrade == 1:
-                    IVGrade = 2
+                    if (RatioP17M20 < RatioC):
+                        IVGrade = 3
+                    elif (RatioP17M20 < RatioB) and IVGrade == 1:
+                        IVGrade = 2
+                else:
+                    print "#"*80,"\nWARNING: could not calculate I(+17)/I(-20) ratio, no grading on ratio is done!\n","#"*80
+
 
         else:
             pass
