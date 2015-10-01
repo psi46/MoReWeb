@@ -9,6 +9,7 @@ from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 
 from AbstractClasses.GeneralTestResult import GeneralTestResult
 import subprocess
+import warnings
 #import PixelDB
 
 class TestResult(GeneralTestResult):
@@ -373,7 +374,7 @@ class TestResult(GeneralTestResult):
 
         HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
         if len(HRHotPixelsPaths) > 1:
-                warnings.warn("multiple MaskHotPixel tests found")
+                warnings.warn("multiple MaskHotPixel tests found, using first one: %s"%HRHotPixelsPaths[0])
 
         for Path in HRHotPixelsPaths:
             FolderName = os.path.basename(Path)
@@ -398,7 +399,7 @@ class TestResult(GeneralTestResult):
 
         RetrimHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_RetrimHotPixels_*')
         if len(RetrimHotPixelsPaths) > 1:
-                warnings.warn("multiple RetrimHotPixels tests found")
+                warnings.warn("multiple RetrimHotPixels tests found, using first one: %s"%RetrimHotPixelsPaths[0])
 
         for Path in RetrimHotPixelsPaths:
             FolderName = os.path.basename(Path)
