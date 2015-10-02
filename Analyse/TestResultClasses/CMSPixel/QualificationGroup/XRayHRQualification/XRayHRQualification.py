@@ -256,7 +256,8 @@ class TestResult(GeneralTestResult):
         self.Attributes['Rates'] = {
             'HREfficiency':[],
             'HRData':[],
-            'HRSCurves':[]
+            'HRSCurves':[],
+            'RetrimHotPixels':[]
         }
 
         self.FileHandle = []
@@ -283,8 +284,6 @@ class TestResult(GeneralTestResult):
     def AnalyzeHRQualificationFolder(self):
 
         self.logfilePaths = []
-
-
 
         HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
         for Path in HREfficiencyPaths:
@@ -321,7 +320,7 @@ class TestResult(GeneralTestResult):
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray HREfficiency: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -344,7 +343,7 @@ class TestResult(GeneralTestResult):
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray HRData: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -367,7 +366,7 @@ class TestResult(GeneralTestResult):
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray HRSCurves: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -391,25 +390,28 @@ class TestResult(GeneralTestResult):
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray MaskHotPixels: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
             break
 
-        RetrimHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_RetrimHotPixels_*')
-        if len(RetrimHotPixelsPaths) > 1:
-                warnings.warn("multiple RetrimHotPixels tests found, using first one: %s"%RetrimHotPixelsPaths[0])
-
+        RetrimHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_RetrimHotPixel*_*')
         for Path in RetrimHotPixelsPaths:
             FolderName = os.path.basename(Path)
+            try:
+                Rate = int(FolderName.split('_')[2])
+            except:
+                Rate = 0
+            self.Attributes['Rates']['RetrimHotPixels'].append(Rate)
             ROOTFiles = glob.glob(Path+'/*.root')
+
             if len(ROOTFiles) > 1:
                 warnings.warn("The directory '%s' contains more than one .root file, choosing first one: '%s'"%(FolderName, ROOTFiles[0]))
             if len(ROOTFiles) >= 1:
-                self.Attributes['ROOTFiles']['RetrimHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
+                self.Attributes['ROOTFiles']['RetrimHotPixels_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
                 self.Attributes['RetrimHotPixelsPath'] = Path
-                self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels'])
+                self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
             logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
@@ -418,11 +420,10 @@ class TestResult(GeneralTestResult):
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray RetrimHotPixels: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
-            break
 
 
         PixelAlivePaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_PixelAlive_*')
@@ -456,7 +457,7 @@ class TestResult(GeneralTestResult):
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray PixelAlive: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -476,7 +477,7 @@ class TestResult(GeneralTestResult):
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray CalDelScan: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -788,7 +789,7 @@ class TestResult(GeneralTestResult):
                 },
             })
 
-        for Rate in self.Attributes['Rates']['HRData']:
+        for Rate in self.Attributes['Rates']['RetrimHotPixels']:
             self.ResultData['SubTestResultDictList'].append({
                 'Key': 'HotPixelRetrimming_{Rate}'.format(Rate=Rate),
                 'Module': 'HotPixelRetrimming',

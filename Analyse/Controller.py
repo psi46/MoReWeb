@@ -533,6 +533,12 @@ if args.deleterow:
 
 # test analysis
 if not args.deleterow and not args.comment and not args.production_overview:
+
+    # prepare test analysis
+    #  database migrations
+    
+
+    # run test analysis
     if not args.singleFulltestPath=='':
         AnalyseSingleFullTest(args.singleFulltestPath)
     elif not args.singleQualificationPath=='':

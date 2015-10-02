@@ -18,7 +18,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'ReadoutUniformityOverTimeGrade',
                 'ColumnReadoutUniformityOverTimeGrade'
             ],
-            'HRSCurves':[]
+            'HRSCurves':[],
+            'RetrimHotPixels':[]
         }
         self.Attributes['NumberKeys'] = {
             'HREfficiency':[
@@ -31,7 +32,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'NumberOfNonUniformColumnEvents',
                 'BumpBondingDefects'
             ],
-            'HRSCurves':[]
+            'HRSCurves':[],
+            'RetrimHotPixels':[]
         }
         RateTypes = self.ParentObject.ParentObject.ParentObject.Attributes['Rates'].keys()
         RateData = {}

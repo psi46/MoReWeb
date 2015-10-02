@@ -19,8 +19,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Canvas.Clear()
         self.ResultData['Plot']['ROOTObject'] = None
 
-        if 'RetrimHotPixels' in self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']:
-            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['RetrimHotPixels']
+        RetrimHotPixelsRootFileKey = 'RetrimHotPixels_{Rate}'.format(Rate=self.Attributes['Rate'])
+        if RetrimHotPixelsRootFileKey in self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']:
+            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles'][RetrimHotPixelsRootFileKey]
             histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'RetrimHotPixels').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
             self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
         else:
@@ -45,7 +46,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['ListOfRetrimmedHotPixels'] = {'Label': 'Retrimmed Hot Pixels List', 'Value': self.RetrimmedHotPixelsList}
         self.ResultData['HiddenData']['NumberOfRetrimmedHotPixels'] = {'Label': 'Retrimmed Hot Pixels', 'Value': len(self.RetrimmedHotPixelsList)}
 
-        self.Title = 'Retrim Hot Pix {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
+        self.Title = 'Retrim Hot Pix {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'], Rate=self.Attributes['Rate'])
         if self.Canvas:
             self.Canvas.SetCanvasSize(500, 500)
         self.ResultData['Plot']['Format'] = 'png'
