@@ -58,6 +58,21 @@ import AbstractClasses.Helper.ROOTConfiguration as ROOTConfiguration
 
 ROOTConfiguration.initialise_ROOT()
 Configuration = ConfigParser.ConfigParser()
+
+if not os.path.isfile('Configuration/Paths.cfg'):
+    print "error: The config file 'Configuration/Paths.cfg' was not found, copy it from 'Configuration/Paths.cfg.default' and adjust the paths!"
+    exit()
+
+
+if not os.path.isfile('Configuration/ProductionOverview.cfg'):
+    print "info: The config file 'Configuration/ProductionOverview.cfg' was not found, it will be automatically created with default settings!"
+    try:
+        shutil.copy('Configuration/ProductionOverview.cfg.default', 'Configuration/ProductionOverview.cfg')
+        print " => done!"
+    except:
+        print " => failed! try to create 'Configuration/ProductionOverview.cfg' manually and run MoReWeb again!"
+        exit()
+
 Configuration.read([
     'Configuration/GradingParameters.cfg',
     'Configuration/SystemConfiguration.cfg',
@@ -517,7 +532,7 @@ if args.deleterow:
                             print "no connection to local db!"
 
 # test analysis
-if not args.deleterow and not args.comment:
+if not args.deleterow and not args.comment and not args.production_overview:
     if not args.singleFulltestPath=='':
         AnalyseSingleFullTest(args.singleFulltestPath)
     elif not args.singleQualificationPath=='':
