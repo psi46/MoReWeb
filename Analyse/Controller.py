@@ -1,11 +1,12 @@
 #!/usr/bin/env python
  # -*- coding: utf-8 -*-
-from AbstractClasses import GeneralTestResult, TestResultEnvironment, ModuleResultOverview, GeneralProductionOverview
+from AbstractClasses import PresentationMaker, GeneralTestResult, TestResultEnvironment, ModuleResultOverview, GeneralProductionOverview, GetValuesForSummaryPresentation
 import AbstractClasses.Helper.hasher as hasher
 import argparse
 # from AbstractClasses import Helper
 import TestResultClasses.CMSPixel.QualificationGroup.QualificationGroup
 from OverviewClasses.CMSPixel.ProductionOverview import ProductionOverview
+from OverviewClasses.CMSPixel.ProductionOverview.ProductionOverviewPage.GradingOverview import GradingOverview
 import os, time,shutil, sys
 # import errno
 import ConfigParser
@@ -48,6 +49,8 @@ parser.add_argument('-p', '--production-overview', dest = 'production_overview',
                     help = 'Creates production overview page in the end')
 parser.add_argument('-new', '--new-folders-only', dest = 'no_re_analysis', action = 'store_true', default = False,
                     help = 'Do not analyze folder if it already exists in DB, even if MoReWeb version has changed')
+parser.add_argument('-pres', '--make-presentation', dest = 'make_presentation', action = 'store_true', default = False,
+                    help = 'Creates tex file for presentation in the end')
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -557,6 +560,19 @@ if args.production_overview:
     print "production overview:"
     ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
     ProductionOverviewObject.GenerateOverview()
+    Summary = PresentationMaker.MakeProductionSummary()
+    GetInfo = GetValuesForSummaryPresentation.ModuleSummaryValues(TestResultEnvironmentInstance)
+    values = GetInfo.MakeArray()
+
+    if args.make_presentation:
+        print "Making tex file"
+        try:
+            Summary.MakeTexFile(values)
+        except:
+            print "Could not produce tex file for Presentation"
+
+
+
 
 # display error list
 print '\nErrorList:'
