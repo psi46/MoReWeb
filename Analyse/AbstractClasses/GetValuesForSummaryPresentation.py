@@ -160,29 +160,18 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
-                        tag = 1
 
                         if not RowTuple['Temperature'] or int(RowTuple['Temperature']) == 17:
                             #  grading criteria for measured currents
                             GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
                             GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
-                        else:
-                            # grading criteria for recalculated currents
-                            tag = 0
-                            GradeABrec = float(self.TestResultEnvironmentObject.GradingParameters['currentBm10'])
-                            GradeBCrec = float(self.TestResultEnvironmentObject.GradingParameters['currentCm10'])
 
-                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
-                        if tag:
+                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
                             if Value is not None and float(Value) > GradeBC:
                                 Numbers['nIV150C'] += 1
                             elif Value is not None and float(Value) > GradeAB:
                                 Numbers['nIV150B'] += 1
-                        else: 
-                            if Value is not None and float(Value) > GradeBCrec:
-                                Numbers['nRecCurrentC'] += 1
-                            elif Value is not None and float(Value) > GradeABrec:
-                                Numbers['nRecCurrentB'] += 1
+
 
             ### Pedestal Spread
             for RowTuple in Rows:
