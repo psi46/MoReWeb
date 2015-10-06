@@ -535,7 +535,7 @@ if args.deleterow:
                             print "no connection to local db!"
 
 # test analysis
-if not args.deleterow and not args.comment and not args.production_overview:
+if not args.deleterow and not args.comment and not args.production_overview and not args.make_presentation:
 
     # prepare test analysis
     #  database migrations
@@ -560,16 +560,18 @@ if args.production_overview:
     print "production overview:"
     ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
     ProductionOverviewObject.GenerateOverview()
+
+if args.make_presentation:
+    print "presentation maker: collecting data..."
     Summary = PresentationMaker.MakeProductionSummary()
     GetInfo = GetValuesForSummaryPresentation.ModuleSummaryValues(TestResultEnvironmentInstance)
     values = GetInfo.MakeArray()
-
-    if args.make_presentation:
-        print "Making tex file"
-        try:
-            Summary.MakeTexFile(values)
-        except:
-            print "Could not produce tex file for Presentation"
+    print "presentation maker: write tex file..."
+    try:
+        Summary.MakeTexFile(values)
+        print "done."
+    except:
+        print "Could not produce tex file for Presentation"
 
 
 

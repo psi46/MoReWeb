@@ -1,7 +1,10 @@
 from sys import argv
 import time
 from time import gmtime, strftime
+import os
 import ConfigParser
+import subprocess
+import shlex
 
 class MakeProductionSummary:
 
@@ -11,7 +14,17 @@ class MakeProductionSummary:
     Configuration.read([
     'Configuration/Paths.cfg',
     ])
-    OutputDirectoryPath = Configuration.get('Paths', 'GlobalPresentationPath')
+    try:
+      OutputDirectoryPath = Configuration.get('Paths', 'GlobalPresentationPath')
+    except:
+      OutputDirectoryPath = Configuration.get('Paths', 'GlobalOverviewPath')
+
+    if not os.path.exists(OutputDirectoryPath):
+      try:
+        os.makedirs(OutputDirectoryPath)
+      except:
+        print "could not create presentation output directory!"
+
     FiguresPath = Configuration.get('Paths', 'GlobalOverviewPath')
 
 
@@ -290,4 +303,11 @@ class MakeProductionSummary:
     with  open(filename,'w') as myfile:
       myfile.write(template.format(**context))
 
+    print "compile tex file..."
+
+    try:
+      proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename))
+      proc.communicate()
+    except:
+      print "could not compile tex file, pdflatex installed?"
 
