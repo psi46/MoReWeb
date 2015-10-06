@@ -10,6 +10,7 @@ from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 from AbstractClasses.GeneralTestResult import GeneralTestResult
 import subprocess
 import warnings
+import traceback
 #import PixelDB
 
 class TestResult(GeneralTestResult):
@@ -278,8 +279,18 @@ class TestResult(GeneralTestResult):
                 'ErrorCode': inst,
                 'FinalResultsStoragePath':'unkown'
                 }
-            )
-            print "\x1b[31mProblems in X-ray HR directory structure detected, skip qualification directory! %s\x1b[0m"%self.TestResultEnvironmentObject.ModuleDataDirectory
+            )            
+            # Start red color
+            sys.stdout.write("\x1b[31m")
+            sys.stdout.flush()
+            print "\x1b[31mProblems in X-ray HR directory structure detected, skip qualification directory! %s"%self.TestResultEnvironmentObject.ModuleDataDirectory
+            # Print traceback
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            traceback.print_exception(exc_type, exc_obj, exc_tb) 
+            # Reset color
+            sys.stdout.write("\x1b[0m")
+            sys.stdout.flush()
+
 
     def AnalyzeHRQualificationFolder(self):
 
@@ -314,7 +325,7 @@ class TestResult(GeneralTestResult):
                 print '\x1b[31mWARNING: testParameters.dat file not found in "%s", using default number of triggers Ntrig = %d\x1b[0m'%(FolderName, self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
@@ -337,7 +348,7 @@ class TestResult(GeneralTestResult):
             self.FileHandle.append(self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
@@ -360,7 +371,7 @@ class TestResult(GeneralTestResult):
                 self.FileHandle.append(self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
@@ -384,7 +395,7 @@ class TestResult(GeneralTestResult):
             self.FileHandle.append(self.Attributes['ROOTFiles']['MaskHotPixels'])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
@@ -414,7 +425,7 @@ class TestResult(GeneralTestResult):
                 self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
@@ -451,7 +462,7 @@ class TestResult(GeneralTestResult):
                 print '\x1b[31mWARNING: testParameters.dat file not found in "%s", using default number of triggers Ntrig = 10\x1b[0m'%FolderName
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
@@ -471,7 +482,7 @@ class TestResult(GeneralTestResult):
                 self.FileHandle.append(self.Attributes['ROOTFiles']['CalDelScan'])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
