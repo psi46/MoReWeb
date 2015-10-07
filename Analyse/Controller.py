@@ -7,7 +7,7 @@ import argparse
 import TestResultClasses.CMSPixel.QualificationGroup.QualificationGroup
 from OverviewClasses.CMSPixel.ProductionOverview import ProductionOverview
 from OverviewClasses.CMSPixel.ProductionOverview.ProductionOverviewPage.GradingOverview import GradingOverview
-import os, time,shutil, sys
+import os, time,shutil, sys,traceback
 # import errno
 import ConfigParser
 import datetime
@@ -561,17 +561,27 @@ if args.production_overview:
     ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
     ProductionOverviewObject.GenerateOverview()
 
-if args.make_presentation:
-    print "presentation maker: collecting data..."
-    Summary = PresentationMaker.MakeProductionSummary()
-    GetInfo = GetValuesForSummaryPresentation.ModuleSummaryValues(TestResultEnvironmentInstance)
-    values = GetInfo.MakeArray()
-    print "presentation maker: write tex file..."
-    try:
-        Summary.MakeTexFile(values)
-        print "done."
-    except:
-        print "Could not produce tex file for Presentation"
+    if args.make_presentation:
+        print "presentation maker: collecting data..."
+        Summary = PresentationMaker.MakeProductionSummary()
+        GetInfo = GetValuesForSummaryPresentation.ModuleSummaryValues(TestResultEnvironmentInstance)
+        values = GetInfo.MakeArray()
+        print "presentation maker: write tex file..."
+        try:
+            Summary.MakeTexFile(values)
+            print "done."
+        except:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            # Start red color
+            sys.stdout.write("\x1b[31m")
+            sys.stdout.flush()
+            # Print error message
+            print "Could not produce tex file for Presentation!"
+            # Print traceback
+            traceback.print_exception(exc_type, exc_obj, exc_tb)
+            # Stop red color
+            sys.stdout.write("\x1b[0m")
+            sys.stdout.flush()
 
 
 

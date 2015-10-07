@@ -44,6 +44,8 @@ class MakeProductionSummary:
     lcstartupC = args['nlcstartupC']
     IV150B = args['nIV150B']
     IV150C = args['nIV150C']
+    IRatio150B = args['nCurrentRatioB']
+    IRatio150C = args['nCurrentRatioC']
     IVSlopeB = args['nIVSlopeB']
     IVSlopeC = args['nIVSlopeC']
     RecCurrentB = args['nRecCurrentB']
@@ -106,6 +108,7 @@ class MakeProductionSummary:
     RelGainW = round(float(RelGainWC)/nQ*100,1)
     VcalThrW = round(float(VcalThrWC)/nQ*100,1)
     LowHREf = round(float(LowHREfC)/nQ*100,1)
+    IRatio150 = round(float(IRatio150C)/nQ*100,1)
     
  
 
@@ -174,7 +177,8 @@ class MakeProductionSummary:
     \\toprule
                                     & Defects             & B & C &  C (\%  of production)\\\\ \midrule
     \multirow{{2}}{{*}}{{Sensor}}     & LC startup        & {lcstartupB} & {lcstartupC} &  {lcstartup}\\\\
-                                    & IV 150              & {IV150B} & {IV150C} & {IV150} \\\\ \midrule
+                                    & IV 150              & {IV150B} & {IV150C} & {IV150} \\\\
+                                    & I(+17)/I(-20)       & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ \midrule
     \multirow{{2}}{{*}}{{Sensor m20}} & IV slope          & {IVSlopeB} & {IVSlopeC} & {IVSlope} \\\\
                                     & Rec current         & {RecCurrentB} & {RecCurrentC} & {RecCurrent} \\\\ \midrule
     \multirow{{9}}{{*}}{{Pixel defects}} & Total defects  & {totDefectsB} & {totDefectsC} & {totDefects} \\\\ 
@@ -243,6 +247,9 @@ class MakeProductionSummary:
       "lcstartupC" : lcstartupC,
       "IV150B" : IV150B,
       "IV150C" : IV150C,
+      "IRatio150B" : IRatio150B,
+      "IRatio150C" : IRatio150C,
+      "IRatio150" : IRatio150,
       "IVSlopeB" : IVSlopeB,
       "IVSlopeC" : IVSlopeC,
       "RecCurrentB" : RecCurrentB,
@@ -299,15 +306,25 @@ class MakeProductionSummary:
       "FiguresPath" : FiguresPath
     } 
 
-
+    oldWorkingDirectory = os.getcwd()
     with  open(filename,'w') as myfile:
       myfile.write(template.format(**context))
 
     print "compile tex file..."
 
     try:
+      os.chdir(OutputDirectoryPath)
       proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename))
       proc.communicate()
+      for extension in ['aux', 'nav', 'snm', 'toc', 'out']:
+        auxFile = filename[0:-4]+"."+extension
+        if os.path.isfile(auxFile):
+          try:
+            os.remove(auxFile)
+          except:
+            print "could not remove auxiliary file: %s"%auxFile
     except:
       print "could not compile tex file, pdflatex installed?"
+      raise
+    os.chdir(oldWorkingDirectory)
 

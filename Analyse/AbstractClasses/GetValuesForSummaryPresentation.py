@@ -22,6 +22,8 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         'nIVSlopeC' : 0,
         'nRecCurrentB' : 0,
         'nRecCurrentC' : 0,
+        'nCurrentRatioB' : 0,
+        'nCurrentRatioC' : 0,
         'ntotDefectsB' : 0,
         'ntotDefectsC' : 0,
         'ntotDefectsXrayB' : 0,
@@ -127,10 +129,10 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
 
         for ModuleID in ModuleIDsList:
 
-            ### LeakageCurrent PON
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     
+            ### LeakageCurrent PON
                     if RowTuple['TestType'] in TestTypeLeakageCurrentPON:
                         GradeC = 15*1e-6
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'KeyValueDictPairs.json', 'LeakageCurrent', 'Value'])
@@ -139,13 +141,11 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
                             
             ### IV slope
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
                         GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['slopeivC'])
+
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'Variation', 'Value'])
                         if Value is not None and float(Value) > GradeBC:
                             Numbers['nIVSlopeC'] += 1
@@ -154,10 +154,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             Numbers['nIVSlopeB'] += 1
                             break
 
-            ### IV 150
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
+            ### IV 150 & leakage curent ratio
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
@@ -171,12 +168,18 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 Numbers['nIV150C'] += 1
                             elif Value is not None and float(Value) > GradeAB:
                                 Numbers['nIV150B'] += 1
+                        elif int(RowTuple['Temperature']) == -20:
+                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioB'])
+                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioC'])
+
+                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'CurrentRatio150V', 'Value'])
+                            if Value is not None and float(Value) < GradeBC:
+                                Numbers['nCurrentRatioC'] += 1
+                            elif Value is not None and float(Value) < GradeAB:
+                                Numbers['nCurrentRatioB'] += 1
 
 
             ### Pedestal Spread
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
@@ -191,9 +194,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### RelativeGainWidth
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
@@ -208,9 +208,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### VcalThrWidth
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
@@ -225,9 +222,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### Noise
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
@@ -242,8 +236,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### deadPixel
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         RocGrades = []
@@ -263,8 +255,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### AddressDefects
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         RocGrades = []
@@ -284,8 +274,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### maskDefects
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         RocGrades = []
@@ -305,8 +293,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### trimbitDefects
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         RocGrades = []
@@ -326,9 +312,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### TotalDefects
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
@@ -343,8 +326,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### defectiveBumps Fulltest
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         BBGrades = []
@@ -364,9 +345,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### defectiveBumps X-ray
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] == TestTypeXrayHR:
 
                         BBGrades = []
@@ -385,9 +363,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### lowEfficiency
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] == TestTypeXrayHR:
 
                         EfficiencyGrades = []
@@ -405,8 +380,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 break       
 
             ### unif problems
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
                     if RowTuple['TestType'] == TestTypeXrayHR:
 
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithUniformityProblems', 'Value'])
@@ -415,8 +388,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 break
 
             ### X-ray noise
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
                     if RowTuple['TestType'] == TestTypeXrayHR:
 
                         RocGrades = []
@@ -442,8 +413,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             break
 
             ### totalDefects X-ray
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
                     if RowTuple['TestType'] == TestTypeXrayHR:
                         RocGrades = []
                         for Chip in range(0,16):

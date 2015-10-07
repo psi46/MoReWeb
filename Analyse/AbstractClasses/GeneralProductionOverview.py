@@ -524,19 +524,22 @@ class GeneralProductionOverview:
     def GetJSONValue(self, Keys):
 
         Path = self.GlobalOverviewPath + '/' + '/'.join(Keys[0:-2])
-        JSONFiles = glob.glob(Path)
-        if len(JSONFiles) > 1:
-            print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
-            return None
-        elif len(JSONFiles) < 1:
-            # first Fulltest at -20 is allowed to not have IV curve, don't show warning in this case
-            if not 'ModuleFulltestPxar_m20_1/IVCurve' in Path:
-                print "WARNING: %s json file not found: '%s"%(self.Name, Path)
-            return None
+        if os.path.isfile(Path):
+                with open(Path) as data_file:    
+                    JSONData = json.load(data_file)
         else:
-
-            with open(JSONFiles[0]) as data_file:    
-                JSONData = json.load(data_file)
+            JSONFiles = glob.glob(Path)
+            if len(JSONFiles) > 1:
+                print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
+                return None
+            elif len(JSONFiles) < 1:
+                # first Fulltest at -20 is allowed to not have IV curve, don't show warning in this case
+                if not 'ModuleFulltestPxar_m20_1/IVCurve' in Path:
+                    print "WARNING: %s json file not found: '%s"%(self.Name, Path)
+                return None
+            else:
+                with open(JSONFiles[0]) as data_file:    
+                    JSONData = json.load(data_file)
 
         try:
             value = JSONData[Keys[-2]][Keys[-1]]
