@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
+import AbstractClasses.Helper.HistoGetter as HistoGetter
 import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -14,51 +15,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
+        ChipNo=self.ParentObject.Attributes['ChipNo']
 
-        self.ResultData['Plot']['ROOTObject'] =  self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['Plot']['ROOTObject_ht'].Clone(self.GetUniqueID())
+        try:
+            self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['Plot']['ROOTObject_ht'].Clone(self.GetUniqueID())
+        except:
+            self.ResultData['Plot']['ROOTObject'] = None
 
-        #self.ResultData['Plot']['ROOTObject_ht'] = self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['Plot']['ROOTObject_ht'];
-        #
-        # #mG
-        # MeanVcalThr = self.ResultData['Plot']['ROOTObject'].GetMean()
-        # #sG
-        # RMSVcalThr = self.ResultData['Plot']['ROOTObject'].GetRMS()
-        # #nG
-        # IntegralVcalThr = self.ResultData['Plot']['ROOTObject'].Integral(
-            # self.ResultData['Plot']['ROOTObject'].GetXaxis().GetFirst(),
-            # self.ResultData['Plot']['ROOTObject'].GetXaxis().GetLast()
-        # )
-        # #nG_entries
-        # IntegralVcalThr_Entries = self.ResultData['Plot']['ROOTObject'].GetEntries()
-        #
-        # under = self.ResultData['Plot']['ROOTObject'].GetBinContent(0)
-        # over = self.ResultData['Plot']['ROOTObject'].GetBinContent(self.ResultData['Plot']['ROOTObject'].GetNbinsX()+1)
-                #
-            #
-        # self.ResultData['KeyValueDictPairs'] = {
-            # 'N': {
-                # 'Value':'{0:1.0f}'.format(IntegralVcalThr),
-                # 'Label':'N'
-            # },
-            # 'mu': {
-                # 'Value':'{0:1.2f}'.format(MeanVcalThr),
-                # 'Label':'μ'
-            # },
-            # 'sigma':{
-                # 'Value':'{0:1.2f}'.format(RMSVcalThr),
-                # 'Label':'σ'
-            # }
-        # }
-        # self.ResultData['KeyList'] = ['N','mu','sigma']
-        # if under:
-            # self.ResultData['KeyValueDictPairs']['under'] = {'Value':'{0:1.2f}'.format(under), 'Label':'<='}
-            # self.ResultData['KeyList'].append('under')
-        # if over:
-            # self.ResultData['KeyValueDictPairs']['over'] = {'Value':'{0:1.2f}'.format(over), 'Label':'>='}
-            # self.ResultData['KeyList'].append('over')
-    #
-        #
-        #
+        pxarfit = False
+        if self.ResultData['Plot']['ROOTObject'] is None or ('NoDatFile' in self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData'] and self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['NoDatFile']):
+            HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
+            histname = HistoDict.get(self.NameSingle, 'ThresholdMap')
+            self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo).Clone(self.GetUniqueID())
+            print "error: Scurve .dat file not found, try to use pxar histogram from root file instead! histogram: ", histname
+            if self.ResultData['Plot']['ROOTObject']:
+                print "found!"
+                self.ResultData['KeyValueDictPairs']['fit'] = {
+                        'Label' : 'Fit',
+                        'Value': 'pxar',
+                    }
+                self.ResultData['KeyList'].append('fit')
+                pxarfit = True
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['htmin'], self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['htmax'])
@@ -67,11 +44,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            if pxarfit:
+                self.ResultData['Plot']['ROOTObject'].SetTitle("fit and histogram taken from pxar!!!")
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
+
 
 
         self.ResultData['Plot']['Caption'] = 'Vcal Threshold Untrimmed'
         if self.Canvas:
             self.Canvas.SetCanvasSize(500, 500)
         self.ResultData['Plot']['Format'] = 'png'
-        self.SaveCanvas()        
+        self.SaveCanvas()

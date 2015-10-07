@@ -59,15 +59,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if object != None:
                 self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
         if not self.ResultData['Plot']['ROOTObject_h2']:
+            self.ResultData['HiddenData']['NoDatFile'] = True
             print 'Cannot find Histogram ',HistoDict.get(self.NameSingle,'Digital'),HistoDict.has_option(self.NameSingle,'Analog')
             print[x.GetName() for x in self.ParentObject.ParentObject.FileHandle.GetListOfKeys()]
             print 'NameSingle: ', self.NameSingle
             raise KeyError('SCurveWidth: Cannot Find Histogram in ROOT File')
         Directory = self.RawTestSessionDataPath
         SCurveFileName = "{Directory}/SCurve_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
-        SCurveFile = open(SCurveFileName, "r")
-
-        self.FileHandle = SCurveFile # needed in summary
+        try:
+            SCurveFile = open(SCurveFileName, "r")
+            self.FileHandle = SCurveFile # needed in summary
+        except:
+            SCurveFile = None
+            self.ResultData['HiddenData']['NoDatFile'] = True
+            raise
 
         try:
             DeadPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
