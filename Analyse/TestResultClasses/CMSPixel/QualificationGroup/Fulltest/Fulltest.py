@@ -629,6 +629,10 @@ class TestResult(GeneralTestResult):
         if SubtestMissing:
             grade = 'C'
             Comment += 'Fulltest incomplete, graded C'
+           
+        #adding comment (if any) from manual grading
+        if self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
+            Comment += self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['GradeComment']['Value']
 
         # fill final grade and comments
         Comment = Comment.strip().strip('/')

@@ -160,6 +160,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if IVGrade > ModuleGrade:
             ModuleGrade = IVGrade
 
+        #if grade was manually specified, apply it
+        GradeComment = ''
+        ManualGrade = self.check_for_manualGrade()
+        print "hello we got a manual grade: "+str(ManualGrade) 
+        if ManualGrade != '':
+            GradeComment = "Grade manually changed from "+str(GradeMapping[ModuleGrade])+" to "+str(GradeMapping[int(ManualGrade)])
+            ModuleGrade =int(ManualGrade)
+            print "ModuleGrade set to "+str(ModuleGrade)
+
         print 'Fulltest Summary:'
         if MissingSubtests:
             print "\x1b[31mMISSING TESTS!\x1b[0m"
@@ -214,6 +223,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '{0:1.0f}'.format(nPixelDefectsGradeC),
                 'Label': 'ROCs with Grade C'
             },
+            'GradeComment': {
+                'Value': GradeComment,
+                'Label': 'Grade comment'
+            },
+            
         }
         self.ResultData['HiddenData']['SubGradings'] = SubGradings
         self.ResultData['HiddenData']['MissingSubtests'] = {'Label': 'Missing Subtests', 'Value': '1' if MissingSubtests else '0'}
