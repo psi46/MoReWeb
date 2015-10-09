@@ -76,7 +76,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': TBM2status, 
                 'Label':'TBM2'
             },
-        
         }
         
         self.ResultData['KeyList'] = ['TestDate','TestTime', 'TestDuration', 'TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
@@ -84,6 +83,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ParentObject.pxarVersion:
             self.ResultData['KeyValueDictPairs']['PxarVersion'] = {'Label': 'pXar', 'Value': self.ParentObject.pxarVersion.replace("~","\n")}
             self.ResultData['KeyList'].append('PxarVersion')
+
+        try:
+            if 'ModuleIa' in self.ParentObject.ResultData['SubTestResults']['AnalogCurrent'].ResultData['KeyValueDictPairs']:
+                self.ResultData['KeyValueDictPairs']['ModuleIa'] = self.ParentObject.ResultData['SubTestResults']['AnalogCurrent'].ResultData['KeyValueDictPairs']['ModuleIa']
+                self.ResultData['KeyList'].append('ModuleIa')
+        except:
+            pass
 
 
 
