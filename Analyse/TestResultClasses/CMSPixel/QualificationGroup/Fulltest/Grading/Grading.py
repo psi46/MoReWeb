@@ -163,11 +163,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #if grade was manually specified, apply it
         GradeComment = ''
         ManualGrade = self.check_for_manualGrade()
-        print "hello we got a manual grade: "+str(ManualGrade) 
         if ManualGrade != '':
             GradeComment = "Grade manually changed from "+str(GradeMapping[ModuleGrade])+" to "+str(GradeMapping[int(ManualGrade)])
+            print GradeComment
             ModuleGrade =int(ManualGrade)
-            print "ModuleGrade set to "+str(ModuleGrade)
 
         print 'Fulltest Summary:'
         if MissingSubtests:
