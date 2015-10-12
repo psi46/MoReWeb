@@ -343,7 +343,12 @@ class GeneralTestResult(object):
                 gradefile = open(filename)
             except:
                 warnings.warn('cannot open manual grade file {file}'.format(file=filename))
-            grade = gradefile.read()
+            grade = gradefile.read().strip()
+            gradefile.close()
+            # grade can be given either as number 1,2,3 or as letter A,B,C
+            GradeNames = ['A','B','C']
+            if grade in GradeNames:
+                grade = 1 + GradeNames.index(grade)
             print "Reading a manual grade "+str(grade)+" specified by the user in "+str(filename)
         return grade
             

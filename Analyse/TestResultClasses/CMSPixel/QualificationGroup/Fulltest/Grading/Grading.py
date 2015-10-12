@@ -175,6 +175,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         print " SubGradings:"
         print "  %s: %s"%('Electrical'.ljust(22), GradeMapping[ElectricalGrade] if ElectricalGrade in GradeMapping else 'None')
         print "  %s: %s"%('IV'.ljust(22), GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None')
+        if ManualGrade != '':
+            print "  %s: %s"%('Manual'.ljust(22), GradeMapping[int(ManualGrade)] if int(ManualGrade) in GradeMapping else 'None')
+
         for i in SubGradings:
             print '  %s: %s/%s/%s' % (
                 i.ljust(22), self.getNumberOfRocsWithGrade('1', SubGradings[i]),
@@ -232,6 +235,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['MissingSubtests'] = {'Label': 'Missing Subtests', 'Value': '1' if MissingSubtests else '0'}
         self.ResultData['KeyList'] = ['Module', 'ModuleGrade', 'PixelDefectsRocsB']
 
+        if ManualGrade != '':
+            self.ResultData['KeyValueDictPairs']['ManualGrade'] = {'Label': 'Manual grade', 'Value': str(int(ManualGrade))}
+            self.ResultData['KeyList'].append('ManualGrade')
 
         # needed in summary1
         if self.verbose:
