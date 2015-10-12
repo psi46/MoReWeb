@@ -333,6 +333,26 @@ class GeneralTestResult(object):
             }
             self.ResultData['KeyList'].append('Comment')
 
+    def check_for_manualGrade(self):
+        self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
+        print self.RawTestSessionDataPath
+        gradefilenames = glob.glob(self.RawTestSessionDataPath + '/grade.txt')
+        grade = ''
+        for filename in gradefilenames:
+            try:
+                gradefile = open(filename)
+            except:
+                warnings.warn('cannot open manual grade file {file}'.format(file=filename))
+            grade = gradefile.read().strip()
+            gradefile.close()
+            # grade can be given either as number 1,2,3 or as letter A,B,C
+            GradeNames = ['A','B','C']
+            if grade in GradeNames:
+                grade = 1 + GradeNames.index(grade)
+            print "Reading a manual grade "+str(grade)+" specified by the user in "+str(filename)
+        return grade
+            
+
     def ReadModuleVersion(self):
         if self.verbose:
             print 'Read configParameters'

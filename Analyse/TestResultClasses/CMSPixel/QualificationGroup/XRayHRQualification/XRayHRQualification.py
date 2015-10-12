@@ -888,6 +888,8 @@ class TestResult(GeneralTestResult):
         print" ATTRIBUTES", self.Attributes
 #        print" PATTRIBUTES", self.ParentObj.Attributes
         
+        Comment=''
+
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
@@ -913,6 +915,16 @@ class TestResult(GeneralTestResult):
             'Hostname': self.Attributes['Hostname'],
             'Operator': self.Attributes['Operator'],
         }
+
+        #adding comment (if any) from manual grading
+        if self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
+            Comment += self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['GradeComment']['Value']
+        
+        # fill final comments
+        Comment = Comment.strip().strip('/')
+        Row.update({
+            'Comments': Comment,
+            })
 
         print 'fill row end'
 
@@ -1300,7 +1312,8 @@ class TestResult(GeneralTestResult):
                         ROCsMoreThanFourPercent,
                         Noise,
                         RelativeModuleFinalResultsPath,
-                        FulltestSubfolder
+                        FulltestSubfolder,
+                        Comments
                         
                     )
                     VALUES (
@@ -1315,8 +1328,8 @@ class TestResult(GeneralTestResult):
                         :ROCsMoreThanFourPercent,
                         :Noise,
                         :RelativeModuleFinalResultsPath,
-                        :FulltestSubfolder
-                        
+                        :FulltestSubfolder,
+                        :Comments
                     )
                     ''', Row)
                 return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid

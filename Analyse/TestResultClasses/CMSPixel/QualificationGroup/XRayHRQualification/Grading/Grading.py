@@ -125,6 +125,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             else:
                 MeanNoise = -1
 
+        #if grade was manually specified, apply it
+        GradeComment = ''
+        ManualGrade = self.check_for_manualGrade()
+        if ManualGrade != '':
+            GradeComment = "Grade manually changed from "+str(GradeMapping[ModuleGrade])+" to "+str(GradeMapping[int(ManualGrade)])
+            print GradeComment
+            ModuleGrade =int(ManualGrade)
+                    
         SubGradings['PixelDefects'] = SubGrading
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -187,6 +195,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': "{Noise:1.0f}".format(Noise=MeanNoise),
                 'Label': 'Mean Noise'
             },
+            'GradeComment': {
+                'Value': GradeComment,
+                'Label': 'Grade comment'
+            },
         }
 
         self.ResultData['HiddenData']['SubGradings'] = SubGradings
@@ -209,6 +221,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Label': 'TotalDefectPixelsList',
             'Value': TotalDefectPixelsList
         }
+
+        #
+        if ManualGrade != '':
+            self.ResultData['KeyValueDictPairs']['ManualGrade'] = {'Label': 'Manual grade', 'Value': str(int(ManualGrade))}
+            self.ResultData['KeyList'].append('ManualGrade')
 
         # needed in summary1
         if self.verbose:

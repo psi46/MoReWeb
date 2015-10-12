@@ -60,7 +60,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ModuleGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Value'])
         ElectricalGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ElectricalGrade']['Value'])
         IVGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['IVGrade']['Value'])
-        
+        ManualGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ManualGrade']['Value']) if 'ManualGrade' in self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'] else 0
+
         GradeText = GradeMapping[ModuleGrade] if ModuleGrade in GradeMapping else 'None'
 
         if self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData'].has_key('MissingSubtests') and int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MissingSubtests']['Value'])>0:
@@ -82,6 +83,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'IVGrade': {
                 'Value':GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None',
                 'Label':'IV Grade'
+            },
+            'ManualGrade': {
+                'Value':GradeMapping[ManualGrade] if ManualGrade in GradeMapping else 'None',
+                'Label':'Manual Grade'
             },
             'PixelDefectsRocsA': {
                 'Value':'{0:1.0f}'.format(PixelDefectsRocsA), 
@@ -141,7 +146,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'PH Parameter1 Defects'
             },
         }
-        self.ResultData['KeyList'] = ['Module','Grade','ElectricalGrade', 'IVGrade', 'PixelDefects', 'DeadPixels','AddressProblems', 'ThresholdDefects', 'MaskDefects', 'DeadBumps', 'NoisyPixels', 'TrimProblems', 'PHGainDefects', 'PHPedestalDefects', 'PHPar1Defects']
+        self.ResultData['KeyList'] = ['Module','Grade','ElectricalGrade', 'IVGrade', 'ManualGrade', 'PixelDefects', 'DeadPixels','AddressProblems', 'ThresholdDefects', 'MaskDefects', 'DeadBumps', 'NoisyPixels', 'TrimProblems', 'PHGainDefects', 'PHPedestalDefects', 'PHPar1Defects']
 
 
 	SubGradings = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGradings']
