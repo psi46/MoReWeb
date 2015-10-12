@@ -4,6 +4,14 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
+##### version 0.6.6
+
+**manual grading possible**
+
+how to: add a file grade.txt inside the 00\*\_Fulltest\_\* subfolder which contains the grade as letter (A,B,C) or number (1,2,3). (To add a comment: add a file called comment.txt to the main qualification directory, e.g. M\*\_FullQualification\_...)
+
+...
+
 ##### version 0.6.4
 
 **new grading for IV curves!**
