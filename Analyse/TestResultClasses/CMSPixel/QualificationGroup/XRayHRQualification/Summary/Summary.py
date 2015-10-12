@@ -15,6 +15,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             2:'B',
             3:'C'
         }
+        if 'ManualGrade' in self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']:
+            ManualGradeNumeric = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ManualGrade']['Value'])
+            ManualGrade = GradeMapping[ManualGradeNumeric] if ManualGradeNumeric in GradeMapping else ''
+        else:
+            ManualGrade = ''
 
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -24,6 +29,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Grade': {
                 'Value': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Value'],
                 'Label': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Label']
+            },
+            'ManualGrade': {
+                'Value': ManualGrade if ManualGrade != '' else 'None',
+                'Label': 'Manual Grade'
             },
             'ROCGrades': {
                 'Value': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrades']['Value'],
@@ -83,6 +92,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Unit': 'e-',
             }
 
-        self.ResultData['KeyList'] = ['Module','Grade', 'ROCGrades','PixelDefects','BumpBondingDefects','NoisyPixels', 'HotPixelDefects', 'ROCsWithReadoutProblems', 'ROCsWithUniformityProblems', 'Efficiency','Noise']
+        self.ResultData['KeyList'] = ['Module', 'Grade', 'ManualGrade', 'ROCGrades','PixelDefects','BumpBondingDefects','NoisyPixels', 'HotPixelDefects', 'ROCsWithReadoutProblems', 'ROCsWithUniformityProblems', 'Efficiency','Noise']
 
 

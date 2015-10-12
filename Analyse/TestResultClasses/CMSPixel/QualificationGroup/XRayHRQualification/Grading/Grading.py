@@ -222,6 +222,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Value': TotalDefectPixelsList
         }
 
+        #
+        if ManualGrade != '':
+            self.ResultData['KeyValueDictPairs']['ManualGrade'] = {'Label': 'Manual grade', 'Value': str(int(ManualGrade))}
+            self.ResultData['KeyList'].append('ManualGrade')
+
         # needed in summary1
         if self.verbose:
             print 'SubGradings of ROCs:'
