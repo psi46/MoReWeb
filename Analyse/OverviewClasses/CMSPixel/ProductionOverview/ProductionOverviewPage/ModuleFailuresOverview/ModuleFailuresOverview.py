@@ -2,6 +2,8 @@
 import ROOT
 import AbstractClasses
 import glob
+import sys
+import time
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
@@ -33,7 +35,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         ModuleIDsList.sort()
-        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'BB_X-ray', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
+        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'GradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'BB_X-ray', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         BinNumber = 1
@@ -58,14 +60,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         GradeMaskDefectsAB = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsB'])
         GradeMaskDefectsBC = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsC'])
 
+        #time_start = time.time()
         for ModuleID in ModuleIDsList:
-
+            #print "t=",(time.time()-time_start)
+            #time_start = time.time()
+            sys.stdout.write('.')
+            sys.stdout.flush()
             Summary.GetXaxis().SetBinLabel(BinNumber, ModuleID)
 
-            ### LeakageCurrent PON
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
-                    
+
+            ### LeakageCurrent PON
                     if RowTuple['TestType'] in TestTypeLeakageCurrentPON:
                         GradeC = 15*1e-6
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'KeyValueDictPairs.json', 'LeakageCurrent', 'Value'])
@@ -74,9 +80,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('LCStartup') + i, ColorC)
 
             ### IV slope
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests and (not RowTuple['Temperature'] or (len(RowTuple['Temperature'].strip()) > 0 and int(RowTuple['Temperature']) == 17)):
                         TestIndex = FullTests.index(RowTuple['TestType'])
                         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
@@ -88,9 +91,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVSlope') + TestIndex, ColorB)
 
             ### IV 150
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
@@ -105,13 +105,22 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             elif Value is not None and float(Value) > GradeAB:
                                 Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorB)
 
-            ### Pedestal Spread
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
+            ### GradeFT
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ModuleGrade', 'Value'])
+                        if Value is not None:
+                            try:
+                                Value = int(Value)
+                                if Value == 3:
+                                    Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('GradeFT') + TestIndex, ColorC)
+                                elif Value == 2:
+                                    Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('GradeFT') + TestIndex, ColorB)
+                            except:
+                                pass
+
+            ### Pedestal Spread
                         ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PedestalSpreadGradeBROCs', 'Value'])
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PedestalSpreadGradeCROCs', 'Value'])
 
@@ -121,12 +130,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('PedestalSpread') + TestIndex, ColorB)
 
             ### RelativeGainWidth
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
                         ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'RelativeGainWidthGradeBROCs', 'Value'])
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'RelativeGainWidthGradeCROCs', 'Value'])
 
@@ -136,12 +139,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('RelativeGainWidth') + TestIndex, ColorB)
 
             ### VcalThrWidth
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
                         ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'VcalThresholdWidthGradeBROCs', 'Value'])
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'VcalThresholdWidthGradeCROCs', 'Value'])
 
@@ -151,12 +148,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('VcalThrWidth') + TestIndex, ColorB)
 
             ### Noise
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
                         ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'NoiseGradeBROCs', 'Value'])
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'NoiseGradeCROCs', 'Value'])
 
@@ -166,10 +157,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('Noise') + TestIndex, ColorB)
 
             ### deadPixel
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
                         RocGrades = []
                         for Chip in range(0,16):
                             NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'PixelMap', 'KeyValueDictPairs.json', 'NDeadPixels', 'Value'])
@@ -185,10 +172,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('deadPixels') + TestIndex, ColorB)
 
             ### AddressDefects
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
                         RocGrades = []
                         for Chip in range(0,16):
                             NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'AddressDecoding', 'KeyValueDictPairs.json', 'NAddressDecodingProblems', 'Value'])
@@ -204,10 +187,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('AddressDefects') + TestIndex, ColorB)
 
             ### maskDefects
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
                         RocGrades = []
                         for Chip in range(0,16):
                             NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'PixelMap', 'KeyValueDictPairs.json', 'NMaskDefects', 'Value'])
@@ -223,10 +202,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('maskDefects') + TestIndex, ColorB)
 
             ### trimbitDefects
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
                         RocGrades = []
                         for Chip in range(0,16):
                             NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'TrimBitProblems', 'KeyValueDictPairs.json', 'nDeadTrimbits', 'Value'])
@@ -242,12 +217,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('trimbitDefects') + TestIndex, ColorB)
 
             ### TotalDefects
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
                         ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsB', 'Value'])
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsC', 'Value'])
 
@@ -257,10 +226,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('TotalDefects') + TestIndex, ColorB)
 
             ### defectiveBumps Fulltest
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
                         BBGrades = []
                         for Chip in range(0,16):
                             NDefectiveBumps = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'BumpBonding', 'KeyValueDictPairs.json', 'nBumpBondingProblems', 'Value'])
@@ -275,12 +240,28 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         elif 'B' in BBGrades:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BB_Fulltest') + TestIndex, ColorB)
 
-            ### defectiveBumps X-ray
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
                     if RowTuple['TestType'] == TestTypeXrayHR:
 
+            ### GradeHR
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ModuleGrade', 'Value'])
+                        if Value is not None:
+                            GradeNames = ['A', 'B', 'C']
+                            if Value in GradeNames:
+                                Value = 1 + GradeNames.index(Value)
+                            try:                            
+                                GradeNames = ['A', 'B', 'C']
+                                if Value in GradeNames:
+                                    Value = 1 + GradeNames.index(Value)
+                                else:
+                                    Value = int(Value)
+                                if Value == 3:
+                                    Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('GradeHR') + 0, ColorC)
+                                elif Value == 2:
+                                    Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('GradeHR') + 0, ColorB)
+                            except:
+                                pass
+
+            ### defectiveBumps X-ray
                         BBGrades = []
                         for Chip in range(0,16):
                             BBGradesROC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'HitMapGrade', 'Value'])
@@ -297,11 +278,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('BB_X-ray') + i, ColorB)
 
             ### lowEfficiency
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-
                         EfficiencyGrades = []
                         for Chip in range(0,16):
                             Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'EfficiencyGrade', 'Value'])
@@ -317,30 +293,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('lowHREfficiency') + i, ColorB)
 
             ### r/o problems
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithReadoutProblems', 'Value'])
                         if Value is not None and Value > 0:
                             for i in range(3):
                                 Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('ReadoutProblems') + i, ColorC)
 
             ### unif problems
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithUniformityProblems', 'Value'])
                         if Value is not None and Value > 0:
                             for i in range(3):
                                 Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('UniformityProblems') + i, ColorC)
 
             ### X-ray noise
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-
                         RocGrades = []
                         for Chip in range(0,16):
                             # pixel
@@ -364,9 +328,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('Noise_X-ray') + i, ColorB)
 
             ### totalDefects X-ray
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    if RowTuple['TestType'] == TestTypeXrayHR:
                         RocGrades = []
                         for Chip in range(0,16):
                             NDefects = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
