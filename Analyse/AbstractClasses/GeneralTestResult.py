@@ -336,21 +336,23 @@ class GeneralTestResult(object):
 
     def check_for_manualGrade(self):
         self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
-        print self.RawTestSessionDataPath
-        gradefilenames = glob.glob(self.RawTestSessionDataPath + '/grade.txt')
+        gradefilename = self.RawTestSessionDataPath + '/grade.txt'
+        print "checking for manual grading in '%s'"%gradefilename
         grade = ''
-        for filename in gradefilenames:
+        if os.path.isfile(gradefilename):
             try:
-                gradefile = open(filename)
+                gradefile = open(gradefilename)
             except:
-                warnings.warn('cannot open manual grade file {file}'.format(file=filename))
+                warnings.warn('cannot open manual grade file {file}'.format(file=gradefilename))
             grade = gradefile.read().strip()
             gradefile.close()
             # grade can be given either as number 1,2,3 or as letter A,B,C
             GradeNames = ['A','B','C']
             if grade in GradeNames:
                 grade = 1 + GradeNames.index(grade)
-            print "Reading a manual grade "+str(grade)+" specified by the user in "+str(filename)
+            print "Reading a manual grade "+str(grade)+" specified by the user in "+str(gradefilename)
+        else:
+            print " => not found."
         return grade
             
 

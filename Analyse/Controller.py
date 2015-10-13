@@ -495,7 +495,11 @@ if args.deleterow:
         print "  ", 'ID'.ljust(6),  ' TestDate'.ljust(25),  'QualificationType'.ljust(30), 'TestType'.ljust(30), 'Grade'.ljust(3), 'Comments'.ljust(30)
         RowID = 0
         for Row in Rows:
-            print " ", "\x1b[31m", ("%d"%RowID).ljust(6), "\x1b[0m", datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S').ljust(25), Row['QualificationType'].ljust(30), Row['TestType'].ljust(30), ("%s"%Row['Grade']).ljust(3), ("%s"%Row['Comments']).ljust(30)
+            try:
+                TestDate = datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S')
+            except:
+                TestDate = "INVALID: " + repr(Row['TestDate'])
+            print " ", "\x1b[31m", ("%d"%RowID).ljust(6), "\x1b[0m", TestDate.ljust(25), Row['QualificationType'].ljust(30), Row['TestType'].ljust(30), ("%s"%Row['Grade']).ljust(3), ("%s"%Row['Comments']).ljust(30)
             RowID += 1
 
         RowIDs = raw_input("Select rows (separated by comma): ")
@@ -518,7 +522,11 @@ if args.deleterow:
             for RowID in RowIDsList:
                 if Rows[RowID]:
                     Row = Rows[RowID]
-                    print "delete? ", ("%d"%RowID), datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S'), Row['QualificationType'], Row['TestType'], ("%s"%Row['Grade']), ("%s"%Row['Comments'])
+                    try:
+                        TestDate = datetime.datetime.fromtimestamp(int(Row['TestDate'])).strftime('%Y-%m-%d %H:%M:%S')
+                    except:
+                        TestDate = "INVALID: " + repr(Row['TestDate'])
+                    print "delete? ", ("%d"%RowID), TestDate, Row['QualificationType'], Row['TestType'], ("%s"%Row['Grade']), ("%s"%Row['Comments'])
                     confirmation = raw_input("(y/N)")
                     if confirmation.lower().strip() == 'y':
                         result = TestResultEnvironmentInstance.LocalDBConnectionCursor.execute( 
