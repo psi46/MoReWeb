@@ -8,6 +8,7 @@ import os
 import ConfigParser
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 import subprocess
+import traceback
 
 try:
     set
@@ -1114,12 +1115,21 @@ class GeneralTestResult(object):
             try:
                 self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
             except Exception as inst:
+                # Start red color
+                sys.stdout.write("\x1b[31m")
+                sys.stdout.flush()
                 print 'Error in subtest (write to database)', self.ResultData['SubTestResults'][i].ModulePath, \
                     self.ResultData['SubTestResults'][i].FinalResultsStoragePath
                 print inst
                 print inst.args
                 print sys.exc_info()[0]
                 print "\n\n------\n"
+                # Print traceback
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                traceback.print_exception(exc_type, exc_obj, exc_tb)
+                # Reset color
+                sys.stdout.write("\x1b[0m")
+                sys.stdout.flush()
 
         self.PostWriteToDatabase()
 

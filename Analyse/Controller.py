@@ -11,6 +11,7 @@ import os, time,shutil, sys,traceback
 # import errno
 import ConfigParser
 import datetime
+import subprocess
 
 #arg parse to analyse a single Fulltest
 parser = argparse.ArgumentParser(description='MORE web Controller: an analysis software for CMS pixel modules and ROCs')
