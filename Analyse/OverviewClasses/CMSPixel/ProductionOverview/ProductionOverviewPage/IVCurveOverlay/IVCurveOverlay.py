@@ -51,6 +51,23 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         else:
                             ROOTObject = self.GetHistFromROOTFile(RootFiles[0], "Graph")
                             if ROOTObject:
+                                IVGrade = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'IVGrade', 'Value'])
+                                IVColor = ROOT.kBlue
+                                try:
+                                    if int(IVGrade) == 3:
+                                        IVColor = self.GradeColors['C']
+                                    elif int(IVGrade) == 2:
+                                        IVColor = self.GradeColors['B']
+                                    elif int(IVGrade) == 1:
+                                        IVColor = self.GradeColors['A']
+                                except:
+                                    print "WARNING: ",ModuleID," IV ",TestType, " unable to read IV grade or IV grade not A/B/C: '",IVGrade,"'"
+
+                                try:
+                                    ROOTObject.SetLineColorAlpha(IVColor, 0.35)
+                                except:
+                                    # might fail in old ROOT versions
+                                    pass
                                 MultiGraph.Add(ROOTObject)
                                 NModules += 1
                             else:
@@ -66,7 +83,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             title.SetNDC()
             title.SetTextAlign(12)
             Subtitle = self.Attributes['Test']
-            TestNames = {'m20_1' : 'Fulltest -20°C BTC', 'm20_2': 'Fulltest -20°C ATC', 'p17_1': 'Fulltest +17°C'}
+            TestNames = {'m20_1' : 'Fulltest -20C BTC', 'm20_2': 'Fulltest -20C ATC', 'p17_1': 'Fulltest +17C'}
             if TestNames.has_key(Subtitle):
                 Subtitle = TestNames[Subtitle]
             title.DrawText(0.15,0.965,"%s, modules: %d"%(Subtitle,NModules))

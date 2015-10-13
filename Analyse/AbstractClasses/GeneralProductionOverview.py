@@ -522,12 +522,12 @@ class GeneralProductionOverview:
             return ROOT.kBlack
 
     def GetJSONValue(self, Keys):
-
         Path = self.GlobalOverviewPath + '/' + '/'.join(Keys[0:-2])
-        if os.path.isfile(Path):
-                with open(Path) as data_file:    
-                    JSONData = json.load(data_file)
-        else:
+
+        try:
+            with open(Path) as data_file:
+                JSONData = json.load(data_file)
+        except:
             JSONFiles = glob.glob(Path)
             if len(JSONFiles) > 1:
                 print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
@@ -538,8 +538,11 @@ class GeneralProductionOverview:
                     print "WARNING: %s json file not found: '%s"%(self.Name, Path)
                 return None
             else:
-                with open(JSONFiles[0]) as data_file:    
-                    JSONData = json.load(data_file)
+                try:
+                    with open(JSONFiles[0]) as data_file:
+                        JSONData = json.load(data_file)
+                except:
+                    JSONData = None
 
         try:
             value = JSONData[Keys[-2]][Keys[-1]]

@@ -35,7 +35,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         ModuleIDsList.sort()
-        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'GradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'BB_X-ray', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
+        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'BB_X-ray', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         BinNumber = 1
@@ -61,10 +61,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         GradeMaskDefectsBC = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsC'])
 
         #time_start = time.time()
+        ModulesCount = 0
         for ModuleID in ModuleIDsList:
             #print "t=",(time.time()-time_start)
             #time_start = time.time()
-            sys.stdout.write('.')
+            if (ModulesCount % 10 == 0):
+                sys.stdout.write('*')
+            else:
+                sys.stdout.write('.')
+
+            ModulesCount = ModulesCount + 1
             sys.stdout.flush()
             Summary.GetXaxis().SetBinLabel(BinNumber, ModuleID)
 
@@ -89,6 +95,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVSlope') + TestIndex, ColorC)
                         elif Value is not None and float(Value) > GradeAB:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVSlope') + TestIndex, ColorB)
+
+            ### IV ratio 150
+                    if RowTuple['TestType'] in FullTests and (RowTuple['Temperature'] and int(RowTuple['Temperature']) == -20):
+                        TestIndex = FullTests.index(RowTuple['TestType'])
+                        GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioB'])
+                        GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioC'])
+
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'CurrentRatio150V', 'Value'])
+                        if Value is not None and float(Value) < GradeBC:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVRatio150') + TestIndex, ColorC)
+                        elif Value is not None and float(Value) < GradeAB:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IVRatio150') + TestIndex, ColorB)
 
             ### IV 150
                     if RowTuple['TestType'] in FullTests:
