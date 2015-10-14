@@ -92,12 +92,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
 
             # current
-            #    grading is only done with the measured value at +17
-            if self.ParentObject.Attributes['TestType'].startswith('p17_'):
-                if IVGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentB']:
-                    IVGrade = 2
-                if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
-                    IVGrade = 3
+            #    grading is done with the measured value at +17 and -20
+            if IVGrade == 1 and CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentB']:
+                IVGrade = 2
+            if CurrentAtVoltage150V > self.TestResultEnvironmentObject.GradingParameters['currentC']:
+                IVGrade = 3
 
             # slope
             #    grading is only done with the measured value at +17

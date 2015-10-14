@@ -112,16 +112,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
 
-                        if not RowTuple['Temperature'] or (len(RowTuple['Temperature'].strip()) > 0 and int(RowTuple['Temperature']) == 17):
-                            #  grading criteria for measured currents
-                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
-                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
+                        #  grading criteria for measured currents
+                        GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
+                        GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
 
-                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
-                            if Value is not None and float(Value) > GradeBC:
-                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorC)
-                            elif Value is not None and float(Value) > GradeAB:
-                                Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorB)
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
+                        if Value is not None and float(Value) > GradeBC:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorC)
+                        elif Value is not None and float(Value) > GradeAB:
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index('IV150') + TestIndex, ColorB)
 
                     if RowTuple['TestType'] in FullTests:
                         TestIndex = FullTests.index(RowTuple['TestType'])
