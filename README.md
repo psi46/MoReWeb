@@ -4,6 +4,12 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
+##### version 0.6.7
+
+**IV grading**
+
+Also grade on measured value of leakage current at -20 degrees (with the same criteria than at +17). This will affect grading of modules that have both a higher leakage current at -20 than at +17 and a leakage current at -20 larger than 10 uA. (Not seen any so far, but one module would almost fulfil these criteria)
+
 ##### version 0.6.6
 
 **manual grading possible**
