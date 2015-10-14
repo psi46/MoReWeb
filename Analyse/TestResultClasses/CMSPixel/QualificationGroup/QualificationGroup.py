@@ -119,7 +119,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'FinalResultsStoragePath':'unkown'
                 }
             )
-            print "\x1b[31mProblems in directory structure detected, skip qualification directory! %s\x1b[0m"%self.TestResultEnvironmentObject.ModuleDataDirectory
+            print "\x1b[31mProblems in directory structure detected, skip qualification directory! %s\n%s\n%s\x1b[0m"%(self.TestResultEnvironmentObject.ModuleDataDirectory,inst, traceback.format_exc())
             return []
         return self.extractTests()
 
