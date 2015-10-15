@@ -102,8 +102,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 NonUniformColumns = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
             except:
                 NonUniformColumns = 0
-            if NonUniformColumns > 0:
-                TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=NonUniformColumns)))
+
+            try:
+                NonUniformColumnEventsList = ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnEvents']['Value']
+                NonUniformColumnEvents = sum([int(x) for x in NonUniformColumnEventsList.split('/')])
+            except:
+                NonUniformColumnEvents = 0
+
+            if NonUniformColumns > 0 or NonUniformColumnEvents > 0:
+                if NonUniformColumnEvents > 0:
+                    TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}+{Value2}".format(Value=NonUniformColumns, Value2=NonUniformColumnEventsList)))
+                else:
+                    TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=NonUniformColumns)))
             else:
                 TableRow.append("{Value:1.0f}".format(Value=NonUniformColumns))
 
