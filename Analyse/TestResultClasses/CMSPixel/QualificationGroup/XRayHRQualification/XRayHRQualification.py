@@ -362,7 +362,10 @@ class TestResult(GeneralTestResult):
         HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRS[Cc]urves_*')
         for Path in HRSCurvesPaths:
             FolderName = os.path.basename(Path)
-            Rate = int(FolderName.split('_')[2])
+            try:
+                Rate = int(FolderName.split('_')[2])
+            except:
+                Rate = 0
             self.Attributes['Rates']['HRSCurves'].append(Rate)
             self.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)] = Path
             ROOTFiles = glob.glob(Path+'/*.root')
@@ -917,7 +920,7 @@ class TestResult(GeneralTestResult):
         }
 
         #adding comment (if any) from manual grading
-        if self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
+        if 'Grading' in self.ResultData['SubTestResults'] and self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
             Comment += self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['GradeComment']['Value']
         
         # fill final comments
