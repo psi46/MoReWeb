@@ -3,6 +3,8 @@ import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
 import array
+import numpy as np
+import math
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -15,6 +17,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)] = {
                 'Value':'{0:1.0f}'.format(-1),
                 'Label':'Interpol. Efficiency {Rate}'.format(Rate=Rate)
+            }
+            self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}Error'.format(Rate=Rate)] = {
+                'Value':'{0:1.0f}'.format(-1),
+                'Label':'Interpol. Efficiency {Rate} error'.format(Rate=Rate)
             }
         self.ResultData['KeyValueDictPairs']['fitfunction'] = {
             'Value': self.FitFunction,
@@ -37,7 +43,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '0',
                 'Unit': '%',
             }
-
+            self.ResultData['HiddenData']['InterpolatedEfficiency%dError'%int(InterpolationRate)] = {
+                'Label': 'Interpolated Efficiency at %s Mhz/cm2 error'%int(InterpolationRate),
+                'Value': '0',
+                'Unit': '%',
+            }
         DoubleColumnRateList = array.array('d')
         DoubleColumnEfficiencyList = array.array('d')
 
@@ -76,19 +86,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 except:
                     pass
 
-
-
         self.Canvas.Clear()
 
         if len(DoubleColumnRateList) > 0:
-            self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList,DoubleColumnEfficiencyList)
+            DoubleColumnRateErrorsList = array.array('d', [0.5] * len(DoubleColumnRateList))
+            DoubleColumnEfficiencyErrorsList = array.array('d', [0.1] * len(DoubleColumnEfficiencyList))
+            self.ResultData['Plot']['ROOTObject'] = ROOT.TGraphErrors(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList, DoubleColumnRateErrorsList, DoubleColumnEfficiencyErrorsList)
 
             if self.ResultData['Plot']['ROOTObject']:
                 ROOT.gStyle.SetOptStat(0)
 
                 cubicFit = ROOT.TF1("fitfunction", self.FitFunction, 40, 150)
-                cubicFit.SetParameter(1, 100)
-                cubicFit.SetParameter(2, 5e-7)
+                cubicFit.SetParameter(0, 100)
+                cubicFit.SetParLimits(0, 0, 101)
+                cubicFit.SetParameter(1, 5e-7)
+                cubicFit.SetParLimits(1, 0, 0.01)
 
                 PlotMinEfficiency = 80
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(PlotMinEfficiency, 105.)
@@ -100,9 +112,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
                 self.ResultData['Plot']['ROOTObject'].Draw("ap")
 
-                self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'QR')
+                FitResults = self.ResultData['Plot']['ROOTObject'].Fit(cubicFit,'BQRS')
                 self.ResultData['Plot']['ROOTObject'].SetTitle("")
                 InterpolationFunction = cubicFit
+
+                self.ResultData['KeyValueDictPairs']['Chi2NDF'] = {'Label':'chi2/ndf', 'Value': '{0:1.2f}'.format(cubicFit.GetChisquare() / max(cubicFit.GetNDF(), 1))}
+                self.ResultData['KeyList'].append('Chi2NDF')
+
+                self.ResultData['KeyValueDictPairs']['NumberFitPoints'] = {'Label':'# fit points', 'Value': cubicFit.GetNumberFitPoints()}
+                self.ResultData['KeyList'].append('NumberFitPoints')
+
+                self.ResultData['KeyValueDictPairs']['p0'] = {'Label':'p0', 'Value': '{0:1.2f}'.format(cubicFit.GetParameter(0))}
+                self.ResultData['KeyList'].append('p0')
+
+                self.ResultData['KeyValueDictPairs']['p1'] = {'Label':'p1', 'Value': '{0:1.2e}'.format(cubicFit.GetParameter(1))}
+                self.ResultData['KeyList'].append('p1')
 
                 # values to show in summary
                 for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
@@ -115,6 +139,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                     self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
                     self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)]
+
+                    xpos = np.array([float(InterpolationRate * 1.0e6 * ScalingFactor)])
+                    err = np.array([0.]*len(xpos))
+                    try:
+                        FitResults.GetConfidenceIntervals(len(xpos), 1, 1, xpos, err, 0.683)
+                        InterpolatedEfficiencyError = err[0]
+                    except:
+                        InterpolatedEfficiencyError = 0
+                        pass
+                    self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%dError'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiencyError:1.3f}'.format(InterpolatedEfficiencyError=InterpolatedEfficiencyError)
+                    self.ResultData['KeyList'] += ['InterpolatedEfficiency%dError'%int(InterpolationRate)]
 
                 # always interpolate at this rates, but don't show them in summary
                 for InterpolationRate in HiddenDataInterpolationRates:

@@ -59,6 +59,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Value':'',
             'Label':'Efficiency '+RateData['InterpolatedEfficiencyRates']['RatesString']
         }
+        self.ResultData['KeyValueDictPairs']['EfficiencyFit'] = {
+            'Value':'',
+            'Label':'Efficiency Fit'
+        }
         self.ResultData['KeyValueDictPairs']['EfficiencyGrade'] = {
             'Value':'',
             'Label':'Efficiency Grade '+RateData['InterpolatedEfficiencyRates']['RatesString']
@@ -121,6 +125,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'NumberOfNonUniformColumnEvents',
                 'BumpBondingDefects',
                 'Efficiency',
+                'EfficiencyFit',
                 'EfficiencyGrade',
                 'HotPixelsGrade',
                 'HitMapGrade',
@@ -166,7 +171,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             3: 'C'
         }
         ROCGrades = []
-        
+        ReadoutProblemsDetected = False
         ChipNo = self.ParentObject.Attributes['ChipNo']
         
         # efficiency grading
@@ -203,6 +208,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if 'EfficiencyGrade' in OmitGradesInFinalGrading or 'EfficiencyGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
                 Grade = '('+Grade+')'
             self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value'] = (self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value']+'/'+Grade).strip('/')
+
+        EfficiencyFit = "chi2/ndf: {chi2}, # points: {n}".format(chi2=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value'], n=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['NumberFitPoints']['Value'])
+        self.ResultData['KeyValueDictPairs']['EfficiencyFit']['Value'] = EfficiencyFit
 
         AliveMapROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
        
@@ -273,6 +281,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 ):
                     NumberValues['NumberOfNonUniformEvents'] += 1
                     Grades['ReadoutUniformityOverTimeGrade'] = 3
+                    ReadoutProblemsDetected = True
                     #print "non uniform event: %d %d / %f"%(Event, EventHits, ReadoutUniformityOverTimeMean)
             
             if not 'ReadoutUniformityOverTimeGrade' in OmitGradesInFinalGrading and not 'ReadoutUniformityOverTimeGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
@@ -300,6 +309,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     ):
                         NumberValues['NumberOfNonUniformColumnEvents'] += 1
                         Grades['ColumnReadoutUniformityOverTimeGrade'] = 3
+                        ReadoutProblemsDetected = True
 
                 ColumnReadoutUniformityHistogram.Delete()
 
@@ -464,11 +474,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         GradeFormatted = GradeMapping[max(ROCGrades)]
         try:
             InterpolatedEfficiency120 = self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency120']['Value']
+            EfficiencyError120 = self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency120Error']['Value']
         except:
             InterpolatedEfficiency120 = '-'
+            EfficiencyError120 = '?'
 
         print ' ROC {ROC:2.0f}: Grade {Grade}'.format(ROC=self.ParentObject.Attributes['ChipNo'], Grade=GradeFormatted)
         print '         Pixel Defects:              {Defects}'.format(Defects=TotalPixelDefects)
         print '         BumpBonding Defects:        {Defects}'.format(Defects=len(BumpBondingDefectPixelsList))
-        print '         Efficiency at 120 MHz/cm2:  {Eff}'.format(Eff=InterpolatedEfficiency120)
+        print '         Efficiency at 120 MHz/cm2:  {Eff} +/- {EffErr}'.format(Eff=InterpolatedEfficiency120, EffErr=EfficiencyError120)
+        try:
+            FitChi2 = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value'])
+            if FitChi2 > 5:
+                print '         \x1b[31mEfficiency fit chi2/ndf is high! chi2/ndf = %f\x1b[0m fit probably failed!'%FitChi2
+        except:
+            pass
+        if int(NumberValues['NumberOfNonUniformColumns']) > 0:
+            print '         \x1b[31mNumber of non uniform coulmns: %d'%int(NumberValues['NumberOfNonUniformColumns'])
+        if int(NumberValues['NumberOfNonUniformColumnEvents']) > 0:
+            print '         \x1b[31mNumber of non uniform events in a column: %d'%int(NumberValues['NumberOfNonUniformColumnEvents'])
+        if ReadoutProblemsDetected:
+            print '         \x1b[31mProblems in readout uniformity detected!\x1b[0m check for hot pixels!'
+
+
         print '-'*78
