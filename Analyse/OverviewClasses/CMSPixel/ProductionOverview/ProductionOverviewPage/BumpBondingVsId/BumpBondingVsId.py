@@ -26,11 +26,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TableData = []
 
         Rows = self.FetchData()
-
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
+        ModuleIDsList = self.GetModuleIDsList(Rows)
 
         HTML = ""
 
@@ -107,7 +103,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             title2.SetNDC()
             title2.SetTextAlign(12)
             title2.SetTextColor(ROOT.kRed + 2)
-            Subtitle2 = "ColdBox"
+            Subtitle2 = "ColdBox+17"
             title2.DrawText(0.9, 0.965, Subtitle2)
 
             title2 = ROOT.TText()

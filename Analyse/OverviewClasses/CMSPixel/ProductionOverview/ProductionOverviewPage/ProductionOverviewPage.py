@@ -1,5 +1,12 @@
 import ROOT
 import AbstractClasses
+import os, json
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
@@ -461,6 +468,39 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def GenerateOverview(self):
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
+
+        # for all plots that have been split into several boxes
+        # merge the JSON files to simplify further processing of the data
+        SumJSONFilesModules = ['ModuleFailuresOverview']
+        for SumJSONFilesModule in SumJSONFilesModules:
+            print("merge JSON files for '%s'..."%SumJSONFilesModule)
+            TotalJSONDict = {}
+            for Page in [x for x in self.SubPages if x['Key'] == SumJSONFilesModule]:
+                Path = self.GlobalOverviewPath + '/' + self.Attributes['BasePath'] + '/' + Page['InitialAttributes']['StorageKey'] + "/KeyValueDictPairs.json"
+                with open(Path) as data_file:
+                    JSONData = json.load(data_file)
+                    TotalJSONDict.update(JSONData)
+                    print("add file: %s"%Path)
+
+            # create directory
+            JsonFileDir = self.GlobalOverviewPath + '/' + self.Attributes['BasePath'] + '/' + SumJSONFilesModule
+            JsonFileName = JsonFileDir + '/KeyValueDictPairs.json'
+            try:
+                os.mkdir(JsonFileDir)
+            except:
+                pass
+
+            # save file
+            try:
+                f = open(JsonFileName, 'w')
+                f.write(json.dumps(TotalJSONDict, sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
+                f.close()
+                print("-"*100)
+                print("-> written to %s"%JsonFileName)
+            except:
+                print("could not write json file: '%s'!"%JsonFileName)
+
+
 
         HTML = "<a href='%s'>%s</a><br />"%(self.GetStorageKey()+'/'+self.HTMLFileName, self.Attributes['Title'])
         return HTML
