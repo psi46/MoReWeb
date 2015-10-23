@@ -24,12 +24,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TableData = []
 
         Rows = self.FetchData()
-
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
-
+        ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
 
         self.Canvas.Clear()
@@ -44,10 +39,14 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', '*.root'])
                         RootFiles = glob.glob(Path)
                         if len(RootFiles) > 1:
-                            print "more than 1 root file found"
+                            if self.Verbose:
+                                print "more than 1 root file found in: '%s"%Path
+                            self.ProblematicModulesList.append(ModuleID)
                         elif len(RootFiles) < 1:
                             if '_m20_1' not in Path:
-                                print "root file not found in: '%s"%Path
+                                if self.Verbose:
+                                    print "root file not found in: '%s"%Path
+                                self.ProblematicModulesList.append(ModuleID)
                         else:
                             ROOTObject = self.GetHistFromROOTFile(RootFiles[0], "Graph")
                             if ROOTObject:
@@ -61,7 +60,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                     elif int(IVGrade) == 1:
                                         IVColor = self.GradeColors['A']
                                 except:
-                                    print "WARNING: ",ModuleID," IV ",TestType, " unable to read IV grade or IV grade not A/B/C: '",IVGrade,"'"
+                                    if self.Verbose:
+                                        print "WARNING: ",ModuleID," IV ",TestType, " unable to read IV grade or IV grade not A/B/C: '",IVGrade,"'"
+                                    self.ProblematicModulesList.append(ModuleID)
 
                                 try:
                                     ROOTObject.SetLineColorAlpha(IVColor, 0.35)
@@ -71,7 +72,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 MultiGraph.Add(ROOTObject)
                                 NModules += 1
                             else:
-                                print "WARNING: graph in root file not found"
+                                if self.Verbose:
+                                    print "WARNING: graph in root file not found"
+                                self.ProblematicModulesList.append(ModuleID)
         if MultiGraph:
             MultiGraph.Draw("AL")
             if MultiGraph.GetXaxis():
@@ -93,5 +96,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
         ROOT.gPad.SetLogy(0)
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 

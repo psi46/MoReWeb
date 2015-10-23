@@ -23,11 +23,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TableData = []
 
         Rows = self.FetchData()
-
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
+        ModuleIDsList = self.GetModuleIDsList(Rows)
 
         nColsModule = 8 * self.nCols
         nRowsModule = 2 * self.nRows
@@ -51,7 +47,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                             self.UpdatePlot(SummaryMap, Chip, col, row, 1)
                                 ROOTObject.Delete()
                             else:
-                                print "      Dead Pixel map not found for module '%s' Chip '%d'"%(ModuleID, Chip)
+                                self.ProblematicModulesList.append(ModuleID)
+                                if self.Verbose:
+                                    print "      Dead Pixel map not found for module '%s' Chip '%d'"%(ModuleID, Chip)
 
                         NModules += 1
 
@@ -74,6 +72,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of modules: %d"%NModules)
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 
     def UpdatePlot(self, Plot, chipNo, col, row, value):

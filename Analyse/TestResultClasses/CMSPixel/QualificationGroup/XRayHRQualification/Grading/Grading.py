@@ -105,7 +105,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                 # column uniformity
                 NonUniformColumnsROC = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
-                if NonUniformColumnsROC > 0:
+                NonUniformColumnEventsROCList = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnEvents']['Value']
+                NonUniformColumnEventsROC = sum([int(x) for x in NonUniformColumnEventsROCList.split('/')])
+                if NonUniformColumnsROC > 0 or NonUniformColumnEventsROC > 0:
                     ROCsWithUniformityProblems += 1
 
                 # readout uniformity

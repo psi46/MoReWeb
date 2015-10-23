@@ -25,10 +25,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         Rows = AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.FetchData(self)
         
         ### list of modules tested
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
+        ModuleIDsList = self.GetModuleIDsList(Rows)
 
         ## check if all grades are available
         ModuleData = []

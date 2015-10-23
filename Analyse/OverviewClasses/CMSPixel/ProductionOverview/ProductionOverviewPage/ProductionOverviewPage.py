@@ -14,6 +14,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         self.SaveHTML = True
 
+        Rows = self.FetchData()
+        ModuleIDsList = self.GetModuleIDsList(Rows)
+        NumModules = len(ModuleIDsList)
+        NumModulesMaxPerList = 50
+
         TestsList = ['m20_1', 'm20_2', 'p17_1']
 
         self.SubPages.append({
@@ -74,17 +79,25 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             )
 
-            self.SubPages.append(
-                {
-                    "Key": "ModuleFailuresOverview",
-                    "Module": "ModuleFailuresOverview",
-                    "InitialAttributes" : {
-                        "StorageKey" : "ModuleFailuresOverview",
-                        "DateBegin": self.Attributes['DateBegin'],
-                        "DateEnd": self.Attributes['DateEnd'],
-                    },
-                }
-            )
+            Offset = 0
+            NumModulesToShow = NumModules
+
+            while (NumModulesToShow > 0):
+                self.SubPages.append(
+                    {
+                        "Key": "ModuleFailuresOverview",
+                        "Module": "ModuleFailuresOverview",
+                        "InitialAttributes" : {
+                            "StorageKey" : "ModuleFailuresOverview_%d"%Offset,
+                            "DateBegin": self.Attributes['DateBegin'],
+                            "DateEnd": self.Attributes['DateEnd'],
+                            "NumModules": NumModulesMaxPerList,
+                            "Offset": Offset,
+                        },
+                    }
+                )
+                NumModulesToShow -= NumModulesMaxPerList
+                Offset += NumModulesMaxPerList
         else:     
             self.SubPages.append(
                 {
@@ -409,6 +422,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
+        self.SubPages.append(
+            {
+                "Key": "XrayNoisePerPixel",
+                "Module": "XrayNoisePerPixel",
+                "InitialAttributes" : {
+                    "StorageKey" : "XrayNoisePerPixel",
+                    "DateBegin": self.Attributes['DateBegin'],
+                    "DateEnd": self.Attributes['DateEnd'],
+                }
+            }
+        )
 
         ### Vcal Calibration ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "VcalCalibration", "Title": "Vcal Calibration"}, "Key": "Section","Module": "Section"})

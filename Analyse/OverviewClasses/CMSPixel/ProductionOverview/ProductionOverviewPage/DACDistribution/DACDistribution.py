@@ -24,10 +24,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         TableData = []
         Rows = self.FetchData()
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
+        ModuleIDsList = self.GetModuleIDsList(Rows)
 
         HTML = ""
         HistogramMax = self.Attributes['Maximum']
@@ -56,7 +53,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             if Value is not None:
                                 Histogram.Fill(float(Value))
                                 NROCs += 1
-
                         break
         
         Histogram.Draw("")

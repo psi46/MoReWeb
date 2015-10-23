@@ -23,12 +23,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TableData = []
 
         Rows = self.FetchData()
-
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
-
+        ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
 
         NoiseMax = 1200

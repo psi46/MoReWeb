@@ -23,11 +23,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TableData = []
 
         Rows = self.FetchData()
-
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
+        ModuleIDsList = self.GetModuleIDsList(Rows)
 
         HTML = ""
 
@@ -57,6 +53,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             if Value is not None:
                                 Histogram.Fill(float(Value))
                                 NROCs += 1
+                            else:
+                                self.ProblematicModulesList.append(ModuleID)
                         break
         
         Histogram.Draw("")
@@ -83,6 +81,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         ROOT.gPad.SetLogy(0)
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 
 

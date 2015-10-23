@@ -25,77 +25,74 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TableData = []
 
         Rows = self.FetchData()
-
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
-
+        ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
 
         HistogramMax = 140
         NBins = 38
         NFullTests = 0
 
-        TestDurations = {
-            'm20_1' : [],
-            'm20_2' : [],
-            'p17_1' : [],
-        }
+        TestDurations = {}
+        for FullTestName in self.FullQualificationFullTests:
+            TestDurations[FullTestName] = []
 
         # fill list with durations
         for ModuleID in ModuleIDsList:
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
-                    TestType = RowTuple['TestType']
+                    FullTestName = RowTuple['TestType']
                     # only count Fulltests
-                    if TestDurations.has_key(TestType):
+                    if TestDurations.has_key(FullTestName):
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'DigitalCurrent', 'HiddenData.json', 'Duration', 'Value'])
-                        
                         if Value:
-                            TestDurations[TestType].append(float(Value)/60.0)
+                            TestDurations[FullTestName].append(float(Value)/60.0)
                             NFullTests += 1
+                        else:
+                            if self.Verbose:
+                                print "     could not get duration for %s at %s"%(ModuleID, FullTestName)
+                            self.ProblematicModulesList.append(ModuleID)
 
-        # create plot
+        # create plots for different fulltest temperatures
+        FulltestDurationHistograms = {}
+        for FullTestName in self.FullQualificationFullTests:
+            FulltestDurationHistograms[FullTestName] = ROOT.TH1D("h1duration_%s_%s"%(FullTestName, self.GetUniqueID()), "", NBins, 0, HistogramMax)
+            FulltestDurationHistograms[FullTestName].SetFillStyle(1001)
+            FulltestDurationHistograms[FullTestName].SetFillColor(self.GetTestPlotColor(FullTestName))
 
-        HistStack = ROOT.THStack("hs_fulltest_duration","")
+            for DurationMinutes in TestDurations[FullTestName]:
+                FulltestDurationHistograms[FullTestName].Fill(DurationMinutes)
 
-        hA = ROOT.TH1D("h1duration_m20_1_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
-        hB = ROOT.TH1D("h1duration_m20_2_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
-        hC = ROOT.TH1D("h1duration_p17_1_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
+        # stack them
+        HistStack = ROOT.THStack("hs_fulltest_duration_%s"%self.GetUniqueID(),"")
+        for FullTestName in self.FullQualificationFullTests:
+            HistStack.Add(FulltestDurationHistograms[FullTestName])
 
-        hA.SetFillStyle(1001)
-        hA.SetFillColor(self.GetTestPlotColor('m20_1'))
-        hB.SetFillStyle(1001)
-        hB.SetFillColor(self.GetTestPlotColor('m20_2'))
-        hC.SetFillStyle(1001)
-        hC.SetFillColor(self.GetTestPlotColor('p17_1'))
-
-        for DurationMinutes in TestDurations['m20_1']:
-            hA.Fill(DurationMinutes)
-        for DurationMinutes in TestDurations['m20_2']:
-            hB.Fill(DurationMinutes)
-        for DurationMinutes in TestDurations['p17_1']:
-            hC.Fill(DurationMinutes)
-
-        HistStack.Add(hA)
-        HistStack.Add(hB)
-        HistStack.Add(hC)
-
+        # draw
         HistStack.Draw()
         HistStack.GetXaxis().SetLabelOffset(0.02)
         HistStack.GetXaxis().SetTitle("minutes")
         HistStack.GetXaxis().SetTitleOffset(1)
         HistStack.GetYaxis().SetTitle("# modules")
         HistStack.GetYaxis().SetTitleOffset(0.7)
-                        
         HistStack.Draw("")
-        
+
+        OffsetX = 0.15
+        for FullTestName in self.FullQualificationFullTests:
+            title = ROOT.TText()
+            title.SetNDC()
+            title.SetTextAlign(11)
+            title.SetTextAlign(12)
+            title.SetTextColor(self.GetTestPlotColor(FullTestName))
+            title.DrawText(OffsetX, 0.965, FullTestName)
+            OffsetX += 0.1
+
+        # save
         self.SaveCanvas()
 
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of Fulltests: %d"%NFullTests)
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
         ROOT.gPad.SetLogy(0)
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 

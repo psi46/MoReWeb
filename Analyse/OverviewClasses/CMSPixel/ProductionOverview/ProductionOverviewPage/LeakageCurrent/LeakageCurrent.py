@@ -23,15 +23,12 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         ROOT.gPad.SetLogy(1)
         ROOT.gPad.SetLogx(0)
 
+        print "    Fulltest: ", self.Attributes['Test']
+
         TableData = []
 
         Rows = self.FetchData()
-
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
-
+        ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
 
         HistogramMin = 1e-7
@@ -63,6 +60,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         if Factor is not None and Value is not None:
                             Histogram.Fill(float(Factor) * float(Value))
                             NModules += 1
+                        else:
+                            self.ProblematicModulesList.append(ModuleID)
 
         Histogram.Draw("")
 
@@ -127,5 +126,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         ROOT.gPad.SetLogy(0)
         ROOT.gPad.SetLogx(0)
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 

@@ -34,9 +34,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     TestType = RowTuple['TestType']
-
                     if TestType == self.Attributes['Test']:
-
                         for Chip in range(0, 16):
                             Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'PHCalibrationPedestal', '*.root'])
                             RootFiles = glob.glob(Path)
@@ -48,8 +46,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 else:
                                     try:
                                         Histogram.Add(ROOTObject)
+                                        NROCs += 1
                                     except:
-                                        print "histogram could not be added, (did you try to use results of different MoReWeb versions?)"
+                                        if self.Verbose:
+                                            print "histogram %s ROC %d could not be added, (did you try to use results of different MoReWeb versions?)"%(ModuleId, Chip)
+                                        self.ProblematicModulesList.append(ModuleID)
                                 self.CloseFileHandles()
         
         if Histogram:
@@ -62,15 +63,23 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             PaveStats.SetX2NDC(0.9)
             PaveStats.SetY1NDC(0.7)
             PaveStats.SetY2NDC(0.9)
-            self.SaveCanvas()
-            NPix = Histogram.GetEntries()
 
-            HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of Pixels: %d"%NPix)
+            title = ROOT.TText()
+            title.SetNDC()
+            title.SetTextAlign(11)
+            title.SetTextAlign(12)
+            title.SetTextSize(0.04)
+            NPix = Histogram.GetEntries()
+            title.DrawText(0.15, 0.965, "#roc: %d,  #pix: %d"%(NROCs, NPix))
+            self.SaveCanvas()
+
+            HTML = self.Image(self.Attributes['ImageFile'])
             Histogram.Delete()
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
 
         ROOT.gPad.SetLogy(0)
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 

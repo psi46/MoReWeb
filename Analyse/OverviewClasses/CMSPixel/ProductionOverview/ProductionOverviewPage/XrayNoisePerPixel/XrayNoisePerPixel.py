@@ -7,9 +7,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def CustomInit(self):
 
-        self.NameSingle='VcalThresholdTrimmedPerPixel'
+        self.NameSingle='XrayNoisePerPixel'
     	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
-        self.Title = 'Vcal Thr Trimmed {Test}'.format(Test=self.Attributes['Test'])
+        self.Title = 'Noise per pixel (HighRate)'.format()
         self.DisplayOptions = {
             'Width': 1,
         }
@@ -27,20 +27,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
         Histogram = None
-        PlotColor = self.GetTestPlotColor(self.Attributes['Test'])
+        PlotColor = ROOT.kBlue+2
 
         NROCs = 0
         for ModuleID in ModuleIDsList:
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     TestType = RowTuple['TestType']
-
-                    if TestType == self.Attributes['Test']:
-
+                    if TestType == 'XRayHRQualification':
                         for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'VcalThresholdTrimmed', '*.root'])
+                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'SCurveWidths*', '*.root'])
                             RootFiles = glob.glob(Path)
-                            ROOTObject = self.GetHistFromROOTFile(RootFiles, "VcalThresholdTrimmed")
+                            ROOTObject = self.GetHistFromROOTFile(RootFiles, "SCurveWidths")
                             if ROOTObject:
                                 ROOTObject.SetDirectory(0)
                                 if not Histogram:
@@ -56,7 +54,24 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 self.CloseFileHandles()
         
         if Histogram:
-            Histogram.Draw("HIST") # does not plot the fit line
+            Histogram.Draw("HIST")
+
+            CutLow = ROOT.TCutG('lLower', 2)
+            CutLow.SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C'], -1e6)
+            CutLow.SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C'], +1e6)
+            CutLow.SetLineColor(ROOT.kRed)
+            CutLow.SetLineStyle(2)
+            CutLow.Draw('same')
+
+            CutHigh = ROOT.TCutG('lUpper', 2)
+            CutHigh.SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'], -1e6)
+            CutHigh.SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'], +1e6)
+            CutHigh.SetLineColor(ROOT.kOrange)
+            CutHigh.SetLineStyle(3)
+            CutHigh.Draw('same')
+
+            Histogram.SetStats(ROOT.kTRUE)
+
             ROOT.gPad.Update()
             PaveStats = Histogram.FindObject("stats")
             PaveStats.SetX1NDC(0.7)
