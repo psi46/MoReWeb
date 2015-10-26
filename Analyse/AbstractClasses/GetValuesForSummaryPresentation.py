@@ -3,6 +3,7 @@ import ROOT
 import AbstractClasses
 import time
 import glob
+import json
 
 class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
@@ -14,46 +15,20 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         'nB' : 0,
         'nC' : 0,
         'nM' : 0,
-        'nlcstartupB': 0, 
-        'nlcstartupC' : 0,
-        'nIV150B' : 0,
-        'nIV150C' : 0,
-        'nIVSlopeB' : 0,
-        'nIVSlopeC' : 0,
-        'nRecCurrentB' : 0,
-        'nRecCurrentC' : 0,
-        'nCurrentRatioB' : 0,
-        'nCurrentRatioC' : 0,
-        'ntotDefectsB' : 0,
-        'ntotDefectsC' : 0,
-        'ntotDefectsXrayB' : 0,
-        'ntotDefectsXrayC' : 0,
-        'nBBFullB' : 0,
-        'nBBFullC' : 0,
-        'nBBXrayB' : 0,
-        'nBBXrayC' : 0,
-        'nAddressdefB' : 0,
-        'nAddressdefC' : 0,
-        'nTrimbitdefB' : 0,
-        'nTrimbitdefC' : 0,
-        'nMaskdefB' : 0,
-        'nMaskdefC' : 0,
-        'ndeadpixB' : 0,
-        'ndeadpixC' : 0,
-        'nuniformityB' : 0,
-        'nuniformityC' : 0,
-        'nNoiseB' : 0,
-        'nNoiseC' : 0,
-        'nNoiseXrayB' : 0,
-        'nNoiseXrayC' : 0,
-        'nPedSpreadB' : 0,
-        'nPedSpreadC' : 0,
-        'nRelGainWB' : 0,
-        'nRelGainWC' : 0,
-        'nVcalThrWB' : 0,
-        'nVcalThrWC' : 0,
-        'nLowHREfB' : 0,
-        'nLowHREfC' : 0
+        'BrokenROC' : 0,
+        'BrokenROCX' : 0,
+        'nAtoB' : 0,
+        'nAtoC' : 0,
+        'nBtoC' : 0,
+        'nBtoA' : 0,
+        'nCtoA' : 0,
+        'nCtoB' : 0,
+        'nAtoBX' : 0,
+        'nAtoCX' : 0,
+        'nBtoCX' : 0,
+        'nBtoAX' : 0,
+        'nCtoAX' : 0,
+        'nCtoBX' : 0
         }
 
         Rows = self.FetchData()
@@ -65,8 +40,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         ModuleIDsList.sort(reverse=True)
 
         FullTests = ['m20_1','m20_2','p17_1'][::-1]
-        TestTypeLeakageCurrentPON = ['LeakageCurrentPON']
-        TestTypeXrayHR = 'XRayHRQualification'
         Final_Grades = []
 
         FTMinus20BTC_Grades = []
@@ -115,323 +88,157 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         Numbers['nA'] = len([x for x in Final_Grades if x=='A'])
         Numbers['nB'] = len([x for x in Final_Grades if x=='B'])
         Numbers['nC'] = len([x for x in Final_Grades if x=='C'])
-
-        #missing = len(ModuleIDsList) - len(Final_Grades)
-
         Numbers['nM'] = len(ModuleIDsList) - len(Final_Grades)
-        
-        GradePixelDefectsAB = float(self.TestResultEnvironmentObject.GradingParameters['defectsB'])
-        GradePixelDefectsBC = float(self.TestResultEnvironmentObject.GradingParameters['defectsC'])
 
-        GradeMaskDefectsAB = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsB'])
-        GradeMaskDefectsBC = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsC'])
+        DefectROCs = 0
+        DefectROCsX = 0
 
 
         for ModuleID in ModuleIDsList:
 
+            grades = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            Pixdefects = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            gradesX = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            PixdefectsX = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            initialF = [0,0,0]
+            finalF = [0,0,0]
+            initialX = 0 
+            finalX = 0
+            initial = 0
+            final = 0
+
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
+
+                    TestType = RowTuple['TestType']
+                    if TestType != 'TemperatureCycle':
+
+                        #Number of broken ROCs
+                        if TestType in FullTests:
+                            Pixdefects[0] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip0', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[1] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip1', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[2] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip2', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[3] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip3', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])                        
+                            Pixdefects[4] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip4', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])                         
+                            Pixdefects[5] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip5', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[6] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip6', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[7] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip7', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[8] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip8', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[9] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip9', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[10] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip10', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[11] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip11', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[12] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip12', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[13] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip13', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[14] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip14', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+                            Pixdefects[15] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip15', 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
+
+                        elif TestType == 'XRayHRQualification':
+                            PixdefectsX[0] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip0', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[1] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip1', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[2] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip2', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[3] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip3', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[4] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip4', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[5] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip5', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[6] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip6', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[7] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip7', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[8] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip8', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[9] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip9', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[10] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip10', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[11] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip11', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[12] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip12', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[13] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip13', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[14] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip14', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                            PixdefectsX[15] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip15', 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
+                 
+
+
+                        for  i, v in enumerate(Pixdefects):
+                            if v is not None and float(v) > 1000:
+                                grades[i] = 1
+
+                        for  i, v in enumerate(PixdefectsX):
+                            if v is not None and float(v) > 1000:
+                                gradesX[i] = 1
+
+                        #Number of manual regradings
+                        reg = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'GradeComment', 'Value']))
+                        
+                        try: 
+                            if (reg!=''):
+                                if (TestType == "XRayHRQualification"):
+                                    initialX=reg[28]
+                                    finalX=reg[33]
+                                elif (TestType == 'm20_1'):
+                                    initialF[0] = reg[28]
+                                    finalF[0] = reg[33]
+                                elif (TestType == 'm20_2'):
+                                    initialF[1] = reg[28]
+                                    finalF[1] = reg[33]
+                                elif (TestType == "p17_1"):
+                                    initialF[2] = reg[28]
+                                    finalF[2] = reg[33]
+
+                                if 'C' in initialF:
+                                    initial = 'C'
+                                elif 'B' in initialF:
+                                    initial = 'B'
+                                elif 'A' in initialF:
+                                    initial = 'A'
+
+                                if 'C' in finalF:
+                                    final = 'C'
+                                elif 'B' in finalF:
+                                    final = 'B'
+                                elif 'A' in finalF:
+                                    final = 'A'
+
+                               
+                        except:
+                            pass
+
                     
-            ### LeakageCurrent PON
-                    if RowTuple['TestType'] in TestTypeLeakageCurrentPON:
-                        GradeC = 15*1e-6
-                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'KeyValueDictPairs.json', 'LeakageCurrent', 'Value'])
-                        if Value is not None and float(Value) > GradeC:
-                            Numbers['nlcstartupC'] += 1
-                            break
-                            
-            ### IV slope
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-                        GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
-                        GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['slopeivC'])
+            if (initialX=='A' and finalX=='B'):
+                Numbers['nAtoBX'] += 1
+            elif (initialX=='A' and finalX=='C'):
+                Numbers['nAtoCX'] += 1
+            elif (initialX=='B' and finalX=='A'):
+                Numbers['nBtoAX'] += 1
+            elif (initialX=='B' and finalX=='C'):
+                Numbers['nBtoCX'] += 1
+            elif (initialX=='C' and finalX=='A'):
+                Numbers['nCtoAX'] += 1
+            elif (initialX=='C' and finalX=='B'):
+                Numbers['nCtoBX'] += 1
 
-                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'Variation', 'Value'])
-                        if Value is not None and float(Value) > GradeBC:
-                            Numbers['nIVSlopeC'] += 1
-                            break
-                        elif Value is not None and float(Value) > GradeAB:
-                            Numbers['nIVSlopeB'] += 1
-                            break
-
-            ### IV 150 & leakage curent ratio
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
-                        if not RowTuple['Temperature'] or int(RowTuple['Temperature']) == 17:
-                            #  grading criteria for measured currents
-                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['currentB'])
-                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['currentC'])
-
-                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary3', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
-                            if Value is not None and float(Value) > GradeBC:
-                                Numbers['nIV150C'] += 1
-                            elif Value is not None and float(Value) > GradeAB:
-                                Numbers['nIV150B'] += 1
-                        elif int(RowTuple['Temperature']) == -20:
-                            GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioB'])
-                            GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['leakageCurrentRatioC'])
-
-                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'CurrentRatio150V', 'Value'])
-                            if Value is not None and float(Value) < GradeBC:
-                                Numbers['nCurrentRatioC'] += 1
-                            elif Value is not None and float(Value) < GradeAB:
-                                Numbers['nCurrentRatioB'] += 1
+            if (initial=='A' and final=='B'):
+                Numbers['nAtoB'] += 1
+            elif (initial=='A' and final=='C'):
+                Numbers['nAtoC'] += 1
+            elif (initial=='B' and final=='A'):
+                Numbers['nBtoA'] += 1
+            elif (initial=='B' and final=='C'):
+                Numbers['nBtoC'] += 1
+            elif (initial=='C' and final=='A'):
+                Numbers['nCtoA'] += 1
+            elif (initial=='C' and final=='B'):
+                Numbers['nCtoB'] += 1
 
 
-            ### Pedestal Spread
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
-                        ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PedestalSpreadGradeBROCs', 'Value'])
-                        ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PedestalSpreadGradeCROCs', 'Value'])
-
-                        if ValueC is not None and float(ValueC) > 0:
-                            Numbers['nPedSpreadC'] += 1
-                            break
-                        elif ValueB is not None and float(ValueB) > 0:
-                            Numbers['nPedSpreadB'] += 1
-                            break
-
-            ### RelativeGainWidth
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
-                        ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'RelativeGainWidthGradeBROCs', 'Value'])
-                        ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'RelativeGainWidthGradeCROCs', 'Value'])
-
-                        if ValueC is not None and float(ValueC) > 0:
-                            Numbers['nRelGainWC'] += 1
-                            break
-                        elif ValueB is not None and float(ValueB) > 0:
-                            Numbers['nRelGainWB'] += 1
-                            break
-
-            ### VcalThrWidth
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
-                        ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'VcalThresholdWidthGradeBROCs', 'Value'])
-                        ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'VcalThresholdWidthGradeCROCs', 'Value'])
-
-                        if ValueC is not None and float(ValueC) > 0:
-                            Numbers['nVcalThrWC'] += 1
-                            break
-                        elif ValueB is not None and float(ValueB) > 0:
-                            Numbers['nVcalThrWB'] += 1
-                            break
-
-            ### Noise
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
-                        ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'NoiseGradeBROCs', 'Value'])
-                        ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'NoiseGradeCROCs', 'Value'])
-
-                        if ValueC is not None and float(ValueC) > 0:
-                            Numbers['nNoiseC'] += 1
-                            break
-                        elif ValueB is not None and float(ValueB) > 0:
-                            Numbers['nNoiseB'] += 1
-                            break
-
-            ### deadPixel
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-                        RocGrades = []
-                        for Chip in range(0,16):
-                            NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'PixelMap', 'KeyValueDictPairs.json', 'NDeadPixels', 'Value'])
-                            if NDefects:
-                                NDefects = int(NDefects)
-                                if NDefects >= GradePixelDefectsBC:
-                                    RocGrades.append('C')
-                                elif  NDefects >= GradePixelDefectsAB:
-                                    RocGrades.append('B')
-                        if 'C' in RocGrades:
-                            Numbers['ndeadpixC'] += 1
-                            break
-                        elif 'B' in RocGrades:
-                            Numbers['ndeadpixB'] += 1
-                            break
-
-            ### AddressDefects
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-                        RocGrades = []
-                        for Chip in range(0,16):
-                            NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'AddressDecoding', 'KeyValueDictPairs.json', 'NAddressDecodingProblems', 'Value'])
-                            if NDefects:
-                                NDefects = int(NDefects)
-                                if NDefects >= GradePixelDefectsBC:
-                                    RocGrades.append('C')
-                                elif  NDefects >= GradePixelDefectsAB:
-                                    RocGrades.append('B')
-                        if 'C' in RocGrades:
-                            Numbers['nAddressdefC'] += 1
-                            break
-                        elif 'B' in RocGrades:
-                            Numbers['nAddressdefB'] += 1
-                            break
-
-            ### maskDefects
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-                        RocGrades = []
-                        for Chip in range(0,16):
-                            NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'PixelMap', 'KeyValueDictPairs.json', 'NMaskDefects', 'Value'])
-                            if NDefects:
-                                NDefects = int(NDefects)
-                                if NDefects >= GradeMaskDefectsBC:
-                                    RocGrades.append('C')
-                                elif  NDefects >= GradeMaskDefectsAB:
-                                    RocGrades.append('B')
-                        if 'C' in RocGrades:
-                            Numbers['nMaskdefC'] += 1
-                            break
-                        elif 'B' in RocGrades:
-                            Numbers['nMaskdefB'] += 1
-                            break
-
-            ### trimbitDefects
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-                        RocGrades = []
-                        for Chip in range(0,16):
-                            NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'TrimBitProblems', 'KeyValueDictPairs.json', 'nDeadTrimbits', 'Value'])
-                            if NDefects:
-                                NDefects = int(NDefects)
-                                if NDefects >= GradePixelDefectsBC:
-                                    RocGrades.append('C')
-                                elif  NDefects >= GradePixelDefectsAB:
-                                    RocGrades.append('B')
-                        if 'C' in RocGrades:
-                            Numbers['nTrimbitdefC'] += 1
-                            break
-                        elif 'B' in RocGrades:
-                            Numbers['nTrimbitdefB'] += 1
-                            break
-
-            ### TotalDefects
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-
-                        ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsB', 'Value'])
-                        ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsC', 'Value'])
-
-                        if ValueC is not None and float(ValueC) > 0:
-                            Numbers['ntotDefectsC'] += 1
-                            break
-                        elif ValueB is not None and float(ValueB) > 0:
-                            Numbers['ntotDefectsB'] += 1
-                            break
-
-            ### defectiveBumps Fulltest
-                    if RowTuple['TestType'] in FullTests:
-                        TestIndex = FullTests.index(RowTuple['TestType'])
-                        BBGrades = []
-                        for Chip in range(0,16):
-                            NDefectiveBumps = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'BumpBonding', 'KeyValueDictPairs.json', 'nBumpBondingProblems', 'Value'])
-                            if NDefectiveBumps:
-                                NDefectiveBumps = int(NDefectiveBumps)
-                                if NDefectiveBumps >= GradePixelDefectsBC:
-                                    BBGrades.append('C')
-                                elif  NDefectiveBumps >= GradePixelDefectsAB:
-                                    BBGrades.append('B')
-                        if 'C' in BBGrades:
-                            Numbers['nBBFullC'] += 1
-                            break
-                        elif 'B' in BBGrades:
-                            Numbers['nBBFullB'] += 1
-                            break
-
-            ### defectiveBumps X-ray
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-
-                        BBGrades = []
-                        for Chip in range(0,16):
-                            BBGradesROC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'HitMapGrade', 'Value'])
-                            if BBGradesROC:
-                                for BBGradeROC in BBGradesROC.split("/"):
-                                    if not '(' in BBGradeROC and len(BBGradeROC)>0:
-                                        BBGrades.append(BBGradeROC)
-
-                        if 'C' in BBGrades:
-                            Numbers['nBBXrayC'] += 1
-                            break
-                        elif 'B' in BBGrades:
-                            Numbers['nBBXrayB'] += 1
-                            break
-
-            ### lowEfficiency
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-
-                        EfficiencyGrades = []
-                        for Chip in range(0,16):
-                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'EfficiencyGrade', 'Value'])
-                            if Value is not None:
-                                Grades = [grade for grade in Value.split('/') if grade.strip()[0] != '(']
-                                EfficiencyGrades += Grades
-
-                        if 'C' in EfficiencyGrades:
-                                Numbers['nLowHREfC'] += 1
-                                break
-                        elif 'B' in EfficiencyGrades:
-                                Numbers['nLowHREfB'] += 1 
-                                break       
-
-            ### unif problems
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-
-                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithUniformityProblems', 'Value'])
-                        if Value is not None and Value > 0:
-                                Numbers['nuniformityC'] += 1
-                                break
-
-            ### X-ray noise
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-
-                        RocGrades = []
-                        for Chip in range(0,16):
-                            # pixel
-                            NDefects = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'HiddenData.json', 'NoiseDefects', 'Value'])
-                            if NDefects:
-                                NDefects = int(NDefects)
-                                if NDefects >= GradePixelDefectsBC:
-                                    RocGrades.append('C')
-                                elif  NDefects >= GradePixelDefectsAB:
-                                    RocGrades.append('B')
-                            # mean
-                            MeanNoiseGrade = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'NoiseGrade', 'Value'])
-                            if MeanNoiseGrade:
-                                RocGrades.append(MeanNoiseGrade)
-
-                        if 'C' in RocGrades:
-                            Numbers['nNoiseXrayC'] += 1
-                            break
-                        elif 'B' in RocGrades:
-                            Numbers['nNoiseXrayB'] += 1
-                            break
-
-            ### totalDefects X-ray
-                    if RowTuple['TestType'] == TestTypeXrayHR:
-                        RocGrades = []
-                        for Chip in range(0,16):
-                            NDefects = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
-                            if NDefects:
-                                NDefects = int(NDefects)
-                                if NDefects >= GradePixelDefectsBC:
-                                    RocGrades.append('C')
-                                elif  NDefects >= GradePixelDefectsAB:
-                                    RocGrades.append('B')
-
-                        if 'C' in RocGrades:
-                            Numbers['ntotDefectsXrayC'] += 1
-                            break
-                        elif 'B' in RocGrades:
-                            Numbers['ntotDefectsXrayB'] += 1
-                            break
 
 
+            if (grades.count(1)>0):
+                DefectROCs += 1
+
+            if (gradesX.count(1)>0):
+                DefectROCsX += 1
+
+
+                        
+
+
+        Numbers['BrokenROC'] = DefectROCs
+        Numbers['BrokenROCX'] = DefectROCsX
+        
         return Numbers
 
 
