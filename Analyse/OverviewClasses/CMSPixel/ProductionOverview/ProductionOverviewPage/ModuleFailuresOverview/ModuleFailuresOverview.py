@@ -249,6 +249,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             ### TotalDefects
                         ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsB', 'Value'])
                         ValueC = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsRocsC', 'Value'])
+                        
                         if ValueC is not None and float(ValueC) > 0:
                             DefectsDict[ModuleID]['TotalDefects'][RowTuple['TestType']] = 'C'
                         elif ValueB is not None and float(ValueB) > 0:
