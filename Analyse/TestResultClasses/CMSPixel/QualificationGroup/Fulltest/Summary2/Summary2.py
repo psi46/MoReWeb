@@ -41,8 +41,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 TestDuration = self.ParentObject.ResultData['SubTestResults']['AnalogCurrent'].ResultData['KeyValueDictPairs']['Duration']['Value']
             except:
                 TestDuration = ''
+        try:
+            test_center = self.ParentObject.ResultData['SubTestResults']['ConfigFiles'].ResultData['KeyValueDictPairs']['TestCenter']['Value']
+        except:
+            test_center = ''
 
         self.ResultData['KeyValueDictPairs'] = {
+            'TestCenter': {
+                'Value': test_center,
+                'Label':'Test Center'
+            },
             'TestDate': {
                 'Value':test_date,
                 'Label':'Test Date'
@@ -78,7 +86,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
         }
         
-        self.ResultData['KeyList'] = ['TestDate','TestTime', 'TestDuration', 'TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
+        self.ResultData['KeyList'] = ['TestCenter', 'TestDate','TestTime', 'TestDuration', 'TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
 
         if self.ParentObject.pxarVersion:
             self.ResultData['KeyValueDictPairs']['PxarVersion'] = {'Label': 'pXar', 'Value': self.ParentObject.pxarVersion.replace("~","\n")}

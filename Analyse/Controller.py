@@ -52,6 +52,8 @@ parser.add_argument('-new', '--new-folders-only', dest = 'no_re_analysis', actio
                     help = 'Do not analyze folder if it already exists in DB, even if MoReWeb version has changed')
 parser.add_argument('-pres', '--make-presentation', dest = 'make_presentation', action = 'store_true', default = False,
                     help = 'Creates tex file for presentation in the end')
+parser.add_argument('-tc', '--show-test-center', dest = 'show_test_center', action = 'store_true', default = False,
+                    help = 'Show test-center in qualification list')
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -164,6 +166,15 @@ if MoReWebBranch:
 
 if args.refit:
     TestResultEnvironmentInstance.Configuration['Fitting']['refit'] = True
+
+if 'SystemConfiguration' not in TestResultEnvironmentInstance.Configuration:
+    TestResultEnvironmentInstance.Configuration['SystemConfiguration'] = {}
+
+if args.show_test_center:
+    TestResultEnvironmentInstance.Configuration['SystemConfiguration']['show_test_center'] = True
+else:
+    TestResultEnvironmentInstance.Configuration['SystemConfiguration']['show_test_center'] = False
+
 
 if Configuration.has_option('Paths','AbsoluteOverviewPage'):
     TestResultEnvironmentInstance.Configuration['OverviewHTMLLink'] = Configuration.get('Paths','AbsoluteOverviewPage')

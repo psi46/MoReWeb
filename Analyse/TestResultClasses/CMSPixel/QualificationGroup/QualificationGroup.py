@@ -75,7 +75,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
 
-        self.ResultData['KeyValueDictPairs'] = {'AnalysisDate': str(int(time.time()))}
+        try:
+            if len(self.ResultData['SubTestResultDictList']) > 0:
+                TestCenter = self.ResultData['SubTestResultDictList'][0]['InitialAttributes']['TestCenter']
+        except:
+            TestCenter = ''
+
+        self.ResultData['KeyValueDictPairs'] = {'AnalysisDate': str(int(time.time())), 'TestCenter': TestCenter}
 
     def appendOperationDetails(self, testlist):
         Operator = 'UNKNOWN'

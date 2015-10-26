@@ -43,6 +43,12 @@ class TestResult(GeneralTestResult):
 
         self.ResultData['SubTestResultDictList'] = [
             {
+                'Key': 'ConfigFiles',
+                'DisplayOptions': {
+                    'Show': False,
+                }
+            },  
+            {
                 'Key': 'DigitalCurrent',
                 'DisplayOptions': {
                     'Order': 20,
@@ -75,6 +81,7 @@ class TestResult(GeneralTestResult):
                 'DisplayOptions': {
                     'GroupWithNext': False,
                     'Order': 99,
+                    'Show': False,
                 },
                 'InitialAttributes': {
                     'ModuleVersion': self.Attributes['ModuleVersion'],
