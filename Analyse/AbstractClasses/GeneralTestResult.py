@@ -1049,6 +1049,10 @@ class GeneralTestResult(object):
             if not SubTestResultListItems:
                 SubTestResultListHTML = ''
 
+
+        if 'HTMLContent' in TestResultObject.ResultData:
+            ResultDataHTML = ResultDataHTML + TestResultObject.ResultData['HTMLContent']
+
         ResultDataHTML = HtmlParser.substituteSubpartArray(
             ResultDataHTML,
             {

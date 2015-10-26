@@ -220,6 +220,14 @@ class TestResult(GeneralTestResult):
                     'Width': 5,
                 }
             },
+            {
+                'Key': 'Logfile',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 120,
+                    'Show': True,
+                }
+            }
         ]
 
     def MergePyxarData(self):
