@@ -169,6 +169,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tests, test, index = self.appendTemperatureGraph(tests, test, index)
             tests, test, index = self.appendHumidityGraph(tests, test, index)
         HRTestAdded = False
+        self.TestResultEnvironmentObject.IVCurveFiles = {}
         while test:
             if 'fulltest' in test.testname.lower():
                 print '\t-> appendFulltest'

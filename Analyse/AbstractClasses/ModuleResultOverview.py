@@ -69,7 +69,7 @@ class ModuleResultOverview:
                 'Label':'Analysis',
                 'DBColumnName':'KeyValueDictPairs/AnalysisDate',
                 'InGlobalOverviewList': True
-             },             
+             },
              {
                 'Label':'TestCenter',
                 'DBColumnName':'KeyValueDictPairs/TestCenter',

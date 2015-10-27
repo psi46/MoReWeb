@@ -248,6 +248,7 @@ class TestResult(GeneralTestResult):
         else:
             IVCurveFilesListLowT = []
 
+
         #only for the first IV at low T
         if len(IVCurveFilesListLowT) > 0:
             if self.ParentObject.Attributes['IVCurveSubDirectory'] == IVCurveFilesListLowT[0]:
@@ -255,6 +256,7 @@ class TestResult(GeneralTestResult):
                     IVCurveFilesListHighT = sorted(self.TestResultEnvironmentObject.IVCurveFiles[HighTemperatureEnvironment])
                 else:
                     IVCurveFilesListHighT = []
+
 
                 if len(IVCurveFilesListHighT) > 1:
                     print "more than 1 IV curves for %s found, using first one: %s"%(HighTemperatureEnvironment, IVCurveFilesListHighT[0])
@@ -272,6 +274,9 @@ class TestResult(GeneralTestResult):
                     self.ResultData['KeyValueDictPairs']['CurrentRatio150V'] = {'Label': 'I(+17C)/I(-20C) 150V', 'Value': '{0:1.2f}'.format(CurrentRatio150V)}
                     self.ResultData['KeyList'].append('CurrentRatio100V')
                     self.ResultData['KeyList'].append('CurrentRatio150V')
+                    print "Low T IV curves: ", IVCurveFilesListLowT
+                    print "High T IV curves: ", IVCurveFilesListHighT
+                    print "LEAKAGE CURRENT RATIO: ", CurrentRatio150V
                 else:
                     print "no %s IV for current ratio found :-("%HighTemperatureEnvironment
         else:

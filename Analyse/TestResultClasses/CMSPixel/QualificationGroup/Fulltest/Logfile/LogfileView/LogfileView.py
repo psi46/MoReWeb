@@ -17,7 +17,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             LogfileNameShort = 'logfile'
 
-        print "short name:", LogfileNameShort
         if os.path.isfile(LogfileName):
             try:
                 with open(LogfileName) as Logfile:
