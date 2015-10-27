@@ -7,21 +7,34 @@
 
 	<body>
 	<h1>MoReWeb changelog</h1>
-	last updated: October 14, 2015
+	last updated: October 27, 2015
 
 	<h2>v0.6.7</h2>
-	IV grading: also grade on measured value of leakage current at -20 degrees with the same criteria than at +17. <strong>This will affect grading of modules that have both a higher leakage current at -20 than at +17 and a leakage current at -20 larger than 10 uA.</strong>
+	<strong>v0.6.7-12</strong>: fix bug with not found IV curve files if qualifications with different directory structures are analyzed in one go
+	<ul>
+		<li>IV grading: also grade on measured value of leakage current at -20 degrees with the same criteria than at +17. <strong>This will affect grading of modules that have both a higher leakage current at -20 than at +17 and a leakage current at -20 larger than 10 uA.</strong><br></li>
+		<li>show fulltest logfile at HTML on results page</li>
+		<li>in the module qualifications list, the test center can be shown with parameter --show-test-center</li>
+	</ul>
+
 
 	<h2>v0.6.6</h2>
-	add possibility to place a file containing the grade into each fulltest/x-ray hr subfolder to manually change grade. (comments can be placed in the main folder in a file called comments.txt)<br />
+	<ul>
+		<li>add possibility to place a file containing the grade into each fulltest/x-ray hr subfolder to manually change grade. (comments can be placed in the main folder in a file called comments.txt)</li>
+	</ul>
 
 	<h2>v0.6.4</h2>
-	modified IV grading which takes I(+17)/I(-20) at 150V into account. If IV at -20 is not available, ratio grading is skipped.<br />
-	adds Iana loss test to Fulltest analysis<br />
-	adds readout error statistics to x-ray HR tests<br />
+	<ul>
+		<li>modified IV grading which takes I(+17)/I(-20) at 150V into account. If IV at -20 is not available, ratio grading is skipped.</li>
+		<li>adds Iana loss test to Fulltest analysis</li>
+		<li>adds readout error statistics to x-ray HR tests</li>
+	</ul>
 
 	<h2>v0.6.3</h2>
-	adds upload of HR test results to global DB
+	<h4>New features</h4>
+	<ul>
+		<li>adds upload of HR test results to global DB</li>
+	</ul>
 
 	<h3>Bug fixes</h3>
 
