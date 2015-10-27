@@ -5,6 +5,7 @@ import os
 import ConfigParser
 import subprocess
 import shlex
+import glob
 
 class MakeProductionSummary:
 
@@ -246,9 +247,7 @@ class MakeProductionSummary:
     \\frame{{
     \\frametitle{{Defects overview}}
     \\vspace{{-1cm}}
-    \\begin{{figure}} \centering \\advance\leftskip-0.9cm
-    \includegraphics[width=1.14\\textwidth, angle=0] {{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview/ModuleFailuresOverview.pdf}}
-    \end{{figure}}
+    {ModuleFailureOverviewFigures}
     }}
 
     \\frame{{
@@ -292,6 +291,27 @@ class MakeProductionSummary:
     \end{{document}}
 
     """ 
+
+    ModuleFailureOverviewFigureTemplate = """
+      \\begin{{figure}} \centering \\advance\leftskip-0.9cm
+      \includegraphics[width=1.14\\textwidth, angle=0] {{{GlobalOverviewPath}/ProductionOverview/ProductionOverviewPage_Total/{ModuleFailuresOverviewFolder}/ModuleFailuresOverview.pdf}}
+      \end{{figure}}
+      """
+
+    GlobalOverviewPath = Configuration.get('Paths', 'GlobalOverviewPath')
+    ModuleFailuresOverviewPath = GlobalOverviewPath + "/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview_*"
+    ModuleFailuresOverviewFolders = glob.glob(ModuleFailuresOverviewPath)
+    try:
+      ModuleFailuresOverviewFolders.sort(key=lambda x: int(x.strip('/').split('_')[-1]))
+    except:
+      pass
+
+    ModuleFailureOverviewFigures = ""
+    for ModuleFailuresOverviewFolder in ModuleFailuresOverviewFolders:
+
+        FolderName = ModuleFailuresOverviewFolder.replace('\\','/').split('/')[-1]
+        ModuleFailureOverviewFigures += ModuleFailureOverviewFigureTemplate.format(GlobalOverviewPath=GlobalOverviewPath, ModuleFailuresOverviewFolder=FolderName)
+
 
     context = {
       "nA":nA, 
@@ -378,7 +398,8 @@ class MakeProductionSummary:
       "nBtoAX" : nBtoAX,
       "nBtoCX" : nBtoCX,
       "nCtoAX" : nCtoAX,
-      "nCtoBX" : nCtoBX
+      "nCtoBX" : nCtoBX,
+      "ModuleFailureOverviewFigures": ModuleFailureOverviewFigures,
     } 
 
     oldWorkingDirectory = os.getcwd()
