@@ -8,7 +8,7 @@ import shlex
 
 class MakeProductionSummary:
 
-  def MakeTexFile(self, args):
+  def MakeTexFile(self, args, args2):
 
     Configuration = ConfigParser.ConfigParser()
     Configuration.read([
@@ -36,20 +36,34 @@ class MakeProductionSummary:
     filename = OutputDirectoryPath + "/ModuleProductionOverview_Week{0}.tex".format(week)
     
 
-    nA = args['nA']
-    nB = args['nB']
-    nC = args['nC']
-    nM = args['nM']
+    nA = args2['nA']
+    nB = args2['nB']
+    nC = args2['nC']
+    nM = args2['nM']
+    nBrokenROCs = args2['BrokenROC']
+    nBrokenROCsX = args2['BrokenROCX']
+    nAtoB = args2['nAtoB']
+    nAtoC = args2['nAtoC']
+    nBtoA = args2['nBtoA']
+    nBtoC = args2['nBtoC']
+    nCtoA = args2['nCtoA']
+    nCtoB = args2['nCtoB']
+    nAtoBX = args2['nAtoBX']
+    nAtoCX = args2['nAtoCX']
+    nBtoAX = args2['nBtoAX']
+    nBtoCX = args2['nBtoCX']
+    nCtoAX = args2['nCtoAX']
+    nCtoBX = args2['nCtoBX']
     lcstartupB = args['nlcstartupB']
     lcstartupC = args['nlcstartupC']
     IV150B = args['nIV150B']
     IV150C = args['nIV150C']
+    IV150m20B = args['nIV150m20B']
+    IV150m20C = args['nIV150m20C']
     IRatio150B = args['nCurrentRatioB']
     IRatio150C = args['nCurrentRatioC']
     IVSlopeB = args['nIVSlopeB']
     IVSlopeC = args['nIVSlopeC']
-    RecCurrentB = args['nRecCurrentB']
-    RecCurrentC = args['nRecCurrentC']
     totDefectsB = args['ntotDefectsB']
     totDefectsC = args['ntotDefectsC']
     totDefectsXrayB = args['ntotDefectsXrayB']
@@ -90,9 +104,8 @@ class MakeProductionSummary:
 
     lcstartup = round(float(lcstartupC)/nQ*100,1)
     IV150 = round(float(IV150C)/nQ*100,1)
-    IV150 = round(float(IV150C)/nQ*100,1)
+    IV150m20 = round(float(IV150m20C)/nQ*100,1)
     IVSlope = round(float(IVSlopeC)/nQ*100,1)
-    RecCurrent = round(float(RecCurrentC)/nQ*100,1)
     totDefects = round(float(totDefectsC)/nQ*100,1)
     totDefectsXray = round(float(totDefectsXrayC)/nQ*100,1)
     BBFull = round(float(BBFullC)/nQ*100,1)
@@ -109,6 +122,8 @@ class MakeProductionSummary:
     VcalThrW = round(float(VcalThrWC)/nQ*100,1)
     LowHREf = round(float(LowHREfC)/nQ*100,1)
     IRatio150 = round(float(IRatio150C)/nQ*100,1)
+    BrokenROC = round(float(nBrokenROCs)/nQ*100,1)
+    BrokenROCX = round(float(nBrokenROCsX)/nQ*100,1)
     
  
 
@@ -134,6 +149,20 @@ class MakeProductionSummary:
     }}
     \item[]}}
     {{\end{{list}}}} 
+
+    \setbeamertemplate{{footline}}
+{{
+  \leavevmode%
+  \hbox{{%
+  \\begin{{beamercolorbox}}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{{author in head/foot}}%
+  \end{{beamercolorbox}}%
+  \\begin{{beamercolorbox}}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{{title in head/foot}}%
+  \end{{beamercolorbox}}%
+  \\begin{{beamercolorbox}}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{{date in head/foot}}%
+    \insertframenumber\hspace*{{2ex}} 
+  \end{{beamercolorbox}}}}%
+  \\vskip0pt%
+}}
 
     \\begin{{document}}
 
@@ -176,20 +205,17 @@ class MakeProductionSummary:
     \\begin{{tabular}}{{@{{}}llccc@{{}}}}
     \\toprule
                                     & Defects             & B & C &  C (\%  of production)\\\\ \midrule
-    \multirow{{2}}{{*}}{{Sensor}}     & LC startup        & {lcstartupB} & {lcstartupC} &  {lcstartup}\\\\
-                                    & IV 150              & {IV150B} & {IV150C} & {IV150} \\\\
-                                    & I(+17)/I(-20)       & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ \midrule
-    \multirow{{2}}{{*}}{{Sensor m20}} & IV slope          & {IVSlopeB} & {IVSlopeC} & {IVSlope} \\\\
-                                    & Rec current         & {RecCurrentB} & {RecCurrentC} & {RecCurrent} \\\\ \midrule
-    \multirow{{9}}{{*}}{{Pixel defects}} & Total defects  & {totDefectsB} & {totDefectsC} & {totDefects} \\\\ 
-                                    & Total defects X-ray & {totDefectsXrayB} & {totDefectsXrayC} & {totDefectsXray} \\\\
-                                    & BB Fulltest         & {BBFullB} & {BBFullC} & {BBFull} \\\\
-                                    & BB X-ray            & {BBXrayB} & {BBXrayC} & {BBXray} \\\\
-                                    & Address defects      & {AddressdefB} & {AddressdefC} & {Addressdef} \\\\
-                                    & Trimbit defects     & {TrimbitdefB} & {TrimbitdefC} & {Trimbitdef} \\\\
-                                    & Mask defects        & {MaskdefB} & {MaskdefC} & {Maskdef} \\\\
-                                    & Dead pixels         & {deadpixB} & {deadpixC} & {deadpix} \\\\
-                                    & Uniformity problem  & {uniformityB} & {uniformityC} & {uniformity} \\\\ \\bottomrule 
+    \multirow{{5}}{{*}}{{Sensor}}   & LC startup          & {lcstartupB} & {lcstartupC} &  {lcstartup}\\\\
+                                    & IV 150 (+17)        & {IV150B} & {IV150C} & {IV150} \\\\
+                                    & IV 150 (-20)        & {IV150m20B} & {IV150m20C} & {IV150m20} \\\\ 
+                                    & I(+17)/I(-20)       & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ 
+                                     & IV slope           & {IVSlopeB} & {IVSlopeC} & {IVSlope} \\\\ \midrule
+    \multirow{{6}}{{*}}{{Chip performance}} & Noise       & {NoiseB} & {NoiseC} & {Noise} \\\\
+                                    & Noise X-ray         & {NoiseXrayB} & {NoiseXrayC} & {NoiseXray} \\\\
+                                    & Pedestal spread     & {PedSpreadB} & {PedSpreadC} & {PedSpread} \\\\
+                                    & Rel. Gain Width     & {RelGainWB} & {RelGainWC} & {RelGainW} \\\\
+                                    & VcalThr Width       & {VcalThrWB} & {VcalThrWC} & {VcalThrW} \\\\
+                                    & Low HR Efficiency   & {LowHREfB} & {LowHREfC} & {LowHREf} \\\\ \\bottomrule 
     \end{{tabular}}
     \end{{table}}
     }}
@@ -201,12 +227,17 @@ class MakeProductionSummary:
     \\begin{{tabular}}{{@{{}}llccc@{{}}}}
     \\toprule
                                     & Defects             & B & C &  C (\%  of production)\\\\ \midrule
-    \multirow{{6}}{{*}}{{Chip performance}} & Noise       & {NoiseB} & {NoiseC} & {Noise} \\\\
-                                    & Noise X-ray         & {NoiseXrayB} & {NoiseXrayC} & {NoiseXray} \\\\
-                                    & Pedestal spread     & {PedSpreadB} & {PedSpreadC} & {PedSpread} \\\\
-                                    & Rel. Gain Width     & {RelGainWB} & {RelGainWC} & {RelGainW} \\\\
-                                    & VcalThr Width       & {VcalThrWB} & {VcalThrWC} & {VcalThrW} \\\\
-                                    & Low HR Efficiency   & {LowHREfB} & {LowHREfC} & {LowHREf} \\\\ \\bottomrule 
+    \multirow{{11}}{{*}}{{Pixel defects}} & Total defects  & {totDefectsB} & {totDefectsC} & {totDefects} \\\\ 
+                                    & Total defects X-ray & {totDefectsXrayB} & {totDefectsXrayC} & {totDefectsXray} \\\\
+                                    & BB Fulltest         & {BBFullB} & {BBFullC} & {BBFull} \\\\
+                                    & BB X-ray            & {BBXrayB} & {BBXrayC} & {BBXray} \\\\
+                                    & Address defects     & {AddressdefB} & {AddressdefC} & {Addressdef} \\\\
+                                    & Trimbit defects     & {TrimbitdefB} & {TrimbitdefC} & {Trimbitdef} \\\\
+                                    & Mask defects        & {MaskdefB} & {MaskdefC} & {Maskdef} \\\\
+                                    & Dead pixels         & {deadpixB} & {deadpixC} & {deadpix} \\\\
+                                    & Broken ROC          & 0 & {nBrokenROCs} & {BrokenROC} \\\\
+                                    & Broken ROC X-ray    & 0 & {nBrokenROCsX} & {BrokenROCX} \\\\
+                                    & Uniformity problem  & {uniformityB} & {uniformityC} & {uniformity} \\\\ \\bottomrule 
     \end{{tabular}}
     \end{{table}}
     }}
@@ -219,6 +250,34 @@ class MakeProductionSummary:
     \includegraphics[width=1.14\\textwidth, angle=0] {{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview/ModuleFailuresOverview.pdf}}
     \end{{figure}}
     }}
+
+    \\frame{{
+    \\frametitle{{Manual regradings}}
+    \\begin{{table}}[]
+    \\begin{{minipage}}[b]{{0.45\linewidth}}
+    \centering
+    \\begin{{tabular}}{{@{{}}llll@{{}}}}
+    \\toprule
+    initial/final  & A & B & C \\\\ \midrule
+    A & / & {nAtoB}  &  {nAtoC} \\\\
+    B &  {nBtoA} & / &  {nBtoC} \\\\
+    C &  {nCtoA} & {nCtoB}  & / \\\\ \\bottomrule
+    \end{{tabular}} \caption{{Full qualification}}
+\end{{minipage}}
+\hspace{{0.5cm}}
+\\begin{{minipage}}[b]{{0.45\linewidth}}
+\centering
+\\begin{{tabular}}{{@{{}}llll@{{}}}}
+    \\toprule
+    initial/final  & A & B & C \\\\ \midrule
+    A & / & {nAtoBX}  &  {nAtoCX} \\\\
+    B &  {nBtoAX} & / &  {nBtoCX} \\\\
+    C &  {nCtoAX} & {nCtoBX}  & / \\\\ \\bottomrule
+    \end{{tabular}} \caption{{X-ray qualification}}
+    \end{{minipage}}
+    \end{{table}}
+    }}
+
 
     \\frame{{
     \\frametitle{{Fulltest duration}}
@@ -247,13 +306,13 @@ class MakeProductionSummary:
       "lcstartupC" : lcstartupC,
       "IV150B" : IV150B,
       "IV150C" : IV150C,
+      "IV150m20B" : IV150m20B,
+      "IV150m20C" : IV150m20C,
       "IRatio150B" : IRatio150B,
       "IRatio150C" : IRatio150C,
       "IRatio150" : IRatio150,
       "IVSlopeB" : IVSlopeB,
       "IVSlopeC" : IVSlopeC,
-      "RecCurrentB" : RecCurrentB,
-      "RecCurrentC" : RecCurrentC,
       "totDefectsB" : totDefectsB,
       "totDefectsC" : totDefectsC,
       "totDefectsXrayB" : totDefectsXrayB,
@@ -286,8 +345,8 @@ class MakeProductionSummary:
       "LowHREfC" : LowHREfC,
       "lcstartup" : lcstartup,
       "IV150" : IV150,
+      "IV150m20" : IV150m20,
       "IVSlope" : IVSlope,
-      "RecCurrent" : RecCurrent,
       "totDefects" : totDefects,
       "totDefectsXray" : totDefectsXray,
       "BBFull" : BBFull,
@@ -303,7 +362,23 @@ class MakeProductionSummary:
       "RelGainW" : RelGainW,
       "VcalThrW" : VcalThrW,
       "LowHREf" : LowHREf,
-      "FiguresPath" : FiguresPath
+      "FiguresPath" : FiguresPath,
+      "nBrokenROCs" : nBrokenROCs,
+      "BrokenROC" : BrokenROC,
+      "nBrokenROCsX" : nBrokenROCsX,
+      "BrokenROCX" : BrokenROCX,
+      "nAtoB" : nAtoB,
+      "nAtoC" : nAtoC,
+      "nBtoA" : nBtoA,
+      "nBtoC" : nBtoC,
+      "nCtoA" : nCtoA,
+      "nCtoB" : nCtoB,
+      "nAtoBX" : nAtoBX,
+      "nAtoCX" : nAtoCX,
+      "nBtoAX" : nBtoAX,
+      "nBtoCX" : nBtoCX,
+      "nCtoAX" : nCtoAX,
+      "nCtoBX" : nCtoBX
     } 
 
     oldWorkingDirectory = os.getcwd()
