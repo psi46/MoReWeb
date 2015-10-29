@@ -802,6 +802,14 @@ class TestResult(GeneralTestResult):
                     'Width': 1,
                 },
             })
+        self.ResultData['SubTestResultDictList'].append({
+                'Key': 'Logfile',
+                'DisplayOptions': {
+                    'GroupWithNext': False,
+                    'Order': 901,
+                    'Width': 1,
+                },
+            })
 
         for Rate in self.Attributes['Rates']['RetrimHotPixels']:
             self.ResultData['SubTestResultDictList'].append({
