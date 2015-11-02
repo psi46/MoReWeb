@@ -298,7 +298,8 @@ def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
 
     CreateApacheWebserverConfiguration(FinalModuleResultsPath)
 
-    TestResultEnvironmentInstance.ModulesAnalyzed.append(ModuleInformation['ModuleID'])
+    ModuleIdentifier = ModuleInformation['ModuleID'] + '-' + ModuleInformation['QualificationType'] + '-' + ModuleInformation['TestDate']
+    TestResultEnvironmentInstance.ModulesAnalyzed.append(ModuleIdentifier)
     print 'Working on: ',ModuleInformation
     print ' -- '
 
@@ -307,7 +308,7 @@ def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
     WriteToDBSuccess = ModuleTestResult.WriteToDatabase() # needed before final output
 
     if WriteToDBSuccess:
-        TestResultEnvironmentInstance.ModulesInsertedIntoDB.append(ModuleInformation['ModuleID'])
+        TestResultEnvironmentInstance.ModulesInsertedIntoDB.append(ModuleIdentifier)
 
     print '    Generating Final Output'
     ModuleTestResult.GenerateFinalOutput()
