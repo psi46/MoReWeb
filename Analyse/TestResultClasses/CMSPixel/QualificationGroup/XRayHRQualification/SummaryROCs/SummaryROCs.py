@@ -61,7 +61,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                  '<div style="text-align:center;">%s</div>'%ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value'],             
             ]
         
-            PixelDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value'])
+            try:
+                PixelDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value'])
+            except:
+                PixelDefects = -1
+
             if PixelDefects > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_C']:
                 TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=PixelDefects)))
             elif PixelDefects > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_B']:
@@ -79,7 +83,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 else:
                     TableRow.append("{Value:1.2f}".format(Value=Efficiency))
                 RateIndex += 1
-            TableRow.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value'])
+
+            try:
+                Chi2NDF = ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value']
+            except:
+                Chi2NDF = -1
+            TableRow.append(Chi2NDF)
 
             # rate and bb defects
             for Rate in self.ParentObject.Attributes['Rates']['HRData']:

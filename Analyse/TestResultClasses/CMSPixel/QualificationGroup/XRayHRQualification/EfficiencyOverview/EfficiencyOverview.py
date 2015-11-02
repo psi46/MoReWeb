@@ -20,10 +20,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             histo = ChipTestResultObject.ResultData['SubTestResults']['EfficiencyMap_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
             chipNo = ChipTestResultObject.Attributes['ChipNo']
 
-            for col in range(self.nCols): 
-                for row in range(self.nRows):
-                    result = histo.GetBinContent(col + 1, row + 1)
-                    self.UpdatePlot(chipNo, col, row, result)
+            if histo:
+                for col in range(self.nCols): 
+                    for row in range(self.nRows):
+                        result = histo.GetBinContent(col + 1, row + 1)
+                        self.UpdatePlot(chipNo, col, row, result)
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
