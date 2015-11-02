@@ -868,7 +868,7 @@ class TestResult(GeneralTestResult):
         try:
             grade = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Value']
         except KeyError:
-            grade = 'None'
+            raise
 
         try:
             PixelDefects = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value']

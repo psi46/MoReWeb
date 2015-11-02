@@ -174,7 +174,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             MeanEfficiency120 = '{0:1.2f}'.format(sum(MeanEfficiency120List)/float(len(MeanEfficiency120List)))
         except:
             MeanEfficiency120 = '-1'
-
+            
         SubGradings['PixelDefects'] = SubGrading
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {

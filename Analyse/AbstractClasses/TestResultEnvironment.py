@@ -129,6 +129,8 @@ class TestResultEnvironment:
 
     #Error Handling
     ErrorList = []
+    ModulesAnalyzed = []
+    ModulesInsertedIntoDB = []
 
     def __init__(self, Configuration = None):
         if Configuration:

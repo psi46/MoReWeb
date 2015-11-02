@@ -298,12 +298,16 @@ def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
 
     CreateApacheWebserverConfiguration(FinalModuleResultsPath)
 
+    TestResultEnvironmentInstance.ModulesAnalyzed.append(ModuleInformation['ModuleID'])
     print 'Working on: ',ModuleInformation
     print ' -- '
 
     print '    Populating Data'
     ModuleTestResult.PopulateAllData()
-    ModuleTestResult.WriteToDatabase() # needed before final output
+    WriteToDBSuccess = ModuleTestResult.WriteToDatabase() # needed before final output
+
+    if WriteToDBSuccess:
+        TestResultEnvironmentInstance.ModulesInsertedIntoDB.append(ModuleInformation['ModuleID'])
 
     print '    Generating Final Output'
     ModuleTestResult.GenerateFinalOutput()
@@ -613,5 +617,34 @@ print '\nErrorList:'
 for i in TestResultEnvironmentInstance.ErrorList:
     print i
     print '\t - %s: %s'%(i['ModulePath'],i['ErrorCode'])
-sys.exit(len(TestResultEnvironmentInstance.ErrorList))
+
+
+ExitCode = -2
+
+try:
+    ModulesNotInsertedIntoDB = list(set(TestResultEnvironmentInstance.ModulesAnalyzed) - set(TestResultEnvironmentInstance.ModulesInsertedIntoDB))
+except:
+    ModulesNotInsertedIntoDB = []
+
+if TestResultEnvironmentInstance.Configuration['Database']['UseGlobal']:
+
+    if len(ModulesNotInsertedIntoDB) == 0 and len(TestResultEnvironmentInstance.ModulesInsertedIntoDB) > 0:
+        ExitCode = 0
+    else:
+        ExitCode = len(TestResultEnvironmentInstance.ErrorList)
+
+else:
+    ExitCode = len(TestResultEnvironmentInstance.ErrorList)
+
+try:
+    if len(ModulesNotInsertedIntoDB) > 0:
+        print 'Modules not inserted into DB: %s'%','.join(ModulesNotInsertedIntoDB)
+except:
+    pass
+
+print 'inserted: ', TestResultEnvironmentInstance.ModulesInsertedIntoDB
+print 'failed: ', ModulesNotInsertedIntoDB
+print 'Exit code: %d'%ExitCode
+
+sys.exit(ExitCode)
 

@@ -1117,9 +1117,11 @@ class GeneralTestResult(object):
         ID = 0
         ID = self.CustomWriteToDatabase(ParentID)
 
+        WriteToDBSuccess = True
         for i in self.ResultData['SubTestResults']:
             try:
-                self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
+                SubtestWriteToDBSuccess = self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
+                WriteToDBSuccess = WriteToDBSuccess and SubtestWriteToDBSuccess
             except Exception as inst:
                 # Start red color
                 sys.stdout.write("\x1b[31m")
@@ -1136,8 +1138,10 @@ class GeneralTestResult(object):
                 # Reset color
                 sys.stdout.write("\x1b[0m")
                 sys.stdout.flush()
+                WriteToDBSuccess = False
 
         self.PostWriteToDatabase()
+        return WriteToDBSuccess
 
     def CustomWriteToDatabase(self, ParentID):
         pass
