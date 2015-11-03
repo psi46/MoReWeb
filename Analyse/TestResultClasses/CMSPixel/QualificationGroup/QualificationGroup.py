@@ -75,7 +75,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
 
-        self.ResultData['KeyValueDictPairs'] = {'AnalysisDate': str(int(time.time()))}
+        try:
+            if len(self.ResultData['SubTestResultDictList']) > 0:
+                TestCenter = self.ResultData['SubTestResultDictList'][0]['InitialAttributes']['TestCenter']
+        except:
+            TestCenter = ''
+
+        self.ResultData['KeyValueDictPairs'] = {'AnalysisDate': str(int(time.time())), 'TestCenter': TestCenter}
 
     def appendOperationDetails(self, testlist):
         Operator = 'UNKNOWN'
@@ -119,7 +125,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'FinalResultsStoragePath':'unkown'
                 }
             )
-            print "\x1b[31mProblems in directory structure detected, skip qualification directory! %s\x1b[0m"%self.TestResultEnvironmentObject.ModuleDataDirectory
+            print "\x1b[31mProblems in directory structure detected, skip qualification directory! %s\n%s\n%s\x1b[0m"%(self.TestResultEnvironmentObject.ModuleDataDirectory,inst, traceback.format_exc())
             return []
         return self.extractTests()
 
@@ -163,6 +169,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tests, test, index = self.appendTemperatureGraph(tests, test, index)
             tests, test, index = self.appendHumidityGraph(tests, test, index)
         HRTestAdded = False
+        self.TestResultEnvironmentObject.IVCurveFiles = {}
         while test:
             if 'fulltest' in test.testname.lower():
                 print '\t-> appendFulltest'

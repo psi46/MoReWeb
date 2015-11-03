@@ -103,14 +103,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             hN.SetLineColor(self.GetGradeColor('None'))
 
             for Module in ModuleData:
-                if Module['Grade'] == 'A':
-                    hA.Fill(Module['TestDate'] - TimeOffset)
-                elif Module['Grade'] == 'B':
-                    hB.Fill(Module['TestDate'] - TimeOffset)
-                elif Module['Grade'] == 'C':
-                    hC.Fill(Module['TestDate'] - TimeOffset)
-                else:
-                    hN.Fill(Module['TestDate'] - TimeOffset)
+                try:
+                    relativeTestDate = float(Module['TestDate']) - TimeOffset
+                    if Module['Grade'] == 'A':
+                        hA.Fill(relativeTestDate)
+                    elif Module['Grade'] == 'B':
+                        hB.Fill(relativeTestDate)
+                    elif Module['Grade'] == 'C':
+                        hC.Fill(relativeTestDate)
+                    else:
+                        hN.Fill(relativeTestDate)
+                except:
+                    print "could not fill in module: ", Module['ModuleID']
 
             hA = self.GetCumulative(hA)
             hB = self.GetCumulative(hB)

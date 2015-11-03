@@ -24,12 +24,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TableData = []
 
         Rows = self.FetchData()
-
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
-
+        ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
 
         self.Canvas.Clear()
@@ -44,17 +39,42 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', '*.root'])
                         RootFiles = glob.glob(Path)
                         if len(RootFiles) > 1:
-                            print "more than 1 root file found"
+                            if self.Verbose:
+                                print "more than 1 root file found in: '%s"%Path
+                            self.ProblematicModulesList.append(ModuleID)
                         elif len(RootFiles) < 1:
                             if '_m20_1' not in Path:
-                                print "root file not found in: '%s"%Path
+                                if self.Verbose:
+                                    print "root file not found in: '%s"%Path
+                                self.ProblematicModulesList.append(ModuleID)
                         else:
                             ROOTObject = self.GetHistFromROOTFile(RootFiles[0], "Graph")
                             if ROOTObject:
+                                IVGrade = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'IVGrade', 'Value'])
+                                IVColor = ROOT.kBlue
+                                try:
+                                    if int(IVGrade) == 3:
+                                        IVColor = self.GradeColors['C']
+                                    elif int(IVGrade) == 2:
+                                        IVColor = self.GradeColors['B']
+                                    elif int(IVGrade) == 1:
+                                        IVColor = self.GradeColors['A']
+                                except:
+                                    if self.Verbose:
+                                        print "WARNING: ",ModuleID," IV ",TestType, " unable to read IV grade or IV grade not A/B/C: '",IVGrade,"'"
+                                    self.ProblematicModulesList.append(ModuleID)
+
+                                try:
+                                    ROOTObject.SetLineColorAlpha(IVColor, 0.35)
+                                except:
+                                    # might fail in old ROOT versions
+                                    pass
                                 MultiGraph.Add(ROOTObject)
                                 NModules += 1
                             else:
-                                print "WARNING: graph in root file not found"
+                                if self.Verbose:
+                                    print "WARNING: graph in root file not found"
+                                self.ProblematicModulesList.append(ModuleID)
         if MultiGraph:
             MultiGraph.Draw("AL")
             if MultiGraph.GetXaxis():
@@ -66,7 +86,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             title.SetNDC()
             title.SetTextAlign(12)
             Subtitle = self.Attributes['Test']
-            TestNames = {'m20_1' : 'Fulltest -20°C BTC', 'm20_2': 'Fulltest -20°C ATC', 'p17_1': 'Fulltest +17°C'}
+            TestNames = {'m20_1' : 'Fulltest -20C BTC', 'm20_2': 'Fulltest -20C ATC', 'p17_1': 'Fulltest +17C'}
             if TestNames.has_key(Subtitle):
                 Subtitle = TestNames[Subtitle]
             title.DrawText(0.15,0.965,"%s, modules: %d"%(Subtitle,NModules))
@@ -76,5 +96,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
         ROOT.gPad.SetLogy(0)
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 

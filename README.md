@@ -4,6 +4,20 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
+##### version 0.6.7
+
+**IV grading**
+
+Also grade on measured value of leakage current at -20 degrees (with the same criteria than at +17). This will affect grading of modules that have both a higher leakage current at -20 than at +17 and a leakage current at -20 larger than 10 uA. (Not seen any so far, but one module would almost fulfil these criteria)
+
+##### version 0.6.6
+
+**manual grading possible**
+
+how to: add a file grade.txt inside the 00\*\_Fulltest\_\* subfolder which contains the grade as letter (A,B,C) or number (1,2,3). (To add a comment: add a file called comment.txt to the main qualification directory, e.g. M\*\_FullQualification\_...)
+
+...
+
 ##### version 0.6.4
 
 **new grading for IV curves!**

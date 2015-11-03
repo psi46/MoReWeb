@@ -41,8 +41,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 TestDuration = self.ParentObject.ResultData['SubTestResults']['AnalogCurrent'].ResultData['KeyValueDictPairs']['Duration']['Value']
             except:
                 TestDuration = ''
+        try:
+            test_center = self.ParentObject.ResultData['SubTestResults']['ConfigFiles'].ResultData['KeyValueDictPairs']['TestCenter']['Value']
+        except:
+            test_center = ''
 
         self.ResultData['KeyValueDictPairs'] = {
+            'TestCenter': {
+                'Value': test_center,
+                'Label':'Test Center'
+            },
             'TestDate': {
                 'Value':test_date,
                 'Label':'Test Date'
@@ -76,14 +84,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': TBM2status, 
                 'Label':'TBM2'
             },
-        
         }
         
-        self.ResultData['KeyList'] = ['TestDate','TestTime', 'TestDuration', 'TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
+        self.ResultData['KeyList'] = ['TestCenter', 'TestDate','TestTime', 'TestDuration', 'TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
 
         if self.ParentObject.pxarVersion:
             self.ResultData['KeyValueDictPairs']['PxarVersion'] = {'Label': 'pXar', 'Value': self.ParentObject.pxarVersion.replace("~","\n")}
             self.ResultData['KeyList'].append('PxarVersion')
+
+        try:
+            if 'ModuleIa' in self.ParentObject.ResultData['SubTestResults']['AnalogCurrent'].ResultData['KeyValueDictPairs']:
+                self.ResultData['KeyValueDictPairs']['ModuleIa'] = self.ParentObject.ResultData['SubTestResults']['AnalogCurrent'].ResultData['KeyValueDictPairs']['ModuleIa']
+                self.ResultData['KeyList'].append('ModuleIa')
+        except:
+            pass
 
 
 

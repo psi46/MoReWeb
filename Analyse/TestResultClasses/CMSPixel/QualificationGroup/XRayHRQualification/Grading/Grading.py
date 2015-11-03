@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
-
+import sys, traceback
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -45,86 +45,136 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROCsWithUniformityProblems = 0
         MeanEfficiency50List = []
         MeanEfficiency120List = []
+        MeanNoise = -1.0
 
         HotPixelsList = set()
         BumpBondingDefectPixelsList = set()
         NoiseDefectPixelsList = set()
         TotalDefectPixelsList = set()
 
-        for i in chipResults:
-            ROCGrade = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value']
-            GradeHistogram[ROCGrade] += 1
-            if ROCGrade == GradeMapping[2] and ModuleGrade < 2:
-                ModuleGrade = 2
-            if ROCGrade == GradeMapping[3] and ModuleGrade < 3:
-                ModuleGrade = 3
+        TestIncomplete = False
 
-            BumpBondingDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects']['Value']
-            NoiseDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefects']['Value']
-            HotPixelDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefects']['Value']
+        try:
+            for i in chipResults:
+                ROCGrade = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value']
+                GradeHistogram[ROCGrade] += 1
+                if ROCGrade == GradeMapping[2] and ModuleGrade < 2:
+                    ModuleGrade = 2
+                if ROCGrade == GradeMapping[3] and ModuleGrade < 3:
+                    ModuleGrade = 3
 
-            BumpBondingDefectsROC = int(BumpBondingDefectsROC) if BumpBondingDefectsROC is not None else 0
-            NoiseDefectsROC = int(NoiseDefectsROC) if NoiseDefectsROC is not None else 0
-            HotPixelDefectsROC = int(HotPixelDefectsROC) if HotPixelDefectsROC is not None else 0
+                BumpBondingDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects']['Value']
+                NoiseDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefects']['Value']
+                HotPixelDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefects']['Value']
 
-            # total pixel defects per ROC
-            PixelDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['PixelDefects']['Value']
+                BumpBondingDefectsROC = int(BumpBondingDefectsROC) if BumpBondingDefectsROC is not None else 0
+                NoiseDefectsROC = int(NoiseDefectsROC) if NoiseDefectsROC is not None else 0
+                HotPixelDefectsROC = int(HotPixelDefectsROC) if HotPixelDefectsROC is not None else 0
 
-            PixelDefects += PixelDefectsROC
-            if PixelDefectsROC > 166:
-                ROCsMoreThanFourPercent += 1
-            elif PixelDefectsROC > 41:
-                ROCsMoreThanOnePercent += 1
+                # total pixel defects per ROC
+                PixelDefectsROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['PixelDefects']['Value']
+
+                PixelDefects += PixelDefectsROC
+                if PixelDefectsROC > 166:
+                    ROCsMoreThanFourPercent += 1
+                elif PixelDefectsROC > 41:
+                    ROCsMoreThanOnePercent += 1
+                else:
+                    ROCsLessThanOnePercent += 1
+
+                # count number of pixel defects per module
+                BumpBondingDefects += BumpBondingDefectsROC
+                NoiseDefects += NoiseDefectsROC
+                HotPixelDefects += HotPixelDefectsROC
+
+                # get ROC pixel defect lists
+                HotPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefectsList']['Value']
+                BumpBondingDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefectsList']['Value']
+                NoiseDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoisePixelsList']['Value']
+                TotalDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['TotalPixelDefectsList']['Value']
+
+                # append to pixel defects list for module
+                HotPixelsList = HotPixelsList | HotPixelsListROC
+                BumpBondingDefectPixelsList = BumpBondingDefectPixelsList | BumpBondingDefectPixelsListROC
+                NoiseDefectPixelsList = NoiseDefectPixelsList | NoiseDefectPixelsListROC
+                TotalDefectPixelsList = TotalDefectPixelsList | TotalDefectPixelsListROC
+
+                # mean efficiency
+                MeanEfficiency50List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency50']['Value']))
+                MeanEfficiency120List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency120']['Value']))
+
+                # column uniformity
+                NonUniformColumnsROC = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
+                NonUniformColumnEventsROCList = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnEvents']['Value']
+                NonUniformColumnEventsROC = sum([int(x) for x in NonUniformColumnEventsROCList.split('/')])
+                if NonUniformColumnsROC > 0 or NonUniformColumnEventsROC > 0:
+                    ROCsWithUniformityProblems += 1
+
+                # readout uniformity
+                NonUniformEventsROC = 0
+                for Rate in self.ParentObject.Attributes['Rates']['HRData']:
+                    NonUniformEventsROC += int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]['Value'])
+                if NonUniformEventsROC > 0:
+                    ROCsWithReadoutProblems += 1
+
+                # mean noise
+                if len(self.ParentObject.Attributes['Rates']['HRSCurves']) > 0:
+                    Rate = self.ParentObject.Attributes['Rates']['HRSCurves'][0]
+
+                    NoiseList = []
+                    for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
+                        ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                        Noise = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noise_{Rate}'.format(Rate=Rate)]
+                        NoiseList.append(Noise)
+
+                    MeanNoise = sum(NoiseList) / float(len(NoiseList))
+                else:
+                    MeanNoise = -1
+        except:
+            TestIncomplete = True
+            # Start red color
+            sys.stdout.write("\x1b[31m")
+            sys.stdout.flush()
+            print "X-ray test incomplete!!!"
+            # Print traceback
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            traceback.print_exception(exc_type, exc_obj, exc_tb)
+            # Reset color
+            sys.stdout.write("\x1b[0m")
+            sys.stdout.flush()
+
+        # check for test completenes
+        if TestIncomplete:
+            print "\x1b[31mX-ray test incomplete/bad format => GRADE C\x1b[0m"
+            ModuleGrade = 3
+
+        #if grade was manually specified, apply it
+        GradeComment = ''
+        ManualGrade = self.check_for_manualGrade()
+        if ManualGrade != '':
+            OldGrade = str(GradeMapping[ModuleGrade])
+            NewGrade = str(GradeMapping[int(ManualGrade)])
+
+            print '*'*80
+            if NewGrade != OldGrade:
+                GradeComment = "Grade manually changed from "+OldGrade+" to "+NewGrade
             else:
-                ROCsLessThanOnePercent += 1
+                GradeComment = "Manually graded " + NewGrade + " (already " + OldGrade + " before)"
+            print GradeComment
 
-            # count number of pixel defects per module
-            BumpBondingDefects += BumpBondingDefectsROC
-            NoiseDefects += NoiseDefectsROC
-            HotPixelDefects += HotPixelDefectsROC
+            ModuleGrade = int(ManualGrade)
+            print '*'*80
 
-            # get ROC pixel defect lists
-            HotPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefectsList']['Value']
-            BumpBondingDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefectsList']['Value']
-            NoiseDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoisePixelsList']['Value']
-            TotalDefectPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['TotalPixelDefectsList']['Value']
+        try:
+            MeanEfficiency50 = '{0:1.2f}'.format(sum(MeanEfficiency50List)/float(len(MeanEfficiency50List)))
+        except:
+            MeanEfficiency50 = '-1'
 
-            # append to pixel defects list for module
-            HotPixelsList = HotPixelsList | HotPixelsListROC
-            BumpBondingDefectPixelsList = BumpBondingDefectPixelsList | BumpBondingDefectPixelsListROC
-            NoiseDefectPixelsList = NoiseDefectPixelsList | NoiseDefectPixelsListROC
-            TotalDefectPixelsList = TotalDefectPixelsList | TotalDefectPixelsListROC
-
-            # mean efficiency
-            MeanEfficiency50List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency50']['Value']))
-            MeanEfficiency120List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency120']['Value']))
-
-            # column uniformity
-            NonUniformColumnsROC = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
-            if NonUniformColumnsROC > 0:
-                ROCsWithUniformityProblems += 1
-
-            # readout uniformity
-            NonUniformEventsROC = 0
-            for Rate in self.ParentObject.Attributes['Rates']['HRData']:
-                NonUniformEventsROC += int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfNonUniformEvents_{Rate}'.format(Rate=Rate)]['Value'])
-            if NonUniformEventsROC > 0:
-                ROCsWithReadoutProblems += 1
-
-            # mean noise
-            if len(self.ParentObject.Attributes['Rates']['HRSCurves']) > 0:
-                Rate = self.ParentObject.Attributes['Rates']['HRSCurves'][0]
-
-                NoiseList = []
-                for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
-                    ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-                    Noise = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noise_{Rate}'.format(Rate=Rate)]
-                    NoiseList.append(Noise)
-
-                MeanNoise = sum(NoiseList) / float(len(NoiseList))
-            else:
-                MeanNoise = -1
-
+        try:
+            MeanEfficiency120 = '{0:1.2f}'.format(sum(MeanEfficiency120List)/float(len(MeanEfficiency120List)))
+        except:
+            MeanEfficiency120 = '-1'
+            
         SubGradings['PixelDefects'] = SubGrading
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -152,11 +202,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label': 'Total Pixel Defects'
             },
             'Efficiency_50': {
-                'Value': '{0:1.2f}'.format(sum(MeanEfficiency50List)/float(len(MeanEfficiency50List))),
+                'Value': MeanEfficiency50,
                 'Label': 'Mean efficiency at 50 MHz/cm2'
             },
             'Efficiency_120': {
-                'Value': '{0:1.2f}'.format(sum(MeanEfficiency120List)/float(len(MeanEfficiency120List))),
+                'Value': MeanEfficiency120,
                 'Label': 'Mean efficiency at 120 MHz/cm2'
             },
             'ROCGrades': {
@@ -187,6 +237,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': "{Noise:1.0f}".format(Noise=MeanNoise),
                 'Label': 'Mean Noise'
             },
+            'GradeComment': {
+                'Value': GradeComment,
+                'Label': 'Grade comment'
+            },
         }
 
         self.ResultData['HiddenData']['SubGradings'] = SubGradings
@@ -209,6 +263,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Label': 'TotalDefectPixelsList',
             'Value': TotalDefectPixelsList
         }
+
+        #
+        if ManualGrade != '':
+            self.ResultData['KeyValueDictPairs']['ManualGrade'] = {'Label': 'Manual grade', 'Value': str(int(ManualGrade))}
+            self.ResultData['KeyList'].append('ManualGrade')
 
         # needed in summary1
         if self.verbose:

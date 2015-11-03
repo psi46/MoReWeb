@@ -30,7 +30,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         PlotColor = self.GetTestPlotColor(self.Attributes['Test'])
 
         NROCs = 0
-        ModuleErrors =set()
         for ModuleID in ModuleIDsList:
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
@@ -47,14 +46,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 else:
                                     try:
                                         Histogram.Add(ROOTObject)
+                                        NROCs += 1
                                     except:
-                                        ModuleErrors.add(ModuleID)
+                                        self.ProblematicModulesList.append(ModuleID)
             self.CloseFileHandles()
-
-        if len(ModuleErrors) > 0:
-            print "    found problems with following modules:"
-            for ModuleID in ModuleErrors:
-                print "      ",ModuleID
 
         if Histogram:
             Histogram.Draw("")
@@ -82,9 +77,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             PaveStats.SetY1NDC(0.7)
             PaveStats.SetY2NDC(0.9)
 
-            self.SaveCanvas()
+            title = ROOT.TText()
+            title.SetNDC()
+            title.SetTextAlign(11)
+            title.SetTextAlign(12)
+            title.SetTextSize(0.04)
             NPix = Histogram.GetEntries()
-            HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of Pixels: %d"%NPix)
+            title.DrawText(0.15, 0.965, "#roc: %d,  #pix: %d"%(NROCs, NPix))
+
+            self.SaveCanvas()
+            HTML = self.Image(self.Attributes['ImageFile'])
             Histogram.Delete()
         else:
             Message = "No histogram for gain per pixel found!!!"
@@ -95,5 +97,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         ROOT.gPad.SetLogy(0)
+        self.DisplayErrorsList
         return self.Boxed(HTML)
 

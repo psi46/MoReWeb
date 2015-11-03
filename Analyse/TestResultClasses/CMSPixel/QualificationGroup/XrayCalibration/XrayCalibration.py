@@ -295,7 +295,7 @@ class TestResult(GeneralTestResult):
                 print self.ResultData['SubTestResults'][slope_key].ResultData['KeyValueDictPairs'].keys()
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            warnings.warn(exc_type, fname, exc_tb.tb_lineno)
+            #warnings.warn(exc_type, fname, exc_tb.tb_lineno)
             avrgSlope = 0
             minSlope = 0
             maxSlope = 0
@@ -306,6 +306,17 @@ class TestResult(GeneralTestResult):
             Offsets = []
             Chi2 = []
             target_energies = []
+
+        try:
+            Vcal_Slope_Module = self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['KeyValueDictPairs']['avrg_Slope']['Value']
+        except:
+            Vcal_Slope_Module = ""
+
+        try:
+            Vcal_Offset_Module = self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['KeyValueDictPairs']['avrg_Slope']['Value']
+        except:
+            Vcal_Offset_Module = ""
+
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
@@ -346,12 +357,8 @@ class TestResult(GeneralTestResult):
             'CycleTempHigh': None,
 
             # Vcalibration Module
-            'Vcal_Slope_Module':
-                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['KeyValueDictPairs'][
-                    'avrg_Slope']['Value'],
-            'Vcal_Offset_Module':
-                self.ResultData['SubTestResults']['VcalCalibrationModule'].ResultData['KeyValueDictPairs'][
-                    'avrg_Slope']['Value'],
+            'Vcal_Slope_Module': Vcal_Slope_Module,
+            'Vcal_Offset_Module': Vcal_Offset_Module,
             #'Grade':self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Grade']['Value']
             ##TODO: target hit rates, grade
 

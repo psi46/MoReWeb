@@ -52,6 +52,8 @@ class ModuleResultOverview:
         TableBodyHTMLTemplate = HtmlParser.getSubpart(TableHTMLTemplate, '###BODY###')
         CellLinkHTMLTemplate  = HtmlParser.getSubpart(TableBodyHTMLTemplate, '###LINK###')
 
+        ShowTestCenter = self.TestResultEnvironmentObject.Configuration['SystemConfiguration']['show_test_center']
+
         TableColumns = [
             {
                 'Label':'Module ID',
@@ -67,6 +69,12 @@ class ModuleResultOverview:
                 'Label':'Analysis',
                 'DBColumnName':'KeyValueDictPairs/AnalysisDate',
                 'InGlobalOverviewList': True
+             },
+             {
+                'Label':'TestCenter',
+                'DBColumnName':'KeyValueDictPairs/TestCenter',
+                'InGlobalOverviewList': ShowTestCenter,
+                'InFullList': ShowTestCenter,
              },
              {
                 'Label':'Qualification Type',
@@ -263,6 +271,12 @@ class ModuleResultOverview:
                 except:
                     pass
 
+                if ShowTestCenter:
+                    try:
+                        RowDict['KeyValueDictPairs/TestCenter'] = "<div style='text-align:center'>" + RowDict['KeyValueDictPairs/TestCenter'] + "</div>"
+                    except:
+                        pass
+
             else:
                 #TestType
                 FinalModuleRowsDict[Identificator]['TestType'] += ' & %s'%RowTuple['TestType']
@@ -306,8 +320,8 @@ class ModuleResultOverview:
             Row = []
             for Key in TableColumnList:
                 Row.append(RowDict[Key])
-            TableData['BODY'].append(Row)
 
+            TableData['BODY'].append(Row)
 
         return TableData
 

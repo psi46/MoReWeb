@@ -5,6 +5,7 @@ GlobalDataDirectory = /home/bachmair/DATA/digTest
 
 #local DB directory including the local html overview page
 GlobalOverviewPath = /home/bachmair/DATA/Overview
+GlobalPresentationPath = /home/bachmair/DATA/Overview
 
 # If not specified (commented out) the FinalResults will be in a
 # subdirectory of the Raw Data

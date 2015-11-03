@@ -9,6 +9,8 @@ from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 
 from AbstractClasses.GeneralTestResult import GeneralTestResult
 import subprocess
+import warnings
+import traceback
 #import PixelDB
 
 class TestResult(GeneralTestResult):
@@ -255,7 +257,8 @@ class TestResult(GeneralTestResult):
         self.Attributes['Rates'] = {
             'HREfficiency':[],
             'HRData':[],
-            'HRSCurves':[]
+            'HRSCurves':[],
+            'RetrimHotPixels':[]
         }
 
         self.FileHandle = []
@@ -276,14 +279,22 @@ class TestResult(GeneralTestResult):
                 'ErrorCode': inst,
                 'FinalResultsStoragePath':'unkown'
                 }
-            )
-            print "\x1b[31mProblems in X-ray HR directory structure detected, skip qualification directory! %s\x1b[0m"%self.TestResultEnvironmentObject.ModuleDataDirectory
+            )            
+            # Start red color
+            sys.stdout.write("\x1b[31m")
+            sys.stdout.flush()
+            print "\x1b[31mProblems in X-ray HR directory structure detected, skip qualification directory! %s"%self.TestResultEnvironmentObject.ModuleDataDirectory
+            # Print traceback
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            traceback.print_exception(exc_type, exc_obj, exc_tb) 
+            # Reset color
+            sys.stdout.write("\x1b[0m")
+            sys.stdout.flush()
+
 
     def AnalyzeHRQualificationFolder(self):
 
         self.logfilePaths = []
-
-
 
         HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
         for Path in HREfficiencyPaths:
@@ -314,13 +325,13 @@ class TestResult(GeneralTestResult):
                 print '\x1b[31mWARNING: testParameters.dat file not found in "%s", using default number of triggers Ntrig = %d\x1b[0m'%(FolderName, self.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray HREfficiency: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -337,13 +348,13 @@ class TestResult(GeneralTestResult):
             self.FileHandle.append(self.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray HRData: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -351,7 +362,10 @@ class TestResult(GeneralTestResult):
         HRSCurvesPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HRS[Cc]urves_*')
         for Path in HRSCurvesPaths:
             FolderName = os.path.basename(Path)
-            Rate = int(FolderName.split('_')[2])
+            try:
+                Rate = int(FolderName.split('_')[2])
+            except:
+                Rate = 0
             self.Attributes['Rates']['HRSCurves'].append(Rate)
             self.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=Rate)] = Path
             ROOTFiles = glob.glob(Path+'/*.root')
@@ -360,20 +374,20 @@ class TestResult(GeneralTestResult):
                 self.FileHandle.append(self.Attributes['ROOTFiles']['HRSCurves_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray HRSCurves: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
 
         HRHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_MaskHotPixels_*')
         if len(HRHotPixelsPaths) > 1:
-                warnings.warn("multiple MaskHotPixel tests found")
+                warnings.warn("multiple MaskHotPixel tests found, using first one: %s"%HRHotPixelsPaths[0])
 
         for Path in HRHotPixelsPaths:
             FolderName = os.path.basename(Path)
@@ -384,44 +398,46 @@ class TestResult(GeneralTestResult):
             self.FileHandle.append(self.Attributes['ROOTFiles']['MaskHotPixels'])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray MaskHotPixels: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
             break
 
-        RetrimHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_RetrimHotPixels_*')
-        if len(RetrimHotPixelsPaths) > 1:
-                warnings.warn("multiple RetrimHotPixels tests found")
-
+        RetrimHotPixelsPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_RetrimHotPixel*_*')
         for Path in RetrimHotPixelsPaths:
             FolderName = os.path.basename(Path)
+            try:
+                Rate = int(FolderName.split('_')[2])
+            except:
+                Rate = 0
+            self.Attributes['Rates']['RetrimHotPixels'].append(Rate)
             ROOTFiles = glob.glob(Path+'/*.root')
+
             if len(ROOTFiles) > 1:
                 warnings.warn("The directory '%s' contains more than one .root file, choosing first one: '%s'"%(FolderName, ROOTFiles[0]))
             if len(ROOTFiles) >= 1:
-                self.Attributes['ROOTFiles']['RetrimHotPixels'] = ROOT.TFile.Open(ROOTFiles[0])
+                self.Attributes['ROOTFiles']['RetrimHotPixels_{Rate}'.format(Rate=Rate)] = ROOT.TFile.Open(ROOTFiles[0])
                 self.Attributes['RetrimHotPixelsPath'] = Path
-                self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels'])
+                self.FileHandle.append(self.Attributes['ROOTFiles']['RetrimHotPixels_{Rate}'.format(Rate=Rate)])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray RetrimHotPixels: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
-            break
 
 
         PixelAlivePaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_PixelAlive_*')
@@ -449,13 +465,13 @@ class TestResult(GeneralTestResult):
                 print '\x1b[31mWARNING: testParameters.dat file not found in "%s", using default number of triggers Ntrig = 10\x1b[0m'%FolderName
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray PixelAlive: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -469,13 +485,13 @@ class TestResult(GeneralTestResult):
                 self.FileHandle.append(self.Attributes['ROOTFiles']['CalDelScan'])
 
             # find pxar logfile
-            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles[0]) > 4 else ''
+            logfilePath = ("%s.log"%ROOTFiles[0][:-5]) if len(ROOTFiles) > 0 and len(ROOTFiles[0]) > 4 else ''
             if os.path.isfile(logfilePath):
                 self.logfilePaths.append(logfilePath)
             else:
                 files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.log')]
                 if len(files) == 1:
-                    self.logfilePath.append(files[0])
+                    self.logfilePaths.append(files[0])
                 else:
                     print "X-ray CalDelScan: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
@@ -786,8 +802,16 @@ class TestResult(GeneralTestResult):
                     'Width': 1,
                 },
             })
+        self.ResultData['SubTestResultDictList'].append({
+                'Key': 'Logfile',
+                'DisplayOptions': {
+                    'GroupWithNext': False,
+                    'Order': 901,
+                    'Width': 1,
+                },
+            })
 
-        for Rate in self.Attributes['Rates']['HRData']:
+        for Rate in self.Attributes['Rates']['RetrimHotPixels']:
             self.ResultData['SubTestResultDictList'].append({
                 'Key': 'HotPixelRetrimming_{Rate}'.format(Rate=Rate),
                 'Module': 'HotPixelRetrimming',
@@ -844,7 +868,7 @@ class TestResult(GeneralTestResult):
         try:
             grade = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Value']
         except KeyError:
-            grade = 'None'
+            raise
 
         try:
             PixelDefects = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value']
@@ -875,6 +899,8 @@ class TestResult(GeneralTestResult):
         print" ATTRIBUTES", self.Attributes
 #        print" PATTRIBUTES", self.ParentObj.Attributes
         
+        Comment=''
+
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
@@ -900,6 +926,16 @@ class TestResult(GeneralTestResult):
             'Hostname': self.Attributes['Hostname'],
             'Operator': self.Attributes['Operator'],
         }
+
+        #adding comment (if any) from manual grading
+        if 'Grading' in self.ResultData['SubTestResults'] and self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
+            Comment += self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['GradeComment']['Value']
+        
+        # fill final comments
+        Comment = Comment.strip().strip('/')
+        Row.update({
+            'Comments': Comment,
+            })
 
         print 'fill row end'
 
@@ -1287,7 +1323,8 @@ class TestResult(GeneralTestResult):
                         ROCsMoreThanFourPercent,
                         Noise,
                         RelativeModuleFinalResultsPath,
-                        FulltestSubfolder
+                        FulltestSubfolder,
+                        Comments
                         
                     )
                     VALUES (
@@ -1302,8 +1339,8 @@ class TestResult(GeneralTestResult):
                         :ROCsMoreThanFourPercent,
                         :Noise,
                         :RelativeModuleFinalResultsPath,
-                        :FulltestSubfolder
-                        
+                        :FulltestSubfolder,
+                        :Comments
                     )
                     ''', Row)
                 return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid

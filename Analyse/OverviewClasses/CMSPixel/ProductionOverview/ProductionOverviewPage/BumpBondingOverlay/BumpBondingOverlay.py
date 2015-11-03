@@ -52,7 +52,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             SummaryMap.Add(ROOTObject)
                             NModules += 1
                         else:
-                            print "BumpBonding map not found for module: '%s'"%ModuleID
+                            self.ProblematicModulesList.append(ModuleID)
+                            if self.Verbose:
+                                print "warning: BumpBonding map not found for module: '%s'"%ModuleID
         
         SummaryMap.Draw("colz")
 
@@ -66,5 +68,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of modules: %d"%NModules)
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
+
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 

@@ -18,8 +18,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            DeadPixels = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfDeadPixels']
-            InefficientPixels = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfInefficientPixels']
+            try:
+                DeadPixels = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfDeadPixels']
+            except:
+                DeadPixels = -1
+
+            try:
+                InefficientPixels = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfInefficientPixels']
+            except:
+                InefficientPixels = -1
+
             ChipNo = ChipTestResultObject.Attributes['ChipNo']
             RocNumbers.append(ChipNo)
             DeadPixelList.append(DeadPixels)

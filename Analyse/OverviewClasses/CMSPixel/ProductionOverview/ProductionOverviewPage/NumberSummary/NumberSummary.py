@@ -15,13 +15,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
     def FetchData(self):
 
         Rows = AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.FetchData(self)
-
-        ModuleIDsList = []
-
-        for RowTuple in Rows:
-            #print repr(RowTuple)
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
+        ModuleIDsList = self.GetModuleIDsList(Rows)
 
         ModuleData = []
 

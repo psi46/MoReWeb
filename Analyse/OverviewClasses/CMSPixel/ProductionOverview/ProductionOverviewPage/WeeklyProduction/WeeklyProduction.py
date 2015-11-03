@@ -25,10 +25,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         Rows = AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.FetchData(self)
         
         ### list of modules tested
-        ModuleIDsList = []
-        for RowTuple in Rows:
-            if not RowTuple['ModuleID'] in ModuleIDsList:
-                ModuleIDsList.append(RowTuple['ModuleID'])
+        ModuleIDsList = self.GetModuleIDsList(Rows)
 
         ## check if all grades are available
         ModuleData = []
@@ -105,14 +102,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             hN.SetFillColor(self.GetGradeColor('None'))
 
             for Module in ModuleData:
-                if Module['Grade'] == 'A':
-                    hA.Fill(Module['TestDate'] - TimeOffset)
-                elif Module['Grade'] == 'B':
-                    hB.Fill(Module['TestDate'] - TimeOffset)
-                elif Module['Grade'] == 'C':
-                    hC.Fill(Module['TestDate'] - TimeOffset)
-                else:
-                    hN.Fill(Module['TestDate'] - TimeOffset)
+                try:
+                    relativeTestDate = float(Module['TestDate']) - TimeOffset
+                    if Module['Grade'] == 'A':
+                        hA.Fill(relativeTestDate)
+                    elif Module['Grade'] == 'B':
+                        hB.Fill(relativeTestDate)
+                    elif Module['Grade'] == 'C':
+                        hC.Fill(relativeTestDate)
+                    else:
+                        hN.Fill(relativeTestDate)
+                except:
+                    print "could not fill in module: ", Module['ModuleID']
 
             HistStack.Add(hA)
             HistStack.Add(hB)

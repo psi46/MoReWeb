@@ -8,6 +8,7 @@ import os
 import ConfigParser
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 import subprocess
+import traceback
 
 try:
     set
@@ -332,6 +333,28 @@ class GeneralTestResult(object):
                 'Value': comment,
             }
             self.ResultData['KeyList'].append('Comment')
+
+    def check_for_manualGrade(self):
+        self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
+        gradefilename = self.RawTestSessionDataPath + '/grade.txt'
+        print "checking for manual grading in '%s'"%gradefilename
+        grade = ''
+        if os.path.isfile(gradefilename):
+            try:
+                gradefile = open(gradefilename)
+            except:
+                warnings.warn('cannot open manual grade file {file}'.format(file=gradefilename))
+            grade = gradefile.read().strip()
+            gradefile.close()
+            # grade can be given either as number 1,2,3 or as letter A,B,C
+            GradeNames = ['A','B','C']
+            if grade in GradeNames:
+                grade = 1 + GradeNames.index(grade)
+            print "Reading a manual grade "+str(grade)+" specified by the user in "+str(gradefilename)
+        else:
+            print " => not found."
+        return grade
+            
 
     def ReadModuleVersion(self):
         if self.verbose:
@@ -1026,6 +1049,10 @@ class GeneralTestResult(object):
             if not SubTestResultListItems:
                 SubTestResultListHTML = ''
 
+
+        if 'HTMLContent' in TestResultObject.ResultData:
+            ResultDataHTML = ResultDataHTML + TestResultObject.ResultData['HTMLContent']
+
         ResultDataHTML = HtmlParser.substituteSubpartArray(
             ResultDataHTML,
             {
@@ -1090,18 +1117,31 @@ class GeneralTestResult(object):
         ID = 0
         ID = self.CustomWriteToDatabase(ParentID)
 
+        WriteToDBSuccess = True
         for i in self.ResultData['SubTestResults']:
             try:
-                self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
+                SubtestWriteToDBSuccess = self.ResultData['SubTestResults'][i].WriteToDatabase(ID)
+                WriteToDBSuccess = WriteToDBSuccess and SubtestWriteToDBSuccess
             except Exception as inst:
+                # Start red color
+                sys.stdout.write("\x1b[31m")
+                sys.stdout.flush()
                 print 'Error in subtest (write to database)', self.ResultData['SubTestResults'][i].ModulePath, \
                     self.ResultData['SubTestResults'][i].FinalResultsStoragePath
                 print inst
                 print inst.args
                 print sys.exc_info()[0]
                 print "\n\n------\n"
+                # Print traceback
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                traceback.print_exception(exc_type, exc_obj, exc_tb)
+                # Reset color
+                sys.stdout.write("\x1b[0m")
+                sys.stdout.flush()
+                WriteToDBSuccess = False
 
         self.PostWriteToDatabase()
+        return WriteToDBSuccess
 
     def CustomWriteToDatabase(self, ParentID):
         pass

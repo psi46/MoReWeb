@@ -16,6 +16,7 @@ class GeneralProductionOverview:
             self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
 
         self.Debug = False
+        self.Verbose = False
         self.Name = 'AbstractClasses_GeneralProductionOverview'
         self.NameSingle = 'GeneralProductionOverview'
         self.SubPages = []
@@ -53,12 +54,20 @@ class GeneralProductionOverview:
         self.Canvas.Clear()
         self.Canvas.cd()
         self.ParentObject = ParentObject
-
+        self.ProblematicModulesList = []
+        self.FullQualificationFullTests = ['m20_1', 'm20_2', 'p17_1']
         ### custom init
         self.CustomInit()
 
         try:
-            print " ", self.NameSingle
+            TestName = self.NameSingle
+            if 'Test' in self.Attributes:
+                TestName += " %s"%self.Attributes['Test']
+            if 'DAC' in self.Attributes:
+                TestName += " %s"%self.Attributes['DAC']
+            if 'Trim' in self.Attributes:
+                TestName += " -T %s"%self.Attributes['Trim']
+            print " ", TestName
         except:
             pass
 
@@ -158,11 +167,19 @@ class GeneralProductionOverview:
 
         return Rows
 
-    def GetModuleIDsList(self, Rows):
+    def GetModuleIDsList(self, Rows, NumModules = 9999, Offset = 0):
         ModuleIDsList = []
         for RowTuple in Rows:
             if not RowTuple['ModuleID'] in ModuleIDsList:
                 ModuleIDsList.append(RowTuple['ModuleID'])
+        ModuleIDsList.sort()
+
+        if Offset < len(ModuleIDsList):
+            ModuleIDsList = ModuleIDsList[Offset::]
+
+        if len(ModuleIDsList) > NumModules:
+            ModuleIDsList = ModuleIDsList[0:NumModules]
+
         return ModuleIDsList
 
     def GetModuleQualificationRows(self, ModuleID):
@@ -474,10 +491,12 @@ class GeneralProductionOverview:
 
         MultipleFilesWarning = False
         if len(RootFileNames) > 1:
-            print "    More than 1 root file found! Using the first one which contains the histogram."
+            if self.Verbose:
+                print "    More than 1 root file found! Using the first one which contains the histogram."
             MultipleFilesWarning = True
         elif len(RootFileNames) < 1:
-            print "    .root file for histogram %s not found!"%HistName
+            if self.Verbose:
+                print "    .root file for histogram %s not found!"%HistName
             return None
 
         HistogramFound = False
@@ -522,21 +541,29 @@ class GeneralProductionOverview:
             return ROOT.kBlack
 
     def GetJSONValue(self, Keys):
-
         Path = self.GlobalOverviewPath + '/' + '/'.join(Keys[0:-2])
-        JSONFiles = glob.glob(Path)
-        if len(JSONFiles) > 1:
-            print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
-            return None
-        elif len(JSONFiles) < 1:
-            # first Fulltest at -20 is allowed to not have IV curve, don't show warning in this case
-            if not 'ModuleFulltestPxar_m20_1/IVCurve' in Path:
-                print "WARNING: %s json file not found: '%s"%(self.Name, Path)
-            return None
-        else:
 
-            with open(JSONFiles[0]) as data_file:    
+        try:
+            with open(Path) as data_file:
                 JSONData = json.load(data_file)
+        except:
+            JSONFiles = glob.glob(Path)
+            if len(JSONFiles) > 1:
+                if self.Verbose:
+                    print "WARNING: %s more than 1 file found '%s"%(self.Name, Path)
+                return None
+            elif len(JSONFiles) < 1:
+                # first Fulltest at -20 is allowed to not have IV curve, don't show warning in this case
+                if not 'ModuleFulltestPxar_m20_1/IVCurve' in Path:
+                    if self.Verbose:
+                        print "WARNING: %s json file not found: '%s"%(self.Name, Path)
+                return None
+            else:
+                try:
+                    with open(JSONFiles[0]) as data_file:
+                        JSONData = json.load(data_file)
+                except:
+                    JSONData = None
 
         try:
             value = JSONData[Keys[-2]][Keys[-1]]
@@ -571,5 +598,8 @@ class GeneralProductionOverview:
             THCumulative.SetBinContent(binx, Sum)
         return THCumulative
 
-
+    def DisplayErrorsList(self):
+        UniqueList = list(set(self.ProblematicModulesList))
+        if len(UniqueList)>0:
+            print("    \x1b[31m==> Problems with modules: %s\x1b[0m"%(', '.join(UniqueList)))
 
