@@ -35,15 +35,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HistogramMax = 6000
         NBins = 120
         ScaleFactor = self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
-        Histogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, HistogramMax)
 
-        PlotColor = self.GetTestPlotColor(self.Attributes['Test'])
-        Histogram.SetLineColor(PlotColor)
-        Histogram.SetFillColor(PlotColor)
-        Histogram.SetFillStyle(1001)
-        Histogram.GetXaxis().SetTitle("Pedestal Spread [e-]")
-        Histogram.GetYaxis().SetTitle("# ROCs")
-        Histogram.GetYaxis().SetTitleOffset(1.5)
+        ModuleGrade = {
+            '1' : [],
+            '2' : [],
+            '3' : [],
+        }
+
+        Histogram = ROOT.THStack(self.GetUniqueID(),"")
+
+        
 
         NROCs = 0
         for ModuleID in ModuleIDsList:
@@ -56,27 +57,94 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
                         for Chip in range(0, 16):
                             Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'PHCalibrationPedestal', 'KeyValueDictPairs.json', 'sigma', 'Value'])
-
-                            if Value is not None:
-                                Histogram.Fill(ScaleFactor * float(Value))
+                            Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip,'Grading','KeyValueDictPairs.json','PixelDefectsGrade','Value'])
+                            if Value is not None and Grade is not None:
+                                ModuleGrade[Grade].append(ScaleFactor * float(Value))
+                                NROCs += 1
+                            if Value is not None and Grade is None:
+                                ModuleGrade['3'].append(ScaleFactor * float(Value))
                                 NROCs += 1
 
                         break
         
+        hA = ROOT.TH1D("vcalslope_A_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
+        hB = ROOT.TH1D("vcalslope_B_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
+        hC = ROOT.TH1D("vcalslope_C_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
+        hAB = ROOT.TH1D("vcalslope_AB_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
+        h = ROOT.TH1D("vcalslope_all_%s"%self.GetUniqueID(), "", NBins, 0, HistogramMax)
+
+        hA.SetFillStyle(1001)
+        hA.SetFillColor(self.GetGradeColor('A'))
+        hA.SetLineColor(self.GetGradeColor('A'))
+        hB.SetFillStyle(1001)
+        hB.SetFillColor(self.GetGradeColor('B'))
+        hB.SetLineColor(self.GetGradeColor('B'))
+        hC.SetFillStyle(1001)
+        hC.SetFillColor(self.GetGradeColor('C'))
+        hC.SetLineColor(self.GetGradeColor('C'))
+
+        for x in ModuleGrade['1']:
+            hA.Fill(x)
+        for x in ModuleGrade['2']:
+            hB.Fill(x)
+        for x in ModuleGrade['3']:
+            hC.Fill(x)
+
+        Histogram.Add(hA)
+        Histogram.Add(hB)
+        Histogram.Add(hC)
+
+        hAB.Add(hA,hB)
+        h.Add(hAB,hC)
+
         Histogram.Draw("")
 
-        ROOT.gPad.Update()
-        PaveStats = Histogram.FindObject("stats")
-        PaveStats.SetX1NDC(0.62)
-        PaveStats.SetX2NDC(0.83)
-        PaveStats.SetY1NDC(0.8)
-        PaveStats.SetY2NDC(0.9)
+        meanAll = round(h.GetMean(),1)
+        meanAB = round(hAB.GetMean(),1)
+        meanC = round(hC.GetMean(),1)
+        meanerrAll = round(h.GetMeanError(),1)
+        meanerrAB = round(hAB.GetMeanError(),1)
+        meanerrC = round(hC.GetMeanError(),1)
+        RMSAll = round(h.GetRMS(),1)
+        RMSAB = round(hAB.GetRMS(),1)
+        RMSC = round(hC.GetRMS(),1)
+        underAll = int(h.GetBinContent(0))
+        underAB = int(hAB.GetBinContent(0))
+        underC = int(hC.GetBinContent(0))
+        overAll = int(h.GetBinContent(NBins+1))
+        overAB = int(hAB.GetBinContent(NBins+1))
+        overC = int(hC.GetBinContent(NBins+1))
+
+
+        
+        stats = ROOT.TPaveText(0.6,0.6,0.9,0.8, "NDCNB")
+        stats.SetFillColor(ROOT.kWhite)
+        stats.SetTextSize(0.025)
+        stats.SetTextAlign(10)
+        stats.SetTextFont(62)
+        stats.SetBorderSize(0)
+        stats.AddText("All: #mu = {0} #pm {1}".format(meanAll,meanerrAll))
+        stats.AddText(" #sigma = {0}".format(RMSAll))
+        stats.AddText("  UF = {0}, OF = {1}".format(underAll,overAll))
+        stats.AddText("AB: #mu = {0} #pm {1}".format(meanAB,meanerrAB))
+        stats.AddText(" #sigma = {0}".format(RMSAB))
+        stats.AddText("  UF = {0}, OF = {1}".format(underAB,overAB))
+        stats.AddText("C: #mu = {0} #pm {1}".format(meanC,meanerrC))
+        stats.AddText(" #sigma = {0}".format(RMSC))
+        stats.AddText("  UF = {0}, OF = {1}".format(underC,overC))
+        stats.Draw("same")
+
+        Histogram.GetXaxis().SetTitle("Pedestal Spread [e-]")
+        Histogram.GetYaxis().SetTitle("# ROCs")
+        Histogram.GetYaxis().SetTitleOffset(1.5)
         
         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['pedestalB'])
         GradeBC = float(self.TestResultEnvironmentObject.GradingParameters['pedestalC'])
 
-        PlotMaximum = Histogram.GetMaximum()*1.1
-        Histogram.SetMaximum(PlotMaximum)
+        PM = Histogram.GetMaximum()*1.1
+        Histogram.SetMaximum(PM)
+
+        PlotMaximum = Histogram.GetMaximum()*3.0
 
         try:
             CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, HistogramMax)
@@ -110,19 +178,40 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         # mean, rms and gauss fit sigma
         GaussFitFunction = ROOT.TF1("GaussFitFunction", "gaus(0)")
-        GaussFitFunction.SetParameter(0, Histogram.GetBinContent(Histogram.GetMaximumBin()))
-        GaussFitFunction.SetParameter(1, Histogram.GetMean())
-        GaussFitFunction.SetParameter(2, Histogram.GetRMS())
+        GaussFitFunction.SetParameter(0, h.GetBinContent(h.GetMaximumBin()))
+        GaussFitFunction.SetParameter(1, h.GetMean())
+        GaussFitFunction.SetParameter(2, h.GetRMS())
         GaussFitFunction.SetParLimits(1,0,3000)
         GaussFitFunction.SetParLimits(2,0,500)
-        Histogram.Fit(GaussFitFunction, "QB0")
+        h.Fit(GaussFitFunction, "QB0")
         GaussFitSigma = GaussFitFunction.GetParameter(2)
         title = ROOT.TText()
         title.SetNDC()
         title.SetTextAlign(12)
         title.SetTextSize(0.035)
-        TitleText = "Mean: %d, RMS: %d, Gauss-fit sigma: %d"%(Histogram.GetMean(), Histogram.GetRMS(), GaussFitSigma)
+        TitleText = "Mean: %d, RMS: %d, Gauss-fit sigma: %d"%(h.GetMean(), h.GetRMS(), GaussFitSigma)
         title.DrawText(0.15, 0.965, TitleText)
+
+        title4 = ROOT.TText()
+        title4.SetNDC()
+        title4.SetTextAlign(12)
+        title4.SetTextSize(0.03)
+        title4.SetTextColor(self.GetGradeColor('A'))
+        title4.DrawText(0.72,0.9,"Grade A")
+
+        title2 = ROOT.TText()
+        title2.SetNDC()
+        title2.SetTextAlign(12)
+        title2.SetTextSize(0.03)
+        title2.SetTextColor(self.GetGradeColor('B'))
+        title2.DrawText(0.72,0.88,"Grade B")
+
+        title3 = ROOT.TText()
+        title3.SetNDC()
+        title3.SetTextAlign(12)
+        title3.SetTextSize(0.03)
+        title3.SetTextColor(self.GetGradeColor('C'))
+        title3.DrawText(0.72,0.86,"Grade C")
 
         self.SaveCanvas()
 
