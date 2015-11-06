@@ -34,16 +34,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HistogramMax = 4
         NBins = 60
 
-        Histogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, 0, HistogramMax)
+        ModuleGrade = {
+            'A' : [],
+            'B' : [],
+            'C' : [],
+        }
 
-        PlotColor = self.GetTestPlotColor(self.Attributes['Test'])
-        Histogram.SetLineColor(PlotColor)
-        Histogram.SetFillColor(PlotColor)
-        Histogram.SetFillStyle(1001)
-        Histogram.GetXaxis().SetTitle("I(150 V) / I(100 V)")
-        Histogram.GetYaxis().SetTitle("# modules")
-        Histogram.GetYaxis().SetTitleOffset(1.5)
+        Histogram = ROOT.THStack(self.GetUniqueID(),"")
 
+       
         NModules = 0
         for ModuleID in ModuleIDsList:
 
@@ -54,18 +53,86 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == self.Attributes['Test']:
 
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'Variation', 'Value'])
-                        if Value is not None:
-                            Histogram.Fill(float(Value))
+                        Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary1','KeyValueDictPairs.json','Grade','Value'])
+                        if Value is not None and Grade is not None:
+                            ModuleGrade[Grade].append(float(Value))
                             NModules += 1
+                        if Value is not None and Grade is None:
+                            ModuleGrade['C'].append(float(Value))
+                            NModules += 1
+
+        hA = ROOT.TH1D("vcalslope_A_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hB = ROOT.TH1D("vcalslope_B_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hC = ROOT.TH1D("vcalslope_C_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hAB = ROOT.TH1D("vcalslope_AB_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        h = ROOT.TH1D("vcalslope_all_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+
+        hA.SetFillStyle(1001)
+        hA.SetFillColor(self.GetGradeColor('A'))
+        hA.SetLineColor(self.GetGradeColor('A'))
+        hB.SetFillStyle(1001)
+        hB.SetFillColor(self.GetGradeColor('B'))
+        hB.SetLineColor(self.GetGradeColor('B'))
+        hC.SetFillStyle(1001)
+        hC.SetFillColor(self.GetGradeColor('C'))
+        hC.SetLineColor(self.GetGradeColor('C'))
+
+        for x in ModuleGrade['A']:
+            hA.Fill(x)
+        for x in ModuleGrade['B']:
+            hB.Fill(x)
+        for x in ModuleGrade['C']:
+            hC.Fill(x)
+
+        Histogram.Add(hA)
+        Histogram.Add(hB)
+        Histogram.Add(hC)
+
+        hAB.Add(hA,hB)
+        h.Add(hAB,hC)
 
         Histogram.Draw("")
 
-        ROOT.gPad.Update()
-        PaveStats = Histogram.FindObject("stats")
-        PaveStats.SetX1NDC(0.62)
-        PaveStats.SetX2NDC(0.83)
-        PaveStats.SetY1NDC(0.8)
-        PaveStats.SetY2NDC(0.9)
+        meanAll = round(h.GetMean(),2)
+        meanAB = round(hAB.GetMean(),2)
+        meanC = round(hC.GetMean(),2)
+        meanerrAll = round(h.GetMeanError(),2)
+        meanerrAB = round(hAB.GetMeanError(),2)
+        meanerrC = round(hC.GetMeanError(),2)
+        RMSAll = round(h.GetRMS(),2)
+        RMSAB = round(hAB.GetRMS(),2)
+        RMSC = round(hC.GetRMS(),2)
+        underAll = int(h.GetBinContent(0))
+        underAB = int(hAB.GetBinContent(0))
+        underC = int(hC.GetBinContent(0))
+        overAll = int(h.GetBinContent(NBins+1))
+        overAB = int(hAB.GetBinContent(NBins+1))
+        overC = int(hC.GetBinContent(NBins+1))
+
+
+        
+        stats = ROOT.TPaveText(0.15,0.7,0.45,0.9, "NDCNB")
+        stats.SetFillColor(ROOT.kWhite)
+        stats.SetTextSize(0.025)
+        stats.SetTextAlign(10)
+        stats.SetTextFont(62)
+        stats.SetBorderSize(0)
+        stats.AddText("All: #mu = {0} #pm {1}".format(meanAll,meanerrAll))
+        stats.AddText(" #sigma = {0}".format(RMSAll))
+        stats.AddText("  UF = {0}, OF = {1}".format(underAll,overAll))
+        stats.AddText("AB: #mu = {0} #pm {1}".format(meanAB,meanerrAB))
+        stats.AddText(" #sigma = {0}".format(RMSAB))
+        stats.AddText("  UF = {0}, OF = {1}".format(underAB,overAB))
+        stats.AddText("C: #mu = {0} #pm {1}".format(meanC,meanerrC))
+        stats.AddText(" #sigma = {0}".format(RMSC))
+        stats.AddText("  UF = {0}, OF = {1}".format(underC,overC))
+        stats.Draw("same")
+
+        
+        Histogram.GetXaxis().SetTitle("I(150 V) / I(100 V)")
+        Histogram.GetYaxis().SetTitle("# modules")
+        Histogram.GetYaxis().SetTitleOffset(1.5)
+      
 
         GradeAB = float(self.TestResultEnvironmentObject.GradingParameters['slopeivB'])
         if self.TestResultEnvironmentObject.GradingParameters.has_key('slopeivC'):
@@ -73,8 +140,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         else:
             GradeBC = 100
 
-        PlotMaximum = Histogram.GetMaximum()*1.1
-        Histogram.SetMaximum(PlotMaximum)
+        PM = Histogram.GetMaximum()*1.1
+        Histogram.SetMaximum(PM)
+
+        PlotMaximum = Histogram.GetMaximum()*3.0
+
 
         try:
             CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
@@ -114,6 +184,27 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         if TestNames.has_key(Subtitle):
             Subtitle = TestNames[Subtitle]
         title.DrawText(0.15,0.965,"%s, modules: %d"%(Subtitle,NModules))
+
+        title4 = ROOT.TText()
+        title4.SetNDC()
+        title4.SetTextAlign(12)
+        title4.SetTextSize(0.03)
+        title4.SetTextColor(self.GetGradeColor('A'))
+        title4.DrawText(0.72,0.9,"Grade A")
+
+        title2 = ROOT.TText()
+        title2.SetNDC()
+        title2.SetTextAlign(12)
+        title2.SetTextSize(0.03)
+        title2.SetTextColor(self.GetGradeColor('B'))
+        title2.DrawText(0.72,0.88,"Grade B")
+
+        title3 = ROOT.TText()
+        title3.SetNDC()
+        title3.SetTextAlign(12)
+        title3.SetTextSize(0.03)
+        title3.SetTextColor(self.GetGradeColor('C'))
+        title3.DrawText(0.72,0.86,"Grade C")
 
         self.SaveCanvas()
 

@@ -2,13 +2,13 @@ import ROOT
 import AbstractClasses
 import glob
 import json
+import copy
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-
         self.NameSingle='PedestalPerPixel'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = 'Pedestal per pixel {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
             'Width': 1,
@@ -18,68 +18,65 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.Canvas.SetCanvasSize(400,500)
 
     def GenerateOverview(self):
-        ROOT.gStyle.SetOptStat(111210)
-        ROOT.gPad.SetLogy(1)
-
         TableData = []
 
         Rows = self.FetchData()
         ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
-        Histogram = None
-        PlotColor = self.GetTestPlotColor(self.Attributes['Test'])
 
-        NROCs = 0
-        for ModuleID in ModuleIDsList:
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    TestType = RowTuple['TestType']
-                    if TestType == self.Attributes['Test']:
-                        for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'PHCalibrationPedestal', '*.root'])
-                            RootFiles = glob.glob(Path)
-                            ROOTObject = self.GetHistFromROOTFile(RootFiles, "PHCalibrationGain") # (called PHCalibrationGain) todo: name consistently
-                            if ROOTObject:
-                                ROOTObject.SetDirectory(0)
-                                if not Histogram:
-                                    Histogram = ROOTObject
-                                else:
-                                    try:
-                                        Histogram.Add(ROOTObject)
-                                        NROCs += 1
-                                    except:
-                                        if self.Verbose:
-                                            print "histogram %s ROC %d could not be added, (did you try to use results of different MoReWeb versions?)"%(ModuleId, Chip)
-                                        self.ProblematicModulesList.append(ModuleID)
-                                self.CloseFileHandles()
-        
-        if Histogram:
-            Histogram.Draw("")
-            Histogram.SetStats(ROOT.kTRUE)
+        # define for which grades to plot histogram
+        HistogramDict = {
+            '0-All': {
+                'Histogram': None,
+                'Title': 'All',
+            },
+            '1-A': {
+                'Histogram': None,
+                'Grades': [1],
+                'Color': self.GetGradeColor('A'),
+                'Title': 'A',
+            },
+            '2-B': {
+                'Histogram': None,
+                'Grades': [2],
+                'Color': self.GetGradeColor('B'),
+                'Title': 'B',
+            },
+            '3-C': {
+                'Histogram': None,
+                'Grades': [3],
+                'Color': self.GetGradeColor('C'),
+                'Title': 'C',
+            },
+            '4-AB': {
+                'Histogram': None,
+                'Grades': [1, 2],
+                'Title': 'A/B',
+                'Show': False,
+            }
+        }
 
-            ROOT.gPad.Update()
-            PaveStats = Histogram.FindObject("stats")
-            PaveStats.SetX1NDC(0.7)
-            PaveStats.SetX2NDC(0.9)
-            PaveStats.SetY1NDC(0.7)
-            PaveStats.SetY2NDC(0.9)
+        # set histogram options
+        HistogramOptions = {
+            'RootFileHistogramName': 'PHCalibrationGain',
+            'GradeJsonPath': ['Chips','Chip{Chip}', 'Grading','KeyValueDictPairs.json','PixelDefectsGrade','Value'],
+            'RootFilePath': ['Chips' ,'Chip{Chip}', 'PHCalibrationPedestal', '*.root'],
+            'StatsPosition': [0.60,0.88,0.80,0.88],
+            'LegendPosition': [0.2, 0.88],
+            'XTitle': "Vcal offset",
+            'YTitle': "No. of Entries",
+            'Range': [-150, 300],
+        }
 
-            title = ROOT.TText()
-            title.SetNDC()
-            title.SetTextAlign(11)
-            title.SetTextAlign(12)
-            title.SetTextSize(0.04)
-            NPix = Histogram.GetEntries()
-            title.DrawText(0.15, 0.965, "#roc: %d,  #pix: %d"%(NROCs, NPix))
-            self.SaveCanvas()
+        # draw histogram
+        self.DrawPixelHistogram(Rows, ModuleIDsList, HistogramDict, HistogramOptions)
 
-            HTML = self.Image(self.Attributes['ImageFile'])
-            Histogram.Delete()
+        # save plot and add to .html
+        self.SaveCanvas()
+        HTML = self.Image(self.Attributes['ImageFile'])
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
-
 
         ROOT.gPad.SetLogy(0)
         self.DisplayErrorsList()
         return self.Boxed(HTML)
-

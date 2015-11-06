@@ -257,7 +257,7 @@ class GeneralTestResult(object):
                 f = __import__(importdir + '.TestResult', fromlist=[''])
                 print 'imported', f, 'please change name of file'
             pass
-		
+
             self.ResultData['SubTestResults'][i['Key']] = f.TestResult(
                 self.TestResultEnvironmentObject,
                 self,

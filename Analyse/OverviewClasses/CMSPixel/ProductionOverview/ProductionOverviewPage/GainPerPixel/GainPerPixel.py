@@ -26,77 +26,74 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         Rows = self.FetchData()
         ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
-        Histogram = None
-        PlotColor = self.GetTestPlotColor(self.Attributes['Test'])
 
-        NROCs = 0
-        for ModuleID in ModuleIDsList:
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    TestType = RowTuple['TestType']
-                    if TestType == self.Attributes['Test']:
-                        for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'PHCalibrationGain', '*.root'])
-                            RootFiles = glob.glob(Path)
-                            ROOTObject = self.GetHistFromROOTFile(RootFiles, "PHCalibrationGain")
-                            if ROOTObject:
-                                ROOTObject.SetDirectory(0)
-                                if not Histogram:
-                                    Histogram = ROOTObject
-                                else:
-                                    try:
-                                        Histogram.Add(ROOTObject)
-                                        NROCs += 1
-                                    except:
-                                        self.ProblematicModulesList.append(ModuleID)
-            self.CloseFileHandles()
+        # define for which grades to plot histogram
+        HistogramDict = {
+            '0-All': {
+                'Histogram': None,
+                'Title': 'All',
+            },
+            '1-A': {
+                'Histogram': None,
+                'Grades': [1],
+                'Color': self.GetGradeColor('A'),
+                'Title': 'A',
+            },
+            '2-B': {
+                'Histogram': None,
+                'Grades': [2],
+                'Color': self.GetGradeColor('B'),
+                'Title': 'B',
+            },
+            '3-C': {
+                'Histogram': None,
+                'Grades': [3],
+                'Color': self.GetGradeColor('C'),
+                'Title': 'C',
+            },
+            '4-AB': {
+                'Histogram': None,
+                'Grades': [1, 2],
+                'Title': 'A/B',
+                'Show': False,
+            }
+        }
 
-        if Histogram:
-            Histogram.Draw("")
+        # set histogram options
+        HistogramOptions = {
+            'RootFileHistogramName': 'PHCalibrationGain',
+            'GradeJsonPath': ['Chips','Chip{Chip}', 'Grading','KeyValueDictPairs.json','PixelDefectsGrade','Value'],
+            'RootFilePath': ['Chips' ,'Chip{Chip}', 'PHCalibrationGain', '*.root'],
+            'StatsPosition': [0.20,0.88,0.80,0.88],
+            'LegendPosition': [0.2, 0.88],
+            'XTitle': "Gain [Vcal/ADC]",
+            'YTitle': "No. of Entries",
+            'Range': [-150, 300],
+        }
 
-            CutLow = ROOT.TCutG('lLower', 2)
-            CutLow.SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['gainMin'], -1e6)
-            CutLow.SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['gainMin'], +1e6)
-            CutLow.SetLineColor(ROOT.kRed)
-            CutLow.SetLineStyle(2)
-            CutLow.Draw('same')
+        # define gradign cuts
+        GradingCuts = [self.TestResultEnvironmentObject.GradingParameters['gainMin'], self.TestResultEnvironmentObject.GradingParameters['gainMax']]
 
-            CutHigh = ROOT.TCutG('lUpper', 2)
-            CutHigh.SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['gainMax'], -1e6)
-            CutHigh.SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['gainMax'], +1e6)
-            CutHigh.SetLineColor(ROOT.kRed)
-            CutHigh.SetLineStyle(2)
-            CutHigh.Draw('same')
+        # draw histogram
+        self.DrawPixelHistogram(Rows, ModuleIDsList, HistogramDict, HistogramOptions)
 
-            Histogram.SetStats(ROOT.kTRUE)
+        # draw grading cuts
+        CutLow = []
+        for Cut in GradingCuts:
+            CutLow.append(ROOT.TCutG('lLower', 2))
 
-            ROOT.gPad.Update()
-            PaveStats = Histogram.FindObject("stats")
-            PaveStats.SetX1NDC(0.18)
-            PaveStats.SetX2NDC(0.40)
-            PaveStats.SetY1NDC(0.7)
-            PaveStats.SetY2NDC(0.9)
+            CutLow[-1].SetPoint(0, Cut, -1e6)
+            CutLow[-1].SetPoint(1, Cut, +1e6)
+            CutLow[-1].SetLineColor(ROOT.kRed)
+            CutLow[-1].SetLineStyle(2)
+            CutLow[-1].Draw('same')
 
-            title = ROOT.TText()
-            title.SetNDC()
-            title.SetTextAlign(11)
-            title.SetTextAlign(12)
-            title.SetTextSize(0.04)
-            NPix = Histogram.GetEntries()
-            title.DrawText(0.15, 0.965, "#roc: %d,  #pix: %d"%(NROCs, NPix))
-
-            self.SaveCanvas()
-            HTML = self.Image(self.Attributes['ImageFile'])
-            Histogram.Delete()
-        else:
-            Message = "No histogram for gain per pixel found!!!"
-            HTML = Message
-            self.PrintInfo(Message)
+        self.SaveCanvas()
+        HTML = self.Image(self.Attributes['ImageFile'])
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
-
         ROOT.gPad.SetLogy(0)
-        self.DisplayErrorsList
+        self.DisplayErrorsList()
         return self.Boxed(HTML)
 

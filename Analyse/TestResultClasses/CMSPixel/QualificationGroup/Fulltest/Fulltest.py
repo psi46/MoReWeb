@@ -389,18 +389,18 @@ class TestResult(GeneralTestResult):
                     print '\t',ChipNo, i,PerformanceParameters[i]['Value']
         ####
         IVCurveData = {
-        	'CurrentAtVoltage150V':-1,
-        	'CurrentAtVoltage100V':-1,
-        	'RecalculatedCurrentAtVoltage150V':-1,
+            'CurrentAtVoltage150V':-1,
+            'CurrentAtVoltage100V':-1,
+            'RecalculatedCurrentAtVoltage150V':-1,
                 'RecalculatedCurrentAtVoltage100V':-1,
                 'RecalculatedToTemperature':17,
-        	'IVSlope':0,
-        	'IVCurveFilePath':'',
-        	'TestTemperature':'',
-        	'IVCurveData':{
-        		'VoltageList':[],
-        		'CurrentList':[]
-        	}
+            'IVSlope':0,
+            'IVCurveFilePath':'',
+            'TestTemperature':'',
+            'IVCurveData':{
+                'VoltageList':[],
+                'CurrentList':[]
+            }
         }
         
         if self.ResultData['SubTestResults'].has_key('IVCurve'):
