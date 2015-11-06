@@ -6,6 +6,7 @@ import os
 import ROOT
 import glob
 import json
+import copy
 
 class GeneralProductionOverview:
     LastUniqueIDCounter = 1
@@ -603,3 +604,109 @@ class GeneralProductionOverview:
         if len(UniqueList)>0:
             print("    \x1b[31m==> Problems with modules: %s\x1b[0m"%(', '.join(UniqueList)))
 
+
+    def DrawPixelHistogram(self, Rows, ModuleIDsList, HistogramDict, HistogramOptions):
+        ROOT.gPad.SetLogy(1)
+        ROOT.gStyle.SetOptStat("")
+
+        GradeDict = {
+            'A':1,
+            'B':2,
+            'C':3,
+        }
+
+        NROCs = 0
+        for RowTuple in Rows:
+            ModuleID = RowTuple['ModuleID']
+            if ModuleID in ModuleIDsList:
+                if ('TestType' in HistogramOptions and HistogramOptions['TestType'] == RowTuple['TestType']) or ('Test' in self.Attributes and RowTuple['TestType'] == self.Attributes['Test']):
+                    for Chip in range(0, 16):
+                        GradeJsonPath = [x.format(Chip=Chip) if '{Chip}' in x else x for x in HistogramOptions['GradeJsonPath']]
+                        RootFilePath = [x.format(Chip=Chip) if '{Chip}' in x else x for x in HistogramOptions['RootFilePath']]
+                        GradeJsonPath[:0] = [RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder']]
+                        RootFilePath[:0] = [self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder']]
+
+                        Grade = self.GetJSONValue(GradeJsonPath)
+                        if Grade and Grade in GradeDict:
+                            Grade = GradeDict[Grade]
+
+                        Path = '/'.join(RootFilePath)
+                        RootFiles = glob.glob(Path)
+                        ROOTObject = copy.copy(self.GetHistFromROOTFile(RootFiles, HistogramOptions['RootFileHistogramName'])) # (called PHCalibrationGain) todo: name consistently in creation of .root file
+
+                        if ROOTObject:
+                            NROCs += 1
+                            for HistogramName, HistogramData in HistogramDict.items():
+                                if 'Grades' not in HistogramData or (Grade and int(Grade) in HistogramData['Grades']):
+                                    if HistogramData['Histogram']:
+                                        try:
+                                            HistogramDict[HistogramName]['Histogram'].Add(ROOTObject)
+                                        except:
+                                            print "histogram could not be added, (did you try to use results of different MoReWeb versions?)"
+                                    else:
+                                        HistogramDict[HistogramName]['Histogram'] = copy.copy(ROOTObject)
+                            self.CloseFileHandles()
+                        else:
+                            self.ProblematicModulesList.append(ModuleID)
+
+
+        if HistogramDict:
+            stats = ROOT.TLatex()
+            stats.SetNDC()
+            stats.SetTextSize(0.025)
+            stats.SetTextAlign(10)
+            stats.SetTextFont(62)
+            statsText = []
+
+            First = True
+            Counter = 0
+            StatsTextCounter = 0
+            for HistogramName, HistogramData in sorted(HistogramDict.items()):
+                if HistogramData['Histogram'] and ('Show' not in HistogramData or HistogramData['Show']):
+
+                    # draw histogram
+                    HistogramData['Histogram'].SetLineColor(HistogramData['Color'] if 'Color' in HistogramData else ROOT.kBlack)
+                    if First:
+                        HistogramData['Histogram'].GetXaxis().SetRangeUser(HistogramOptions['Range'][0], HistogramOptions['Range'][1])
+                        HistogramData['Histogram'].GetXaxis().CenterTitle()
+                        HistogramData['Histogram'].GetXaxis().SetTitle(HistogramOptions['XTitle'])
+                        HistogramData['Histogram'].GetYaxis().SetTitle(HistogramOptions['YTitle'])
+                        HistogramData['Histogram'].GetYaxis().CenterTitle()
+                        HistogramData['Histogram'].GetYaxis().SetTitleOffset(1.2)
+                        HistogramData['Histogram'].Draw("hist")
+
+                        First = False
+                    else:
+                        HistogramData['Histogram'].Draw("same;hist")
+
+
+                    # add stats entry
+                    mean = round(HistogramData['Histogram'].GetMean(), 2)
+                    rms = round(HistogramData['Histogram'].GetRMS(), 2)
+                    underflowCount = HistogramData['Histogram'].GetBinContent(0)
+                    overflowCount = HistogramData['Histogram'].GetBinContent(HistogramData['Histogram'].GetSize())
+                    
+                    stats.SetTextColor(HistogramData['Color'] if 'Color' in HistogramData else ROOT.kBlack)
+                    statsText = "{Name}: #mu={mu}, #sigma={sigma}".format(Name=HistogramData['Title'] if 'Title' in HistogramData else HistogramName, mu=mean, sigma=rms)
+                    stats.DrawLatex(HistogramOptions['StatsPosition'][0], HistogramOptions['StatsPosition'][1] - StatsTextCounter*0.02, statsText)
+                    StatsTextCounter += 1
+
+                    statsText = "UF={uf:1.0f}, OF={of:1.0f}".format(uf=underflowCount, of=overflowCount)
+                    stats.DrawLatex(HistogramOptions['StatsPosition'][0], HistogramOptions['StatsPosition'][1] - StatsTextCounter*0.02, statsText)
+                    StatsTextCounter += 1
+
+                    Counter += 1
+
+            ROOT.gPad.Update()
+
+            # draw caption
+            try:
+                NPix = HistogramDict['0-All']['Histogram'].GetEntries()
+            except:
+                NPix = 0
+
+            title = ROOT.TText()
+            title.SetNDC()
+            title.SetTextAlign(12)
+            title.SetTextSize(0.03)
+            title.DrawText(0.15, 0.96, "#roc: %d,  #pix: %d"%(NROCs, NPix))

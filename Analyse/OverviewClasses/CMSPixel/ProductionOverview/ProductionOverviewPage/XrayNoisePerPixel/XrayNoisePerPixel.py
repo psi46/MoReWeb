@@ -26,75 +26,74 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         Rows = self.FetchData()
         ModuleIDsList = self.GetModuleIDsList(Rows)
         HTML = ""
-        Histogram = None
-        PlotColor = ROOT.kBlue+2
 
-        NROCs = 0
-        for ModuleID in ModuleIDsList:
-            for RowTuple in Rows:
-                if RowTuple['ModuleID'] == ModuleID:
-                    TestType = RowTuple['TestType']
-                    if TestType == 'XRayHRQualification':
-                        for Chip in range(0, 16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'SCurveWidths*', '*.root'])
-                            RootFiles = glob.glob(Path)
-                            ROOTObject = self.GetHistFromROOTFile(RootFiles, "SCurveWidths")
-                            if ROOTObject:
-                                ROOTObject.SetDirectory(0)
-                                if not Histogram:
-                                    Histogram = ROOTObject
-                                else:
-                                    try:
-                                        Histogram.Add(ROOTObject)
-                                        NROCs += 1
-                                    except:
-                                        if self.Verbose:
-                                            print "histogram %s ROC %d could not be added, (did you try to use results of different MoReWeb versions?)"%(ModuleId, Chip)
-                                        self.ProblematicModulesList.append(ModuleID)
-                                self.CloseFileHandles()
-        
-        if Histogram:
-            Histogram.Draw("HIST")
+        # define for which grades to plot histogram
+        HistogramDict = {
+            '0-All': {
+                'Histogram': None,
+                'Title': 'All',
+            },
+            '1-A': {
+                'Histogram': None,
+                'Grades': [1],
+                'Color': self.GetGradeColor('A'),
+                'Title': 'A',
+            },
+            '2-B': {
+                'Histogram': None,
+                'Grades': [2],
+                'Color': self.GetGradeColor('B'),
+                'Title': 'B',
+            },
+            '3-C': {
+                'Histogram': None,
+                'Grades': [3],
+                'Color': self.GetGradeColor('C'),
+                'Title': 'C',
+            },
+            '4-AB': {
+                'Histogram': None,
+                'Grades': [1,2],
+                'Title': 'A/B',
+                'Show': False,
+            }
+        }
 
-            CutLow = ROOT.TCutG('lLower', 2)
-            CutLow.SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C'], -1e6)
-            CutLow.SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C'], +1e6)
-            CutLow.SetLineColor(ROOT.kRed)
-            CutLow.SetLineStyle(2)
-            CutLow.Draw('same')
+        # set histogram options
+        HistogramOptions = {
+            'TestType': 'XRayHRQualification',
+            'RootFileHistogramName': 'SCurveWidths',
+            'GradeJsonPath': ['Chips','Chip{Chip}', 'Grading','KeyValueDictPairs.json','ROCGrade','Value'],
+            'RootFilePath': ['Chips' ,'Chip{Chip}', 'SCurveWidths*', '*.root'],
+            'StatsPosition': [0.50,0.88],
+            'LegendPosition': [0.2, 0.88],
+            'XTitle': "Noise [e-]",
+            'YTitle': "No. of Entries",
+            'Range': [0, 900],
+        }
 
-            CutHigh = ROOT.TCutG('lUpper', 2)
-            CutHigh.SetPoint(0, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'], -1e6)
-            CutHigh.SetPoint(1, self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B'], +1e6)
-            CutHigh.SetLineColor(ROOT.kOrange)
-            CutHigh.SetLineStyle(3)
-            CutHigh.Draw('same')
+        # define gradign cuts
+        GradingCuts = [self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']]
 
-            Histogram.SetStats(ROOT.kTRUE)
+        # draw histogram
+        self.DrawPixelHistogram(Rows, ModuleIDsList, HistogramDict, HistogramOptions)
 
-            ROOT.gPad.Update()
-            PaveStats = Histogram.FindObject("stats")
-            PaveStats.SetX1NDC(0.7)
-            PaveStats.SetX2NDC(0.9)
-            PaveStats.SetY1NDC(0.7)
-            PaveStats.SetY2NDC(0.9)
+        # draw grading cuts
+        CutLow = []
+        for Cut in GradingCuts:
+            CutLow.append(ROOT.TCutG('lLower', 2))
 
-            title = ROOT.TText()
-            title.SetNDC()
-            title.SetTextAlign(11)
-            title.SetTextAlign(12)
-            title.SetTextSize(0.04)
-            NPix = Histogram.GetEntries()
-            title.DrawText(0.15, 0.965, "#roc: %d,  #pix: %d"%(NROCs, NPix))
-            self.SaveCanvas()
+            CutLow[-1].SetPoint(0, Cut, -1e6)
+            CutLow[-1].SetPoint(1, Cut, +1e6)
+            CutLow[-1].SetLineColor(ROOT.kRed)
+            CutLow[-1].SetLineStyle(2)
+            CutLow[-1].Draw('same')
 
-            HTML = self.Image(self.Attributes['ImageFile'])
-            Histogram.Delete()
+        self.SaveCanvas()
+        HTML = self.Image(self.Attributes['ImageFile'])
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
-
-        ROOT.gPad.SetLogy(0)
         self.DisplayErrorsList()
         return self.Boxed(HTML)
 

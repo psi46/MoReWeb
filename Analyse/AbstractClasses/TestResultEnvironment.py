@@ -21,6 +21,7 @@ class TestResultEnvironment:
     }
 
     GradingParameters = {
+        'trimThr':35,
         'tthrTol':10,
         'gainMin':1.,
         'gainMax': 4.5,

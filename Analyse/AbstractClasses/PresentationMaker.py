@@ -828,12 +828,9 @@ class MakeProductionSummary:
       "nBtoCX" : nBtoCX,
       "nCtoAX" : nCtoAX,
       "nCtoBX" : nCtoBX,
-<<<<<<< HEAD
       "ModuleFailureOverviewFigures": ModuleFailureOverviewFigures,
-=======
       "nHDI" : nHDI,
       "HDI" : HDI
->>>>>>> mmeinhard/FixesPresentation
     } 
 
 
