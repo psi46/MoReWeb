@@ -9,7 +9,7 @@ import glob
 
 class MakeProductionSummary:
 
-  def MakeTexFile(self, args, args2):
+  def MakeTexFile(self, args):
 
     Configuration = ConfigParser.ConfigParser()
     Configuration.read([
@@ -37,24 +37,25 @@ class MakeProductionSummary:
     filename = OutputDirectoryPath + "/ModuleProductionOverview_Week{0}.tex".format(week)
     
 
-    nA = args2['nA']
-    nB = args2['nB']
-    nC = args2['nC']
-    nM = args2['nM']
-    nBrokenROCs = args2['BrokenROC']
-    nBrokenROCsX = args2['BrokenROCX']
-    nAtoB = args2['nAtoB']
-    nAtoC = args2['nAtoC']
-    nBtoA = args2['nBtoA']
-    nBtoC = args2['nBtoC']
-    nCtoA = args2['nCtoA']
-    nCtoB = args2['nCtoB']
-    nAtoBX = args2['nAtoBX']
-    nAtoCX = args2['nAtoCX']
-    nBtoAX = args2['nBtoAX']
-    nBtoCX = args2['nBtoCX']
-    nCtoAX = args2['nCtoAX']
-    nCtoBX = args2['nCtoBX']
+    nA = args['nA']
+    nB = args['nB']
+    nC = args['nC']
+    nM = args['nM']
+    nBrokenROCs = args['BrokenROC']
+    nBrokenROCsX = args['BrokenROCX']
+    nAtoB = args['nAtoB']
+    nAtoC = args['nAtoC']
+    nBtoA = args['nBtoA']
+    nBtoC = args['nBtoC']
+    nCtoA = args['nCtoA']
+    nCtoB = args['nCtoB']
+    nAtoBX = args['nAtoBX']
+    nAtoCX = args['nAtoCX']
+    nBtoAX = args['nBtoAX']
+    nBtoCX = args['nBtoCX']
+    nCtoAX = args['nCtoAX']
+    nCtoBX = args['nCtoBX']
+    nHDI = args['nHDI']
     lcstartupB = args['nlcstartupB']
     lcstartupC = args['nlcstartupC']
     IV150B = args['nIV150B']
@@ -125,6 +126,7 @@ class MakeProductionSummary:
     IRatio150 = round(float(IRatio150C)/nQ*100,1)
     BrokenROC = round(float(nBrokenROCs)/nQ*100,1)
     BrokenROCX = round(float(nBrokenROCsX)/nQ*100,1)
+    HDI = round(float(nHDI)/nQ*100,1)
     
  
 
@@ -132,6 +134,7 @@ class MakeProductionSummary:
     \documentclass[xcolor=dvipsnames]{{beamer}}
     \usepackage{{booktabs}}
     \usepackage{{multirow}}
+    \usepackage{{siunitx}}
     \setbeamertemplate{{footline}}[frame number]
     \setbeamercolor{{frametitle}}{{fg=Black,bg=White}}
     \setbeamercolor{{title}}{{fg=Black,bg=White}}
@@ -168,7 +171,7 @@ class MakeProductionSummary:
     \\begin{{document}}
 
     \\title{{\\textbf{{Status of module qualification}}}}   
-    \\author{{\\textbf{{ETH Pixel Group}}}} 
+    
     \date{{\\today}} 
 
     \\frame{{
@@ -206,7 +209,7 @@ class MakeProductionSummary:
     \\begin{{tabular}}{{@{{}}llccc@{{}}}}
     \\toprule
                                     & Defects             & B & C &  C (\%  of production)\\\\ \midrule
-    \multirow{{5}}{{*}}{{Sensor}}   & LC startup          & {lcstartupB} & {lcstartupC} &  {lcstartup}\\\\
+    \multirow{{5}}{{*}}{{Sensor}}   & $I_{{biais}}$ startup          & {lcstartupB} & {lcstartupC} &  {lcstartup}\\\\
                                     & IV 150 (+17)        & {IV150B} & {IV150C} & {IV150} \\\\
                                     & IV 150 (-20)        & {IV150m20B} & {IV150m20C} & {IV150m20} \\\\ 
                                     & I(+17)/I(-20)       & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ 
@@ -228,7 +231,7 @@ class MakeProductionSummary:
     \\begin{{tabular}}{{@{{}}llccc@{{}}}}
     \\toprule
                                     & Defects             & B & C &  C (\%  of production)\\\\ \midrule
-    \multirow{{11}}{{*}}{{Pixel defects}} & Total defects  & {totDefectsB} & {totDefectsC} & {totDefects} \\\\ 
+    \multirow{{12}}{{*}}{{Pixel defects}} & Total defects  & {totDefectsB} & {totDefectsC} & {totDefects} \\\\ 
                                     & Total defects X-ray & {totDefectsXrayB} & {totDefectsXrayC} & {totDefectsXray} \\\\
                                     & BB Fulltest         & {BBFullB} & {BBFullC} & {BBFull} \\\\
                                     & BB X-ray            & {BBXrayB} & {BBXrayC} & {BBXray} \\\\
@@ -238,6 +241,7 @@ class MakeProductionSummary:
                                     & Dead pixels         & {deadpixB} & {deadpixC} & {deadpix} \\\\
                                     & Broken ROC          & 0 & {nBrokenROCs} & {BrokenROC} \\\\
                                     & Broken ROC X-ray    & 0 & {nBrokenROCsX} & {BrokenROCX} \\\\
+                                    & HDI Problem    & 0 & {nHDI} & {HDI} \\\\
                                     & Uniformity problem  & {uniformityB} & {uniformityC} & {uniformity} \\\\ \\bottomrule 
     \end{{tabular}}
     \end{{table}}
@@ -284,6 +288,431 @@ class MakeProductionSummary:
     \\begin{{figure}} \centering \\advance\leftskip-0.9cm
     \includegraphics[width=1.14\\textwidth, angle=0] {{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/AbstractClasses_GeneralProductionOverview/Duration.pdf}}
     \end{{figure}}
+    }}
+
+    \\frame{{
+    \\begin{{center}}
+    \\textbf{{Results from electrical tests}}
+    \\end{{center}}
+    }}
+
+    \\frame{{
+    \\frametitle{{Overlay of Bump Bonding defects}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}} \centering \\advance\leftskip-0.9cm
+    \includegraphics[width=1.14\\textwidth, angle=0] {{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/BumpBondingOverlay_All/BumpBondingOverlay.pdf}}
+    \end{{figure}}
+    }}
+
+
+    \\frame{{
+    \\frametitle{{Overlay of Dead Pixels}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}} \centering \\advance\leftskip-0.9cm
+    \includegraphics[width=1.14\\textwidth, angle=0] {{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DeadPixelOverlay_m20_2/DeadPixelOverlay.pdf}}
+    \end{{figure}}
+    }}
+
+    \\frame{{
+    \\frametitle{{Mean Noise per ROC}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/MeanNoise_m20_1/MeanNoiseROC.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/MeanNoise_m20_2/MeanNoiseROC.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/MeanNoise_p17_1/MeanNoiseROC.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+     \\frame{{
+    \\frametitle{{Relative Gain Width}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/RelativeGainWidth_m20_1/RelativeGainWidth.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/RelativeGainWidth_m20_2/RelativeGainWidth.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/RelativeGainWidth_p17_1/RelativeGainWidth.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+     \\frame{{
+    \\frametitle{{Pedestal Spread}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/PedestalSpread_m20_1/PedestalSpread.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/PedestalSpread_m20_2/PedestalSpread.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/PedestalSpread_p17_1/PedestalSpread.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+     \\frame{{
+    \\frametitle{{Vcal Threshold Width}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/VcalThresholdWidth_m20_1/VcalThresholdWidth.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/VcalThresholdWidth_m20_2/VcalThresholdWidth.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/VcalThresholdWidth_p17_1/VcalThresholdWidth.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+     \\frame{{
+    \\frametitle{{Gain per Pixel}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/GainPerPixel__m20_1/GainPerPixel.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/GainPerPixel__m20_2/GainPerPixel.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/GainPerPixel__p17_1/GainPerPixel.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+       \\frame{{
+    \\frametitle{{Pedestal per Pixel}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/PedestalPerPixel__m20_1/PedestalPerPixel.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/PedestalPerPixel__m20_2/PedestalPerPixel.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/PedestalPerPixel__p17_1/PedestalPerPixel.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+        \\frame{{
+    \\frametitle{{Noise per Pixel}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/SCurveWidthsPerPixel__m20_1/SCurveWidthsPerPixel.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/SCurveWidthsPerPixel__m20_2/SCurveWidthsPerPixel.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/SCurveWidthsPerPixel__p17_1/SCurveWidthsPerPixel.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+      \\frame{{
+    \\frametitle{{Trimmed Threshold per Pixel}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/VcalThresholdTrimmedPerPixel__m20_1/VcalThresholdTrimmedPerPixel.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/VcalThresholdTrimmedPerPixel__m20_2/VcalThresholdTrimmedPerPixel.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/VcalThresholdTrimmedPerPixel__p17_1/VcalThresholdTrimmedPerPixel.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+    \\frame{{
+    \\begin{{center}}
+    \\textbf{{Results from leakage current tests}}
+    \\end{{center}}
+    }}
+
+  \\frame{{
+    \\frametitle{{Overlay of IV Curves}}
+    \\begin{{figure}}\centering
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/IVCurveOverlay_m20_2/IVCurveOverlay.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/IVCurveOverlay_p17_1/IVCurveOverlay.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+
+  \\frame{{
+    \\frametitle{{Leakage current at 150V}}
+    \\begin{{figure}}\centering
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/LeakageCurrent_m20_2/LeakageCurrent.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/LeakageCurrent_p17_1/LeakageCurrent.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+   \\frame{{
+    \\frametitle{{Leakage current slopes}}
+    \\begin{{figure}}\centering
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/LeakageCurrentSlope_m20_2/LeakageCurrentSlope.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/LeakageCurrentSlope_p17_1/LeakageCurrentSlope.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+    
+
+    \\frame{{
+    \\begin{{center}}
+    \\textbf{{Results from X-ray qualification}}
+    \\end{{center}}
+    }}
+
+
+   \\frame{{
+    \\frametitle{{HR Efficiency}}
+    \\begin{{figure}}\centering
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/Efficiency_50/Efficiency.pdf}}
+  \caption{{\SI{{50}}{{\mega\hertz\per\square\centi\metre}}}}
+\endminipage\hfill
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/Efficiency_120/Efficiency.pdf}}
+  \caption{{\SI{{120}}{{\mega\hertz\per\square\centi\metre}}}}
+\endminipage
+\end{{figure}}
+    }}
+
+     \\frame{{
+    \\frametitle{{Vcal Calibration}}
+    \\begin{{figure}}\centering
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/VcalSlope_Spectrum/VcalSlope.pdf}}
+  \caption{{Slope}}
+\endminipage\hfill
+\minipage{{0.49\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/VcalOffset_Spectrum/VcalOffset.pdf}}
+  \caption{{Offset}}
+\endminipage
+\end{{figure}}
+    }}
+
+
+
+    \\frame{{
+    \\begin{{center}}
+    \\textbf{{Selection of DAC parameters after trimming}}
+    \\end{{center}}
+    }}
+ 
+
+   \\frame{{
+    \\frametitle{{V$_{{ana}}$}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_1_vana_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_2_vana_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_p17_1_vana_35/DACDistribution.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+
+     \\frame{{
+    \\frametitle{{CalDel}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_1_caldel_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_2_caldel_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_p17_1_caldel_35/DACDistribution.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+     \\frame{{
+    \\frametitle{{VthrComp}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_1_vthrcomp_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_2_vthrcomp_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_p17_1_vthrcomp_35/DACDistribution.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+
+      \\frame{{
+    \\frametitle{{PH\_offset}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_1_phoffset_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_2_phoffset_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_p17_1_phoffset_35/DACDistribution.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+
+  \\frame{{
+    \\frametitle{{PH\_scale}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_1_phscale_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_2_phscale_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_p17_1_phscale_35/DACDistribution.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+      \\frame{{
+    \\frametitle{{Vtrim}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_1_vtrim_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_2_vtrim_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_p17_1_vtrim_35/DACDistribution.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+       \\frame{{
+    \\frametitle{{Trimbits ($\mu$)}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_1_TrimBits_mu_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_2_TrimBits_mu_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_p17_1_TrimBits_mu_35/DACDistribution.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
+    }}
+
+          \\frame{{
+    \\frametitle{{Trimbits ($\sigma$)}}
+    \\vspace{{-1cm}}
+    \\begin{{figure}}\centering
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_1_TrimBits_sigma_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C BTC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_m20_2_TrimBits_sigma_35/DACDistribution.pdf}}
+  \caption{{T=-20$^{{\circ}}$C ATC}}
+\endminipage\hfill
+\minipage{{0.32\\textwidth}}%
+  \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/DACDistribution_p17_1_TrimBits_sigma_35/DACDistribution.pdf}}
+  \caption{{T=+17$^{{\circ}}$C}}
+\endminipage
+\end{{figure}}
     }}
 
 
@@ -399,8 +828,14 @@ class MakeProductionSummary:
       "nBtoCX" : nBtoCX,
       "nCtoAX" : nCtoAX,
       "nCtoBX" : nCtoBX,
+<<<<<<< HEAD
       "ModuleFailureOverviewFigures": ModuleFailureOverviewFigures,
+=======
+      "nHDI" : nHDI,
+      "HDI" : HDI
+>>>>>>> mmeinhard/FixesPresentation
     } 
+
 
     oldWorkingDirectory = os.getcwd()
     with  open(filename,'w') as myfile:

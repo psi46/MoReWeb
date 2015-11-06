@@ -1,13 +1,12 @@
 #!/usr/bin/env python
  # -*- coding: utf-8 -*-
-from AbstractClasses import PresentationMaker, GeneralTestResult, TestResultEnvironment, ModuleResultOverview, GeneralProductionOverview, GetValuesForSummaryPresentation, ReadFileSummaryPresentation
+from AbstractClasses import PresentationMaker, GeneralTestResult, TestResultEnvironment, ModuleResultOverview, GeneralProductionOverview, GetValuesForPresentation
 import AbstractClasses.Helper.hasher as hasher
 import argparse
 # from AbstractClasses import Helper
 import TestResultClasses.CMSPixel.QualificationGroup.QualificationGroup
 from OverviewClasses.CMSPixel.ProductionOverview import ProductionOverview
 from OverviewClasses.CMSPixel.ProductionOverview.ProductionOverviewPage.GradingOverview import GradingOverview
-from AbstractClasses.ReadFileSummaryPresentation import ReadFile
 import os, time,shutil, sys,traceback
 # import errno
 import ConfigParser
@@ -590,12 +589,11 @@ if args.production_overview:
     if args.make_presentation:
         print "presentation maker: collecting data..."
         Summary = PresentationMaker.MakeProductionSummary()
-        values = ReadFile(GlobalOverviewPath)
-        GetInfo = GetValuesForSummaryPresentation.ModuleSummaryValues(TestResultEnvironmentInstance)
-        grades = GetInfo.MakeArray()
+        GetInfo = GetValuesForPresentation.ModuleSummaryValues(TestResultEnvironmentInstance)
+        grades = GetInfo.MakeArray(GlobalOverviewPath)
         print "presentation maker: write tex file..."
         try:
-            Summary.MakeTexFile(values,grades)
+            Summary.MakeTexFile(grades)
             print "done."
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
