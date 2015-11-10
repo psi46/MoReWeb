@@ -28,43 +28,49 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         HistoNameAdcVsDac = HistoDict.get(self.NameSingle, 'AdcVsDac')
         HistoNameCurrentVsDac = HistoDict.get(self.NameSingle, 'CurrentVsDac')
 
-        HistogramAdcVsDac = HistoGetter.get_histo(ROOTFile, HistoNameAdcVsDac, rocNo=ChipNo).Clone(self.GetUniqueID())
-        HistogramCurrentVsDac = HistoGetter.get_histo(ROOTFile, HistoNameCurrentVsDac, rocNo=ChipNo).Clone(self.GetUniqueID())
+        try:
+            HistogramAdcVsDac = HistoGetter.get_histo(ROOTFile, HistoNameAdcVsDac, rocNo=ChipNo).Clone(self.GetUniqueID())
+            HistogramCurrentVsDac = HistoGetter.get_histo(ROOTFile, HistoNameCurrentVsDac, rocNo=ChipNo).Clone(self.GetUniqueID())
+        except:
+            HistogramAdcVsDac = None
+            HistogramCurrentVsDac = None
 
-        NBinsX = HistogramAdcVsDac.GetXaxis().GetNbins()
-        NBinsX2 = HistogramCurrentVsDac.GetXaxis().GetNbins()
-        print "nbins:", NBinsX," ",NBinsX2
-        print "ADC vs DAC: ",
-        for i in range(NBinsX):
-            print HistogramAdcVsDac.GetBinContent(i +1),"  ",
-        print ""
-        print "current vs DAC: ",
-        for i in range(NBinsX2):
-            print HistogramCurrentVsDac.GetBinContent(i +1),"  ",
-        print ""
-        pointListADC = []
-        pointListCurrent = []
-
-        if NBinsX==NBinsX2:
+        if HistogramAdcVsDac and HistogramCurrentVsDac:
+            NBinsX = HistogramAdcVsDac.GetXaxis().GetNbins()
+            NBinsX2 = HistogramCurrentVsDac.GetXaxis().GetNbins()
+            print "nbins:", NBinsX," ",NBinsX2
+            print "ADC vs DAC: ",
             for i in range(NBinsX):
-                if HistogramAdcVsDac.GetBinContent(i+1)!=0 or HistogramCurrentVsDac.GetBinContent(i+1)!=0:
-                    pointListCurrent.append(HistogramCurrentVsDac.GetBinContent(i+1))
-                    pointListADC.append(HistogramAdcVsDac.GetBinContent(i+1))
+                print HistogramAdcVsDac.GetBinContent(i +1),"  ",
+            print ""
+            print "current vs DAC: ",
+            for i in range(NBinsX2):
+                print HistogramCurrentVsDac.GetBinContent(i +1),"  ",
+            print ""
+            pointListADC = []
+            pointListCurrent = []
+
+            if NBinsX==NBinsX2:
+                for i in range(NBinsX):
+                    if HistogramAdcVsDac.GetBinContent(i+1)!=0 or HistogramCurrentVsDac.GetBinContent(i+1)!=0:
+                        pointListCurrent.append(HistogramCurrentVsDac.GetBinContent(i+1))
+                        pointListADC.append(HistogramAdcVsDac.GetBinContent(i+1))
 
 
-        pointsADC = array.array('d', pointListADC)
-        pointsCurrent = array.array('d', pointListCurrent)
-        numPoints = len(pointsADC)
+            pointsADC = array.array('d', pointListADC)
+            pointsCurrent = array.array('d', pointListCurrent)
+            numPoints = len(pointsADC)
 
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(numPoints, pointsADC, pointsCurrent)
+            self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(numPoints, pointsADC, pointsCurrent)
 
 
-        if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].Draw('AP*')
+            if self.ResultData['Plot']['ROOTObject']:
+                self.ResultData['Plot']['ROOTObject'].Draw('AP*')
 
-        self.Title = 'Iana [ADC]/Iana [mA]'
-        if self.Canvas:
-            self.Canvas.SetCanvasSize(500, 500)
+            self.Title = 'Iana [ADC]/Iana [mA]'
+            if self.Canvas:
+                self.Canvas.SetCanvasSize(500, 500)
+
         self.SaveCanvas()
 
         #TODO: Axis label, punkte blau, fit pol 1. ordnung, Graph wegmachen, etc.
