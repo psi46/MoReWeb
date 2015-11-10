@@ -66,3 +66,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.Canvas:
             self.Canvas.SetCanvasSize(500, 500)
         self.SaveCanvas()
+
+        #TODO: Axis label, punkte blau, fit pol 1. ordnung, Graph wegmachen, etc.
