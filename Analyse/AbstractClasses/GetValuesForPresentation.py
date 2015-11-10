@@ -74,8 +74,18 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         'nLowHREfB' : 0,
         'nLowHREfC' : 0,
         'nBrokenROCFull' : 0,
-        'nBrokenROCXray' : 0
+        'nBrokenROCXray' : 0,
+        'nBrokenROC' : 0,
+        'nHDIf' : 0,
+        'nIV' : 0,
+        'ntotDefects' : 0,
+        'nSinglePixDefect' : 0,
+        'nDC' : 0,
+        'nLowHREf' : 0,
+        'nOthers' : 0
 }
+
+
 
         Rows = self.FetchData()
 
@@ -99,6 +109,9 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         brokenrocsx = []
         totdef = []
         totdefx = []
+        modHDI = []
+        modDC = []
+        modlc = []
 
         for ModuleID in ModuleIDsList:
 
@@ -141,6 +154,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         Numbers['nC'] = len([x for x in Final_Grades if x=='C'])
         Numbers['nM'] = len(ModuleIDsList) - len(Final_Grades)
 
+
         DefectROCs = 0
         DefectROCsX = 0
 
@@ -174,14 +188,15 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             for i in range (0,16):
                                 PixdefectsX[i] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%i, 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
                             	Nuniformity[i] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%i,'Grading' ,'KeyValueDictPairs.json', 'NumberOfNonUniformColumns','Value'])
-                                
+                                if (Nuniformity[i]>0 and Nuniformity[i]<3):
+                                    modDC.append(RowTuple['ModuleID'])
                         for  i, v in enumerate(Pixdefects):
-                            if v is not None and float(v) > 3000:
+                            if v is not None and float(v) > 500:
                                 grades[i] = 1
                                 brokenrocs.append(ModuleID)
 
                         for  i, v in enumerate(PixdefectsX):
-                            if v is not None and float(v) > 3000:
+                            if v is not None and float(v) > 500:
                                 gradesX[i] = 1
                                 brokenrocsx.append(ModuleID)
                         for i, v in enumerate(Nuniformity):
@@ -230,9 +245,21 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                         try: 
                             hdicomment = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'KeyValueDictPairs.json', 'Comment', 'Value']))
                             if ("HDI Problem" in hdicomment):
-                                Numbers['nHDI'] += 1   
+                                Numbers['nHDI'] += 1 
+                                modHDI.append(RowTuple['ModuleID'])  
+                            if ("bad double column" in hdicomment):
+                                modDC.append(RowTuple['ModuleID'])
                         except:
                             pass
+
+                    if (TestType in FullTests):
+                        try: 
+                            comment = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'KeyValueDictPairs.json', 'Comment', 'Value']))
+                            if ("leakage current" in comment):
+                                modlc.append(RowTuple['ModuleID'])
+                        except:
+                            pass
+
 
 
 
@@ -301,14 +328,14 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['ntotDefectsB'] += 1
-                    elif tag == "C" and not mod in brokenrocs:
+                    elif tag == "C":
                         Numbers['ntotDefectsC'] += 1
                         totdef.append(mod)
 
                 if (d == 'TotalDefects_X-ray' and grade!=""):
                     if grade == "B" :
                         Numbers['ntotDefectsXrayB'] += 1
-                    elif grade == "C" and not mod in brokenrocsx:
+                    elif grade == "C":
                         Numbers['ntotDefectsXrayC'] += 1
                         totdefx.append(mod)
                         
@@ -327,7 +354,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B":
                         Numbers['nAddressdefB'] += 1
-                    elif tag == "C" and not mod in brokenrocs and not mod in totdef:
+                    elif tag == "C":
                         Numbers['nAddressdefC'] += 1
 
                 if (d == 'BB_Fulltest' and grade!=""):
@@ -339,13 +366,13 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['nBBFullB'] += 1
-                    elif tag == "C" and not mod in brokenrocs and not mod in totdef:
+                    elif tag == "C":
                         Numbers['nBBFullC'] += 1
 
                 if (d == 'BB_X-ray' and grade!=""):
                     if grade == "B" :
                         Numbers['nBBXrayB'] += 1
-                    elif grade == "C" and not mod in brokenrocsx  and not mod in totdefx:
+                    elif grade == "C":
                         Numbers['nBBXrayC'] += 1
 
                 if (d == 'IV150' and grade!=""):
@@ -358,16 +385,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             elif test == "p17_1" and g == "B":
                                 Numbers['nIV150B'] += 1
                             elif test == "p17_1" and g == "C":
-                            	for ModuleID in ModuleIDsList:
-	                                for RowTuple in Rows:
-	                                    if RowTuple['ModuleID'] == ModuleID:
-	                                    	if ModuleID==mod and RowTuple['TestType'] in TestTypeLeakageCurrentPON:
-	                                            GradeC = self.TestResultEnvironmentObject.GradingParameters['leakageCurrentPON_C']*1e-6
-	                                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'KeyValueDictPairs.json', 'LeakageCurrent', 'Value'])
-	                                            if Value is not None and float(Value) > GradeC:
-	                                                Numbers['nlcstartupC'] += 1
-	                                            else:
-	                                                Numbers['nIV150C'] += 1
+                            	Numbers['nIV150C'] += 1
 	                                           
 	                                            
 
@@ -404,13 +422,13 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['nNoiseB'] += 1
-                    elif tag == "C" and not mod in brokenrocs and not mod in totdef:
+                    elif tag == "C":
                         Numbers['nNoiseC'] += 1
 
                 if (d == 'Noise_X-ray' and grade!=""):
                     if grade == "B" :
                         Numbers['nNoiseXrayB'] += 1
-                    elif grade == "C" and not mod in brokenrocsx and not mod in totdefx:
+                    elif grade == "C":
                         Numbers['nNoiseXrayC'] += 1
 
                 if (d == 'PedestalSpread' and grade!=""):
@@ -422,7 +440,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['nPedSpreadB'] += 1
-                    elif tag == "C" and not mod in brokenrocs and not mod in totdef:
+                    elif tag == "C":
                         Numbers['nPedSpreadC'] += 1
 
                 if (d == 'RelativeGainWidth' and grade!=""):
@@ -434,14 +452,14 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['nRelGainWB'] += 1
-                    elif tag == "C" and not mod in brokenrocs and not mod in totdef:
+                    elif tag == "C":
                         Numbers['nRelGainWC'] += 1
 
 
                 if (d == 'UniformityProblems' and grade!=""):
                     if grade == "B" :
                         Numbers['nuniformityB'] += 1
-                    elif grade == "C" and not mod in brokenrocsx and not mod in totdefx:
+                    elif grade == "C":
                         Numbers['nuniformityC'] += 1
 
                 if (d == 'VcalThrWidth' and grade!=""):
@@ -453,7 +471,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['nVcalThrWB'] += 1
-                    elif tag == "C" and not mod in brokenrocs and not mod in totdef:
+                    elif tag == "C":
                         Numbers['nVcalThrWC'] += 1
 
                 if (d == 'deadPixels' and grade!=""):
@@ -465,13 +483,13 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['ndeadpixB'] += 1
-                    elif tag == "C" and not mod in brokenrocs and not mod in totdef:
+                    elif tag == "C":
                         Numbers['ndeadpixC'] += 1
 
                 if (d == 'lowHREfficiency' and grade!=""):
                     if grade == "B" :
                         Numbers['nLowHREfB'] += 1
-                    elif grade == "C" and not mod in brokenrocsx and not mod in totdefx:
+                    elif grade == "C":
                         Numbers['nLowHREfC'] += 1
 
                 if (d == 'maskDefects' and grade!=""):
@@ -483,7 +501,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['nMaskdefB'] += 1
-                    elif tag == "C" and not mod in brokenrocs and not mod in totdef:
+                    elif tag == "C":
                         Numbers['nMaskdefC'] += 1
 
                 if (d == 'trimbitDefects' and grade!=""):
@@ -495,11 +513,121 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             tag = "B"
                     if tag == "B" :
                         Numbers['nTrimbitdefB'] += 1
-                    elif tag == "C" and mod not in brokenrocs and mod not in totdef:
+                    elif tag == "C":
                         Numbers['nTrimbitdefC'] += 1
 
        
         Numbers['nLowHREfC'] -= Numbers['nHDI']
+
+
+        for mod, defects in moduledefects.iteritems():
+            tag = 0
+            for d, grade in defects.iteritems():
+                if (d == 'GradeFT' and grade!=""):
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = 1
+                elif (d == 'GradeHR' and grade!=""):
+                    if grade == "C":
+                        tag = 1
+                elif (d == 'LCStartup' and grade!=""):
+                    if grade == "C":
+                        tag = 1
+           
+
+            if tag == 1:
+                done = 0 
+                for d, grade in defects.iteritems():
+                    if (d == 'IV150' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                Numbers['nIV'] += 1
+                                done = 1
+                for d, grade in defects.iteritems():
+                    if (d == 'LCStartup' and grade!="" and done == 0):
+                        if grade == "C":
+                            Numbers['nIV'] += 1
+                            done = 1
+                if (mod in modlc and done ==0):
+                    Numbers['nIV'] += 1
+                if (mod in modHDI and done == 0):
+                    Numbers['nHDIf'] += 1
+                    done = 1
+                if ((mod in brokenrocs or mod in brokenrocsx) and done == 0):
+                    Numbers['nBrokenROC'] += 1
+                    done = 1
+                if (mod in modDC and done == 0):
+                    Numbers['nDC'] += 1
+                    done = 1
+                for d, grade in defects.iteritems():
+                    if (d == 'lowHREfficiency' and grade!="" and done == 0):
+                        if grade == "C":
+                            Numbers['nLowHREf'] += 1
+                            done = 1
+                numberdefects=0
+                totdefects=0
+                for d, grade in defects.iteritems():
+                    if (d == 'AddressDefects' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'BB_Fulltest' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'Noise' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'PedestalSpread' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'RelativeGainWidth' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'VcalThrWidth' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'deadPixels' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'maskDefects' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'trimbitDefects' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                numberdefects += 1
+                    if (d == 'BB_X-ray' and grade!="" and done == 0):
+                        if grade == "C":
+                            numberdefects += 1
+                    if (d == 'Noise_X-ray' and grade!="" and done == 0):
+                        if grade == "C":
+                            numberdefects += 1
+                    if (d == 'TotalDefects_X-ray' and grade!="" and done == 0):
+                        if grade == "C":
+                            totdefects += 1
+                    if (d == 'TotalDefects' and grade!="" and done == 0):
+                        for test, g in grade.iteritems():
+                            if g == "C":
+                                totdefects += 1
+                if numberdefects == 1 and done == 0:
+                    Numbers['nSinglePixDefect'] += 1
+                    done = 1
+                    
+                elif (numberdefects > 1 and totdefects > 0 and done == 0):
+                    Numbers['ntotDefects']
+                    done = 1
+
+                if done == 0:
+                    Numbers['nOthers'] += 1
+                    done = 1
+
 
 
        
