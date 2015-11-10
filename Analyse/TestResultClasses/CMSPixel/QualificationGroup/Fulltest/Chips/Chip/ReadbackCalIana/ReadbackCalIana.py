@@ -4,6 +4,7 @@ import os
 from operator import itemgetter
 import warnings
 import AbstractClasses.Helper.HistoGetter as HistoGetter
+import array
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
@@ -30,13 +31,38 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         HistogramAdcVsDac = HistoGetter.get_histo(ROOTFile, HistoNameAdcVsDac, rocNo=ChipNo).Clone(self.GetUniqueID())
         HistogramCurrentVsDac = HistoGetter.get_histo(ROOTFile, HistoNameCurrentVsDac, rocNo=ChipNo).Clone(self.GetUniqueID())
 
-        #self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(numPoints, pointsADC, pointsCurrent)
-        self.ResultData['Plot']['ROOTObject'] = None
+        NBinsX = HistogramAdcVsDac.GetXaxis().GetNbins()
+        NBinsX2 = HistogramCurrentVsDac.GetXaxis().GetNbins()
+        print "nbins:", NBinsX," ",NBinsX2
+        print "ADC vs DAC: ",
+        for i in range(NBinsX):
+            print HistogramAdcVsDac.GetBinContent(i +1),"  ",
+        print ""
+        print "current vs DAC: ",
+        for i in range(NBinsX2):
+            print HistogramCurrentVsDac.GetBinContent(i +1),"  ",
+        print ""
+        pointListADC = []
+        pointListCurrent = []
+
+        if NBinsX==NBinsX2:
+            for i in range(NBinsX):
+                if HistogramAdcVsDac.GetBinContent(i+1)!=0 or HistogramCurrentVsDac.GetBinContent(i+1)!=0:
+                    pointListCurrent.append(HistogramCurrentVsDac.GetBinContent(i+1))
+                    pointListADC.append(HistogramAdcVsDac.GetBinContent(i+1))
+
+
+        pointsADC = array.array('d', pointListADC)
+        pointsCurrent = array.array('d', pointListCurrent)
+        numPoints = len(pointsADC)
+
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(numPoints, pointsADC, pointsCurrent)
+
 
         if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].Draw()
+            self.ResultData['Plot']['ROOTObject'].Draw('AP*')
 
-        self.Title = 'Vdig [ADC]/Vd [V]'
+        self.Title = 'Iana [ADC]/Iana [mA]'
         if self.Canvas:
             self.Canvas.SetCanvasSize(500, 500)
         self.SaveCanvas()
