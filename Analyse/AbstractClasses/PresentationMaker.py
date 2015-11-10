@@ -14,7 +14,9 @@ class MakeProductionSummary:
     Configuration = ConfigParser.ConfigParser()
     Configuration.read([
     'Configuration/Paths.cfg',
+    'Configuration/GradingParameters.cfg',
     ])
+
     try:
       OutputDirectoryPath = Configuration.get('Paths', 'GlobalPresentationPath')
     except:
@@ -26,6 +28,39 @@ class MakeProductionSummary:
       except:
         print "could not create presentation output directory!"
 
+    slopeivB = Configuration.get('GradingParameters','slopeivB')
+    leakageCurrentRatioB = Configuration.get('GradingParameters','leakageCurrentRatioB')
+    currentB = Configuration.get('GradingParameters','currentB')
+    currentC = Configuration.get('GradingParameters','currentC')
+    LeakageCurrentPON_B = Configuration.get('GradingParameters','LeakageCurrentPON_B')
+    LeakageCurrentPON_C = Configuration.get('GradingParameters','LeakageCurrentPON_C')
+    pedestalB = Configuration.get('GradingParameters','pedestalB')
+    pedestalC = Configuration.get('GradingParameters','pedestalC')
+    noiseB = Configuration.get('GradingParameters','noiseB')
+    noiseC = Configuration.get('GradingParameters','noiseC')
+    trimmingB = Configuration.get('GradingParameters','trimmingB')
+    trimmingC = Configuration.get('GradingParameters','trimmingC')
+    gainB = Configuration.get('GradingParameters','gainB')
+    gainC = Configuration.get('GradingParameters','gainC')
+    defectsB = Configuration.get('GradingParameters','defectsB')
+    defectsC = Configuration.get('GradingParameters','defectsC')
+    trimThr = Configuration.get('GradingParameters','trimThr')
+    tthrTol = Configuration.get('GradingParameters','tthrTol')
+    gainMin = Configuration.get('GradingParameters','gainMin')
+    gainMax = Configuration.get('GradingParameters','gainMax')
+    pixelNoiseMin = Configuration.get('GradingParameters','pixelNoiseMin')
+    pixelNoiseMax = Configuration.get('GradingParameters','pixelNoiseMax')
+    TrimBitDifference = Configuration.get('GradingParameters','TrimBitDifference')
+    BumpBondThr  = Configuration.get('GradingParameters','BumpBondThr')
+    XRayHighRate_SCurve_Noise_Threshold_B = Configuration.get('GradingParameters','XRayHighRate_SCurve_Noise_Threshold_B')
+    XRayHighRate_SCurve_Noise_Threshold_C = Configuration.get('GradingParameters','XRayHighRate_SCurve_Noise_Threshold_C')
+    XRayHighRateEfficiency_max_allowed_loweff_A_Rate1 = Configuration.get('GradingParameters','XRayHighRateEfficiency_max_allowed_loweff_A_Rate1')
+    XRayHighRateEfficiency_max_allowed_loweff_B_Rate1 = Configuration.get('GradingParameters','XRayHighRateEfficiency_max_allowed_loweff_B_Rate1')
+
+    pixelThrMin = int(trimThr) - int(tthrTol)
+    pixelThrMax = int(trimThr) + int(tthrTol)
+
+
     FiguresPath = Configuration.get('Paths', 'GlobalOverviewPath')
 
 
@@ -36,7 +71,14 @@ class MakeProductionSummary:
 
     filename = OutputDirectoryPath + "/ModuleProductionOverview_Week{0}.tex".format(week)
     
-
+    totIV = args['nIV']
+    totHDI = args['nHDIf']
+    totROC = args['nBrokenROC']
+    totDC = args['nDC']
+    totLowEf = args['nLowHREf']
+    tot1PD = args['nSinglePixDefect']
+    totPD = args['ntotDefects']
+    totOthers = args['nOthers']
     nA = args['nA']
     nB = args['nB']
     nC = args['nC']
@@ -127,6 +169,15 @@ class MakeProductionSummary:
     BrokenROC = round(float(nBrokenROCs)/nQ*100,1)
     BrokenROCX = round(float(nBrokenROCsX)/nQ*100,1)
     HDI = round(float(nHDI)/nQ*100,1)
+
+    FHDI = round(float(totHDI)/nQ*100,1)
+    FIV = round(float(totIV)/nQ*100,1)
+    FDC = round(float(totDC)/nQ*100,1)
+    F1PD = round(float(tot1PD)/nQ*100,1)
+    FPD = round(float(totPD)/nQ*100,1)
+    FLowEf = round(float(totLowEf)/nQ*100,1)
+    FROC = round(float(totROC)/nQ*100,1)
+    FOthers = round(float(totOthers)/nQ*100,1)
     
  
 
@@ -202,49 +253,71 @@ class MakeProductionSummary:
     $\Rightarrow$ {nQ} modules out of {nT} are completely tested.
     }}
 
+    \\begin{{frame}}[label=GradeCmodules]
+    \\frametitle{{Defects of grade C modules}}
+    \\begin{{table}}[]
+\centering
+\\begin{{tabular}}{{@{{}}lcc@{{}}}}
+\\toprule
+Defect               & \# modules graded C & C (\%$^*$) \\\\ \midrule
+Leakage current      & {totIV}     & {FIV}       \\\\
+HDI                  & {totHDI}    & {FHDI}      \\\\
+Defective ROC        & {totROC}    & {FROC}      \\\\
+DC defects           & {totDC}     & {FDC}       \\\\
+Low HR Efficiency    & {totLowEf}  & {FLowEf}    \\\\
+Single pixel defect  & {tot1PD}    & {F1PD}      \\\\
+Sum of pixel defects & {totPD}     & {FPD}       \\\\ 
+Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
+\end{{tabular}}
+\end{{table}}
+    *of completely tested modules
+   \end{{frame}}
+
     \\frame{{
-    \\frametitle{{Defects I}}
+    \\frametitle{{Detailed defects I}}
     \\begin{{table}}[]
     \centering
     \\begin{{tabular}}{{@{{}}llccc@{{}}}}
     \\toprule
-                                    & Defects             & B & C &  C (\%  of production)\\\\ \midrule
-    \multirow{{5}}{{*}}{{Sensor}}   & $I_{{biais}}$ startup          & {lcstartupB} & {lcstartupC} &  {lcstartup}\\\\
-                                    & IV 150 (+17)        & {IV150B} & {IV150C} & {IV150} \\\\
-                                    & IV 150 (-20)        & {IV150m20B} & {IV150m20C} & {IV150m20} \\\\ 
-                                    & I(+17)/I(-20)       & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ 
-                                     & IV slope           & {IVSlopeB} & {IVSlopeC} & {IVSlope} \\\\ \midrule
-    \multirow{{6}}{{*}}{{Chip performance}} & Noise       & {NoiseB} & {NoiseC} & {Noise} \\\\
-                                    & Noise X-ray         & {NoiseXrayB} & {NoiseXrayC} & {NoiseXray} \\\\
-                                    & Pedestal spread     & {PedSpreadB} & {PedSpreadC} & {PedSpread} \\\\
-                                    & Rel. Gain Width     & {RelGainWB} & {RelGainWC} & {RelGainW} \\\\
-                                    & VcalThr Width       & {VcalThrWB} & {VcalThrWC} & {VcalThrW} \\\\
-                                    & Low HR Efficiency   & {LowHREfB} & {LowHREfC} & {LowHREf} \\\\ \\bottomrule 
+                                    & Defects             & B & C &  C (\%$^*$)\\\\ \midrule
+    \multirow{{5}}{{*}}{{Sensor}}   & $I_{{biais}}$ startup & {lcstartupB} & {lcstartupC} & {lcstartup}\\\\
+                                    & $I_{{biais}}$ (+17)   & {IV150B}     & {IV150C}     & {IV150} \\\\
+                                    & $I_{{biais}}$ (-20)   & {IV150m20B}  & {IV150m20C}  & {IV150m20} \\\\ 
+                                    & I(+17)/I(-20)         & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ 
+                                     & IV slope             & {IVSlopeB}   & {IVSlopeC}   & {IVSlope} \\\\ \midrule
+    \multirow{{6}}{{*}}{{Chip performance}} & Noise         & {NoiseB}     & {NoiseC}     & {Noise} \\\\
+                                    & Noise X-ray           & {NoiseXrayB} & {NoiseXrayC} & {NoiseXray} \\\\
+                                    & Pedestal spread       & {PedSpreadB} & {PedSpreadC} & {PedSpread} \\\\
+                                    & Rel. Gain Width       & {RelGainWB}  & {RelGainWC}  & {RelGainW} \\\\
+                                    & VcalThr Width         & {VcalThrWB}  & {VcalThrWC}  & {VcalThrW} \\\\
+                                    & Low HR Efficiency     & {LowHREfB}   & {LowHREfC}   & {LowHREf} \\\\ \\bottomrule 
     \end{{tabular}}
     \end{{table}}
+    *of completely tested modules \\\\
     }}
 
     \\frame{{
-    \\frametitle{{Defects II}}
+    \\frametitle{{Detailed defects II}}
     \\begin{{table}}[]
     \centering
     \\begin{{tabular}}{{@{{}}llccc@{{}}}}
     \\toprule
-                                    & Defects             & B & C &  C (\%  of production)\\\\ \midrule
-    \multirow{{12}}{{*}}{{Pixel defects}} & Total defects  & {totDefectsB} & {totDefectsC} & {totDefects} \\\\ 
-                                    & Total defects X-ray & {totDefectsXrayB} & {totDefectsXrayC} & {totDefectsXray} \\\\
-                                    & BB Fulltest         & {BBFullB} & {BBFullC} & {BBFull} \\\\
-                                    & BB X-ray            & {BBXrayB} & {BBXrayC} & {BBXray} \\\\
-                                    & Address defects     & {AddressdefB} & {AddressdefC} & {Addressdef} \\\\
-                                    & Trimbit defects     & {TrimbitdefB} & {TrimbitdefC} & {Trimbitdef} \\\\
-                                    & Mask defects        & {MaskdefB} & {MaskdefC} & {Maskdef} \\\\
-                                    & Dead pixels         & {deadpixB} & {deadpixC} & {deadpix} \\\\
-                                    & Broken ROC          & 0 & {nBrokenROCs} & {BrokenROC} \\\\
-                                    & Broken ROC X-ray    & 0 & {nBrokenROCsX} & {BrokenROCX} \\\\
-                                    & HDI Problem    & 0 & {nHDI} & {HDI} \\\\
-                                    & Uniformity problem  & {uniformityB} & {uniformityC} & {uniformity} \\\\ \\bottomrule 
+                                          & Defects             & B                 & C                 &  C (\%$^*$)\\\\ \midrule
+    \multirow{{12}}{{*}}{{Pixel defects}} & Total defects       & {totDefectsB}     & {totDefectsC}     & {totDefects} \\\\ 
+                                          & Total defects X-ray & {totDefectsXrayB} & {totDefectsXrayC} & {totDefectsXray} \\\\
+                                          & BB Fulltest         & {BBFullB}         & {BBFullC}         & {BBFull} \\\\
+                                          & BB X-ray            & {BBXrayB}         & {BBXrayC}         & {BBXray} \\\\
+                                          & Address defects     & {AddressdefB}     & {AddressdefC}     & {Addressdef} \\\\
+                                          & Trimbit defects     & {TrimbitdefB}     & {TrimbitdefC}     & {Trimbitdef} \\\\
+                                          & Mask defects        & {MaskdefB}        & {MaskdefC}        & {Maskdef} \\\\
+                                          & Dead pixels         & {deadpixB}        & {deadpixC}        & {deadpix} \\\\
+                                          & Defective ROC       & 0                 & {nBrokenROCs}     & {BrokenROC} \\\\
+                                          & Defective ROC X-ray & 0                 & {nBrokenROCsX}    & {BrokenROCX} \\\\
+                                          & HDI Problem         & 0                 & {nHDI}            & {HDI} \\\\
+                                          & Uniformity problem  & {uniformityB}     & {uniformityC}     & {uniformity} \\\\ \\bottomrule 
     \end{{tabular}}
     \end{{table}}
+    *of completely tested modules \\\\
     }}
 
 
@@ -715,9 +788,120 @@ class MakeProductionSummary:
 \end{{figure}}
     }}
 
+\\begin{{frame}}[label=Pixeldefects]
+\\frametitle{{Pixel defects}}
+\\begin{{itemize}}
+    \item Address defects
+    \item BB defects
+    \item Noise defects
+    \item Pedestal Spread
+    \item Relative Gain Width
+    \item Vcal Threshold Width
+    \item Trimbit defects
+    \item Dead Pixels
+    \item Mask defects
+\end{{itemize}}
+\end{{frame}}
+    
+    
+\\frame{{
+\\frametitle{{Explanation of defects of grade C modules (slide \\ref{{GradeCmodules}})}}
+There is no double counting, if more than one grade C defect is present, only the first one in the list is considered.
+\\begin{{itemize}}
+    \item \\textbf{{Leakage current}}: $I_{{biais}}>\SI{{10}}{{\uA}}$ at 17$^{{\circ}}$C or -20 $^{{\circ}}$C
+    \item \\textbf{{HDI}}: Any HDI problem specified in the "comments.txt" file
+    \item \\textbf{{Defective ROC}}: ROCs with more than 500 pixel defects or with more than 20 non-uniform columns in the X-ray qualification
+    \item \\textbf{{Double column defects}}: ROCs with 1 or 2  non-uniform columns 
+    \item \\textbf{{Low HR efficiency}}: columns where the efficiency is $<95\%$
+    \item \\textbf{{Single pixel defect}}: ROCs where a single pixel defect (see list on slide \\ref{{Pixeldefects}}) leads to a grade C
+    \item \\textbf{{Sum of pixel defects}}: ROCs where only the combination of different pixel defects leads to a grade C
+    \item \\textbf{{Others - for now}}: Not programmable module (defective TBM?) 
+\end{{itemize}}       
+}}
+    
+\\frame{{
+\\frametitle{{Grading criteria - Sensor grading}}
+\\begin{{table}}[]
+\centering
+\\begin{{tabular}}{{@{{}}lcc@{{}}}}
+\\toprule
+                                             & B & C \\\\ \midrule
+Measured $I_{{biais}}$ (17$^{{\circ}}$, 150V, pretest) [\si{{\uA}}] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
+Measured $I_{{biais}}$ (150V) [\si{{\uA}}] & $>{currentB}$   &  $>{currentC}$ \\\\
+Slope (T=17$^{{\circ}}$)                       &  $>{slopeivB}$  & - \\\\
+I(17$^{{\circ}}$, 150V)/I(-20$^{{\circ}}$, 150V) &  $<{leakageCurrentRatioB}$  & - \\\\ \\bottomrule
+\end{{tabular}}
+\end{{table}}
+}}
+
+\\frame{{
+\\frametitle{{Grading criteria - Electrical grading I}}
+Performance parameters
+\\begin{{table}}[]
+\centering
+\\begin{{tabular}}{{@{{}}lcc@{{}}}}
+\\toprule
+                                             & B & C \\\\ \midrule
+Noise [e$^{{-}}$] & $>{noiseB}$   &  $>{noiseC}$ \\\\
+Vcal Threshold Width     &  $>{trimmingB}$  & $>{trimmingC}$ \\\\
+Pedestal Spread &  $>{pedestalB}$  & $>{pedestalC}$ \\\\
+Relative Gain Width &  $>{gainB}$  & $>{gainC}$ \\\\ \\bottomrule
+\end{{tabular}}
+\end{{table}}
+}}
+
+\\frame{{
+\\frametitle{{Grading criteria - Electrical grading II}}
+Pixel defects per ROC ($\geq {defectsB} \Rightarrow$ B, $ \geq {defectsC} \Rightarrow $C)
+\\begin{{table}}[]
+\centering
+\\begin{{tabular}}{{@{{}}lc@{{}}}}
+\\toprule
+                                            & defective pixel if: \\\\ \midrule
+Bump defects  &  $<{BumpBondThr}$ \\\\
+Dead/Ineffient pixel & $<$100\% \\\\
+Mask defect & pixel not maskable ($\geq 1$ defect $\Rightarrow$ C) \\\\
+Noise [e$^{{-}}$] & $<${pixelNoiseMin} or $>${pixelNoiseMax} \\\\
+Threshold [Vcal] & $<${pixelThrMin} or $>{pixelThrMax}$ \\\\
+Trimbit (3 most significant) & $\Delta$ Thr $<{TrimBitDifference}$ \\\\
+Gain [Vcal/ADC] & $<${gainMin} or $>{gainMax}$ \\\\
+Address defect & addr. read out $\\neq$ addr. cal. signal sent \\\\ \\bottomrule
+\end{{tabular}}
+\end{{table}}
+}}
+
+\\frame{{
+\\frametitle{{Grading criteria - X-ray HR grading}}
+Performance parameters
+\\begin{{table}}[]
+\centering
+\\begin{{tabular}}{{@{{}}lcc@{{}}}}
+\\toprule
+                                             & B & C \\\\ \midrule
+Noise [e$^{{-}}$] & $>{XRayHighRate_SCurve_Noise_Threshold_B}$   &  $>{XRayHighRate_SCurve_Noise_Threshold_C}$ \\\\
+Efficiency \SI{{120}}{{\mega\hertz\per\square\centi\metre}}   &  $>{XRayHighRateEfficiency_max_allowed_loweff_A_Rate1}\%$  & $>{XRayHighRateEfficiency_max_allowed_loweff_B_Rate1}\%$ \\\\
+Column uniformity problems &  - & $\geq 1$ \\\\
+Readout uniformity problems &  -  & $\geq 1$ \\\\ \\bottomrule
+\end{{tabular}}
+\end{{table}}
+
+Pixel defects per ROC ($\geq {defectsB}  \Rightarrow$ B, $ \geq {defectsC} \Rightarrow $C)
+\\begin{{table}}[]
+\centering
+\\begin{{tabular}}{{@{{}}lc@{{}}}}
+\\toprule
+                                            & defective pixel if: \\\\ \midrule
+Bump defects  &  pixel is alive but no hits in hitmap \\\\
+Noise [e$^{{-}}$] & $>${XRayHighRate_SCurve_Noise_Threshold_C} \\\\
+Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
+\end{{tabular}}
+\end{{table}}
+}}
 
 
-    \end{{document}}
+
+
+\end{{document}}
 
     """ 
 
@@ -830,7 +1014,52 @@ class MakeProductionSummary:
       "nCtoBX" : nCtoBX,
       "ModuleFailureOverviewFigures": ModuleFailureOverviewFigures,
       "nHDI" : nHDI,
-      "HDI" : HDI
+      "HDI" : HDI,
+      "totIV" : totIV,
+      "totHDI" : totHDI,
+      "totDC" : totDC,
+      "tot1PD" : tot1PD,
+      "totPD" : totPD,
+      "totLowEf" : totLowEf,
+      "totROC" : totROC,
+      "totOthers" : totOthers,
+      "FIV" : FIV,
+      "FHDI" : FHDI,
+      "FDC" : FDC,
+      "F1PD" : F1PD,
+      "FPD" : FPD,
+      "FLowEf" : FLowEf,
+      "FROC" : FROC,
+      "FOthers" : FOthers,
+      "slopeivB" : slopeivB,
+      "leakageCurrentRatioB" : leakageCurrentRatioB,
+      "currentB" : currentB,
+      "currentC" : currentC,
+      "LeakageCurrentPON_B" : LeakageCurrentPON_B,
+      "LeakageCurrentPON_C" : LeakageCurrentPON_C,
+      "noiseB" : noiseB,
+      "noiseC" : noiseC,
+      "trimmingB" : trimmingB,
+      "trimmingC" : trimmingC,
+      "gainB" : gainB,
+      "gainC" : gainC,
+      "pedestalB" : pedestalB,
+      "pedestalC" : pedestalC,
+      "defectsB"  : defectsB,
+      "defectsC" : defectsC,
+      "gainMax" : gainMax,
+      "gainMin" : gainMin,
+      "TrimBitDifference" : TrimBitDifference,
+      "pixelNoiseMin" : pixelNoiseMin,
+      "pixelNoiseMax" : pixelNoiseMax,
+      "pixelThrMin" : pixelThrMin,
+      "pixelThrMax" : pixelThrMax,
+      "BumpBondThr" : BumpBondThr,
+      'XRayHighRate_SCurve_Noise_Threshold_B' : XRayHighRate_SCurve_Noise_Threshold_B,
+      'XRayHighRate_SCurve_Noise_Threshold_C' : XRayHighRate_SCurve_Noise_Threshold_C,
+      'XRayHighRateEfficiency_max_allowed_loweff_A_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_A_Rate1,
+      'XRayHighRateEfficiency_max_allowed_loweff_B_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_B_Rate1
+
     } 
 
 
@@ -842,6 +1071,8 @@ class MakeProductionSummary:
 
     try:
       os.chdir(OutputDirectoryPath)
+      proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename))
+      proc.communicate()
       proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename))
       proc.communicate()
       for extension in ['aux', 'nav', 'snm', 'toc', 'out']:
