@@ -185,7 +185,6 @@ class MakeProductionSummary:
     \documentclass[xcolor=dvipsnames]{{beamer}}
     \usepackage{{booktabs}}
     \usepackage{{multirow}}
-    #\usepackage{{siunitx}}
     \setbeamertemplate{{footline}}[frame number]
     \setbeamercolor{{frametitle}}{{fg=Black,bg=White}}
     \setbeamercolor{{title}}{{fg=Black,bg=White}}
