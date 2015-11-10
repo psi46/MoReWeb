@@ -185,7 +185,7 @@ class MakeProductionSummary:
     \documentclass[xcolor=dvipsnames]{{beamer}}
     \usepackage{{booktabs}}
     \usepackage{{multirow}}
-    \usepackage{{siunitx}}
+    #\usepackage{{siunitx}}
     \setbeamertemplate{{footline}}[frame number]
     \setbeamercolor{{frametitle}}{{fg=Black,bg=White}}
     \setbeamercolor{{title}}{{fg=Black,bg=White}}
@@ -601,11 +601,11 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
     \\begin{{figure}}\centering
 \minipage{{0.49\\textwidth}}
   \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/Efficiency_50/Efficiency.pdf}}
-  \caption{{\SI{{50}}{{\mega\hertz\per\square\centi\metre}}}}
+  \caption{{50 MHz/cm2}}
 \endminipage\hfill
 \minipage{{0.49\\textwidth}}
   \includegraphics[width=\linewidth]{{{FiguresPath}/ProductionOverview/ProductionOverviewPage_Total/Efficiency_120/Efficiency.pdf}}
-  \caption{{\SI{{120}}{{\mega\hertz\per\square\centi\metre}}}}
+  \caption{{120 MHz/cm2}}
 \endminipage
 \end{{figure}}
     }}
@@ -808,7 +808,7 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
 \\frametitle{{Explanation of defects of grade C modules (slide \\ref{{GradeCmodules}})}}
 There is no double counting, if more than one grade C defect is present, only the first one in the list is considered.
 \\begin{{itemize}}
-    \item \\textbf{{Leakage current}}: $I_{{biais}}>\SI{{10}}{{\uA}}$ at 17$^{{\circ}}$C or -20 $^{{\circ}}$C
+    \item \\textbf{{Leakage current}}: $I_{{biais}}>10\mu$ A at 17$^{{\circ}}$C or -20 $^{{\circ}}$C
     \item \\textbf{{HDI}}: Any HDI problem specified in the "comments.txt" file
     \item \\textbf{{Defective ROC}}: ROCs with more than 500 pixel defects or with more than 20 non-uniform columns in the X-ray qualification
     \item \\textbf{{Double column defects}}: ROCs with 1 or 2  non-uniform columns 
@@ -826,8 +826,8 @@ There is no double counting, if more than one grade C defect is present, only th
 \\begin{{tabular}}{{@{{}}lcc@{{}}}}
 \\toprule
                                              & B & C \\\\ \midrule
-Measured $I_{{biais}}$ (17$^{{\circ}}$, 150V, pretest) [\si{{\uA}}] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
-Measured $I_{{biais}}$ (150V) [\si{{\uA}}] & $>{currentB}$   &  $>{currentC}$ \\\\
+Measured $I_{{biais}}$ (17$^{{\circ}}$, 150V, pretest) [$\mu$ A] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
+Measured $I_{{biais}}$ (150V) [$\mu$ A] & $>{currentB}$   &  $>{currentC}$ \\\\
 Slope (T=17$^{{\circ}}$)                       &  $>{slopeivB}$  & - \\\\
 I(17$^{{\circ}}$, 150V)/I(-20$^{{\circ}}$, 150V) &  $<{leakageCurrentRatioB}$  & - \\\\ \\bottomrule
 \end{{tabular}}
@@ -879,7 +879,7 @@ Performance parameters
 \\toprule
                                              & B & C \\\\ \midrule
 Noise [e$^{{-}}$] & $>{XRayHighRate_SCurve_Noise_Threshold_B}$   &  $>{XRayHighRate_SCurve_Noise_Threshold_C}$ \\\\
-Efficiency \SI{{120}}{{\mega\hertz\per\square\centi\metre}}   &  $>{XRayHighRateEfficiency_max_allowed_loweff_A_Rate1}\%$  & $>{XRayHighRateEfficiency_max_allowed_loweff_B_Rate1}\%$ \\\\
+Efficiency 120 MHz/cm2   &  $>{XRayHighRateEfficiency_max_allowed_loweff_A_Rate1}\%$  & $>{XRayHighRateEfficiency_max_allowed_loweff_B_Rate1}\%$ \\\\
 Column uniformity problems &  - & $\geq 1$ \\\\
 Readout uniformity problems &  -  & $\geq 1$ \\\\ \\bottomrule
 \end{{tabular}}
@@ -1071,9 +1071,9 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
 
     try:
       os.chdir(OutputDirectoryPath)
-      proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename))
+      proc=subprocess.Popen(shlex.split("pdflatex '%s' &>/dev/null"%filename))
       proc.communicate()
-      proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename))
+      proc=subprocess.Popen(shlex.split("pdflatex '%s' &>/dev/null"%filename))
       proc.communicate()
       for extension in ['aux', 'nav', 'snm', 'toc', 'out']:
         auxFile = filename[0:-4]+"."+extension

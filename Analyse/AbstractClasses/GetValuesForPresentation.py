@@ -200,9 +200,12 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 gradesX[i] = 1
                                 brokenrocsx.append(ModuleID)
                         for i, v in enumerate(Nuniformity):
-                            if v is not None and float(v) > 20:
-                                gradesX[i] = 1
-                                brokenrocsx.append(ModuleID)
+                            try:
+                                if v is not None and float(v) > 20:
+                                    gradesX[i] = 1
+                                    brokenrocsx.append(ModuleID)
+                            except:
+                                pass
 
                         #Number of manual regradings
                         reg = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'GradeComment', 'Value']))
@@ -307,7 +310,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
 
         Path = p
 
-        filename = "{}/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview/KeyValueDictPairs.json".format(Path)
+        filename = "{Path}/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview/KeyValueDictPairs.json".format(Path=Path)
         #print filename
     	data = open(filename, 'r')
         moduledefects = json.load(data)
