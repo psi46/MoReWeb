@@ -66,8 +66,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     strValue = ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData[
                         'KeyValueDictPairs'][Parameters['DataParameterKey']]['Value']
                     Value = float(strValue)
-                    nValue = float(ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData[
-                        'KeyValueDictPairs']['N']['Value'])
+                    if not 'NoIntegralCheck' in Parameters or not Parameters['NoIntegralCheck']:
+                        nValue = float(ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData[
+                            'KeyValueDictPairs']['N']['Value'])
+                    else:
+                        nValue = 0
                 except KeyError as e:
                     e.message += ' ' + str((Parameters['DataKey'], Parameters['DataParameterKey'], strValue))
                     if Parameters['DataKey'] not in ChipTestResultObject.ResultData['SubTestResults']:
