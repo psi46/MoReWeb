@@ -22,6 +22,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             
         rbfilename = '{Directory}/readbackCal*_C{ChipNo}.dat'.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         names = glob.glob(rbfilename)
+        ReadbackCalibrated = False
+
         if(len(names)>0):
             # sort by creation date
             names.sort(key=lambda x: os.stat(os.path.join('', x)).st_mtime)
@@ -41,6 +43,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         RbCalParameterName = LineArray[0]
                         
                         RbCalParameterValue = float(LineArray[1])
+                        if abs(RbCalParameterValue-1.0) > 1e-6:
+                            ReadbackCalibrated = True
                         self.ResultData['KeyValueDictPairs'][RbCalParameterName.lower()] = {
                             'Value': '{0:.2e}'.format(RbCalParameterValue),
                             'Label': RbCalParameterName
@@ -49,3 +53,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     ReadbackCalFile.close()
         else:
             warnings.warn('No readback calibration file found!')
+
+        self.ResultData['KeyValueDictPairs']['ReadbackCalibrated'] = {'Label': 'Calibrated', 'Value': 'True' if ReadbackCalibrated else 'False'}
+        self.ResultData['KeyList'].append('ReadbackCalibrated')

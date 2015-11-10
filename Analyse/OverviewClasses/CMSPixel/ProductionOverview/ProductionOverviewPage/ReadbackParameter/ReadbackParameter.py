@@ -50,11 +50,12 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     if TestType == self.Attributes['Test']:
 
                         for Chip in range(0, 16):
-                            Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'ReadbackCal', 'KeyValueDictPairs.json', self.Attributes['Parameter'], 'Value'])
-
-                            if Value is not None:
-                                Histogram.Fill(float(Value))
-                                NROCs += 1
+                            IsCalibrated = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'ReadbackCal', 'KeyValueDictPairs.json', 'ReadbackCalibrated', 'Value'])
+                            if IsCalibrated and IsCalibrated.lower().strip() == 'true':
+                                Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip, 'ReadbackCal', 'KeyValueDictPairs.json', self.Attributes['Parameter'], 'Value'])
+                                if Value is not None:
+                                    Histogram.Fill(float(Value))
+                                    NROCs += 1
 
                         break
         
