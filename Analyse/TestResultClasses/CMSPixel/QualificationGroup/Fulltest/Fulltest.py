@@ -230,7 +230,7 @@ class TestResult(GeneralTestResult):
             },
         ]
 
-        for ReadbackParameter in ['par0vd', 'par1vd']:
+        for ReadbackParameter in ['par0vd', 'par1vd','par0va','par1va','par0rbia','par1rbia','par0tbia','par1tbia','par2tbia']:
             self.ResultData['SubTestResultDictList'].append({
                 'Key': 'ReadbackParameter_%s'%ReadbackParameter,
                 'Module': 'ReadbackParameter',

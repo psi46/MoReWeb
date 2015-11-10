@@ -174,6 +174,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                     }
                 },
+                {'Key':'ReadbackCalIana',
+                }
 
             ]
 
