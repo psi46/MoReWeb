@@ -71,6 +71,19 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         # draw histogram
         self.DrawPixelHistogram(Rows, ModuleIDsList, HistogramDict, HistogramOptions)
 
+        GradingCuts = [500]
+        # draw grading cuts
+        CutLow = []
+        for Cut in GradingCuts:
+            CutLow.append(ROOT.TCutG('lLower', 2))
+
+            CutLow[-1].SetPoint(0, Cut, -1e6)
+            CutLow[-1].SetPoint(1, Cut, +1e6)
+            CutLow[-1].SetLineColor(ROOT.kRed)
+            CutLow[-1].SetLineStyle(2)
+            CutLow[-1].Draw('same')
+
+
         # save plot and add to .html
         self.SaveCanvas()
         HTML = self.Image(self.Attributes['ImageFile'])

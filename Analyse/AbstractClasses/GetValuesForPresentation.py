@@ -191,17 +191,17 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 if (Nuniformity[i]>0 and Nuniformity[i]<3):
                                     modDC.append(RowTuple['ModuleID'])
                         for  i, v in enumerate(Pixdefects):
-                            if v is not None and float(v) > 500:
+                            if v and float(v) > 500:
                                 grades[i] = 1
                                 brokenrocs.append(ModuleID)
 
                         for  i, v in enumerate(PixdefectsX):
-                            if v is not None and float(v) > 500:
+                            if v and float(v) > 500:
                                 gradesX[i] = 1
                                 brokenrocsx.append(ModuleID)
                         for i, v in enumerate(Nuniformity):
                             try:
-                                if v is not None and float(v) > 20:
+                                if v and float(v) > 20:
                                     gradesX[i] = 1
                                     brokenrocsx.append(ModuleID)
                             except:
