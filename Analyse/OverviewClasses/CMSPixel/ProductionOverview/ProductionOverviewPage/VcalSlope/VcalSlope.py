@@ -51,12 +51,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         for Chip in range(0, 16):
                             Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips_Xray', 'Chip_Xray%d'%Chip,  'Xray_Calibration_Spectrum_Chip%d'%Chip, 'KeyValueDictPairs.json', "Slope", 'Value'])
                             Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'],'QualificationGroup','XRayHRQualification','Chips','Chip%d'%Chip,'Grading','KeyValueDictPairs.json','ROCGrade','Value'])
-                            if Value is not None:
-                                ModuleGrade[Grade].append(float(Value))
-                                #Histogram.Fill(float(Value))
-                                NROCs += 1
-                            else:
-                                self.ProblematicModulesList.append(ModuleID)
+                            try:
+                                if Value is not None:
+                                    ModuleGrade[Grade].append(float(Value))
+                                    #Histogram.Fill(float(Value))
+                                    NROCs += 1
+                                else:
+                                    self.ProblematicModulesList.append(ModuleID)
+                            except:
+                                pass
                         break
 
 
