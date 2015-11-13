@@ -280,9 +280,9 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
     \\begin{{tabular}}{{@{{}}llccc@{{}}}}
     \\toprule
                                     & Defects             & B & C &  C (\%$^*$)\\\\ \midrule
-    \multirow{{5}}{{*}}{{Sensor}}   & $I_{{biais}}$ startup & {lcstartupB} & {lcstartupC} & {lcstartup}\\\\
-                                    & $I_{{biais}}$ (+17)   & {IV150B}     & {IV150C}     & {IV150} \\\\
-                                    & $I_{{biais}}$ (-20)   & {IV150m20B}  & {IV150m20C}  & {IV150m20} \\\\ 
+    \multirow{{5}}{{*}}{{Sensor}}   & $I_{{leak}}$ startup & {lcstartupB} & {lcstartupC} & {lcstartup}\\\\
+                                    & $I_{{leak}}$ (+17)   & {IV150B}     & {IV150C}     & {IV150} \\\\
+                                    & $I_{{leak}}$ (-20)   & {IV150m20B}  & {IV150m20C}  & {IV150m20} \\\\ 
                                     & I(+17)/I(-20)         & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ 
                                      & IV slope             & {IVSlopeB}   & {IVSlopeC}   & {IVSlope} \\\\ \midrule
     \multirow{{6}}{{*}}{{Chip performance}} & Noise         & {NoiseB}     & {NoiseC}     & {Noise} \\\\
@@ -622,6 +622,7 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
   \caption{{Offset}}
 \endminipage
 \end{{figure}}
+Grades are taken from HR Qualification
     }}
 
 
@@ -808,7 +809,7 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
 \\frametitle{{Explanation of defects of grade C modules (slide \\ref{{GradeCmodules}})}}
 There is no double counting, if more than one grade C defect is present, only the first one in the list is considered.
 \\begin{{itemize}}
-    \item \\textbf{{Leakage current}}: $I_{{biais}}>10\mu$ A at 17$^{{\circ}}$C or -20 $^{{\circ}}$C
+    \item \\textbf{{Leakage current}}: $I_{{leak}}>10\mu$A at 17$^{{\circ}}$C or -20 $^{{\circ}}$C
     \item \\textbf{{HDI}}: Any HDI problem specified in the "comments.txt" file
     \item \\textbf{{Defective ROC}}: ROCs with more than 500 pixel defects or with more than 20 non-uniform columns in the X-ray qualification
     \item \\textbf{{Double column defects}}: ROCs with 1 or 2  non-uniform columns 
@@ -826,8 +827,8 @@ There is no double counting, if more than one grade C defect is present, only th
 \\begin{{tabular}}{{@{{}}lcc@{{}}}}
 \\toprule
                                              & B & C \\\\ \midrule
-Measured $I_{{biais}}$ (17$^{{\circ}}$, 150V, pretest) [$\mu$ A] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
-Measured $I_{{biais}}$ (150V) [$\mu$ A] & $>{currentB}$   &  $>{currentC}$ \\\\
+Measured $I_{{leak}}$ (17$^{{\circ}}$, 150V, pretest) [$\mu$A] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
+Measured $I_{{leak}}$ (150V) [$\mu$A] & $>{currentB}$   &  $>{currentC}$ \\\\
 Slope (T=17$^{{\circ}}$)                       &  $>{slopeivB}$  & - \\\\
 I(17$^{{\circ}}$, 150V)/I(-20$^{{\circ}}$, 150V) &  $<{leakageCurrentRatioB}$  & - \\\\ \\bottomrule
 \end{{tabular}}
