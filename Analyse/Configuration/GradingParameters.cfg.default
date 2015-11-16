@@ -2,7 +2,7 @@
 trimThr = 35
 tthrTol = 10
 gainMin = 1.0
-gainMax = 4.5
+gainMax = 5.0
 par1Min = 0.
 par1Max = 7.
 noiseB = 500
