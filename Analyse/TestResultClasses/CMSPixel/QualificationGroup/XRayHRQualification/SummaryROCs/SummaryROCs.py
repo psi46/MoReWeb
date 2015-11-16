@@ -13,7 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         
     def PopulateResultData(self):
-        TableHeader = ['ROC','Grade','Defects']
+        TableHeader = ['ROC','Grade','Def', 'DC']
         for Rate in self.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             TableHeader.append('Eff {Rate}'.format(Rate=Rate))
 
@@ -24,9 +24,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # display bb defects only for highest rate = best statistics
             if Rate == max(self.ParentObject.Attributes['Rates']['HRData']):
               TableHeader.append('BB def'.format(Rate=Rate))
-        TableHeader.append('RO prob '.format(Rate=Rate))
+        TableHeader.append('R/O'.format(Rate=Rate))
 
-        TableHeader.append('Unif. prob'.format(Rate=Rate))
+        TableHeader.append('Unif.'.format(Rate=Rate))
 
         for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
             TableHeader.append('Thr [e-] "{Rate}"'.format(Rate=Rate))
@@ -61,6 +61,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                  '<div style="text-align:center;">%s</div>'%ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value'],             
             ]
         
+            # pixe defects
             try:
                 PixelDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value'])
             except:
@@ -73,6 +74,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             else:
                 TableRow.append("{Value:1.0f}".format(Value=PixelDefects))
 
+            # double column defects
+            try:
+                DCDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'])
+            except:
+                DCDefects = -1
+            if DCDefects > 0:
+                TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=DCDefects)))
+            else:
+                TableRow.append("{Value:1.0f}".format(Value=DCDefects))
+
+            # interpolated efficiencies
             RateIndex = 1
             for Rate in self.ParentObject.Attributes['InterpolatedEfficiencyRates']:
                 Efficiency = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value'])
