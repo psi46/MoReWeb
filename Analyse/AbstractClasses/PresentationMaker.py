@@ -1071,11 +1071,13 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
     print "compile tex file..."
 
     try:
+      FNULL = open(os.devnull, 'w')
       os.chdir(OutputDirectoryPath)
-      proc=subprocess.Popen(shlex.split("pdflatex '%s' &>/dev/null"%filename))
+      proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename), stdout=FNULL)
       proc.communicate()
-      proc=subprocess.Popen(shlex.split("pdflatex '%s' &>/dev/null"%filename))
+      proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename), stdout=FNULL)
       proc.communicate()
+      print "LaTeX compiler returned: %d"%proc.returncode
       for extension in ['aux', 'nav', 'snm', 'toc', 'out']:
         auxFile = filename[0:-4]+"."+extension
         if os.path.isfile(auxFile):
