@@ -51,40 +51,47 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         DoubleColumnRateList = array.array('d')
         DoubleColumnEfficiencyList = array.array('d')
 
+        # get list of double columns which have been flagged bad
+        BadDoubleColumns = list(set([DoubleColumnData['DoubleColumn'] for DoubleColumnData in self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']]))
+
         for Rate in Rates['HREfficiency']:
             Ntrig = self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)]
             EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
             BackgroundMapROOTObject = self.ParentObject.ResultData['SubTestResults']['BackgroundMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
 
             for DoubleColumn in range(1, 25):
-                PixelRateList = array.array('d')
-                PixelEfficiencyList = array.array('d')
 
-                for PixNo in range(0, 160):
-                    col = DoubleColumn * 2 + (1 if PixNo > 79 else 0)
-                    row = PixNo % 80
-                    PixelNHits = EfficiencyMapROOTObject.GetBinContent(col + 1, row + 1)
-                    BackgroundMapNHits = BackgroundMapROOTObject.GetBinContent(col + 1, row + 1)
+                if DoubleColumn not in BadDoubleColumns:
+                    PixelRateList = array.array('d')
+                    PixelEfficiencyList = array.array('d')
 
-                    # only count alive pixels
-                    if PixelNHits > 0:
-                        PixelEfficiency = PixelNHits/Ntrig
-                        AreaFactor = 1 * (2 if col==0 or col==51 else 1) * (2 if row==0 or row==79 else 1)
+                    for PixNo in range(0, 160):
+                        col = DoubleColumn * 2 + (1 if PixNo > 79 else 0)
+                        row = PixNo % 80
+                        PixelNHits = EfficiencyMapROOTObject.GetBinContent(col + 1, row + 1)
+                        BackgroundMapNHits = BackgroundMapROOTObject.GetBinContent(col + 1, row + 1)
 
-                        # in MHz/cm2
-                        PixelRate = BackgroundMapNHits / (25 * 1e-9 * Ntrig * 4160 * PixelArea * AreaFactor) * ScalingFactor
+                        # only count alive pixels
+                        if PixelNHits > 0:
+                            PixelEfficiency = PixelNHits/Ntrig
+                            AreaFactor = 1 * (2 if col==0 or col==51 else 1) * (2 if row==0 or row==79 else 1)
 
-                        PixelRateList.append(PixelRate)
-                        PixelEfficiencyList.append(PixelEfficiency)
+                            # in MHz/cm2
+                            PixelRate = BackgroundMapNHits / (25 * 1e-9 * Ntrig * 4160 * PixelArea * AreaFactor) * ScalingFactor
 
-                try:
-                    DoubleColumnMeanEfficiency = ROOT.TMath.Mean(len(PixelEfficiencyList), PixelEfficiencyList)
-                    DoubleColumnRate = ROOT.TMath.Mean(len(PixelRateList), PixelRateList)
-                    # correct measured hit rate by efficiency, in %
-                    DoubleColumnRateList.append(DoubleColumnRate / DoubleColumnMeanEfficiency)
-                    DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
-                except:
-                    pass
+                            PixelRateList.append(PixelRate)
+                            PixelEfficiencyList.append(PixelEfficiency)
+
+                    try:
+                        DoubleColumnMeanEfficiency = ROOT.TMath.Mean(len(PixelEfficiencyList), PixelEfficiencyList)
+                        DoubleColumnRate = ROOT.TMath.Mean(len(PixelRateList), PixelRateList)
+                        # correct measured hit rate by efficiency, in %
+                        DoubleColumnRateList.append(DoubleColumnRate / DoubleColumnMeanEfficiency)
+                        DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
+                    except:
+                        pass
+                else:
+                    print "\x1b[31m         double column %d is flagged 'bad' and excluded from fit\x1b[0m"%DoubleColumn
 
         self.Canvas.Clear()
 

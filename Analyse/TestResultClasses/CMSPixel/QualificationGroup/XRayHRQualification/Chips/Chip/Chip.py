@@ -185,14 +185,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     
                 },
                 {
-                    'Key':'EfficiencyInterpolation',
-                    'InitialAttributes':{
-                    },
-                    'DisplayOptions':{
-                        'Order':2
-                    },
-                },
-                {
                     'Key':'DoubleColumnEfficiencyDistribution',
                     'InitialAttributes':{
                     },
@@ -200,6 +192,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':200
                     },
                     
+                },
+                {
+                    'Key':'EfficiencyInterpolation',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':2
+                    },
                 },
                 {
                     'Key':'CalDelScan',

@@ -67,7 +67,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Value':'',
             'Label':'Efficiency Grade '+RateData['InterpolatedEfficiencyRates']['RatesString']
         }
-
+        self.ResultData['KeyValueDictPairs']['BadDoubleColumns'] = {
+            'Value':'',
+            'Label':'# Bad Double Columns',
+        }
+        self.ResultData['KeyValueDictPairs']['BadDoubleColumnsGrade'] = {
+            'Value':'',
+            'Label':'Bad DC Grade',
+        }
         self.ResultData['KeyValueDictPairs']['NumberOfHotPixels'] = {
             'Value':'',
             'Label':'# Hot Pixels '+RateData['HRData']['RatesString']
@@ -99,7 +106,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['ReadoutUniformityOverTimeGrade'] = {
             'Value':'',
             'Label':'ROC Read. Unif. Grade '+RateData['HRData']['RatesString']
-        }        
+        }
         self.ResultData['KeyValueDictPairs']['ColumnReadoutUniformityOverTimeGrade'] = {
             'Value':'',
             'Label':'Column Read. Unif. Grade '+RateData['HRData']['RatesString']
@@ -111,7 +118,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['NoiseGrade'] = {
             'Value':'',
             'Label':'Noise Grade'
-        }        
+        }
         self.ResultData['KeyValueDictPairs']['PixelDefects'] = {
             'Value':'',
             'Label':'Total Number of Pixel Defects',
@@ -123,10 +130,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'NumberOfNonUniformColumns',
                 'NumberOfNonUniformEvents',
                 'NumberOfNonUniformColumnEvents',
+                'BadDoubleColumns',
                 'BumpBondingDefects',
                 'Efficiency',
                 'EfficiencyFit',
                 'EfficiencyGrade',
+                'BadDoubleColumnsGrade',
                 'HotPixelsGrade',
                 'HitMapGrade',
                 'ReadoutUniformityOverTimeGrade',
@@ -217,6 +226,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         BumpBondingDefectsList = []
         NoiseDefectsList = []
         HotPixelDefectsList = []
+
+        # bad double column grading
+        NBadDoubleColumns = -1
+        BadDoubleColumnGrade = -1
+        try:
+            NBadDoubleColumns = int(self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['KeyValueDictPairs']['NBadDoubleColumns']['Value'])
+            self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'] = NBadDoubleColumns
+            if NBadDoubleColumns > 0:
+                BadDoubleColumnGrade = 3
+            else:
+                BadDoubleColumnGrade = 1
+            ROCGrades.append(BadDoubleColumnGrade)
+        except:
+            pass
+
+        self.ResultData['KeyValueDictPairs']['BadDoubleColumnsGrade']['Value'] = GradeMapping[BadDoubleColumnGrade]
 
         # hitmap and uniformity grading
         ColumnReadoutUniformityROOTObject = None
@@ -481,6 +506,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         print ' ROC {ROC:2.0f}: Grade {Grade}'.format(ROC=self.ParentObject.Attributes['ChipNo'], Grade=GradeFormatted)
         print '         Pixel Defects:              {Defects}'.format(Defects=TotalPixelDefects)
+        if NBadDoubleColumns > 0:
+            print '         Double Column Defects:      {Defects}'.format(Defects=NBadDoubleColumns)  
         print '         BumpBonding Defects:        {Defects}'.format(Defects=len(BumpBondingDefectPixelsList))
         print '         Efficiency at 120 MHz/cm2:  {Eff} +/- {EffErr}'.format(Eff=InterpolatedEfficiency120, EffErr=EfficiencyError120)
         try:

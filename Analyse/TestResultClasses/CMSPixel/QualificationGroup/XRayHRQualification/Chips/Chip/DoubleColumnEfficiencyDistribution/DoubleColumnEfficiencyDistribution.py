@@ -22,15 +22,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         EfficiencyList = array.array('d', [100])
         ScalingFactor = 1e-6
 
-        RootHistograms = []
+        BAD_DOUBLECOLUMN_DATA = 1
+        BAD_DOUBLECOLUMN_FIT = 2
+        BAD_DOUBLECOLUMN_BADPIX = 3
 
-        First = True
-        CurveColors = [ROOT.kBlue+2,ROOT.kRed+1, ROOT.kGreen+3]
-        ColorIndex = 0
+        # calculate efficiencies for all rates
+        DoubleColumnEfficiencies = []
+        BadDoubleColumns = []
         for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
-            RootHistogram = ROOT.TH1D(self.GetUniqueID(), '', 50, 95, 100)
+            DoubleColumnEfficienciesRate = []
 
-            for DoubleColumn in range(1, 25):
+            # and all double columns
+            for DoubleColumn in range(0, 26):
                 DoubleColumnRateList = array.array('d')
                 DoubleColumnEfficiencyList = array.array('d')
 
@@ -41,6 +44,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                     PixelRateList = array.array('d')
                     PixelEfficiencyList = array.array('d')
+                    BadPixelsList = []
+
+                    PixelEfficiencyMean = EfficiencyMapROOTObject.GetMean()
+                    PixelEfficiencyRMS = EfficiencyMapROOTObject.GetRMS()
+                    PixelEfficiencyThreshold = min(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_bad_pixels_cut_max'], max(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_bad_pixels_cut_min'], PixelEfficiencyMean - self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_bad_pixels_cut_sigma'] * PixelEfficiencyRMS))
+                    MaximumNumberAllowedBadPixels = self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_bad_pixels_per_double_column']
 
                     for PixNo in range(0, 160):
                         col = DoubleColumn * 2 + (1 if PixNo > 79 else 0)
@@ -53,46 +62,74 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             PixelEfficiency = PixelNHits/Ntrig
                             AreaFactor = 1 * (2 if col==0 or col==51 else 1) * (2 if row==0 or row==79 else 1)
 
+                            if PixelEfficiency < PixelEfficiencyThreshold:
+                                BadPixelsList.append([PixNo])
+
                             # in MHz/cm2
                             PixelRate = BackgroundMapNHits / (25 * 1e-9 * Ntrig * 4160 * PixelArea * AreaFactor) * ScalingFactor
 
                             PixelRateList.append(PixelRate)
                             PixelEfficiencyList.append(PixelEfficiency)
 
+                    # if more than X pixel with very(!) bad efficiency in double column, declare DC as bad
+                    if len(BadPixelsList) > MaximumNumberAllowedBadPixels:
+                        BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_BADPIX})
+
                     try:
                         DoubleColumnMeanEfficiency = ROOT.TMath.Mean(len(PixelEfficiencyList), PixelEfficiencyList)
                         DoubleColumnRate = ROOT.TMath.Mean(len(PixelRateList), PixelRateList)
                         # correct measured hit rate by efficiency, in %
                         DoubleColumnRateList.append(DoubleColumnRate / DoubleColumnMeanEfficiency)
-                        DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
+                        DoubleColumnMeanEfficiencyPercent = DoubleColumnMeanEfficiency * 100
+                        DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiencyPercent)
                     except:
-                        print "could not calculate double column efficiency: ROC", ChipNo, " DC:", DoubleColumn
+                        BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_DATA})
 
                 try:
-                    cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 40, 150)
+                    cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 5, 200)
                     cubicFit.SetParameter(1, 100)
                     cubicFit.SetParameter(2, 5e-7)
 
                     EfficiencyGraph = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList)
                     EfficiencyGraph.Fit(cubicFit, 'QR')
+                    InterpolatedEfficiency = cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor)
 
-                    RootHistogram.Fill(cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor))
+                    DoubleColumnEfficienciesRate.append(InterpolatedEfficiency)
                     cubicFit.Delete()
                     EfficiencyGraph.Delete()
                 except:
-                    print "warning: ROC",ChipNo," double column ", DoubleColumn, ": efficiency fit failed!"
+                    BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_FIT})
+
+            DoubleColumnEfficiencies.append(DoubleColumnEfficienciesRate)
+
+        
+        # get minimum efficiency
+        AllDoubleColumnEfficiencies = [item for sublist in DoubleColumnEfficiencies for item in sublist]
+        EfficiencyMinimum = min(95, min(AllDoubleColumnEfficiencies))
+
+        # draw histogram for each of the different rates with different color
+        RootHistograms = []
+        First = True
+        CurveColors = [ROOT.kBlue+2,ROOT.kRed+1, ROOT.kGreen+3]
+        ColorIndex = 0
+        for DoubleColumnEfficienciesRate in DoubleColumnEfficiencies:
+            RootHistogram = ROOT.TH1D(self.GetUniqueID(), '', 1000, 0, 100)
+            RootHistogram.GetXaxis().SetRangeUser(EfficiencyMinimum, 100)
+
+            for DoubleColumnEfficiency in DoubleColumnEfficienciesRate:
+                RootHistogram.Fill(DoubleColumnEfficiency)
 
             if RootHistogram:
-                RootHistogram.SetLineColor(CurveColors[ColorIndex])
-                ColorIndex += 1
-                if ColorIndex > len(CurveColors)-1:
-                    ColorIndex = 0
-                if First:
-                    RootHistogram.Draw("")
-                    First = False
-                else:
-                    RootHistogram.Draw("same")
-                RootHistograms.append(RootHistogram)
+                    RootHistogram.SetLineColor(CurveColors[ColorIndex])
+                    ColorIndex += 1
+                    if ColorIndex > len(CurveColors)-1:
+                        ColorIndex = 0
+                    if First:
+                        RootHistogram.Draw("")
+                        First = False
+                    else:
+                        RootHistogram.Draw("same")
+                    RootHistograms.append(RootHistogram)
 
         Legend = ROOT.TLegend(0.2,0.85,0.4,0.65)
         for i in range(len(RootHistograms)):
@@ -102,6 +139,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.Title = 'DC Efficiency Distribution: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         self.SaveCanvas()
+
+        self.ResultData['HiddenData']['BadDoubleColumns'] = BadDoubleColumns
+        self.ResultData['KeyValueDictPairs']['NBadDoubleColumns'] = {'Label': 'Bad Double Columns', 'Value': len(set([BadDoubleColumn['DoubleColumn'] for BadDoubleColumn in BadDoubleColumns]))}
+        self.ResultData['KeyList'].append('NBadDoubleColumns')
 
         try:
             for i in RootHistograms:
