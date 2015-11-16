@@ -14,16 +14,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # order!
         self.ResultData['SubTestResultDictList'] = []
 
-        if self.Attributes['ModuleVersion'] == 1:
-            self.ResultData['SubTestResultDictList'] += [
-                {
-                    'Key':'PHCalibrationTan',
-                    'DisplayOptions':{
-                        'Show':False,
-                    }
-                }
-            ]
-
         self.ResultData['SubTestResultDictList'] += [
                 {'Key':'OpParameters',
                     'DisplayOptions':{
@@ -90,6 +80,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             }
         ]
+
+        if self.Attributes['ModuleVersion'] == 1:
+            self.ResultData['SubTestResultDictList'] += [
+                {
+                    'Key':'PHCalibrationTan',
+                    'DisplayOptions':{
+                        'Show':False,
+                    }
+                }
+            ]
 
         self.ResultData['SubTestResultDictList'] += [
                 {'Key':'TrimBitTest',

@@ -507,7 +507,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         print ' ROC {ROC:2.0f}: Grade {Grade}'.format(ROC=self.ParentObject.Attributes['ChipNo'], Grade=GradeFormatted)
         print '         Pixel Defects:              {Defects}'.format(Defects=TotalPixelDefects)
         if NBadDoubleColumns > 0:
-            print '         Double Column Defects:      {Defects}'.format(Defects=NBadDoubleColumns)  
+            print '         \x1b[31mDouble Column Defects:      {Defects}\x1b[0m'.format(Defects=NBadDoubleColumns)  
         print '         BumpBonding Defects:        {Defects}'.format(Defects=len(BumpBondingDefectPixelsList))
         print '         Efficiency at 120 MHz/cm2:  {Eff} +/- {EffErr}'.format(Eff=InterpolatedEfficiency120, EffErr=EfficiencyError120)
         try:
@@ -517,9 +517,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             pass
         if int(NumberValues['NumberOfNonUniformColumns']) > 0:
-            print '         \x1b[31mNumber of non uniform coulmns: %d'%int(NumberValues['NumberOfNonUniformColumns'])
+            print '         \x1b[31mNumber of non uniform coulmns: %d\x1b[0m'%int(NumberValues['NumberOfNonUniformColumns'])
         if int(NumberValues['NumberOfNonUniformColumnEvents']) > 0:
-            print '         \x1b[31mNumber of non uniform events in a column: %d'%int(NumberValues['NumberOfNonUniformColumnEvents'])
+            print '         \x1b[31mNumber of non uniform events in a column: %d\x1b[0m'%int(NumberValues['NumberOfNonUniformColumnEvents'])
         if ReadoutProblemsDetected:
             print '         \x1b[31mProblems in readout uniformity detected!\x1b[0m check for hot pixels!'
 

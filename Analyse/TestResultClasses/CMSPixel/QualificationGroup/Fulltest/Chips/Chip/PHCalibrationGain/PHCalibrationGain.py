@@ -13,10 +13,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle = 'PHCalibrationGain'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.verbose = False
-        self.GainDefectsList = set()
+        self.GainDefectsList = set([])
 
     def fill_histograms(self):
         Directory = self.RawTestSessionDataPath
+        try:
+            ThresholdDefectsList = self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['TrimProblems']['Value']
+        except:
+            ThresholdDefectsList = set([])
+
         # originally: phCalibrationFit_C
         chip = self.ParentObject.Attributes['ChipNo']
         PHCalibrationFitFileName = "{Directory}/phCalibrationFit_C{ChipNo}.dat".format(Directory=Directory,
@@ -75,7 +80,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         self.ResultData['Plot']['ROOTObject_hGainMap'].SetBinContent(col + 1, row + 1, gain)
                         self.ResultData['Plot']['ROOTObject_hPedestalMap'].SetBinContent(col + 1, row + 1, pedestal)
                         if gain > self.TestResultEnvironmentObject.GradingParameters['gainMax'] or gain < self.TestResultEnvironmentObject.GradingParameters['gainMin']:
-                            self.GainDefectsList.add((chip, col, row))
+                            if (chip, col, row) not in ThresholdDefectsList:
+                                self.GainDefectsList.add((chip, col, row))
 
                 except (ValueError, TypeError, IndexError):
                     n_errors += 1

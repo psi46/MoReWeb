@@ -9,23 +9,32 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Show = False
         self.Par1DefectsList = set()
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
-        
 
-        
     def PopulateResultData(self):
         #PHCalibrationTan = Parameter1
+
+        try:
+            ThresholdDefectsList = self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['TrimProblems']['Value']
+        except:
+            ThresholdDefectsList = set([])
+
+        try:
+            DeadPixelsList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
+        except:
+            DeadPixelsList = set([])
+
         ChipNo=self.ParentObject.Attributes['ChipNo']
         #hPar1
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", 350, -1., 6.)  # par1
         Directory = self.RawTestSessionDataPath
-        
+
         PHCalibrationFitTanFileName = "{Directory}/phCalibrationFitTan_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         try:
             PHCalibrationFitTanFile = open(PHCalibrationFitTanFileName, "r")
         except IOError:
             raise  IOError("cannot open %s"%PHCalibrationFitTanFileName)
         self.FileHandle = PHCalibrationFitTanFile #needed in summary
-        
+
         #SCurveFile.seek(2*200) # omit the first 400 bytes
 
         try:
@@ -37,11 +46,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         par1Max = self.TestResultEnvironmentObject.GradingParameters['par1Max']
 
         if PHCalibrationFitTanFile:
-            
             # for (int i = 0 i < 2 i++) fgets(string, 200, phLinearFile)
             for i in range(3):
                 PHCalibrationFitTanFile.readline() #Omit first three lines
-            
+
             for col in range(self.nCols):
                 for row in range(self.nRows):
                     Line = PHCalibrationFitTanFile.readline()
@@ -54,14 +62,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                                 # parameter 1 defects
                                 if par1 > par1Max or par1 < par1Min:
-                                    self.Par1DefectsList.add((ChipNo, col, row))
+                                    if (ChipNo, col, row) not in ThresholdDefectsList and (ChipNo, col, row) not in DeadPixelsList:
+                                        self.Par1DefectsList.add((ChipNo, col, row))
 
                         except (ValueError, TypeError, IndexError):
                             pass
-                    
-            
+
             # -- Parameter1
-        
+
             #mPar1
             MeanPar1 = self.ResultData['Plot']['ROOTObject'].GetMean()
             #sPar1
@@ -73,10 +81,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             )
             #nPar1_entries
             IntegralPar1_Entries = self.ResultData['Plot']['ROOTObject'].GetEntries()
-            
+
             under = self.ResultData['Plot']['ROOTObject'].GetBinContent(0)
             over = self.ResultData['Plot']['ROOTObject'].GetBinContent(self.ResultData['Plot']['ROOTObject'].GetNbinsX()+1)
-                
+
             self.ResultData['KeyValueDictPairs'] = {
                 'N': {
                     'Value':'{0:1.0f}'.format(IntegralPar1), 
