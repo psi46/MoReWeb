@@ -27,6 +27,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Label':'Fit'.format(Rate=Rate)
         }
         self.ResultData['KeyList'].append('fitfunction')
+        self.ResultData['KeyValueDictPairs']['BadDoubleColumns'] = {
+            'Value': '',
+            'Label':'# Bad DCs (excluded from fit)'
+        }
+        self.ResultData['KeyList'].append('BadDoubleColumns')
         
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
@@ -53,6 +58,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # get list of double columns which have been flagged bad
         BadDoubleColumns = list(set([DoubleColumnData['DoubleColumn'] for DoubleColumnData in self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']]))
+        self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'] = len(BadDoubleColumns)
 
         for Rate in Rates['HREfficiency']:
             Ntrig = self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)]
@@ -156,7 +162,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         InterpolatedEfficiencyError = 0
                         pass
                     self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%dError'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiencyError:1.3f}'.format(InterpolatedEfficiencyError=InterpolatedEfficiencyError)
-                    self.ResultData['KeyList'] += ['InterpolatedEfficiency%dError'%int(InterpolationRate)]
+                    #self.ResultData['KeyList'] += ['InterpolatedEfficiency%dError'%int(InterpolationRate)]
 
                 # always interpolate at this rates, but don't show them in summary
                 for InterpolationRate in HiddenDataInterpolationRates:

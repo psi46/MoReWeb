@@ -25,6 +25,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         BAD_DOUBLECOLUMN_DATA = 1
         BAD_DOUBLECOLUMN_FIT = 2
         BAD_DOUBLECOLUMN_BADPIX = 3
+        BAD_DOUBLECOLUMN_EFF = 4
+        
+        MinDCEfficiencyFiducial = self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_fiducial_dc_eff']
+        MinDCEfficiencyEdge = self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_fiducial_dc_eff']
 
         # calculate efficiencies for all rates
         DoubleColumnEfficiencies = []
@@ -82,8 +86,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         DoubleColumnRateList.append(DoubleColumnRate / DoubleColumnMeanEfficiency)
                         DoubleColumnMeanEfficiencyPercent = DoubleColumnMeanEfficiency * 100
                         DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiencyPercent)
+
                     except:
                         BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_DATA})
+
 
                 try:
                     cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 5, 200)
@@ -93,6 +99,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     EfficiencyGraph = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList)
                     EfficiencyGraph.Fit(cubicFit, 'QR')
                     InterpolatedEfficiency = cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor)
+
+                    if InterpolationRate < 121:
+                        if DoubleColumn in [0,25]:
+                            if InterpolatedEfficiency*0.01 < MinDCEfficiencyEdge:
+                                BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
+                        else:
+                            if InterpolatedEfficiency*0.01 < MinDCEfficiencyFiducial:
+                                BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
 
                     DoubleColumnEfficienciesRate.append(InterpolatedEfficiency)
                     cubicFit.Delete()

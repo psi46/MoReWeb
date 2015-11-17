@@ -80,6 +80,8 @@ class TestResultEnvironment:
         'XRayHighRateEfficiency_max_bad_pixels_cut_sigma':10,
         'XRayHighRateEfficiency_max_bad_pixels_cut_max':0.5,
         'XRayHighRateEfficiency_max_bad_pixels_cut_min':0.2,
+        'XRayHighRateEfficiency_min_fiducial_dc_eff':0.95,
+        'XRayHighRateEfficiency_min_edge_dc_eff':0.90,
         'XRayHighRateHotPixels_max_allowed_hot':100,
         'XRayHighRateHotPixels_Threshold':1,
         'XRayHighRate_factor_dcol_uniformity_low':0.5,
