@@ -17,6 +17,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             NumBumpBondingProblems.append(int(i['TestResultObject'].ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['nBumpBondingProblems']['Value']))
             NumDeadPixels.append(int(i['TestResultObject'].ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NDeadPixels']['Value']))
 
+        try:
+            ReadbackStatus = self.ParentObject.ResultData['SubTestResults']['ReadbackStatus'].ResultData['KeyValueDictPairs']['ModuleCalibrationGood']['Value']
+        except:
+            ReadbackStatus = "unknown"
 
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -39,8 +43,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': max(NumDeadPixels),
                 'Label':'Max Dead Pixels/ROC'
             },
+            'Readback': {
+                'Value': ReadbackStatus,
+                'Label':'Readback calibration'
+            },
         }
-        self.ResultData['KeyList'] = ['Module', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax']
+        self.ResultData['KeyList'] = ['Module', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback']
 
     def PopulateResultData(self):
         pass

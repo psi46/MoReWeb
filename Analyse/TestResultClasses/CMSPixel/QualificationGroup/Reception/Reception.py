@@ -30,18 +30,7 @@ class TestResult(GeneralTestResult):
                 'InitialAttributes': {
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                 },
-            },  
-            {
-                'Key': 'Grading',
-                'DisplayOptions': {
-                    'Order': 15,
-                    'Width': 1,
-                    'Show': True,
-                },
-                'InitialAttributes': {
-                    'ModuleVersion': self.Attributes['ModuleVersion'],
-                },
-            },
+            }
         ]
 
         if self.Attributes['IncludeIVCurve']:
@@ -49,8 +38,8 @@ class TestResult(GeneralTestResult):
                 {
                     'Key': 'IVCurve',
                     'DisplayOptions': {
-                        'Order': 30,
-                        'Width': 1,
+                        'Order': 88,
+                        'Width': 2,
                     }
                 },
             ]
@@ -72,7 +61,7 @@ class TestResult(GeneralTestResult):
                 'Key': 'BumpBondingProblems',
                 'DisplayOptions': {
                     'Width': 4,
-                    'Order': 20,
+                    'Order': 41,
                 },
                 'InitialAttributes': {
                     'StorageKey': 'BumpBondingProblems'
@@ -91,6 +80,41 @@ class TestResult(GeneralTestResult):
                 }
             }
         ]
+        self.ResultData['SubTestResultDictList'] += [
+            {
+                'Key': 'IanaLoss',
+                'DisplayOptions': {
+                    'Order': 40,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
+                'Key': 'ReadbackStatus',
+                'DisplayOptions': {
+                    'Width': 3,
+                    'Order': 89,
+                },
+                'InitialAttributes': {
+                    'StorageKey': 'ReadbackStatus'
+                }
+            },
+            {
+                'Key': 'Grading',
+                'DisplayOptions': {
+                    'Order': 15,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+        ]
+
 
     def OpenFileHandle(self):
         self.check_Test_Software()
@@ -142,6 +166,21 @@ class TestResult(GeneralTestResult):
                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
             else:
                 print 'There exist no ROOT file in "%s"' % self.RawTestSessionDataPath
+
+        # find pxar logfile of fulltest
+        logfilePath = ("%s.log"%fileHandlePath[:-5]) if len(fileHandlePath) > 4 else ''
+        self.pxarVersion = None
+        if os.path.isfile(logfilePath):
+            self.logfilePath = logfilePath
+            try:
+                with open(logfilePath, 'r') as logFile:
+                    for line in logFile:
+                        if 'Instanciating API for pxar' in line:
+                            posPxar = line.find('pxar')
+                            if posPxar >=0:
+                                self.pxarVersion = line[posPxar + 5:] if len(line) > posPxar + 5 else '?'
+            except:
+                pass
 
     def CustomWriteToDatabase(self, ParentID):
         if self.verbose:
