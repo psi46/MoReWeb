@@ -33,7 +33,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.8);
             self.ResultData['Plot']['ROOTObject'].Draw()
 
-        self.Title = 'Vdig [ADC]/Vd [V]'
+        self.Title = 'Vdig [ADC]/Vdig [V]'
         if self.Canvas:
             self.Canvas.SetCanvasSize(500, 500)
         self.SaveCanvas()
