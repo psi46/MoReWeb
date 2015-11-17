@@ -28,6 +28,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
 
         if self.ResultData['Plot']['ROOTObject']:
+            self.ResultData['Plot']['ROOTObject'].SetTitle('');
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitleOffset(1.3);
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.8);
             self.ResultData['Plot']['ROOTObject'].Draw()
 
         self.Title = 'Vdig [ADC]/Vd [V]'
