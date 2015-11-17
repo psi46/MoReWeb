@@ -2,7 +2,7 @@
 import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
-
+import array
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -47,6 +47,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].SetContour(100)
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(
