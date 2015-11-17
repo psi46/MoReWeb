@@ -227,8 +227,22 @@ class TestResult(GeneralTestResult):
                     'Order': 120,
                     'Show': True,
                 }
-            }
+            },
         ]
+
+        for ReadbackParameter in ['par0vd', 'par1vd','par0va','par1va','par0rbia','par1rbia','par0tbia','par1tbia','par2tbia']:
+            self.ResultData['SubTestResultDictList'].append({
+                'Key': 'ReadbackParameter_%s'%ReadbackParameter,
+                'Module': 'ReadbackParameter',
+                'InitialAttributes': {
+                    'Parameter': ReadbackParameter,
+                    'StorageKey': 'ReadbackParameter_%s'%ReadbackParameter,
+                },
+                'DisplayOptions': {
+                    'Order': 90,
+                    'Width': 1,
+                }
+            })
 
     def MergePyxarData(self):
         self.check_Test_Software()

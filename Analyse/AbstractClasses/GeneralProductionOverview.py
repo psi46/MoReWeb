@@ -627,8 +627,14 @@ class GeneralProductionOverview:
                         RootFilePath[:0] = [self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder']]
 
                         Grade = self.GetJSONValue(GradeJsonPath)
-                        if Grade and Grade in GradeDict:
-                            Grade = GradeDict[Grade]
+                        try:
+                            if Grade and Grade in GradeDict:
+                                Grade = GradeDict[Grade]
+
+                            if Grade and '\n' in Grade:
+                                Grade = Grade.split('\n')[0]
+                        except:
+                            pass
 
                         Path = '/'.join(RootFilePath)
                         RootFiles = glob.glob(Path)
@@ -691,7 +697,7 @@ class GeneralProductionOverview:
                     stats.DrawLatex(HistogramOptions['StatsPosition'][0], HistogramOptions['StatsPosition'][1] - StatsTextCounter*0.02, statsText)
                     StatsTextCounter += 1
 
-                    statsText = "UF={uf:1.0f}, OF={of:1.0f}".format(uf=underflowCount, of=overflowCount)
+                    statsText = "N={N} UF={uf:1.0f}, OF={of:1.0f}".format(N=HistogramData['Histogram'].GetEntries(), uf=underflowCount, of=overflowCount)
                     stats.DrawLatex(HistogramOptions['StatsPosition'][0], HistogramOptions['StatsPosition'][1] - StatsTextCounter*0.02, statsText)
                     StatsTextCounter += 1
 

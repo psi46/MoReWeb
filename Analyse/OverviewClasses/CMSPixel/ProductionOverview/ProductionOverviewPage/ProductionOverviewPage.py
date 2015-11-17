@@ -27,10 +27,57 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         NumModulesMaxPerList = 50
 
         TestsList = ['m20_1', 'm20_2', 'p17_1']
+        ReadbackParameters = [
+            {
+                'Parameter': 'par0vd',
+                'Xmin': -30,
+                'Xmax': 30
+            },
+            {
+                'Parameter': 'par1vd',
+                'Xmin': 30,
+                'Xmax': 100
+            },
+            {
+                'Parameter': 'par0va',
+                'Xmin': -30,
+                'Xmax': 30
+            },
+            {
+                'Parameter': 'par1va',
+                'Xmin': 0,
+                'Xmax': 100
+            },
+            {
+                'Parameter': 'par0rbia',
+                'Xmin': -20,
+                'Xmax': 50
+            },
+            {
+                'Parameter': 'par1rbia',
+                'Xmin': -1,
+                'Xmax': 3,
+            },
+            {
+                'Parameter': 'par0tbia',
+                'Xmin': 0,
+                'Xmax': 10
+            },
+            {
+                'Parameter': 'par1tbia',
+                'Xmin': 0,
+                'Xmax': 1
+            },
+            {
+                'Parameter': 'par2tbia',
+                'Xmin': -0.001,
+                'Xmax': 0.001
+            },
+        ]
 
         self.SubPages.append({
             "InitialAttributes" : {
-                "Sections": ["BumpBonding", "DeadPixel", "PerformanceParameters", "DACs", "IVCurves", "HighRate", "VcalCalibration"],
+                "Sections": ["BumpBonding", "DeadPixel", "PerformanceParameters", "DACs", "IVCurves", "Readback", "HighRate", "VcalCalibration"],
                 "DateBegin": self.Attributes['DateBegin'],
                 "DateEnd": self.Attributes['DateEnd'],
             }, 
@@ -413,6 +460,25 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             )
 
+        ### Readback ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "Readback", "Title": "Readback"}, "Key": "Section","Module": "Section"})
+        for Test in TestsList:
+            for Parameter in ReadbackParameters:
+                self.SubPages.append(
+                    {
+                        "Key": "ReadbackParameter_{Test}_{Parameter}".format(Test = Test, Parameter = Parameter['Parameter']),
+                        "Module": "ReadbackParameter",
+                        "InitialAttributes" : {
+                            "Test": Test,
+                            "Parameter": Parameter['Parameter'],
+                            "Xmin": Parameter['Xmin'],
+                            "Xmax": Parameter['Xmax'],
+                            "StorageKey" : "ReadbackParameter_{Test}_{Parameter}".format(Test = Test, Parameter = Parameter['Parameter']),
+                            "DateBegin": self.Attributes['DateBegin'],
+                            "DateEnd": self.Attributes['DateEnd'],
+                        }
+                    }
+                )
 
         ### HR ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "HighRate", "Title": "HighRateTests"}, "Key": "Section","Module": "Section"})

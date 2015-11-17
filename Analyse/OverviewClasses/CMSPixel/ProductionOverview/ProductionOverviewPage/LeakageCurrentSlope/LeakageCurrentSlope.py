@@ -54,6 +54,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'Variation', 'Value'])
                         Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary1','KeyValueDictPairs.json','Grade','Value'])
+                        
+                        if Grade and '\n' in Grade:
+                            Grade = Grade.split('\n')[0]
                         if Value is not None and Grade is not None:
                             ModuleGrade[Grade].append(float(Value))
                             NModules += 1

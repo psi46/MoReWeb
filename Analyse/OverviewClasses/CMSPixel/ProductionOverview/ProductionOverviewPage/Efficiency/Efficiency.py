@@ -49,6 +49,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         for Chip in range(0, 16):
                             Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip,  'EfficiencyInterpolation', 'KeyValueDictPairs.json', "InterpolatedEfficiency{Rate}".format(Rate=self.Attributes['Rate']), 'Value'])
                             Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips','Chip%d'%Chip,'Grading','KeyValueDictPairs.json','ROCGrade','Value'])
+                            if Grade and '\n' in Grade:
+                                Grade = Grade.split('\n')[0]
+
                             if Value is not None and Grade is not None and Grade in ModuleGrade:
                                 ModuleGrade[Grade].append(float(Value))
                                 NROCs += 1

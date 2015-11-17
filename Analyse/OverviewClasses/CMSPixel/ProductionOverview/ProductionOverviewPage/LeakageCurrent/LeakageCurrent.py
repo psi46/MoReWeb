@@ -55,10 +55,14 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         Factor = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Factor'])
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
                         Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary1','KeyValueDictPairs.json','Grade','Value'])
-
+                        if Grade and '\n' in Grade:
+                            Grade = Grade.split('\n')[0]
                         if Factor is not None and Value is not None and Grade is not None:
-                            ModuleGrade[Grade].append(float(Factor) * float(Value))
-                            NModules += 1
+                            try:
+                                ModuleGrade[Grade].append(float(Factor) * float(Value))
+                                NModules += 1
+                            except:
+                                print "Grade not defined: %s"%Grade
                         elif Factor is not None and Value is not None and Grade is None:
                             ModuleGrade['C'].append(float(Value))
                             NModules += 1
