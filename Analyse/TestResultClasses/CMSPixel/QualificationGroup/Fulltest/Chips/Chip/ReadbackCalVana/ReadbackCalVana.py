@@ -19,8 +19,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         HistoName = HistoDict.get(self.NameSingle, 'VanaCalibration')
-        #HistoName = 'Readback.rbVa_C%d_V0'
-        print HistoName
         ChipNo = self.ParentObject.Attributes['ChipNo']
         ROOTFile = self.ParentObject.ParentObject.FileHandle
 

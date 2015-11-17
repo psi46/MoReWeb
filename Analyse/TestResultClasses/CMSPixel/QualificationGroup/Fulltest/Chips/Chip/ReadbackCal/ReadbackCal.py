@@ -5,6 +5,7 @@ import os
 import re
 from operator import itemgetter
 import warnings
+import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
@@ -55,4 +56,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             warnings.warn('No readback calibration file found!')
 
         self.ResultData['KeyValueDictPairs']['ReadbackCalibrated'] = {'Label': 'Calibrated', 'Value': 'True' if ReadbackCalibrated else 'False'}
+
+
+        #Adding Vbg    
+        HistoName= 'Readback.Vbg_readback_VdCal_V0'
+        ChipNo = self.ParentObject.Attributes['ChipNo']
+        ROOTFile = self.ParentObject.ParentObject.FileHandle
+
+        try:
+            self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(ROOTFile, HistoName).Clone(self.GetUniqueID())
+        except:
+            pass
+
+        Vbg=round(self.ResultData['Plot']['ROOTObject'].GetBinContent(ChipNo+1),3)
+        self.ResultData['KeyValueDictPairs']['Vbg'] = {'Label': 'Vbg', 'Value': Vbg}                      
+        self.ResultData['KeyList'].append('Vbg')
+
         self.ResultData['KeyList'].append('ReadbackCalibrated')
