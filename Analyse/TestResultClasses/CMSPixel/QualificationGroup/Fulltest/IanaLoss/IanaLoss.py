@@ -68,6 +68,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             for iRoc in range(0, NChips):
                 self.ResultData['Plot']['ROOTObject'].SetBinContent(iRoc + 1, IanaLossPerRoc[iRoc])
+
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0, float(max(IanaLossPerRoc))*1.1 if len(IanaLossPerRoc) > 0 else 25)
+            self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlue+2)
             self.ResultData['Plot']['ROOTObject'].Draw()
 
             IanaLossThr = self.TestResultEnvironmentObject.GradingParameters['IanaLossThr']
