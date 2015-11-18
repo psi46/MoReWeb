@@ -92,7 +92,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
                 try:
-                    cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 10, 200)
+                    cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 5, 150)
                     cubicFit.SetParameter(0, 100.0)
                     cubicFit.SetParLimits(0, 0.0, 110.0)
                     cubicFit.SetParameter(1, 5.0e-7)
@@ -105,9 +105,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     if InterpolationRate < 121:
                         if DoubleColumn in [0,25]:
                             if InterpolatedEfficiency*0.01 < MinDCEfficiencyEdge:
+                                print "rates:", DoubleColumnRateList
+                                print "eff:", DoubleColumnEfficiencyList
+
+                                print "fit: ", InterpolatedEfficiency
                                 BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
                         else:
                             if InterpolatedEfficiency*0.01 < MinDCEfficiencyFiducial:
+                                print "rates:", DoubleColumnRateList
+                                print "eff:", DoubleColumnEfficiencyList
+
+                                print "fit: ", InterpolatedEfficiency
                                 BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
 
                     DoubleColumnEfficienciesRate.append(InterpolatedEfficiency)
