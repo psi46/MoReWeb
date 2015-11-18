@@ -175,6 +175,7 @@ class TestResult(GeneralTestResult):
             'Par1NGradeA': None,
             'Par1NGradeB': None,
             'Par1NGradeC': None,
+            'Comments': '',
         }
         print 'fill row end'
 
