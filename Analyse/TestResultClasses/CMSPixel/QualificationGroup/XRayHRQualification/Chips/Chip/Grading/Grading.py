@@ -314,29 +314,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             ### Column Readout Uniformity Over Time Grade ###
             Grades['ColumnReadoutUniformityOverTimeGrade'] = 1
-            NumberValues['NumberOfNonUniformColumnEvents'] = 0
-            for Column in range(0, 52):
-                ColumnReadoutUniformityHistogram = ColumnReadoutUniformityOverTimeROOTObject.ProjectionX(self.GetUniqueID(), Column + 1, Column + 1)
-                NEvents = ColumnReadoutUniformityHistogram.GetNbinsX()
-                FirstBin = ColumnReadoutUniformityHistogram.GetXaxis().GetFirst()
-                LastBin = ColumnReadoutUniformityHistogram.FindLastBinAbove(0)
-                ColumnReadoutUniformityHistogram.GetXaxis().SetRange(1, LastBin - 1)
-
-                MeanHitsPerBin = ColumnReadoutUniformityHistogram.Integral(FirstBin, LastBin) / (LastBin - FirstBin + 1)
-                ReadoutUniformityOverTimeSigma = math.sqrt(MeanHitsPerBin) # poisson
-
-                #exclude last bin
-                for Event in range(0, LastBin - 1):
-                    BinHits = ColumnReadoutUniformityHistogram.GetBinContent(Event + 1)
-
-                    if( abs(BinHits-MeanHitsPerBin) > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']
-                        *ReadoutUniformityOverTimeSigma
-                    ):
-                        NumberValues['NumberOfNonUniformColumnEvents'] += 1
-                        Grades['ColumnReadoutUniformityOverTimeGrade'] = 3
-                        ReadoutProblemsDetected = True
-
-                ColumnReadoutUniformityHistogram.Delete()
+            NumberValues['NumberOfNonUniformColumnEvents'] = -1
+            try:
+                NumberValues['NumberOfNonUniformColumnEvents'] = int(self.ParentObject.ResultData['SubTestResults']['ColumnUniformityEventsPerColumn_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnEvents']['Value'])
+            except:
+                pass
+            if NumberValues['NumberOfNonUniformColumnEvents']>0:
+                Grades['ColumnReadoutUniformityOverTimeGrade'] = 3
+                ReadoutProblemsDetected = True
 
             if not 'ColumnReadoutUniformityOverTimeGrade' in OmitGradesInFinalGrading and not 'ColumnReadoutUniformityOverTimeGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
                 ROCGrades.append(Grades['ColumnReadoutUniformityOverTimeGrade'])
