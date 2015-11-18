@@ -44,7 +44,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         except:
             pass
 
-        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'BB_X-ray', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
+        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'BB_X-ray', 'lowHREfficiency', 'DoubleColumn', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         Summary.GetYaxis().SetTickLength(0)
@@ -353,6 +353,20 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         DefectsDict[ModuleID]['lowHREfficiency'] = 'C'
                     elif 'B' in EfficiencyGrades:
                         DefectsDict[ModuleID]['lowHREfficiency'] = 'B'
+
+        ### double column ###
+                    DoubleColumnGrades = []
+                    for Chip in range(0,16):
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'BadDoubleColumnsGrade', 'Value'])
+                        if Value is not None:
+                            Grades = [grade for grade in Value.split('/') if grade.strip()[0] != '(']
+                            DoubleColumnGrades += Grades
+                        else:
+                            self.ProblematicModulesList.append(ModuleID)
+                    if 'C' in DoubleColumnGrades:
+                        DefectsDict[ModuleID]['DoubleColumn'] = 'C'
+                    elif 'B' in DoubleColumnGrades:
+                        DefectsDict[ModuleID]['DoubleColumn'] = 'B'
 
         ### r/o problems
                     Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithReadoutProblems', 'Value'])
