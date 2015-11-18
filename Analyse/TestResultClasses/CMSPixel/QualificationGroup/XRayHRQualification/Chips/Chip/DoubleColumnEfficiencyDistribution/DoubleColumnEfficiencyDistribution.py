@@ -92,12 +92,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
                 try:
-                    cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 5, 200)
-                    cubicFit.SetParameter(1, 100)
-                    cubicFit.SetParameter(2, 5e-7)
+                    cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 10, 200)
+                    cubicFit.SetParameter(0, 100.0)
+                    cubicFit.SetParLimits(0, 0.0, 110.0)
+                    cubicFit.SetParameter(1, 5.0e-7)
+                    cubicFit.SetParLimits(1, 0, 1.0e-5)
 
                     EfficiencyGraph = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList)
-                    EfficiencyGraph.Fit(cubicFit, 'QR')
+                    EfficiencyGraph.Fit(cubicFit, 'QRB')
                     InterpolatedEfficiency = cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor)
 
                     if InterpolationRate < 121:

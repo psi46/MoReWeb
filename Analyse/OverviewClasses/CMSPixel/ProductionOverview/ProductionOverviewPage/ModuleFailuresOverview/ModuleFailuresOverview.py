@@ -464,11 +464,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         ROOT.gPad.SetLeftMargin(0.16)
         ROOT.gPad.SetRightMargin(0.03)
-
         Summary.Draw("col")
         Summary.GetZaxis().SetRangeUser(0, 1.0)
         Summary.GetYaxis().SetLabelSize(0.055)
-
 
         Summary.GetXaxis().LabelsOption("v")
         if len(ModuleIDsList) > 200:
@@ -482,6 +480,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         line1 = ROOT.TLine()
         line1.SetLineStyle(2)
+        line1.SetLineWidth(1)
+        line1.SetLineColorAlpha(ROOT.kBlack, 0.35)
         linePositions = [3*i for i in range(1, len(YLabels))]
 
         for linePosition in linePositions:
@@ -499,7 +499,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         title2.SetTextAlign(12)
         title2.SetTextColor(self.GetGradeColor('C'))
         title2.DrawText(0.23,0.965,"Grade C")
-
 
         self.SaveCanvas()
         HTML = self.Image(self.Attributes['ImageFile'], {'height': '350px'})
