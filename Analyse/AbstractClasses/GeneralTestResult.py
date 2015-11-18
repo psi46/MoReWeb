@@ -331,6 +331,7 @@ class GeneralTestResult(object):
                 print 'added comment', comment, 'to ', self.Name
             self.ResultData['KeyValueDictPairs']['Comment'] = {
                 'Value': comment,
+                'Style': 'font-weight:bold;color:red;' if '!' in comment else 'font-weight:bold;',
             }
             self.ResultData['KeyList'].append('Comment')
 
@@ -929,6 +930,10 @@ class GeneralTestResult(object):
             if not TestResultObject.ResultData['KeyValueDictPairs'][i].has_key('Label'):
                 TestResultObject.ResultData['KeyValueDictPairs'][i]['Label'] = i
 
+            css_style = ''
+            if 'Style' in TestResultObject.ResultData['KeyValueDictPairs'][i]:
+                css_style = TestResultObject.ResultData['KeyValueDictPairs'][i]['Style']
+
             KeyValueDictPairsRows += HtmlParser.substituteMarkerArray(
                 KeyValueDictPairsRowHTMLTemplate,
                 {
@@ -936,6 +941,7 @@ class GeneralTestResult(object):
                     '###LABEL###': HtmlParser.MaskHTML(
                         TestResultObject.ResultData['KeyValueDictPairs'][i]['Label']
                     ),
+                    '###STYLE###': css_style,
                     '###VALUE###': html_value,
                     '###UNIT###': HtmlParser.MaskHTML(
                         TestResultObject.ResultData['KeyValueDictPairs'][i]['Unit']
