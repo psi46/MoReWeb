@@ -245,6 +245,20 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         for Test in TestsList:
             self.SubPages.append(
                 {
+                    "Key": "CalDelPerModule_{Test}".format(Test = Test),
+                    "Module": "CalDelPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "CalDelPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
                     "Key": "MeanNoise_{Test}".format(Test = Test),
                     "Module": "MeanNoise",
                     "InitialAttributes" : {
