@@ -176,7 +176,7 @@ class TestResult(GeneralTestResult):
             ]
 
         self.ResultData['SubTestResultDictList'] += [
-        	     {
+            {
                 'Key': 'Grading',
                 'DisplayOptions': {
                     'Show': False,
