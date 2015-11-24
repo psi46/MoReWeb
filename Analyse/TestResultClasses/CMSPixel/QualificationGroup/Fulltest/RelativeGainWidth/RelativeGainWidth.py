@@ -26,5 +26,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gPad.SetLogy(0);
         self.ResultData['HiddenData']['LimitB'] = self.TestResultEnvironmentObject.GradingParameters['gainB']
         self.ResultData['HiddenData']['LimitC'] = self.TestResultEnvironmentObject.GradingParameters['gainC']
-        self.ParentObject.ResultData['SubTestResults']['Noise'].SpecialPopulateData(self,  self.Attributes['SpecialPopulateDataParameters'])
+        self.SpecialPopulateData(self,  self.Attributes['SpecialPopulateDataParameters'])
         

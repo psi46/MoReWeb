@@ -25,4 +25,4 @@ class TestResult(GeneralTestResult):
 
         self.ResultData['HiddenData']['LimitB'] = self.TestResultEnvironmentObject.GradingParameters['pedestalB']
         self.ResultData['HiddenData']['LimitC'] = self.TestResultEnvironmentObject.GradingParameters['pedestalC']
-        self.ParentObject.ResultData['SubTestResults']['Noise'].SpecialPopulateData(self, self.Attributes['SpecialPopulateDataParameters'])
+        self.SpecialPopulateData(self, self.Attributes['SpecialPopulateDataParameters'])

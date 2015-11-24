@@ -27,4 +27,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['HiddenData']['LimitB'] = self.TestResultEnvironmentObject.GradingParameters['trimmingB']
         self.ResultData['HiddenData']['LimitC'] = self.TestResultEnvironmentObject.GradingParameters['trimmingC']
-        self.ParentObject.ResultData['SubTestResults']['Noise'].SpecialPopulateData(self,self.Attributes['SpecialPopulateDataParameters'])
+        self.SpecialPopulateData(self,self.Attributes['SpecialPopulateDataParameters'])
