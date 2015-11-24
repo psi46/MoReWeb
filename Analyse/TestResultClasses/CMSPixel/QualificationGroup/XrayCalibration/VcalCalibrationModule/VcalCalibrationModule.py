@@ -66,6 +66,10 @@ class TestResult(GeneralTestResult):
         offsets = []
         error_slopes = []
         error_offsets = []
+
+        slopesGood = []
+        offsetsGood = []
+
         for roc in range(self.nRocs):
             key = "VcalCalibration_{Method}_ROC{ROC}".format(Method=self.Attributes['Method'], ROC=roc)
             roc_results = self.ResultData['SubTestResults'][key].ResultData
@@ -76,36 +80,58 @@ class TestResult(GeneralTestResult):
             error_slopes.append(roc_results['KeyValueDictPairs']['Slope']['Sigma'])
             error_offsets.append(roc_results['KeyValueDictPairs']['Offset']['Sigma'])
 
+            try:
+                if float(roc_results['KeyValueDictPairs']['Slope']['Value']) > 0:
+                    slopesGood.append(roc_results['KeyValueDictPairs']['Slope']['Value'])
+                    offsetsGood.append(roc_results['KeyValueDictPairs']['Offset']['Value'])
+            except:
+                pass
+
+
         for roc in range(self.nRocs):
             table_line = [roc, "%.1f e- / Vcal" % (slopes[roc]), "%.1f e- / Vcal" % (error_slopes[roc]),
                           "%.1f e-" % (offsets[roc]), "%.1f e-" % (error_offsets[roc])]
             self.ResultData['Table']['BODY'].append(table_line)
+
         if self.verbose:
             print self.nRocs
             print 'offset', offsets
             print 'slope', slopes
-        if len(slopes) == 0:
+
+        if len(slopesGood) == 0:
             average_offset = -1e9
             average_slope = -1e9
             sigma_slope = -1e9
             sigma_offset = -1e9
         else:
-            average_offset = reduce(lambda x, y: x + y, offsets)
-            average_slope = reduce(lambda x, y: x + y, slopes)
-            average_slope /= self.nRocs
+            average_offset = reduce(lambda x, y: x + y, offsetsGood)
+            average_slope = reduce(lambda x, y: x + y, slopesGood)
+            average_slope /= len(slopesGood)
             sigma_slope = math.sqrt(
-                reduce(lambda x, y: x + y, map(lambda x: x ** 2, slopes)) / self.nRocs - average_slope ** 2)
-            average_offset /= self.nRocs
+                reduce(lambda x, y: x + y, map(lambda x: x ** 2, slopesGood)) / len(slopesGood) - average_slope ** 2)
+            average_offset /= len(slopesGood)
             sigma_offset = math.sqrt(
-                reduce(lambda x, y: x + y, map(lambda x: x ** 2, offsets)) / self.nRocs - average_offset ** 2)
+                reduce(lambda x, y: x + y, map(lambda x: x ** 2, offsetsGood)) / len(slopesGood) - average_offset ** 2)
 
         table_line = ["Average", "%.1f e- / Vcal" % average_slope, "", "%.1f e-" % average_offset, ""]
         self.ResultData['Table']['FOOTER'].append(table_line)
 
-        slopes.sort()
-        offsets.sort()
-        median_slope = slopes[self.nRocs / 2]
-        median_offset = offsets[self.nRocs / 2]
+        if len(slopesGood) == 0:
+            median_slope = -1
+            median_offset = -1
+        else:
+            slopesGood.sort()
+            offsetsGood.sort()
+            NGoodRocs = len(slopesGood)
+            if NGoodRocs % 2 == 1:
+                median_slope = slopes[int(NGoodRocs / 2)]
+                median_offset = offsets[int(NGoodRocs / 2)]
+            elif NGoodRocs > 1:
+                median_slope = slopes[int(NGoodRocs / 2)] + slopes[int(NGoodRocs / 2) - 1]
+                median_offset = offsets[int(NGoodRocs / 2)] + offsets[int(NGoodRocs / 2) - 1]
+            else:
+                median_slope = slopes[0]
+                median_offset = offsets[0]
 
         table_line = ["Median", "%.1f e- / Vcal" % median_slope, "", "%.1f e-" % median_offset, ""]
         self.ResultData['Table']['FOOTER'].append(table_line)

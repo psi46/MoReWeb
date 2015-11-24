@@ -72,7 +72,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     refitPHlin = True
                     refitPHtan = True
             except:
-                print "warning: could not read fit revision file!"
+                print "warning: could not read fit revision file! => needs re-fitting"
+                refitScurves = True
+                refitPHlin = True
+                refitPHtan = True
 
         else:
             FitRevDict.add_section('FitRevisions')

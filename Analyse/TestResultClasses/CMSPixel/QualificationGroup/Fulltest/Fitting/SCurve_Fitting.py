@@ -134,7 +134,7 @@ class SCurve_Fitting():
     def getOutputFile(self,dirName,chip):
         outputFileName = '%s//SCurve_C%i.dat'%(dirName, chip)
         if os.path.isfile(outputFileName) and not self.refit:
-            print 'file "%s" already exists --> no fiting'%outputFileName
+            print 'file "%s" already exists --> no fiting'%outputFileName.split('/')[-1]
             retVal =[-2]*4
             retVal[1]=chip
             retVal = [retVal,[]]
