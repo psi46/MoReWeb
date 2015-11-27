@@ -9,6 +9,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogx(0)
         ROOT.gStyle.SetOptStat(0)
 
         # initialize data
@@ -42,7 +43,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.Canvas.SetFrameLineWidth(1)
                 self.Canvas.SetFrameBorderMode(0)
                 self.Canvas.SetFrameBorderSize(1)
-                self.Canvas.SetCanvasSize(1500, 376)
+                self.Canvas.SetCanvasSize(1784, 412)
             except:
                 pass
             self.ResultData['Plot']['ROOTObject'].SetTitle("")

@@ -55,7 +55,11 @@ class TestResult(GeneralTestResult):
                     }
                 ],
             },
-            'SCurves': {
+            'Scurves': {
+                'Fitting': [
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Fitting',
+                    }],
                 'ChipTests': [
                     'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.SCurveWidths',
                     'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.VcalThresholdUntrimmed',
@@ -103,6 +107,62 @@ class TestResult(GeneralTestResult):
                     }
                 ],
             },
+            'GainPedestal': {
+                'Fitting': [
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Fitting',
+                    }],
+                'ChipTests': [
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.' + x for x in [
+                        'PHCalibrationTan', 'PHCalibrationGain', 'PHCalibrationParameter1', 'PHCalibrationPedestal',
+                        'PHCalibrationGainMap'
+                        ]
+                    ],
+                'Tests': [
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.RelativeGainWidth',
+                        'Width': 1,
+                        'InitialAttributes': {
+                                'StorageKey': 'RelativeGainWidth',
+                        },
+                    },
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.PedestalSpread',
+                        'Width': 1,
+                        'InitialAttributes': {
+                                'StorageKey': 'PedestalSpread',
+                            },
+                    },
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Parameter1',
+                        'Width': 1,
+                        'InitialAttributes': {
+                                'StorageKey': 'Parameter1',
+                        },
+                    },
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.GainMap',
+                        'Width': 4,
+                        'InitialAttributes': {
+                                'StorageKey': 'GainMap',
+                        },
+                    },
+                ],
+            },
+            'Hitmap': {
+                'ChipTests': [
+                    'TestResultClasses.CMSPixel.QualificationGroup.XRayHRQualification.Chips.Chip.HitMap',
+                    ],
+                'Tests': [
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.XRayHRQualification.HitOverview',
+                        'Width': 4,
+                        'InitialAttributes': {
+                                'StorageKey': 'HitOverview',
+                        },
+                    },
+                ],
+            },
             'ReadbackCal': {
                 'ChipTests': [
                     'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.ReadbackCal',
@@ -126,6 +186,28 @@ class TestResult(GeneralTestResult):
         TestName = self.Attributes['Test']
         print "checking test '%s'"%TestName
         if TestName in TestNameDictionary:
+
+            if 'Fitting' in TestNameDictionary[TestName]:
+                for Test in TestNameDictionary[TestName]['Fitting']:
+                    print "do fitting: ",Test['Module']
+                    InitialAttributes = {
+                            'ModuleVersion': self.Attributes['ModuleVersion'],
+                            'NumberOfChips': self.Attributes['NumberOfChips'],
+                            'StorageKey': Test['Module'],
+                    }
+
+                    if 'InitialAttributes' in Test:
+                        InitialAttributes.update(Test['InitialAttributes'])
+
+                    self.ResultData['SubTestResultDictList'].append(
+                        {
+                            'Key': Test['Module'],
+                            'DisplayOptions': {
+                                'Show': False,
+                            },
+                            'InitialAttributes': InitialAttributes,
+
+                        })
 
             if 'ChipTests' in TestNameDictionary[TestName]:
                  self.ResultData['SubTestResultDictList'].append(
@@ -180,6 +262,15 @@ class TestResult(GeneralTestResult):
 
         if not self.FileHandle:
             print 'problem to find %s' % fileHandlePath
+            XrayRate = None
+            if self.RawTestSessionDataPath.endswith('MHz/cm2'):
+                XrayRate = self.RawTestSessionDataPath.split('_')[-1].split('MHz/cm2')[0]
+                try:
+                    XrayRate = int(XrayRate)
+                except:
+                    XrayRate = None
+                self.RawTestSessionDataPath = self.RawTestSessionDataPath[0:-7]
+
             files = [f for f in os.listdir(self.RawTestSessionDataPath) if f.endswith('.root')]
             i = 0
             if len(files) > 1:
@@ -217,6 +308,7 @@ class TestResult(GeneralTestResult):
                 fileHandlePath = self.RawTestSessionDataPath + '/' + files[i]
                 print "open '%s'" % fileHandlePath
                 self.FileHandle = ROOT.TFile.Open(fileHandlePath)
+
             elif len(files) == 1:
                 i = 0
                 fileHandlePath = self.RawTestSessionDataPath + '/' + files[i]

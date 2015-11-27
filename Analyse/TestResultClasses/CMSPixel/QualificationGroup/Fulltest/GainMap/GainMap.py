@@ -1,38 +1,37 @@
 import ROOT
 import AbstractClasses
-import array
-
+import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.Name='CMSPixel_QualificationGroup_XRayHRQualification_HitOverview_TestResult'
-        self.NameSingle='HitOverview'
+        self.NameSingle='GainMap'
+        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_%s_TestResult'%self.NameSingle
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
-        self.Canvas.Clear()
 
+        # initialize data
         xBins = 8 * self.nCols
         yBins = 2 * self.nRows
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins)
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins);  # mBumps
 
-        try:
-            Rate = self.Attributes['Rate']
-        except:
-            Rate = ''
-
-        # copy ROC data to module data
+        # fill plot
+        SpecialBumpBondingTestNamesROC = []
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            histo = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate) if len(Rate)>0 else 'HitMap'].ResultData['Plot']['ROOTObject']
-            chipNo = ChipTestResultObject.Attributes['ChipNo']
+            histo = ChipTestResultObject.ResultData['SubTestResults']['PHCalibrationGainMap'].ResultData['Plot']['ROOTObject']
 
-            for col in range(self.nCols): 
+            if not histo:
+                print 'cannot get NoiseMap histo for chip ',ChipTestResultObject.Attributes['ChipNo']
+                continue
+            chipNo = ChipTestResultObject.Attributes['ChipNo']
+            for col in range(self.nCols):
                 for row in range(self.nRows):
                     result = histo.GetBinContent(col + 1, row + 1)
                     self.UpdatePlot(chipNo, col, row, result)
 
+        # draw
         if self.ResultData['Plot']['ROOTObject']:
             try:
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTickLength(0.015)
@@ -46,47 +45,45 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.Canvas.SetCanvasSize(1784, 412)
             except:
                 pass
-
-            # calculate scale for hitmap
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, self.ResultData['Plot']['ROOTObject'].GetMaximum())
-
-            XProjection = self.ResultData['Plot']['ROOTObject'].ProjectionX('hproj_{Rate}_{id}'.format(Rate=Rate, id=self.GetUniqueID()), 50, 50)
-            #Quantiles = array.array('d', [0])
-            #QuantilePositions = array.array('d', [0.5])
-            #XProjection.GetQuantiles(len(QuantilePositions), Quantiles, QuantilePositions)
-            #XProjection.Delete()
-            XProjectionList = []
-            for col in range(XProjection.GetXaxis().GetFirst(), XProjection.GetXaxis().GetLast()+1):
-                XProjectionList.append(XProjection.GetBinContent(col))
-            XProjectionList.sort()
-            Median = XProjectionList[int(len(XProjectionList)/2)]
-
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("#hits")
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitleOffset(0.5)
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle()
-            
-            self.ResultData['Plot']['ROOTObject'].SetContour(100)
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
-            if self.ResultData['Plot']['ROOTObject'].GetMaximum() > Median*3:
-                self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, Median*3)
 
-            ROOT.gPad.Update()
+        boxes = []
+        startChip = self.ParentObject.Attributes['StartChip']
+        endChip = self.ParentObject.Attributes['NumberOfChips'] + startChip - 1
+        if self.verbose:
+            print 'Used chips: %2d -%2d' % (startChip, endChip)
+        for i in range(0,16):
+            if i < startChip or endChip < i:
+                if i < 8:
+                    j = 15 - i
+                else:
+                    j = i - 8
+                beginX = (j % 8) * self.nCols
+                endX = beginX + self.nCols
+                beginY = int(j / 8) * self.nRows
+                endY = beginY + self.nRows
+                if self.verbose:
+                    print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
+                newBox = ROOT.TPaveText(beginX, beginY, endX, endY)
+                newBox.SetFillColor(29)
+                newBox.SetLineColor(29)
+                newBox.SetFillStyle(3004)
+                newBox.SetShadowColor(0)
+                newBox.SetBorderSize(1)
+                newBox.Draw()
+                boxes.append(newBox)
 
         self.ResultData['Plot']['Format'] = 'png'
 
-        self.Title = 'Hit Map {Rate}'.format(Rate=Rate)
+        self.Title = 'Gain Map'
         self.SaveCanvas()
-
-        if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, self.ResultData['Plot']['ROOTObject'].GetMaximum())
-
     def UpdatePlot(self, chipNo, col, row, value):
         result = value
         if chipNo < 8:
@@ -95,8 +92,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             tmpCol = (chipNo % 8 * self.nCols + col)
             tmpRow = row
-        # Get the data from the chip sub test result hitmap
+        # Get the data from the chip sub test result bump bonding
 
         if result and self.verbose:
             print chipNo, col, row, '--->', tmpCol, tmpRow, result
+#         self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol + 1, tmpRow + 1, result)
         self.ResultData['Plot']['ROOTObject'].Fill(tmpCol, tmpRow, result)
