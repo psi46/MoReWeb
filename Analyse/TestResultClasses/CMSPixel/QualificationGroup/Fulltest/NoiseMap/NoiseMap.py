@@ -9,6 +9,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogx(0)
         ROOT.gStyle.SetOptStat(0)
 
         # initialize data
@@ -42,7 +43,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.Canvas.SetFrameLineWidth(1)
                 self.Canvas.SetFrameBorderMode(0)
                 self.Canvas.SetFrameBorderSize(1)
-                self.Canvas.SetCanvasSize(1500, 376)
+                self.Canvas.SetCanvasSize(1784, 412)
             except:
                 pass
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
@@ -52,7 +53,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
-
 
         boxes = []
         startChip = self.ParentObject.Attributes['StartChip']
@@ -72,7 +72,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if self.verbose:
                     print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
                 newBox = ROOT.TPaveText(beginX, beginY, endX, endY)
-#                 newBox.AddText('%2d' % i)
                 newBox.SetFillColor(29)
                 newBox.SetLineColor(29)
                 newBox.SetFillStyle(3004)
@@ -80,20 +79,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 newBox.SetBorderSize(1)
                 newBox.Draw()
                 boxes.append(newBox)
-                # (beginX, beginY, endX, endY)
-#         if self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 0:
-#             box.SetFillColor(29);
-#             box.DrawBox( 0, 0,  8*self.nCols,  self.nRows);
-#         elif self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 8:
-#             box.SetFillColor(29);
-#             box.DrawBox(0, self.nRows, 8 * self.nCols, 2 * self.nRows);
-#         elif self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 8:
-#             box.SetFillColor(29);
-#             box.DrawBox( 0, 0,  8*self.nCols,  2*self.nRows);
 
         self.ResultData['Plot']['Format'] = 'png'
 
-        self.Title = 'Noise Map' + (' (%s)'%self.ResultData['HiddenData']['SpecialBumpBondingTestName']) if 'SpecialBumpBondingTestName' in self.ResultData['HiddenData'] and len(self.ResultData['HiddenData']['SpecialBumpBondingTestName']) > 0 else ''
+        self.Title = 'Noise Map'
         self.SaveCanvas()
     def UpdatePlot(self, chipNo, col, row, value):
         result = value

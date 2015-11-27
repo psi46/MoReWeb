@@ -24,7 +24,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def PopulateResultData(self):
-        ROOT.gPad.SetLogy(0);
+        ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogx(0)
         self.ResultData['HiddenData']['LimitB'] = self.TestResultEnvironmentObject.GradingParameters['noiseB']
         self.ResultData['HiddenData']['LimitC'] = self.TestResultEnvironmentObject.GradingParameters['noiseC']
         self.SpecialPopulateData(self, self.Attributes['SpecialPopulateDataParameters'])

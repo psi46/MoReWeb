@@ -17,10 +17,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         yBins = 2 * self.nRows
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins)
 
+        try:
+            Rate = self.Attributes['Rate']
+        except:
+            Rate = ''
+
         # copy ROC data to module data
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            histo = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
+            histo = ChipTestResultObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate) if Rate else 'HitMap'].ResultData['Plot']['ROOTObject']
             chipNo = ChipTestResultObject.Attributes['ChipNo']
 
             for col in range(self.nCols): 
@@ -38,14 +43,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.Canvas.SetFrameLineWidth(1)
                 self.Canvas.SetFrameBorderMode(0)
                 self.Canvas.SetFrameBorderSize(1)
-                self.Canvas.SetCanvasSize(1500, 376)
+                self.Canvas.SetCanvasSize(1784, 412)
             except:
                 pass
 
             # calculate scale for hitmap
             self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, self.ResultData['Plot']['ROOTObject'].GetMaximum())
 
-            XProjection = self.ResultData['Plot']['ROOTObject'].ProjectionX('hproj_{Rate}_{id}'.format(Rate=self.Attributes['Rate'], id=self.GetUniqueID()), 50, 50)
+            XProjection = self.ResultData['Plot']['ROOTObject'].ProjectionX('hproj_{Rate}_{id}'.format(Rate=Rate, id=self.GetUniqueID()), 50, 50)
             #Quantiles = array.array('d', [0])
             #QuantilePositions = array.array('d', [0.5])
             #XProjection.GetQuantiles(len(QuantilePositions), Quantiles, QuantilePositions)
@@ -76,7 +81,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['Format'] = 'png'
 
-        self.Title = 'Hit Map {Rate}'.format(Rate=self.Attributes['Rate'])
+        self.Title = 'Hit Map {Rate}'.format(Rate=Rate)
         self.SaveCanvas()
 
         if self.ResultData['Plot']['ROOTObject']:

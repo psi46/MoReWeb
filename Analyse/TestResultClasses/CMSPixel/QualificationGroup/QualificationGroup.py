@@ -214,7 +214,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 test = test.next()
 
         # single tests
-        singleTestsList = ['PixelAlive', 'ReadbackCal', 'BumpBonding', 'SCurves', 'Trim']
+        singleTestsList = ['PixelAlive', 'ReadbackCal', 'BumpBonding', 'Scurves', 'Trim', 'GainPedestal', 'Hitmap']
 
         # try to find tests from test list in ini file
         if not QualificationAdded:

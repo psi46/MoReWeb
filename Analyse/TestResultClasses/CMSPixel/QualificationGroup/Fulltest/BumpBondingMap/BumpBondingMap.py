@@ -66,7 +66,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.Canvas.SetFrameLineWidth(1)
                 self.Canvas.SetFrameBorderMode(0)
                 self.Canvas.SetFrameBorderSize(1)
-                self.Canvas.SetCanvasSize(1500, 376)
+                self.Canvas.SetCanvasSize(1784, 412)
             except:
                 pass
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
