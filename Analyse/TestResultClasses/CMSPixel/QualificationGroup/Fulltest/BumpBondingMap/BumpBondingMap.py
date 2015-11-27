@@ -12,9 +12,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gStyle.SetOptStat(0)
 
         # initialize data
-        xBins = 8 * self.nCols + 1
-        yBins = 2 * self.nRows + 1
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins);  # mBumps
+        xBins = 8 * self.nCols
+        yBins = 2 * self.nRows
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins)  # mBumps
 
         # fill plot
         SpecialBumpBondingTestNamesROC = []
@@ -22,7 +22,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
 
             # take the same bb map that has been used in the grading
-            SpecialBumpBondingTestName = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SpecialBumpBondingTestName']
+            try:
+                SpecialBumpBondingTestName = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SpecialBumpBondingTestName']
+            except:
+                SpecialBumpBondingTestName = ''
+
             if SpecialBumpBondingTestName == 'BB4':
                 histo = ChipTestResultObject.ResultData['SubTestResults']['BB4'].ResultData['Plot']['ROOTObject']
                 self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = 'BB4'
@@ -33,7 +37,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 histo = ChipTestResultObject.ResultData['SubTestResults']['BumpBondingMap'].ResultData['Plot']['ROOTObject']
 
             SpecialBumpBondingTestNamesROC.append(SpecialBumpBondingTestName)
-                
+
             if not histo:
                 print 'cannot get BumpBondingProblems histo for chip ',ChipTestResultObject.Attributes['ChipNo']
                 continue
@@ -53,6 +57,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # draw
         if self.ResultData['Plot']['ROOTObject']:
+            try:
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTickLength(0.015)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTickLength(0.012)
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetAxisColor(1, 0.4)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetAxisColor(1, 0.4)
+                self.Canvas.SetFrameLineStyle(0)
+                self.Canvas.SetFrameLineWidth(1)
+                self.Canvas.SetFrameBorderMode(0)
+                self.Canvas.SetFrameBorderSize(1)
+                self.Canvas.SetCanvasSize(1500, 376)
+            except:
+                pass
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
@@ -101,7 +117,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['Format'] = 'png'
 
-        self.Title = 'Bump Bonding Map' + (' (%s)'%self.ResultData['HiddenData']['SpecialBumpBondingTestName']) if 'SpecialBumpBondingTestName' in self.ResultData['HiddenData'] and len(self.ResultData['HiddenData']['SpecialBumpBondingTestName']) > 0 else ''
+        self.Title = 'Bump Bonding Defects' + (' (%s)'%self.ResultData['HiddenData']['SpecialBumpBondingTestName']) if 'SpecialBumpBondingTestName' in self.ResultData['HiddenData'] and len(self.ResultData['HiddenData']['SpecialBumpBondingTestName']) > 0 else ''
         self.SaveCanvas()        
     def UpdatePlot(self, chipNo, col, row, value):
         result = value

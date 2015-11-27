@@ -32,6 +32,77 @@ class TestResult(GeneralTestResult):
                     }
                 ],
             },
+            'BumpBonding': {
+                'ChipTests': [
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.BumpBonding',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.BumpBondingProblems',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.BumpBondingMap',
+                ],
+                'Tests': [
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.BumpBondingProblems',
+                        'Width': 4,
+                        'InitialAttributes': {
+                                'StorageKey': 'BBThrMap',
+                            },
+                    },
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.BumpBondingMap',
+                        'Width': 4,
+                        'InitialAttributes': {
+                                'StorageKey': 'BBDefectsMap',
+                        },
+                    }
+                ],
+            },
+            'SCurves': {
+                'ChipTests': [
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.SCurveWidths',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.VcalThresholdUntrimmed',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.NoiseMap',
+                ],
+                'Tests': [
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.VcalThreshold',
+                        'Width': 4,
+                        'InitialAttributes': {
+                                'StorageKey': 'VcalThreshold',
+                        },
+                    },
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Noise',
+                        'Width': 1,
+                        'InitialAttributes': {
+                                'StorageKey': 'Noise',
+                            },
+                    },
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.NoiseMap',
+                        'Width': 4,
+                        'InitialAttributes': {
+                                'StorageKey': 'NoiseMap',
+                        },
+                    },
+                ],
+            },
+            'Trim': {
+                'ChipTests': [
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.PixelMap',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.TrimBitTest',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.TrimBits',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.TrimBitMap',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.TrimBitProblems',
+                ],
+                'Tests': [
+                    {
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.TrimBitMap',
+                        'Width': 4,
+                        'InitialAttributes': {
+                                'StorageKey': 'TrimBitMap',
+                        },
+                    }
+                ],
+            },
             'ReadbackCal': {
                 'ChipTests': [
                     'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.ReadbackCal',
@@ -53,6 +124,7 @@ class TestResult(GeneralTestResult):
         }
 
         TestName = self.Attributes['Test']
+        print "checking test '%s'"%TestName
         if TestName in TestNameDictionary:
 
             if 'ChipTests' in TestNameDictionary[TestName]:
@@ -73,10 +145,12 @@ class TestResult(GeneralTestResult):
             Index = 2
             if 'Tests' in TestNameDictionary[TestName]:
                 for Test in TestNameDictionary[TestName]['Tests']:
+                    print "add test: ",Test['Module']
                     InitialAttributes = {
                             'ModuleVersion': self.Attributes['ModuleVersion'],
                             'NumberOfChips': self.Attributes['NumberOfChips'],
-                        }
+                            'StorageKey': Test['Module'],
+                    }
 
                     if 'InitialAttributes' in Test:
                         InitialAttributes.update(Test['InitialAttributes'])

@@ -3,8 +3,8 @@ import AbstractClasses
 import ROOT
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
-        self.NameSingle='PixelMap'
-        self.Name='CMSPixel_QualificationGroup_Fulltest_%s_TestResult'%self.NameSingle
+        self.NameSingle='NoiseMap'
+        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_%s_TestResult'%self.NameSingle
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
     def PopulateResultData(self):
@@ -14,16 +14,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # initialize data
         xBins = 8 * self.nCols
         yBins = 2 * self.nRows
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins)  # mBumps
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins);  # mBumps
 
         # fill plot
+        SpecialBumpBondingTestNamesROC = []
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+            histo = ChipTestResultObject.ResultData['SubTestResults']['NoiseMap'].ResultData['Plot']['ROOTObject']
 
-            # take the same bb map that has been used in the grading
-            histo = ChipTestResultObject.ResultData['SubTestResults']['PixelMap'].ResultData['Plot']['ROOTObject']
             if not histo:
-                print 'cannot get PixelMap histo for chip ',ChipTestResultObject.Attributes['ChipNo']
+                print 'cannot get NoiseMap histo for chip ',ChipTestResultObject.Attributes['ChipNo']
                 continue
             chipNo = ChipTestResultObject.Attributes['ChipNo']
             for col in range(self.nCols):
@@ -53,6 +53,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
+
         boxes = []
         startChip = self.ParentObject.Attributes['StartChip']
         endChip = self.ParentObject.Attributes['NumberOfChips'] + startChip - 1
@@ -71,6 +72,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if self.verbose:
                     print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
                 newBox = ROOT.TPaveText(beginX, beginY, endX, endY)
+#                 newBox.AddText('%2d' % i)
                 newBox.SetFillColor(29)
                 newBox.SetLineColor(29)
                 newBox.SetFillStyle(3004)
@@ -78,11 +80,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 newBox.SetBorderSize(1)
                 newBox.Draw()
                 boxes.append(newBox)
+                # (beginX, beginY, endX, endY)
+#         if self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 0:
+#             box.SetFillColor(29);
+#             box.DrawBox( 0, 0,  8*self.nCols,  self.nRows);
+#         elif self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 8:
+#             box.SetFillColor(29);
+#             box.DrawBox(0, self.nRows, 8 * self.nCols, 2 * self.nRows);
+#         elif self.ParentObject.Attributes['NumberOfChips'] < self.nTotalChips and self.ParentObject.Attributes['StartChip'] == 8:
+#             box.SetFillColor(29);
+#             box.DrawBox( 0, 0,  8*self.nCols,  2*self.nRows);
 
         self.ResultData['Plot']['Format'] = 'png'
-        self.Title = 'PixelAlive Map'
-        self.SaveCanvas()
 
+        self.Title = 'Noise Map' + (' (%s)'%self.ResultData['HiddenData']['SpecialBumpBondingTestName']) if 'SpecialBumpBondingTestName' in self.ResultData['HiddenData'] and len(self.ResultData['HiddenData']['SpecialBumpBondingTestName']) > 0 else ''
+        self.SaveCanvas()
     def UpdatePlot(self, chipNo, col, row, value):
         result = value
         if chipNo < 8:

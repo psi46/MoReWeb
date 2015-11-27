@@ -86,8 +86,8 @@ class GeneralTestResult(object):
         if TestResultEnvironmentObject.Configuration.has_key('AdditionalImageFormats'):
             self.AdditionalImageFormats = TestResultEnvironmentObject.Configuration['AdditionalImageFormats'].strip().lower().split(',')
         else:
-        	self.AdditionalImageFormats = ['root', 'pdf']
-        	
+            self.AdditionalImageFormats = ['root', 'pdf']
+
         if TestResultEnvironmentObject.Configuration.has_key('OverviewHTMLLink'):
             self.OverviewHTMLLink = TestResultEnvironmentObject.Configuration['OverviewHTMLLink']
         else:
@@ -779,11 +779,11 @@ class GeneralTestResult(object):
                 if not self.ResultData['Plot']['Caption']:
                     self.ResultData['Plot']['Caption'] = self.Title
                 for Suffix in self.ResultData['Plot']['AdditionalFormats']:
-                	if Suffix == 'pdf':
-                		self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName(Suffix)
-                		if self.ResultData['Plot']['ROOTObject']:
-                		    self.ResultData['Plot']['ROOTObject'].SetTitle(self.ResultData['Plot']['Caption'])
-                	self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
+                    if Suffix == 'pdf':
+                        self.ResultData['Plot']['ImageFilePDF'] = self.GetPlotFileName(Suffix)
+                    if self.ResultData['Plot']['ROOTObject']:
+                        self.ResultData['Plot']['ROOTObject'].SetTitle(self.ResultData['Plot']['Caption'])
+                    self.Canvas.SaveAs(self.GetPlotFileName(Suffix))
                 self.ResultData['Plot']['Enabled'] = 1
                 self.ResultData['Plot']['ImageFile'] = self.GetPlotFileName()
     '''

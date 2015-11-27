@@ -214,9 +214,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 test = test.next()
 
         # single tests
+        singleTestsList = ['PixelAlive', 'ReadbackCal', 'BumpBonding', 'SCurves', 'Trim']
+
+        # try to find tests from test list in ini file
         if not QualificationAdded:
             print "no qualifications found, looking for single tests"
-            singleTestsList = ['PixelAlive', 'ReadbackCal']
             #testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
             test = testchain.next()
             index = 0
@@ -224,11 +226,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if test.testname.lower() in [x.lower() for x in singleTestsList]:
                     print '\t-> appendSingleTest'
                     tests, test, index = self.appendSingleTest(tests, test, index)
+                    QualificationAdded = True
                 else:
                     if self.verbose:
                         print '\t-> cannot convert ', test.testname
                     index += 1
                     test = test.next()
+
 
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
 
@@ -436,7 +440,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'ModuleID': self.Attributes['ModuleID'],
                 'ModuleVersion': self.Attributes['ModuleVersion'],
                 'ModuleType': self.Attributes['ModuleType'],
-                'TestType': '%s_%s' % (test.environment.name, nKeys),
+                'TestType': '%s_%s_%s'%(test.testname, test.environment.name, nKeys),
                 'TestTemperature': test.environment.temperature,
                 'Test': test.testname,
             },

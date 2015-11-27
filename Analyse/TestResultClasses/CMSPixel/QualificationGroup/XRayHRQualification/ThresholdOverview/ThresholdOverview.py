@@ -11,9 +11,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
 
-        xBins = 8 * self.nCols + 1
-        yBins = 2 * self.nRows + 1
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins);         
+        xBins = 8 * self.nCols
+        yBins = 2 * self.nRows
+        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins);
 
         Directory = self.ParentObject.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=self.Attributes['Rate'])]
         SCurveDataFileName = self.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveDataFileName')
@@ -43,6 +43,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         if self.ResultData['Plot']['ROOTObject']:
+            try:
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTickLength(0.015)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTickLength(0.012)
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetAxisColor(1, 0.4)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetAxisColor(1, 0.4)
+                self.Canvas.SetFrameLineStyle(0)
+                self.Canvas.SetFrameLineWidth(1)
+                self.Canvas.SetFrameBorderMode(0)
+                self.Canvas.SetFrameBorderSize(1)
+                self.Canvas.SetCanvasSize(1500, 376)
+            except:
+                pass
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
