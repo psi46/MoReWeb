@@ -146,7 +146,7 @@ class MakeProductionSummary:
     nAB = int(nA) + int(nB)
     nT = nAB + int(nC) + int(nM)
     nQ = nAB + int(nC)
-    Pass = round(float(nAB)/nQ*100,1)
+    Pass = round(float(nAB)/nQ*100,1) if nQ > 0 else 0
 
     lcstartup = round(float(lcstartupC)/nQ*100,1) if nQ > 0 else 0
     IV150 = round(float(IV150C)/nQ*100,1) if nQ > 0 else 0
