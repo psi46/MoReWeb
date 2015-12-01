@@ -6,9 +6,9 @@ import json
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-        self.NameSingle='VcalOffset'
+        self.NameSingle='CalDelPerModule'
     	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
-        self.Title = 'Vcal Offset'
+        self.Title = 'CalDel difference'
         self.DisplayOptions = {
             'Width': 1,
         }
@@ -27,10 +27,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         HTML = ""
 
-        HistogramMin = -2000
-        HistogramMax = 2000
-        NBins = 50
-
+        HistogramMin = 0
+        HistogramMax =  100
+        NBins = 25
 
         ModuleGrade = {
             'A' : [],
@@ -39,7 +38,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         }
 
         Histogram = ROOT.THStack(self.GetUniqueID(),"")
-
+      
 
         NROCs = 0
         for ModuleID in ModuleIDsList:
@@ -47,29 +46,27 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     TestType = RowTuple['TestType']
-
-                    if TestType == 'XrayCalibration_Spectrum':
+                    Value = [0]*16
+                    if TestType == self.Attributes['Test']:
+                        Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary1', 'KeyValueDictPairs.json', 'Grade', 'Value'])
                         for Chip in range(0, 16):
-                            Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips_Xray', 'Chip_Xray%d'%Chip,  'Xray_Calibration_Spectrum_Chip%d'%Chip, 'KeyValueDictPairs.json', "Offset", 'Value'])
-                            Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'],'QualificationGroup','XRayHRQualification','Chips','Chip%d'%Chip,'Grading','KeyValueDictPairs.json','ROCGrade','Value'])
-
-                            if Value is not None:
-                                try:
-                                    ModuleGrade[Grade].append(float(Value))
-                                    NROCs += 1
-                                except:
-                                    self.ProblematicModulesList.append(ModuleID)
-                            else:
+                            Value[Chip] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip,  'DacParameterOverview', 'DacParameters35', 'KeyValueDictPairs.json', "caldel", 'Value'])
+                        if Grade is not None:
+                            try:
+                                diff = int(max(Value))-int(min(Value))
+                                ModuleGrade[Grade].append(float(diff))
+                                NROCs += 1
+                            except:
                                 self.ProblematicModulesList.append(ModuleID)
-
                         break
 
+        
 
-        hA = ROOT.TH1D("vcaloffset_A_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
-        hB = ROOT.TH1D("vcaloffset_B_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
-        hC = ROOT.TH1D("vcaloffset_C_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
-        hAB = ROOT.TH1D("vcaloffset_AB_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
-        h = ROOT.TH1D("vcaloffset_all_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hA = ROOT.TH1D("vcalslope_A_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hB = ROOT.TH1D("vcalslope_B_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hC = ROOT.TH1D("vcalslope_C_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hAB = ROOT.TH1D("vcalslope_AB_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        h = ROOT.TH1D("vcalslope_all_%s"%self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
 
         hA.SetFillStyle(1001)
         hA.SetFillColor(self.GetGradeColor('A'))
@@ -95,12 +92,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         hAB.Add(hA,hB)
         h.Add(hAB,hC)
 
-        Histogram.Draw("")
-
-        Histogram.GetXaxis().SetTitle("Offset [e^-]")
-        Histogram.GetYaxis().SetTitle("# ROCs")
-        Histogram.GetYaxis().SetTitleOffset(1.5)
-
         meanAll = round(h.GetMean(),2)
         meanAB = round(hAB.GetMean(),2)
         meanC = round(hC.GetMean(),2)
@@ -116,6 +107,19 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         overAll = int(h.GetBinContent(NBins+1))
         overAB = int(hAB.GetBinContent(NBins+1))
         overC = int(hC.GetBinContent(NBins+1))
+
+
+
+        
+        Histogram.Draw("")
+        
+       
+        Histogram.GetXaxis().SetTitle("CalDel [ADC]")
+        Histogram.GetYaxis().SetTitle("# modules")
+        Histogram.GetYaxis().SetTitleOffset(1.5)
+
+        ROOT.gPad.Update()
+      
 
 
         
@@ -136,13 +140,14 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         stats.AddText("  UF = {0}, OF = {1}".format(underC,overC))
         stats.Draw("same")
 
+        
 
         # subtitle
         title = ROOT.TText()
         title.SetNDC()
         title.SetTextAlign(12)
         title.SetTextSize(0.03)
-        Subtitle = "Vcal calibration offset, Spectrum Method, ROCs:{NROCs}".format(NROCs=NROCs)
+        Subtitle = "CalDel difference, modules:{NROCs}".format(NROCs=NROCs)
         title.DrawText(0.15,0.95,Subtitle)
 
         title4 = ROOT.TText()
