@@ -240,22 +240,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             )
 
         ### performance parameters ###
+        
         self.SubPages.append({"InitialAttributes" : {"Anchor": "PerformanceParameters", "Title": "Performance Parameters per ROC"}, "Key": "Section","Module": "Section"})
-
-        for Test in TestsList:
-            self.SubPages.append(
-                {
-                    "Key": "CalDelPerModule_{Test}".format(Test = Test),
-                    "Module": "CalDelPerModule",
-                    "InitialAttributes" : {
-                        "Test": "{Test}".format(Test = Test),
-                        "StorageKey" : "CalDelPerModule_{Test}".format(Test = Test),
-                        "DateBegin": self.Attributes['DateBegin'],
-                        "DateEnd": self.Attributes['DateEnd'],
-                    }
-                }
-            )
-
         for Test in TestsList:
             self.SubPages.append(
                 {
@@ -432,6 +418,92 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         }
                     }
                 )
+
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "DACDSpread35", "Title": "DAC parameter spread per module - 35"}, "Key": "Section","Module": "Section"})
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "CalDelPerModule_{Test}".format(Test = Test),
+                    "Module": "CalDelPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "CalDelPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "PHScalePerModule_{Test}".format(Test = Test),
+                    "Module": "PHScalePerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "PHScalePerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "PHOffsetPerModule_{Test}".format(Test = Test),
+                    "Module": "PHOffsetPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "PHOffsetPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "VthrCompPerModule_{Test}".format(Test = Test),
+                    "Module": "VthrCompPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "VthrCompPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "VtrimPerModule_{Test}".format(Test = Test),
+                    "Module": "VtrimPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "VtrimPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "VanaPerModule_{Test}".format(Test = Test),
+                    "Module": "VanaPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "VanaPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
 
         ### Full test duration ###
         self.SubPages.append(
