@@ -43,6 +43,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         if self.ResultData['Plot']['ROOTObject']:
+            try:
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTickLength(0.015)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTickLength(0.012)
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetAxisColor(1, 0.4)
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetAxisColor(1, 0.4)
+                self.Canvas.SetFrameLineStyle(0)
+                self.Canvas.SetFrameLineWidth(1)
+                self.Canvas.SetFrameBorderMode(0)
+                self.Canvas.SetFrameBorderSize(1)
+                self.Canvas.SetCanvasSize(1784, 412)
+            except:
+                pass
             mThresholdMin = 0.
             mThresholdMax = 255.
 
@@ -62,13 +74,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if SortedValueList[UpperIndex]*5. < sum(UpperValueList)/float(len(UpperValueList)):
                     mThresholdMax = SortedValueList[UpperIndex]*1.1
 
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax);
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5);
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle();
-            self.ResultData['Plot']['ROOTObject'].Draw('colz');
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax)
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(0.5)
+            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
 
         boxes = []

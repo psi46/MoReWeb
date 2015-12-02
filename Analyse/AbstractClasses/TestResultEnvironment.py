@@ -95,7 +95,7 @@ class TestResultEnvironment:
         'XRayHighRate_pixel_defects_C':168,
     }
     XRayHRQualificationConfiguration = {
-        'OmitGradesInFinalGrading':'HotPixelGrade',
+        'OmitGradesInFinalGrading':'',
         'TimeConstant':1,
         'Area':1,
     }

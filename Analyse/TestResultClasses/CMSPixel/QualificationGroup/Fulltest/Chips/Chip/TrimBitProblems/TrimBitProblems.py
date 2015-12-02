@@ -13,7 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.chipNo = self.ParentObject.Attributes['ChipNo']
 
     def PopulateResultData(self):
-
+        ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0);
         self.ResultData['Plot']['ROOTObject'] =  ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows ) # htm
         # TH2D

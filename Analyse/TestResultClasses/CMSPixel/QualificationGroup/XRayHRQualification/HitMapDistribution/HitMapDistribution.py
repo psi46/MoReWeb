@@ -12,7 +12,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gPad.SetLogx(1)
         ROOT.gStyle.SetOptStat(0)
 
-        HitMapOverview = self.ParentObject.ResultData['SubTestResults']['HitOverview_{Rate}'.format(Rate=self.Attributes['Rate'])].ResultData['Plot']['ROOTObject']
+        try:
+            Rate = self.Attributes['Rate']
+        except:
+            Rate = ''
+
+
+        HitMapOverview = self.ParentObject.ResultData['SubTestResults']['HitOverview_{Rate}'.format(Rate=Rate) if Rate else 'HitOverview'].ResultData['Plot']['ROOTObject']
         HitMapOverview.GetZaxis().SetRangeUser(0, HitMapOverview.GetMaximum())
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum()) / 100), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
         GraphEdges = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum()) / 100), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
@@ -51,7 +57,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             GraphCorners.Draw('SAME')
 
 
-        self.Title = 'Hits distribution {Rate} inner/edge/corner'.format(Rate=self.Attributes['Rate'])
+        self.Title = 'Hits distribution {Rate} inner/edge/corner'.format(Rate=Rate)
         self.SaveCanvas()
         ROOT.gPad.SetLogy(0)
         ROOT.gPad.SetLogx(0)

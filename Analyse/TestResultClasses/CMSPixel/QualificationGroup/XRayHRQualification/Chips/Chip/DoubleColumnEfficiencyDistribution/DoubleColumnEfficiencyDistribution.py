@@ -105,17 +105,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     if InterpolationRate < 121:
                         if DoubleColumn in [0,25]:
                             if InterpolatedEfficiency*0.01 < MinDCEfficiencyEdge:
-                                print "rates:", DoubleColumnRateList
-                                print "eff:", DoubleColumnEfficiencyList
+                                print "        Edge DC with bad efficiency found!"
+                                print "            rates:", DoubleColumnRateList
+                                print "            eff:", DoubleColumnEfficiencyList
 
-                                print "fit: ", InterpolatedEfficiency
+                                print "        -> e(120MHz/cm2) =  ", InterpolatedEfficiency
                                 BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
                         else:
                             if InterpolatedEfficiency*0.01 < MinDCEfficiencyFiducial:
-                                print "rates:", DoubleColumnRateList
-                                print "eff:", DoubleColumnEfficiencyList
+                                print "        DC with bad efficiency found!"
+                                print "            rates:", DoubleColumnRateList
+                                print "            eff:", DoubleColumnEfficiencyList
 
-                                print "fit: ", InterpolatedEfficiency
+                                print "        -> e(120MHz/cm2) =  ", InterpolatedEfficiency
                                 BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
 
                     DoubleColumnEfficienciesRate.append(InterpolatedEfficiency)
@@ -129,7 +131,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         # get minimum efficiency
         AllDoubleColumnEfficiencies = [item for sublist in DoubleColumnEfficiencies for item in sublist]
-        EfficiencyMinimum = min(95, min(AllDoubleColumnEfficiencies))
+        try:
+            EfficiencyPlotMinimum = min(95, min(AllDoubleColumnEfficiencies))
+        except:
+            EfficiencyPlotMinimum = 95
 
         # draw histogram for each of the different rates with different color
         RootHistograms = []
@@ -138,7 +143,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ColorIndex = 0
         for DoubleColumnEfficienciesRate in DoubleColumnEfficiencies:
             RootHistogram = ROOT.TH1D(self.GetUniqueID(), '', 1000, 0, 100)
-            RootHistogram.GetXaxis().SetRangeUser(EfficiencyMinimum, 100)
+            RootHistogram.GetXaxis().SetRangeUser(EfficiencyPlotMinimum, 100)
 
             for DoubleColumnEfficiency in DoubleColumnEfficienciesRate:
                 RootHistogram.Fill(DoubleColumnEfficiency)

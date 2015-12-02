@@ -64,11 +64,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     print "info: last fit was incomplete! re-fitting..."
                     refit = True
             except:
-                print "warning: could not read fit revision file!"
+                print "warning: could not read fit revision file! => needs re-fitting"
+                refit = True
 
         else:
             FitRevDict.add_section('FitRevisions')
             FitRevDict.add_section('Fit')
+            print "info: never analyzed with recent version of MoReWeb => needs re-fitting"
+            refit = True
 
         # unset complete flag in file
         FitRevDict.set('Fit','Complete', 'false')

@@ -80,6 +80,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #    *    [9]           Turn on speed (sigma of the integrated gaussian)
 #'''
     def FitHisto(self,histo,min,max):
+        print "fit histo!!"
+
         name = "fit_{0}".format( histo.GetName() )
         gausfit = self.FitGaus(histo)
         gaus0 = gausfit.GetParameter(0)
@@ -176,12 +178,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             target= self.Attributes['Target']
         else:
             target = 'unknown'
+
+        print "histo.GetEntries() = %d"%histo.GetEntries()
+
+        if histo.GetEntries() > 100:
+            PeakCenter = round(myfit.GetParameter(3),2)
+            PeakSigma = round(myfit.GetParError(3),2)
+        else:
+            PeakCenter = -1
+            PeakSigma = -1
+
         self.ResultData['KeyValueDictPairs'] = {
             'Center': {
-                'Value': round(myfit.GetParameter(3),2),
+                'Value': PeakCenter,
                 'Label':'Center of Peak',
                 'Unit': 'Vcal',
-                'Sigma': round(myfit.GetParError(3),2),
+                'Sigma': PeakSigma,
             },
             'TargetEnergy': {
                 'Value': round(targetEnergy,2),
@@ -207,6 +219,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #    * Used to find initial guess for signal in other fits
 #'''
     def FitGaus(self,histo):
+        print "fit gaus"
+
         min = histo.GetBinLowEdge(1)
         max = histo.GetBinLowEdge( histo.GetNbinsX() )
         fit = TF1("gausFit","gaus(0)",min,max)
@@ -254,6 +268,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 #    *    [4]           Sigma of the SIGNAL gaussian
 #'''
     def FitHistoSimple(self,histo,min,max):
+        print "fithistosimple"
+
         name = "fit_singleGaus_{0}".format(histo.GetName())
 
 

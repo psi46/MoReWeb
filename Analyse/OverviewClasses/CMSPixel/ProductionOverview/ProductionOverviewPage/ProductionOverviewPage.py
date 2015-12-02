@@ -218,19 +218,34 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             }
         )
-
         ### dead pixels ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "DeadPixel", "Title": "Dead Pixels"}, "Key": "Section","Module": "Section"})
-
-        for Test in TestsList:
+        for Grade in ['All','A', 'B', 'C']:
             self.SubPages.append(
                 {
-                    "Key": "DeadPixelOverlay_{Test}".format(Test = Test),
+                    "Key": "DeadPixelOverlay_{Grade}".format(Grade = Grade),
                     "Module": "DeadPixelOverlay",
                     "InitialAttributes" : {
-                        "Test": "{Test}".format(Test = Test),
-                        "Grade": "All",
-                        "StorageKey" : "DeadPixelOverlay_{Test}".format(Test = Test),
+                        "Test": "m20_2",
+                        "Grade": "{Grade}".format(Grade = Grade),
+                        "StorageKey" : "DeadPixelOverlay_{Grade}".format(Grade = Grade),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        ### pixels with too high or low gain ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "BadGain", "Title": "Pixels with bad gain"}, "Key": "Section","Module": "Section"})
+        for Grade in ['All','A', 'B', 'C']:
+            self.SubPages.append(
+                {
+                    "Key": "GainOverlay_{Grade}".format(Grade = Grade),
+                    "Module": "GainOverlay",
+                    "InitialAttributes" : {
+                        "Test": "m20_2",
+                        "Grade": "{Grade}".format(Grade = Grade),
+                        "StorageKey" : "GainOverlay_{Grade}".format(Grade = Grade),
                         "DateBegin": self.Attributes['DateBegin'],
                         "DateEnd": self.Attributes['DateEnd'],
                     }
@@ -239,6 +254,20 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         ### performance parameters ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "PerformanceParameters", "Title": "Performance Parameters per ROC"}, "Key": "Section","Module": "Section"})
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "CalDelPerModule_{Test}".format(Test = Test),
+                    "Module": "CalDelPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "CalDelPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
 
         for Test in TestsList:
             self.SubPages.append(

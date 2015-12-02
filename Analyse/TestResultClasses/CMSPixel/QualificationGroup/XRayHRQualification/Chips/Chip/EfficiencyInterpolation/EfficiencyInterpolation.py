@@ -57,9 +57,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         DoubleColumnEfficiencyList = array.array('d')
 
         # get list of double columns which have been flagged bad
-        BadDoubleColumns = list(set([DoubleColumnData['DoubleColumn'] for DoubleColumnData in self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']]))
+        try:
+            BadDoubleColumns = list(set([DoubleColumnData['DoubleColumn'] for DoubleColumnData in self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']]))
+        except:
+            BadDoubleColumns = []
+
         self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'] = len(BadDoubleColumns)
 
+        ExcludedMessageShown = []
         for Rate in Rates['HREfficiency']:
             Ntrig = self.ParentObject.ParentObject.ParentObject.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=Rate)]
             EfficiencyMapROOTObject = self.ParentObject.ResultData['SubTestResults']['EfficiencyMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
@@ -97,7 +102,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     except:
                         pass
                 else:
-                    print "\x1b[31m         double column %d is flagged 'bad' and excluded from fit\x1b[0m"%DoubleColumn
+                    if DoubleColumn not in ExcludedMessageShown:
+                        print "\x1b[31m         double column %d is flagged 'bad' and excluded from fit\x1b[0m"%DoubleColumn
+                        ExcludedMessageShown.append(DoubleColumn)
 
         self.Canvas.Clear()
 

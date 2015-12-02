@@ -146,17 +146,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'PH Parameter1 Defects'
             },
         }
-        self.ResultData['KeyList'] = ['Module','Grade','ElectricalGrade', 'IVGrade', 'ManualGrade', 'PixelDefects', 'DeadPixels','AddressProblems', 'ThresholdDefects', 'MaskDefects', 'DeadBumps', 'NoisyPixels', 'TrimProblems', 'PHGainDefects', 'PHPedestalDefects', 'PHPar1Defects']
+        self.ResultData['KeyList'] = ['Module','Grade','ElectricalGrade', 'IVGrade', 'ManualGrade', 'PixelDefects', 'DeadPixels','AddressProblems', 'ThresholdDefects', 'MaskDefects', 'DeadBumps', 'NoisyPixels', 'TrimProblems', 'PHGainDefects', 'PHPar1Defects']
 
-
-	SubGradings = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGradings']
-        
+        SubGradings = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGradings']
         # needed in summary3 and in fulltest db upload
         for i in SubGradings:
             for Grade in GradeMapping:
                 key = i+'Grade'+GradeMapping[Grade]+"ROCs"
                 self.ResultData['KeyValueDictPairs'][key] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'][key]
-                
+
                 # the following line would enable these subgradings in the summary table
-		#self.ResultData['KeyList'].append(key)      
-        
+                #self.ResultData['KeyList'].append(key)

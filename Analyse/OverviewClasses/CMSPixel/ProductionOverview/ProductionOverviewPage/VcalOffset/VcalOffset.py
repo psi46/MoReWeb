@@ -52,6 +52,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         for Chip in range(0, 16):
                             Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips_Xray', 'Chip_Xray%d'%Chip,  'Xray_Calibration_Spectrum_Chip%d'%Chip, 'KeyValueDictPairs.json', "Offset", 'Value'])
                             Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'],'QualificationGroup','XRayHRQualification','Chips','Chip%d'%Chip,'Grading','KeyValueDictPairs.json','ROCGrade','Value'])
+
                             if Value is not None:
                                 try:
                                     ModuleGrade[Grade].append(float(Value))
@@ -60,6 +61,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                     self.ProblematicModulesList.append(ModuleID)
                             else:
                                 self.ProblematicModulesList.append(ModuleID)
+
                         break
 
 

@@ -82,7 +82,9 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         'nSinglePixDefect' : 0,
         'nDC' : 0,
         'nLowHREf' : 0,
-        'nOthers' : 0
+        'nOthers' : 0,
+        'commentsgradechange' : '',
+        'commentsgradechangeX' : ''
 }
 
 
@@ -112,6 +114,10 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         modHDI = []
         modDC = []
         modlc = []
+        modNorate = []
+        comments = ''
+        commentsX = ''
+
 
         for ModuleID in ModuleIDsList:
 
@@ -166,12 +172,15 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
             gradesX = [0]*16
             PixdefectsX = [0]*16
             Nuniformity = [0]*16
+            NnoiseX = [0]*16
+            NrateX = [0]*16
             initialF = [0]*3
             finalF = [0]*3
             initialX = 0 
             finalX = 0
             initial = 0
             final = 0
+            co = ""
 
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
@@ -179,7 +188,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     TestType = RowTuple['TestType']
                     if TestType != 'TemperatureCycle':
 
-                        #Number of broken ROCs
                         if TestType in FullTests:
                             for i in range (0,16):
                                 Pixdefects[i] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%i, 'Summary' ,'KeyValueDictPairs.json', 'Total', 'Value'])
@@ -188,28 +196,55 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             for i in range (0,16):
                                 PixdefectsX[i] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%i, 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
                             	Nuniformity[i] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%i,'Grading' ,'KeyValueDictPairs.json', 'NumberOfNonUniformColumns','Value'])
-                                if (Nuniformity[i]>0 and Nuniformity[i]<3):
-                                    modDC.append(RowTuple['ModuleID'])
+                                NnoiseX[i] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],'Chips','Chip%d'%i,'SCurveWidths_100','KeyValueDictPairs.json','over','Value'])
+                                NrateX[i] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],'Chips','Chip%d'%i,'EfficiencyInterpolation','KeyValueDictPairs.json','InterpolatedEfficiency50','Value'])
+                                try:
+                                    if (int(Nuniformity[i])>0 and int(Nuniformity[i])<3):
+                                        modDC.append(RowTuple['ModuleID'])
+                                except:
+                                    pass
+                                try: 
+                                    if float(NnoiseX[i])>500:
+                                        brokenrocsx.append(RowTuple['ModuleID'])
+                                except:
+                                    pass
+                                try: 
+                                    if float(NrateX[i])<5:
+                                        modNorate.append(RowTuple['ModuleID'])
+                                except:
+                                    pass
                         for  i, v in enumerate(Pixdefects):
-                            if v and float(v) > 500:
-                                grades[i] = 1
-                                brokenrocs.append(ModuleID)
+                            try:
+                                if v and float(v) > 500:
+                                    grades[i] = 1
+                                    brokenrocs.append(RowTuple['ModuleID'])
+                            except:
+                                pass
 
                         for  i, v in enumerate(PixdefectsX):
-                            if v and float(v) > 500:
-                                gradesX[i] = 1
-                                brokenrocsx.append(ModuleID)
+                            try:
+                                if v and float(v) > 500:
+                                    gradesX[i] = 1
+                                    brokenrocsx.append(RowTuple['ModuleID'])
+                            except:
+                                pass
+
                         for i, v in enumerate(Nuniformity):
                             try:
                                 if v and float(v) > 20:
                                     gradesX[i] = 1
-                                    brokenrocsx.append(ModuleID)
+                                    brokenrocsx.append(RowTuple['ModuleID'])
                             except:
                                 pass
 
                         #Number of manual regradings
                         reg = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'GradeComment', 'Value']))
-                        
+                        if (co=='' or co=='None'):
+                            c = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'KeyValueDictPairs.json', 'Comment', 'Value']))
+                            c = c[13:-2]
+                            if (c is not 'None' and c is not ''):
+                                co = RowTuple['ModuleID'] + " : " + c
+
                         try: 
                             if (reg!=''):
                                 if (TestType == "XRayHRQualification"):
@@ -247,7 +282,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     if (TestType == "XRayHRQualification"):
                         try: 
                             hdicomment = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'KeyValueDictPairs.json', 'Comment', 'Value']))
-                            if ("HDI Problem" in hdicomment):
+                            if ("HDI problem" in hdicomment):
                                 Numbers['nHDI'] += 1 
                                 modHDI.append(RowTuple['ModuleID'])  
                             if ("bad double column" in hdicomment):
@@ -258,7 +293,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     if (TestType in FullTests):
                         try: 
                             comment = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'KeyValueDictPairs.json', 'Comment', 'Value']))
-                            if ("leakage current" in comment):
+                            if ("Leakage current" in comment):
                                 modlc.append(RowTuple['ModuleID'])
                         except:
                             pass
@@ -266,33 +301,51 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
 
 
 
-                    
+            modg = 0
+            modgX = 0
             if (initialX=='A' and finalX=='B'):
                 Numbers['nAtoBX'] += 1
+                modgX = 1
             elif (initialX=='A' and finalX=='C'):
                 Numbers['nAtoCX'] += 1
+                modgX = 1
             elif (initialX=='B' and finalX=='A'):
                 Numbers['nBtoAX'] += 1
+                modgX = 1
             elif (initialX=='B' and finalX=='C'):
                 Numbers['nBtoCX'] += 1
+                modgX = 1
             elif (initialX=='C' and finalX=='A'):
                 Numbers['nCtoAX'] += 1
+                modgX = 1
             elif (initialX=='C' and finalX=='B'):
                 Numbers['nCtoBX'] += 1
+                modgX = 1
 
             if (initial=='A' and final=='B'):
                 Numbers['nAtoB'] += 1
+                modg = 1
             elif (initial=='A' and final=='C'):
                 Numbers['nAtoC'] += 1
+                modg = 1
             elif (initial=='B' and final=='A'):
                 Numbers['nBtoA'] += 1
+                modg = 1
             elif (initial=='B' and final=='C'):
                 Numbers['nBtoC'] += 1
+                modg = 1
             elif (initial=='C' and final=='A'):
                 Numbers['nCtoA'] += 1
+                modg = 1
             elif (initial=='C' and final=='B'):
                 Numbers['nCtoB'] += 1
+                modg = 1
 
+
+            if modg == 1:
+                comments = comments + co + "\\\\"
+            if modgX == 1:
+                commentsX = commentsX + co + "\\\\"
 
 
 
@@ -303,8 +356,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                 DefectROCsX += 1
 
       
-
-
         Numbers['BrokenROC'] = DefectROCs
         Numbers['BrokenROCX'] = DefectROCsX
 
@@ -314,7 +365,6 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         #print filename
     	data = open(filename, 'r')
         moduledefects = json.load(data)
-
        
 
         for mod, defects in moduledefects.iteritems():
@@ -520,7 +570,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                         Numbers['nTrimbitdefC'] += 1
 
        
-        Numbers['nLowHREfC'] -= Numbers['nHDI']
+        #Numbers['nLowHREfC'] -= Numbers['nHDI']
 
 
         for mod, defects in moduledefects.iteritems():
@@ -553,6 +603,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                             done = 1
                 if (mod in modlc and done ==0):
                     Numbers['nIV'] += 1
+                    done = 1
                 if (mod in modHDI and done == 0):
                     Numbers['nHDIf'] += 1
                     done = 1
@@ -563,7 +614,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     Numbers['nDC'] += 1
                     done = 1
                 for d, grade in defects.iteritems():
-                    if (d == 'lowHREfficiency' and grade!="" and done == 0):
+                    if (d == 'lowHREfficiency' and grade!="" and done == 0 and mod not in modNorate):
                         if grade == "C":
                             Numbers['nLowHREf'] += 1
                             done = 1
@@ -632,6 +683,8 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     done = 1
 
 
+        Numbers['commentsgradechange'] = comments
+        Numbers['commentsgradechangeX'] = commentsX
 
        
         return Numbers

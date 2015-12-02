@@ -40,7 +40,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Plot']['ROOTObject'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) # hw
         self.ResultData['Plot']['ROOTObject_hd'] =ROOT.TH1D(self.GetUniqueID(), "", 100, 0., 600.) #Noise in unbonded pixel (not displayed) # hd
-        self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # ht
+        self.ResultData['Plot']['ROOTObject_ht'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # threshold 2d map
+        self.ResultData['Plot']['ROOTObject_hn'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows) # noise 2d map
+
         isDigitalROC = False
 
         ChipNo = self.ParentObject.Attributes['ChipNo']
@@ -63,7 +65,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print 'Cannot find Histogram ',HistoDict.get(self.NameSingle,'Digital'),HistoDict.has_option(self.NameSingle,'Analog')
             print[x.GetName() for x in self.ParentObject.ParentObject.FileHandle.GetListOfKeys()]
             print 'NameSingle: ', self.NameSingle
-            raise KeyError('SCurveWidth: Cannot Find Histogram in ROOT File')
+            #raise KeyError('SCurveWidth: Cannot Find Histogram in ROOT File')
         Directory = self.RawTestSessionDataPath
         SCurveFileName = "{Directory}/SCurve_C{ChipNo}.dat".format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'])
         try:
@@ -108,10 +110,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                         Threshold = Threshold / self.TestResultEnvironmentObject.GradingParameters['StandardVcal2ElectronConversionFactor']
                         self.ResultData['Plot']['ROOTObject_ht'].SetBinContent(column+1, row+1, Threshold)
-                        if not isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:
+                        if self.ResultData['Plot']['ROOTObject_h2']:
+                            if not isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) >= self.TestResultEnvironmentObject.GradingParameters['minThrDiff']:
+                                self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
+                            elif isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) <= self.TestResultEnvironmentObject.GradingParameters['BumpBondThr']:
+                                self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
+                        else:
                             self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
-                        elif isDigitalROC and self.ResultData['Plot']['ROOTObject_h2'].GetBinContent(column+1, row+1) <= self.TestResultEnvironmentObject.GradingParameters['BumpBondThr']:
-                            self.ResultData['Plot']['ROOTObject_hd'].Fill(Width)
+
+                        self.ResultData['Plot']['ROOTObject_hn'].SetBinContent(1+column, 1+row, Width)
+
                     else:
                         if self.verbose: print column, row, 'NAN'
             if self.verbose:

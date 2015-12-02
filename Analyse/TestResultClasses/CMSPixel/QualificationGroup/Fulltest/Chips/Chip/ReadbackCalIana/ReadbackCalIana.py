@@ -38,15 +38,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if HistogramAdcVsDac and HistogramCurrentVsDac:
             NBinsX = HistogramAdcVsDac.GetXaxis().GetNbins()
             NBinsX2 = HistogramCurrentVsDac.GetXaxis().GetNbins()
-            print "nbins:", NBinsX," ",NBinsX2
-            print "ADC vs DAC: ",
-            for i in range(NBinsX):
-                print HistogramAdcVsDac.GetBinContent(i +1),"  ",
-            print ""
-            print "current vs DAC: ",
-            for i in range(NBinsX2):
-                print HistogramCurrentVsDac.GetBinContent(i +1),"  ",
-            print ""
+            #print "nbins:", NBinsX," ",NBinsX2
+            #print "ADC vs DAC: ",
+            #for i in range(NBinsX):
+            #    print HistogramAdcVsDac.GetBinContent(i +1),"  ",
+            #print ""
+            #print "current vs DAC: ",
+            #for i in range(NBinsX2):
+            #    print HistogramCurrentVsDac.GetBinContent(i +1),"  ",
+            #print ""
             pointListADC = []
             pointListCurrent = []
 

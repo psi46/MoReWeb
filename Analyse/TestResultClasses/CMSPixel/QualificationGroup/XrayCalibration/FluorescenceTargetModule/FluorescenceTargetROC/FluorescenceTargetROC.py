@@ -316,13 +316,22 @@ class TestResult(GeneralTestResult):
         else:
             target = 'unknown'
         chi2_per_ndf = myfit.GetChisquare() / max(myfit.GetNDF(), 1)
+
+        if histo.GetEntries() > 99:
+            PeakCenter = round(myfit.GetParameter(3), 2)
+            PeakSigma = round(myfit.GetParError(3), 2)
+        else:
+            print "\x1b[31mwarning: histogram with x-ray spectrum has less than 100 entries, no Vcal calibration possible. Dead ROC?\x1b[0m"
+            PeakCenter = -1
+            PeakSigma = -1
+
         self.ResultData['KeyValueDictPairs'].update(
             {
                 'Center': {
-                    'Value': round(myfit.GetParameter(3), 2),
+                    'Value': PeakCenter,
                     'Label': 'Center of Peak',
                     'Unit': 'Vcal',
-                    'Sigma': round(myfit.GetParError(3), 2),
+                    'Sigma': PeakSigma,
                 },
                 'TargetEnergy': {
                     'Value': round(targetEnergy, 2),

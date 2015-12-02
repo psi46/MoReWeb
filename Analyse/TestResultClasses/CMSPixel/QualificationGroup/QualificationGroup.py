@@ -169,14 +169,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             tests, test, index = self.appendTemperatureGraph(tests, test, index)
             tests, test, index = self.appendHumidityGraph(tests, test, index)
         HRTestAdded = False
+
         self.TestResultEnvironmentObject.IVCurveFiles = {}
+
+        # qualifications
+        QualificationAdded = False
         while test:
             if 'fulltest' in test.testname.lower():
                 print '\t-> appendFulltest'
                 tests, test, index = self.appendFulltest(tests, test, index)
+                QualificationAdded = True
             elif test.testname.lower().startswith('reception'):
                 print '\t-> appendReception'
                 tests, test, index = self.appendReception(tests, test, index)
+                QualificationAdded = True
             elif 'powercycle' in test.testname:
                 test = test.next()
             elif 'cycle' in test.testname.lower():
@@ -185,6 +191,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             elif 'xrayspectrum' in test.testname.lower() or 'xraypxar' in test.testname.lower():
                 print '\t-> appendXraySpectrum'
                 tests, test, index = self.appendXrayCalibration(tests, test, index)
+                QualificationAdded = True
             elif (
                     ('hrefficiency' in test.testname.lower()
                         or 'hrdata' in test.testname.lower()
@@ -196,6 +203,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print '\t-> appendXRayHighRateTest'
                 tests, test, index = self.appendXRayHighRateTest(tests, test, index)
                 HRTestAdded = True
+                QualificationAdded = True
             elif 'leakagecurrentpon' in test.testname.lower():
                 print '\t-> appendLeakageCurrentPON'
                 tests, test, index = self.appendLeakageCurrentPON(tests, test, index)
@@ -204,6 +212,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     print '\t-> cannot convert ', test.testname
                 index += 1
                 test = test.next()
+
+        # single tests
+        singleTestsList = ['PixelAlive', 'ReadbackCal', 'BumpBonding', 'Scurves', 'Trim', 'GainPedestal', 'Hitmap']
+
+        # try to find tests from test list in ini file
+        if not QualificationAdded:
+            print "no qualifications found, looking for single tests"
+            #testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
+            test = testchain.next()
+            index = 0
+            while test:
+                if test.testname.lower() in [x.lower() for x in singleTestsList]:
+                    print '\t-> appendSingleTest'
+                    tests, test, index = self.appendSingleTest(tests, test, index)
+                    QualificationAdded = True
+                else:
+                    if self.verbose:
+                        print '\t-> cannot convert ', test.testname
+                    index += 1
+                    test = test.next()
+
+
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
 
         return tests
@@ -389,6 +419,37 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             test = test.next()
             index += 1
+        return tests, test, index
+
+    def appendSingleTest(self, tests, test, index):
+        environment = test.environment
+        key = 'Module%s_%s' % (test.testname, test.environment.name)
+        nKeys = 1
+        for item in tests:
+            if item['Key'].startswith(key):
+                nKeys += 1
+        key += '_%s' % (nKeys)
+        directory = '%03d' % index + '_%s_%s' % (test.testname, test.environment.name)
+        tests.append({
+            'Key': key,
+            'Module': 'SingleTest',
+            'InitialAttributes': {
+                'StorageKey': key,
+                'TestResultSubDirectory': directory,
+                'IncludeIVCurve': False,
+                'ModuleID': self.Attributes['ModuleID'],
+                'ModuleVersion': self.Attributes['ModuleVersion'],
+                'ModuleType': self.Attributes['ModuleType'],
+                'TestType': '%s_%s_%s'%(test.testname, test.environment.name, nKeys),
+                'TestTemperature': test.environment.temperature,
+                'Test': test.testname,
+            },
+            'DisplayOptions': {
+                'Order': len(tests) + 1
+            }
+        })
+        test = test.next()
+        index += 1
         return tests, test, index
 
     def appendXrayCalibration(self, tests, test, index):

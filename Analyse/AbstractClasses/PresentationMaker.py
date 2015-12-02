@@ -138,46 +138,48 @@ class MakeProductionSummary:
     VcalThrWC = args['nVcalThrWC']
     LowHREfB = args['nLowHREfB']
     LowHREfC = args['nLowHREfC']
+    comments = args['commentsgradechange']
+    commentsX = args['commentsgradechangeX']
 
  
 
     nAB = int(nA) + int(nB)
     nT = nAB + int(nC) + int(nM)
     nQ = nAB + int(nC)
-    Pass = round(float(nAB)/nQ*100,1)
+    Pass = round(float(nAB)/nQ*100,1) if nQ > 0 else 0
 
-    lcstartup = round(float(lcstartupC)/nQ*100,1)
-    IV150 = round(float(IV150C)/nQ*100,1)
-    IV150m20 = round(float(IV150m20C)/nQ*100,1)
-    IVSlope = round(float(IVSlopeC)/nQ*100,1)
-    totDefects = round(float(totDefectsC)/nQ*100,1)
-    totDefectsXray = round(float(totDefectsXrayC)/nQ*100,1)
-    BBFull = round(float(BBFullC)/nQ*100,1)
-    BBXray = round(float(BBXrayC)/nQ*100,1)
-    Addressdef = round(float(AddressdefC)/nQ*100,1)
-    Trimbitdef = round(float(TrimbitdefC)/nQ*100,1)
-    Maskdef = round(float(MaskdefC)/nQ*100,1)
-    deadpix = round(float(deadpixC)/nQ*100,1)
-    uniformity = round(float(uniformityC)/nQ*100,1)
-    Noise = round(float(NoiseC)/nQ*100,1)
-    NoiseXray = round(float(NoiseXrayC)/nQ*100,1)
-    PedSpread = round(float(PedSpreadC)/nQ*100,1)
-    RelGainW = round(float(RelGainWC)/nQ*100,1)
-    VcalThrW = round(float(VcalThrWC)/nQ*100,1)
-    LowHREf = round(float(LowHREfC)/nQ*100,1)
-    IRatio150 = round(float(IRatio150C)/nQ*100,1)
-    BrokenROC = round(float(nBrokenROCs)/nQ*100,1)
-    BrokenROCX = round(float(nBrokenROCsX)/nQ*100,1)
-    HDI = round(float(nHDI)/nQ*100,1)
+    lcstartup = round(float(lcstartupC)/nQ*100,1) if nQ > 0 else 0
+    IV150 = round(float(IV150C)/nQ*100,1) if nQ > 0 else 0
+    IV150m20 = round(float(IV150m20C)/nQ*100,1) if nQ > 0 else 0
+    IVSlope = round(float(IVSlopeC)/nQ*100,1) if nQ > 0 else 0
+    totDefects = round(float(totDefectsC)/nQ*100,1) if nQ > 0 else 0
+    totDefectsXray = round(float(totDefectsXrayC)/nQ*100,1) if nQ > 0 else 0
+    BBFull = round(float(BBFullC)/nQ*100,1) if nQ > 0 else 0
+    BBXray = round(float(BBXrayC)/nQ*100,1) if nQ > 0 else 0
+    Addressdef = round(float(AddressdefC)/nQ*100,1) if nQ > 0 else 0
+    Trimbitdef = round(float(TrimbitdefC)/nQ*100,1) if nQ > 0 else 0
+    Maskdef = round(float(MaskdefC)/nQ*100,1) if nQ > 0 else 0
+    deadpix = round(float(deadpixC)/nQ*100,1) if nQ > 0 else 0
+    uniformity = round(float(uniformityC)/nQ*100,1) if nQ > 0 else 0
+    Noise = round(float(NoiseC)/nQ*100,1) if nQ > 0 else 0
+    NoiseXray = round(float(NoiseXrayC)/nQ*100,1)if nQ > 0 else 0
+    PedSpread = round(float(PedSpreadC)/nQ*100,1) if nQ > 0 else 0
+    RelGainW = round(float(RelGainWC)/nQ*100,1) if nQ > 0 else 0
+    VcalThrW = round(float(VcalThrWC)/nQ*100,1) if nQ > 0 else 0
+    LowHREf = round(float(LowHREfC)/nQ*100,1) if nQ > 0 else 0
+    IRatio150 = round(float(IRatio150C)/nQ*100,1) if nQ > 0 else 0
+    BrokenROC = round(float(nBrokenROCs)/nQ*100,1) if nQ > 0 else 0
+    BrokenROCX = round(float(nBrokenROCsX)/nQ*100,1) if nQ > 0 else 0
+    HDI = round(float(nHDI)/nQ*100,1) if nQ > 0 else 0
 
-    FHDI = round(float(totHDI)/nQ*100,1)
-    FIV = round(float(totIV)/nQ*100,1)
-    FDC = round(float(totDC)/nQ*100,1)
-    F1PD = round(float(tot1PD)/nQ*100,1)
-    FPD = round(float(totPD)/nQ*100,1)
-    FLowEf = round(float(totLowEf)/nQ*100,1)
-    FROC = round(float(totROC)/nQ*100,1)
-    FOthers = round(float(totOthers)/nQ*100,1)
+    FHDI = round(float(totHDI)/nQ*100,1) if nQ > 0 else 0
+    FIV = round(float(totIV)/nQ*100,1) if nQ > 0 else 0
+    FDC = round(float(totDC)/nQ*100,1) if nQ > 0 else 0
+    F1PD = round(float(tot1PD)/nQ*100,1) if nQ > 0 else 0
+    FPD = round(float(totPD)/nQ*100,1) if nQ > 0 else 0
+    FLowEf = round(float(totLowEf)/nQ*100,1) if nQ > 0 else 0
+    FROC = round(float(totROC)/nQ*100,1) if nQ > 0 else 0
+    FOthers = round(float(totOthers)/nQ*100,1) if nQ > 0 else 0
     
  
 
@@ -185,6 +187,7 @@ class MakeProductionSummary:
     \documentclass[xcolor=dvipsnames]{{beamer}}
     \usepackage{{booktabs}}
     \usepackage{{multirow}}
+    %\usepackage{{siunitx}}
     \setbeamertemplate{{footline}}[frame number]
     \setbeamercolor{{frametitle}}{{fg=Black,bg=White}}
     \setbeamercolor{{title}}{{fg=Black,bg=White}}
@@ -279,9 +282,9 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
     \\begin{{tabular}}{{@{{}}llccc@{{}}}}
     \\toprule
                                     & Defects             & B & C &  C (\%$^*$)\\\\ \midrule
-    \multirow{{5}}{{*}}{{Sensor}}   & $I_{{biais}}$ startup & {lcstartupB} & {lcstartupC} & {lcstartup}\\\\
-                                    & $I_{{biais}}$ (+17)   & {IV150B}     & {IV150C}     & {IV150} \\\\
-                                    & $I_{{biais}}$ (-20)   & {IV150m20B}  & {IV150m20C}  & {IV150m20} \\\\ 
+    \multirow{{5}}{{*}}{{Sensor}}   & $I_{{leak}}$ startup & {lcstartupB} & {lcstartupC} & {lcstartup}\\\\
+                                    & $I_{{leak}}$ (+17)   & {IV150B}     & {IV150C}     & {IV150} \\\\
+                                    & $I_{{leak}}$ (-20)   & {IV150m20B}  & {IV150m20C}  & {IV150m20} \\\\ 
                                     & I(+17)/I(-20)         & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ 
                                      & IV slope             & {IVSlopeB}   & {IVSlopeC}   & {IVSlope} \\\\ \midrule
     \multirow{{6}}{{*}}{{Chip performance}} & Noise         & {NoiseB}     & {NoiseC}     & {Noise} \\\\
@@ -351,7 +354,17 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
     \end{{tabular}} \caption{{X-ray qualification}}
     \end{{minipage}}
     \end{{table}}
+    \\begin{{minipage}}[t]{{0.45\linewidth}}
+    \centering
+    {comments}
+\end{{minipage}}
+\hspace{{0.5cm}}
+\\begin{{minipage}}[t]{{0.45\linewidth}}
+ \centering
+    {commentsX}
+    \end{{minipage}}
     }}
+
 
 
     \\frame{{
@@ -621,6 +634,7 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
   \caption{{Offset}}
 \endminipage
 \end{{figure}}
+Grades are taken from HR Qualification
     }}
 
 
@@ -807,7 +821,7 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
 \\frametitle{{Explanation of defects of grade C modules (slide \\ref{{GradeCmodules}})}}
 There is no double counting, if more than one grade C defect is present, only the first one in the list is considered.
 \\begin{{itemize}}
-    \item \\textbf{{Leakage current}}: $I_{{biais}}>10\mu$ A at 17$^{{\circ}}$C or -20 $^{{\circ}}$C
+    \item \\textbf{{Leakage current}}: $I_{{leak}}>10\mu$A at 17$^{{\circ}}$C or -20 $^{{\circ}}$C
     \item \\textbf{{HDI}}: Any HDI problem specified in the "comments.txt" file
     \item \\textbf{{Defective ROC}}: ROCs with more than 500 pixel defects or with more than 20 non-uniform columns in the X-ray qualification
     \item \\textbf{{Double column defects}}: ROCs with 1 or 2  non-uniform columns 
@@ -825,8 +839,8 @@ There is no double counting, if more than one grade C defect is present, only th
 \\begin{{tabular}}{{@{{}}lcc@{{}}}}
 \\toprule
                                              & B & C \\\\ \midrule
-Measured $I_{{biais}}$ (17$^{{\circ}}$, 150V, pretest) [$\mu$ A] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
-Measured $I_{{biais}}$ (150V) [$\mu$ A] & $>{currentB}$   &  $>{currentC}$ \\\\
+Measured $I_{{leak}}$ (17$^{{\circ}}$, 150V, pretest) [$\mu$A] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
+Measured $I_{{leak}}$ (150V) [$\mu$A] & $>{currentB}$   &  $>{currentC}$ \\\\
 Slope (T=17$^{{\circ}}$)                       &  $>{slopeivB}$  & - \\\\
 I(17$^{{\circ}}$, 150V)/I(-20$^{{\circ}}$, 150V) &  $<{leakageCurrentRatioB}$  & - \\\\ \\bottomrule
 \end{{tabular}}
@@ -1057,7 +1071,9 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
       'XRayHighRate_SCurve_Noise_Threshold_B' : XRayHighRate_SCurve_Noise_Threshold_B,
       'XRayHighRate_SCurve_Noise_Threshold_C' : XRayHighRate_SCurve_Noise_Threshold_C,
       'XRayHighRateEfficiency_max_allowed_loweff_A_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_A_Rate1,
-      'XRayHighRateEfficiency_max_allowed_loweff_B_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_B_Rate1
+      'XRayHighRateEfficiency_max_allowed_loweff_B_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_B_Rate1,
+      'comments' : comments,
+      'commentsX' : commentsX
 
     } 
 
@@ -1069,11 +1085,13 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
     print "compile tex file..."
 
     try:
+      FNULL = open(os.devnull, 'w')
       os.chdir(OutputDirectoryPath)
-      proc=subprocess.Popen(shlex.split("pdflatex '%s' &>/dev/null"%filename))
+      proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename), stdout=FNULL)
       proc.communicate()
-      proc=subprocess.Popen(shlex.split("pdflatex '%s' &>/dev/null"%filename))
+      proc=subprocess.Popen(shlex.split("pdflatex '%s'"%filename), stdout=FNULL)
       proc.communicate()
+      print "LaTeX compiler returned: %d"%proc.returncode
       for extension in ['aux', 'nav', 'snm', 'toc', 'out']:
         auxFile = filename[0:-4]+"."+extension
         if os.path.isfile(auxFile):
