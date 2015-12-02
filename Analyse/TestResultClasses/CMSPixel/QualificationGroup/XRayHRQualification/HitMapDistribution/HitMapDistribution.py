@@ -19,7 +19,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         HitMapOverview = self.ParentObject.ResultData['SubTestResults']['HitOverview_{Rate}'.format(Rate=Rate) if Rate else 'HitOverview'].ResultData['Plot']['ROOTObject']
-        HitMapOverview.GetZaxis().SetRangeUser(0, HitMapOverview.GetMaximum())
+        try:
+            HitMapOverview.GetZaxis().SetRangeUser(0, HitMapOverview.GetBinContent(HitMapOverview.GetMaximumBin()))
+        except:
+            pass
+
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum()) / 100), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
         GraphEdges = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum()) / 100), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
         GraphCorners = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum()) / 100), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))

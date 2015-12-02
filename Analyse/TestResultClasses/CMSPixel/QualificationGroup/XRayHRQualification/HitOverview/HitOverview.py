@@ -1,6 +1,7 @@
 import ROOT
 import AbstractClasses
-import array
+from AbstractClasses.ModuleMap import ModuleMap
+
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -9,13 +10,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
     def PopulateResultData(self):
-        ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
         self.Canvas.Clear()
 
-        xBins = 8 * self.nCols
-        yBins = 2 * self.nRows
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins)
+        # initialize module map
+        self.ModuleMap = ModuleMap(Name=self.GetUniqueID(), nChips=self.ParentObject.Attributes['NumberOfChips'], StartChip=self.ParentObject.Attributes['StartChip'])
 
         try:
             Rate = self.Attributes['Rate']
@@ -31,72 +30,31 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             for col in range(self.nCols): 
                 for row in range(self.nRows):
                     result = histo.GetBinContent(col + 1, row + 1)
-                    self.UpdatePlot(chipNo, col, row, result)
+                    self.ModuleMap.UpdatePlot(chipNo, col, row, result)
 
-        if self.ResultData['Plot']['ROOTObject']:
+        # draw module map
+        if self.ModuleMap:
+            self.ResultData['Plot']['ROOTObject'] = self.ModuleMap.GetHistogram()
+            self.ModuleMap.SetContour(100)
+
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, self.ResultData['Plot']['ROOTObject'].GetMaximum())
+
             try:
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTickLength(0.015)
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTickLength(0.012)
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetAxisColor(1, 0.4)
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetAxisColor(1, 0.4)
-                self.Canvas.SetFrameLineStyle(0)
-                self.Canvas.SetFrameLineWidth(1)
-                self.Canvas.SetFrameBorderMode(0)
-                self.Canvas.SetFrameBorderSize(1)
-                self.Canvas.SetCanvasSize(1784, 412)
+                XProjection = self.ResultData['Plot']['ROOTObject'].ProjectionX('hproj_{Rate}_{id}'.format(Rate=Rate, id=self.GetUniqueID()), 50, 50)
+                XProjectionList = []
+                for col in range(XProjection.GetXaxis().GetFirst(), XProjection.GetXaxis().GetLast()+1):
+                    XProjectionList.append(XProjection.GetBinContent(col))
+                XProjectionList.sort()
+                Median = XProjectionList[int(len(XProjectionList)/2)]
+
+                if self.ResultData['Plot']['ROOTObject'].GetMaximum() > Median*3:
+                    self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, Median*3)
             except:
                 pass
 
-            # calculate scale for hitmap
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, self.ResultData['Plot']['ROOTObject'].GetMaximum())
+            self.ModuleMap.Draw(Canvas=self.Canvas, TitleZ="# hits")
 
-            XProjection = self.ResultData['Plot']['ROOTObject'].ProjectionX('hproj_{Rate}_{id}'.format(Rate=Rate, id=self.GetUniqueID()), 50, 50)
-            #Quantiles = array.array('d', [0])
-            #QuantilePositions = array.array('d', [0.5])
-            #XProjection.GetQuantiles(len(QuantilePositions), Quantiles, QuantilePositions)
-            #XProjection.Delete()
-            XProjectionList = []
-            for col in range(XProjection.GetXaxis().GetFirst(), XProjection.GetXaxis().GetLast()+1):
-                XProjectionList.append(XProjection.GetBinContent(col))
-            XProjectionList.sort()
-            Median = XProjectionList[int(len(XProjectionList)/2)]
-
-            self.ResultData['Plot']['ROOTObject'].SetTitle("")
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("#hits")
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitleOffset(0.5)
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle()
-            
-            self.ResultData['Plot']['ROOTObject'].SetContour(100)
-            self.ResultData['Plot']['ROOTObject'].Draw('colz')
-
-            if self.ResultData['Plot']['ROOTObject'].GetMaximum() > Median*3:
-                self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, Median*3)
-
-            ROOT.gPad.Update()
-
+        # save canvas
         self.ResultData['Plot']['Format'] = 'png'
-
         self.Title = 'Hit Map {Rate}'.format(Rate=Rate)
         self.SaveCanvas()
-
-        if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, self.ResultData['Plot']['ROOTObject'].GetMaximum())
-
-    def UpdatePlot(self, chipNo, col, row, value):
-        result = value
-        if chipNo < 8:
-            tmpCol = 8 * self.nCols - 1 - chipNo * self.nCols - col
-            tmpRow = 2 * self.nRows - 1 - row
-        else:
-            tmpCol = (chipNo % 8 * self.nCols + col)
-            tmpRow = row
-        # Get the data from the chip sub test result hitmap
-
-        if result and self.verbose:
-            print chipNo, col, row, '--->', tmpCol, tmpRow, result
-        self.ResultData['Plot']['ROOTObject'].Fill(tmpCol, tmpRow, result)

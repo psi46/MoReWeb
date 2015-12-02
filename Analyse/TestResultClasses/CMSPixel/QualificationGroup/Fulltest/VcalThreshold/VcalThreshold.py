@@ -2,6 +2,8 @@ import ROOT
 import AbstractClasses
 import ROOT
 import math
+from AbstractClasses.ModuleMap import ModuleMap
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_VcalThreshold_TestResult'
@@ -11,10 +13,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def PopulateResultData(self):
+        ROOT.gStyle.SetOptStat(0)
+        self.ResultData['Plot']['ROOTObject'] = None
 
+        # initialize module map
+        self.ModuleMap = ModuleMap(Name=self.GetUniqueID(), nChips=self.ParentObject.Attributes['NumberOfChips'], StartChip=self.ParentObject.Attributes['StartChip'])
 
-        ROOT.gStyle.SetOptStat(0);
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", 8*self.nCols, 0., 8*self.nCols, 2*self.nRows, 0., 2*self.nRows); # mThreshold
+        # loop over all chips
         ValueList = []
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
@@ -22,43 +27,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if not histo:
                 print 'cannot get VcalThresholdUntrimmed histo for chip ',ChipTestResultObject.Attributes['ChipNo']
                 continue
-            # ValueList = []
             
-            for col in range(self.nCols): # Columns
-                for row in range(self.nRows): # Rows
-                    if ChipTestResultObject.Attributes['ChipNo'] < 8:
-                        tmpCol = 8*self.nCols-(ChipTestResultObject.Attributes['ChipNo']*self.nCols+col)
-                        tmpRow = 2*self.nRows-row
-                    else:
-                        tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*self.nCols+col)+1
-                        tmpRow = row+1
-                    if ChipTestResultObject.Attributes['ChipNo'] < 8:
-                        #tmpRow += self.nRows
-                        pass
-                    # Get the data from the chip sub test result VcalThresholdUntrimmed
+            for col in range(self.nCols):
+                for row in range(self.nRows):
                     Value = histo.GetBinContent(col + 1, row + 1)
                     ValueList.append(Value)
-                    self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, Value)
+                    self.ModuleMap.UpdatePlot(ChipTestResultObject.Attributes['ChipNo'], col, row, Value)
 
+        # draw module map
+        if self.ModuleMap:
+            self.ResultData['Plot']['ROOTObject'] = self.ModuleMap.GetHistogram()
+            self.ModuleMap.Draw(self.Canvas)
 
-
+        # get minimum and maximum threshold
         if self.ResultData['Plot']['ROOTObject']:
-            try:
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTickLength(0.015)
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTickLength(0.012)
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetAxisColor(1, 0.4)
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetAxisColor(1, 0.4)
-                self.Canvas.SetFrameLineStyle(0)
-                self.Canvas.SetFrameLineWidth(1)
-                self.Canvas.SetFrameBorderMode(0)
-                self.Canvas.SetFrameBorderSize(1)
-                self.Canvas.SetCanvasSize(1784, 412)
-            except:
-                pass
             mThresholdMin = 0.
             mThresholdMax = 255.
 
-            if  self.ResultData['Plot']['ROOTObject'].GetMaximum() < mThresholdMax:
+            if self.ResultData['Plot']['ROOTObject'].GetMaximum() < mThresholdMax:
                 mThresholdMax = self.ResultData['Plot']['ROOTObject'].GetMaximum()
 
             if self.ResultData['Plot']['ROOTObject'].GetMinimum() > mThresholdMin:
@@ -74,43 +60,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 if SortedValueList[UpperIndex]*5. < sum(UpperValueList)/float(len(UpperValueList)):
                     mThresholdMax = SortedValueList[UpperIndex]*1.1
 
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax)
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(0.5)
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].Draw('colz')
-
-
-        boxes = []
-        startChip = self.ParentObject.Attributes['StartChip']
-        endChip = self.ParentObject.Attributes['NumberOfChips'] + startChip - 1
-        if self.verbose:
-            print 'Used chips: %2d -%2d' % (startChip, endChip)
-        for i in range(0, 16):
-            if i < startChip or endChip < i:
-                if i < 8:
-                    j = 15 - i
-                else:
-                    j = i - 8
-                beginX = (j % 8) * self.nCols
-                endX = beginX + self.nCols
-                beginY = int(j / 8) * self.nRows
-                endY = beginY + self.nRows
-                if self.verbose:
-                    print 'chip %d not used.' % i, j, '%d-%d , %d-%d' % (beginX, endX, beginY, endY)
-                newBox = ROOT.TPaveText(beginX, beginY, endX, endY)
-#                 newBox.AddText('%2d' % i)
-                newBox.SetFillColor(29)
-                newBox.SetLineColor(29)
-                newBox.SetFillStyle(3004)
-                newBox.SetShadowColor(0)
-                newBox.SetBorderSize(1)
-                newBox.Draw()
-                boxes.append(newBox)
-
+        # save canvas
         self.ResultData['Plot']['Format'] = 'png'
-
         self.ResultData['Plot']['Caption'] = 'Vcal Threshold'
         self.SaveCanvas()        
