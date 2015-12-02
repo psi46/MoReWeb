@@ -63,6 +63,7 @@ class TestResult(GeneralTestResult):
                 'ChipTests': [
                     'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.SCurveWidths',
                     'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.VcalThresholdUntrimmed',
+                    'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.ThresholdDistribution',
                     'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.NoiseMap',
                 ],
                 'Tests': [
