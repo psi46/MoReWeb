@@ -131,8 +131,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
             ROOT.gStyle.SetOptStat(0)
 
-            hA.Draw()
-            hB.Draw("same")
+            if 'AddAB' in self.Attributes and self.Attributes['AddAB']:
+                hA.Add(hB)
+                hA.Draw()
+            else:
+                hA.Draw()
+                hB.Draw("same")
+
             hC.Draw("same")
             hN.Draw("same")
 
@@ -140,13 +145,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             title.SetNDC()
             title.SetTextAlign(12)
             title.SetTextColor(self.GetGradeColor('A'))
-            title.DrawText(0.15,0.965,"Grade A")
 
-            title2 = ROOT.TText()
-            title2.SetNDC()
-            title2.SetTextAlign(12)
-            title2.SetTextColor(self.GetGradeColor('B'))
-            title2.DrawText(0.30,0.965,"Grade B")
+            if 'AddAB' in self.Attributes and self.Attributes['AddAB']:
+                title.DrawText(0.15,0.965,"Grade A+B")            
+            else:
+                title.DrawText(0.15,0.965,"Grade A")
+                title2 = ROOT.TText()
+                title2.SetNDC()
+                title2.SetTextAlign(12)
+                title2.SetTextColor(self.GetGradeColor('B'))
+                title2.DrawText(0.30,0.965,"Grade B")
 
             title3 = ROOT.TText()
             title3.SetNDC()

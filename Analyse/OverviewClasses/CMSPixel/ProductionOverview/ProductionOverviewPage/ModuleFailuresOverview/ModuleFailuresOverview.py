@@ -345,7 +345,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     for Chip in range(0,16):
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'EfficiencyGrade', 'Value'])
                         if Value is not None:
-                            Grades = [grade for grade in Value.split('/') if grade.strip()[0] != '(']
+                            Grades = [grade for grade in Value.split('/') if grade and grade.strip()[0] != '(']
                             EfficiencyGrades += Grades
                         else:
                             self.ProblematicModulesList.append(ModuleID)
@@ -359,7 +359,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     for Chip in range(0,16):
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'BadDoubleColumnsGrade', 'Value'])
                         if Value is not None:
-                            Grades = [grade for grade in Value.split('/') if grade.strip()[0] != '(']
+                            Grades = [grade for grade in Value.split('/') if grade and grade.strip()[0] != '(']
                             DoubleColumnGrades += Grades
                         else:
                             self.ProblematicModulesList.append(ModuleID)

@@ -124,6 +124,19 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
             self.SubPages.append(
                 {
+                    "Key": "CumulativeProductionGraph",
+                    "Module": "CumulativeProductionGraph",
+                    "InitialAttributes" : {
+                        "StorageKey" : "CumulativeProductionGraphAB",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                        "AddAB": True,
+                    },
+                }
+            )
+
+            self.SubPages.append(
+                {
                     "Key": "ModuleList",
                     "Module": "ModuleList",
                     "InitialAttributes" : {
