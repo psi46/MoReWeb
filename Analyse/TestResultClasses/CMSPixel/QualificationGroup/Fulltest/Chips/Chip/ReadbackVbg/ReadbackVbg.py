@@ -29,12 +29,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             pass
 
-
-        Vbg=round(self.ResultData['Plot']['ROOTObject'].GetBinContent(ChipNo+1),3)
-        self.ResultData['KeyValueDictPairs'] = {
-                    'Vbg': {
-                    'Value':Vbg,
-                    'Label':'Vbg'
-                    },
-                                                }
-        self.ResultData['KeyList'] = ['Vbg']
+        if self.ResultData['Plot']['ROOTObject']:
+            Vbg=round(self.ResultData['Plot']['ROOTObject'].GetBinContent(ChipNo+1),3)
+            self.ResultData['KeyValueDictPairs'] = {
+                        'Vbg': {
+                        'Value':Vbg,
+                        'Label':'Vbg'
+                        },
+                                                    }
+            self.ResultData['KeyList'] = ['Vbg']

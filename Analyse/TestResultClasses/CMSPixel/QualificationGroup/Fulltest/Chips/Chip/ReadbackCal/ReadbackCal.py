@@ -55,7 +55,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             warnings.warn('No readback calibration file found!')
 
-        self.ResultData['KeyValueDictPairs']['ReadbackCalibrated'] = {'Label': 'Calibrated', 'Value': 'True' if ReadbackCalibrated else 'False'}
 
 
         #Adding Vbg    
@@ -68,8 +67,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             pass
 
-        Vbg=round(self.ResultData['Plot']['ROOTObject'].GetBinContent(ChipNo+1),3)
-        self.ResultData['KeyValueDictPairs']['Vbg'] = {'Label': 'Vbg', 'Value': Vbg}                      
-        self.ResultData['KeyList'].append('Vbg')
+        try:
+            Vbg = round(self.ResultData['Plot']['ROOTObject'].GetBinContent(ChipNo+1),3)
+            self.ResultData['KeyValueDictPairs']['Vbg'] = {'Label': 'Vbg', 'Value': Vbg}
+            self.ResultData['KeyList'].append('Vbg')
+        except:
+            ReadbackCalibrated = False
 
+        self.ResultData['KeyValueDictPairs']['ReadbackCalibrated'] = {'Label': 'Calibrated', 'Value': 'True' if ReadbackCalibrated else 'False'}
         self.ResultData['KeyList'].append('ReadbackCalibrated')
