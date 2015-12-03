@@ -10,7 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def CustomInit(self):
-        self.NameSingle = 'ReadbackCalVdig'
+        self.NameSingle = 'ReadbackCalVana'
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_%s_TestResult'%self.NameSingle
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
@@ -19,7 +19,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gStyle.SetOptStat(0)
 
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
-        HistoName = HistoDict.get(self.NameSingle, 'VdigCalibration')
+        HistoName = HistoDict.get(self.NameSingle, 'VanaCalibration')
         ChipNo = self.ParentObject.Attributes['ChipNo']
         ROOTFile = self.ParentObject.ParentObject.FileHandle
 
@@ -50,9 +50,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             g1.SetMarkerColor(4)
             g1.SetMarkerStyle(21)
             g1.SetTitle();
-            g1.GetXaxis().SetTitle('Vdig [V]');
+            g1.GetXaxis().SetTitle('Vana [V]');
             g1.GetXaxis().SetTitleOffset(1.3);
-            g1.GetYaxis().SetTitle('Vdig [ADC]');
+            g1.GetYaxis().SetTitle('Vana [ADC]');
             g1.GetYaxis().SetTitleOffset(1.4);
             
             #Make linear fit with pol1 and get fit parameters
@@ -65,28 +65,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             #Draw the plot
             g1.Draw('AP')
 
-        self.Title = 'Vdig [ADC]/Vdig [V]'
+        self.Title = 'Vana [ADC]/Vana [V]'
         if self.Canvas:
             self.Canvas.SetCanvasSize(500, 500)
             self.SaveCanvas()
 
         #Write down the fit results
         self.ResultData['KeyValueDictPairs'] = {
-            'par0vd': {
+            'par0va': {
             'Value':round(p0,2),
-            'Label':'par0vd'
+            'Label':'par0va'
             },
-            'par1vd': {
+            'par1va': {
                 'Value':round(p1,2),
-                'Label':'par1vd'
+                'Label':'par1va'
             },
-            'chi2vd': {
+            'chi2va': {
                 'Value':round(chi2,2),
                 'Label':'chi2'
             },
 
                                                 }
-        self.ResultData['KeyList'] = ['par0vd', 'par1vd', 'chi2vd']
+        self.ResultData['KeyList'] = ['par0va', 'par1va', 'chi2va']
 
 
 
