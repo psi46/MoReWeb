@@ -199,7 +199,6 @@ class GeneralTestResult(object):
         # Module Path
         self.ModulePath = self.NameSingle
         
-        
         if InitialModulePath:
             self.ModulePath = InitialModulePath
 
@@ -262,15 +261,31 @@ class GeneralTestResult(object):
             else:
                 importdir = self.ModulePath + '.' + SubModule
 
+            # self.ModulePath contains the path under which the module will be saved in hierarchy
+            # self.ImportPath contains the path from which the module is copied
+
+            self.ImportPath = None
             try:
-                # print 'import ',importdir,SubModule
                 f = __import__(importdir + '.' + SubModule, fromlist=[importdir + '.' + 'TestResult'])
+                self.ImportPath = importdir
             except ImportError as inst:
-                # print 'could not ',importdir+'.'+SubModule,SubModule
-                # print 'type',type(inst)
-                # print 'inst',inst
-                f = __import__(importdir + '.TestResult', fromlist=[''])
-                print 'imported', f, 'please change name of file'
+                try:
+                    ParentObjectPath = self.ParentObject.ImportPath
+                    ModulePath = ParentObjectPath + '.' + SubModule  + '.' + SubModule
+                    FromList = ParentObjectPath + '.' + SubModule + '.TestResult'
+                    f = __import__(ModulePath, fromlist=[FromList])
+                    self.ImportPath = ParentObjectPath + '.' + SubModule
+                except:
+                    try:
+                        f = __import__(importdir + '.TestResult', fromlist=[''])
+                    except:
+                        print "\x1b[31mImport failed:"
+                        print " importdir: ", importdir + '.TestResult'
+                        print " fromlist: []"
+                        print "\x1b[0m"
+                        raise
+
+                    print 'imported', f, 'please change name of file'
             pass
 
             self.ResultData['SubTestResults'][i['Key']] = f.TestResult(

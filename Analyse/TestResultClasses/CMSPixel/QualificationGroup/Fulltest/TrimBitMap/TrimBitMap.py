@@ -1,6 +1,5 @@
 import ROOT
 import AbstractClasses
-import ROOT
 from AbstractClasses.ModuleMap import ModuleMap
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):

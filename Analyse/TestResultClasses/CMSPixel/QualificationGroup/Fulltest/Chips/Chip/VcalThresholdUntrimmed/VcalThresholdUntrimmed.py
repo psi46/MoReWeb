@@ -21,7 +21,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'] = self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['Plot']['ROOTObject_ht'].Clone(self.GetUniqueID())
         except:
             self.ResultData['Plot']['ROOTObject'] = None
-
         pxarfit = False
         if self.ResultData['Plot']['ROOTObject'] is None or ('NoDatFile' in self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData'] and self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['NoDatFile']):
             HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict

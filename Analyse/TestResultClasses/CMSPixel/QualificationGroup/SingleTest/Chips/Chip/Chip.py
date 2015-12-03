@@ -1,11 +1,9 @@
 import AbstractClasses
-import ROOT
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def CustomInit(self):
-        ROOT.gStyle.SetOptStat(0)
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_SingleTest_ROC'
 
         self.Name = 'CMSPixel_QualificationGroup_SingleTest_Chips_Chip_TestResult'

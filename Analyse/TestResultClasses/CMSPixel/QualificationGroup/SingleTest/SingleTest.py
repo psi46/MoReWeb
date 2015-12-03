@@ -15,7 +15,8 @@ class TestResult(GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_%s_TestResult'%self.NameSingle 
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-        self.Attributes['NumberOfChips'] = self.nTotalChips
+        self.ReadModuleVersion()
+        self.Attributes['NumberOfChips'] = self.nRocs
         self.Attributes['StartChip'] = 0
         self.Attributes['ModuleVersion'] = 1
         self.Attributes['isDigital'] = 1
