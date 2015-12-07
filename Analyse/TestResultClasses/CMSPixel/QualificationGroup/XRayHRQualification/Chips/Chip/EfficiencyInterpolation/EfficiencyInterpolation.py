@@ -122,9 +122,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 cubicFit.SetParameter(1, 5e-7)
                 cubicFit.SetParLimits(1, 0, 0.01)
 
-                PlotMinEfficiency = 80
+                PlotMinEfficiency = min(80, min(DoubleColumnEfficiencyList)*0.95) if len(DoubleColumnEfficiencyList) > 0 else 80
+                RateMaxRange = max(300, max(DoubleColumnRateList)*1.05) if len(DoubleColumnRateList) > 0 else 300
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(PlotMinEfficiency, 105.)
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, 300)
+                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, RateMaxRange)
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]")
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency [%]")
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
