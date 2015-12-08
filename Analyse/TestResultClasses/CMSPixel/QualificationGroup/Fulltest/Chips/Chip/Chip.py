@@ -165,11 +165,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                     }
                 },
-                {'Key':'ReadbackCal',
+                {'Key':'ReadbackCalIana',
                     'DisplayOptions':{
-                        
                     }
                 },
+                
                 {'Key':'ReadbackCalVdig',
                     'DisplayOptions':{
                     }
@@ -178,12 +178,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                     }
                 },
-                {'Key':'ReadbackCalIana',
+                {'Key':'ReadbackVbg',
                     'DisplayOptions':{
                     }
                 },
-                {'Key':'ReadbackVbg',
+                {'Key':'ReadbackCal',
                     'DisplayOptions':{
+                        
                     }
                 }
 
