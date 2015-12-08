@@ -1,5 +1,6 @@
 import ROOT
 import AbstractClasses
+from AbstractClasses.ModuleMap import ModuleMap
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -8,15 +9,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
     def PopulateResultData(self):
-        ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
 
-        xBins = 8 * self.nCols
-        yBins = 2 * self.nRows
-        self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins);         
-
+        # initialize module map
+        self.ModuleMap = ModuleMap(Name=self.GetUniqueID(), nChips=self.ParentObject.Attributes['NumberOfChips'], StartChip=self.ParentObject.Attributes['StartChip'])
         Directory = self.ParentObject.Attributes['SCurvePaths']['HRSCurves_{Rate}'.format(Rate=self.Attributes['Rate'])]
-        SCurveDataFileName = self.ParentObject.ParentObject.HistoDict.get('HighRate', 'SCurveDataFileName')
 
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
@@ -38,50 +35,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             LineArray = Line.strip().split()
                             Noise = float(LineArray[1])
                             if 0 < Noise < 2000:
-                                self.UpdatePlot(ChipNo, column, row, Noise)
+                                self.ModuleMap.UpdatePlot(ChipNo, column, row, Noise)
             SCurveFile.close()
 
-        if self.ResultData['Plot']['ROOTObject']:
-            try:
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTickLength(0.015)
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTickLength(0.012)
-                self.ResultData['Plot']['ROOTObject'].GetXaxis().SetAxisColor(1, 0.4)
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetAxisColor(1, 0.4)
-                self.Canvas.SetFrameLineStyle(0)
-                self.Canvas.SetFrameLineWidth(1)
-                self.Canvas.SetFrameBorderMode(0)
-                self.Canvas.SetFrameBorderSize(1)
-                self.Canvas.SetCanvasSize(1784, 412)
-            except:
-                pass
-            self.ResultData['Plot']['ROOTObject'].SetTitle("")
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
-            self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
-            if self.ResultData['Plot']['ROOTObject'].GetMaximum() < 600:
+        # draw module map
+        if self.ModuleMap:
+            self.ModuleMap.SetContour(100)
+            self.ResultData['Plot']['ROOTObject'] = self.ModuleMap.GetHistogram()
+            if self.ResultData['Plot']['ROOTObject'] and self.ResultData['Plot']['ROOTObject'].GetMaximum() < 600:
                 self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, 600)
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("electrons")
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitleOffset(0.5)
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
+            self.ModuleMap.Draw(Canvas=self.Canvas, TitleZ="electrons")
+
+        # save canvas
         self.ResultData['Plot']['Format'] = 'png'
-
         self.Title = 'Noise {Rate}'.format(Rate=self.Attributes['Rate'])
-        self.SaveCanvas()     
-
-    def UpdatePlot(self, chipNo, col, row, value):
-        result = value
-        if chipNo < 8:
-            tmpCol = 8 * self.nCols - 1 - chipNo * self.nCols - col
-            tmpRow = 2 * self.nRows - 1 - row
-        else:
-            tmpCol = (chipNo % 8 * self.nCols + col)
-            tmpRow = row
-        # Get the data from the chip sub test result hitmap
-
-        if result and self.verbose:
-            print chipNo, col, row, '--->', tmpCol, tmpRow, result
-        self.ResultData['Plot']['ROOTObject'].Fill(tmpCol, tmpRow, result)
+        self.SaveCanvas()

@@ -61,7 +61,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if object != None:
                 self.ResultData['Plot']['ROOTObject_h2'] = object.Clone(self.GetUniqueID())
         if not self.ResultData['Plot']['ROOTObject_h2']:
-            self.ResultData['HiddenData']['NoDatFile'] = True
+            #self.ResultData['HiddenData']['NoDatFile'] = True
             print 'Cannot find Histogram ',HistoDict.get(self.NameSingle,'Digital'),HistoDict.has_option(self.NameSingle,'Analog')
             print[x.GetName() for x in self.ParentObject.ParentObject.FileHandle.GetListOfKeys()]
             print 'NameSingle: ', self.NameSingle

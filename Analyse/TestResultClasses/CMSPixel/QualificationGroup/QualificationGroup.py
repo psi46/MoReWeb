@@ -11,6 +11,8 @@ import AbstractClasses.Helper.testchain
 import warnings
 import time
 import traceback
+import glob
+import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -224,7 +226,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             index = 0
             while test:
                 if test.testname.lower() in [x.lower() for x in singleTestsList]:
-                    print '\t-> appendSingleTest'
+                    print '\t-> appendSingleTest %s'%test.testname
                     tests, test, index = self.appendSingleTest(tests, test, index)
                     QualificationAdded = True
                 else:
@@ -233,6 +235,49 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     index += 1
                     test = test.next()
 
+        # check root files in subfolders directly and try to find something...
+        if not QualificationAdded:
+            SubtestfoldersPath = "%s/*_*_*/*.root"%self.TestResultEnvironmentObject.ModuleDataDirectory
+            SubtestfolderRootFiles = glob.glob(SubtestfoldersPath)
+            print "found at least some .root files:", SubtestfolderRootFiles
+
+            SingleTestsDicts = [
+                {'HistoDictSection': 'PixelMap',
+                 'HistoDictEntry': 'Calibrate',
+                 'SingleTestName': 'PixelAlive'},
+                {'HistoDictSection': 'VcalThresholdUntrimmed',
+                 'HistoDictEntry': 'ThresholdMap',
+                 'SingleTestName': 'Scurves'},
+                {'HistoDictSection': 'TrimBitMap',
+                 'HistoDictEntry': 'TrimBitMap',
+                 'SingleTestName': 'Trim'},
+                {'HistoDictSection': 'GainPedestal',
+                 'HistoDictEntry': 'GainPedestalP0',
+                 'SingleTestName': 'GainPedestal'},
+            ]
+            for RootFileName in SubtestfolderRootFiles:
+                RootFile = ROOT.TFile.Open(RootFileName)
+                if RootFile:
+                    self.check_Test_Software()
+                    print "file: %s =>"%RootFileName
+
+                    for SingleTestsDict in SingleTestsDicts:
+                        if self.HistoDict.has_option(SingleTestsDict['HistoDictSection'], SingleTestsDict['HistoDictEntry']):
+                            histname = self.HistoDict.get(SingleTestsDict['HistoDictSection'], SingleTestsDict['HistoDictEntry'])
+                            object = HistoGetter.get_histo(RootFile, histname, rocNo = 0)
+                            if object:
+                                SubfolderName = RootFileName.split('/')[-2]
+                                print '\t-> appendSingleTest %s'%test
+                                index = int(SubfolderName.split('_')[0])
+                                Environment = SubfolderName.split('_')[-1]
+                                Temperature = Environment.replace('p','').replace('m', '-')
+                                Directory = SubfolderName
+                                tests, test, index = self.appendSingleTestFromRootfile(tests, SingleTestsDict['SingleTestName'], index, Directory, Environment, Temperature)
+                                QualificationAdded = True
+
+                    RootFile.Close()
+                else:
+                    print "cannot open root file '%s'"%RootFileName
 
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
 
@@ -422,7 +467,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         return tests, test, index
 
     def appendSingleTest(self, tests, test, index):
-        environment = test.environment
         key = 'Module%s_%s' % (test.testname, test.environment.name)
         nKeys = 1
         for item in tests:
@@ -450,6 +494,33 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         })
         test = test.next()
         index += 1
+        return tests, test, index
+
+    def appendSingleTestFromRootfile(self, tests, test, index, directory, envname, envtemperature):
+        key = 'Module%s_%s' % (test, envname)
+        nKeys = 1
+        for item in tests:
+            if item['Key'].startswith(key):
+                nKeys += 1
+        key += '_%s' % (nKeys)
+        tests.append({
+            'Key': key,
+            'Module': 'SingleTest',
+            'InitialAttributes': {
+                'StorageKey': key,
+                'TestResultSubDirectory': directory,
+                'IncludeIVCurve': False,
+                'ModuleID': self.Attributes['ModuleID'],
+                'ModuleVersion': self.Attributes['ModuleVersion'],
+                'ModuleType': self.Attributes['ModuleType'],
+                'TestType': '%s_%s_%s'%(test, envname, nKeys),
+                'TestTemperature': envtemperature,
+                'Test': test,
+            },
+            'DisplayOptions': {
+                'Order': len(tests) + 1
+            }
+        })
         return tests, test, index
 
     def appendXrayCalibration(self, tests, test, index):

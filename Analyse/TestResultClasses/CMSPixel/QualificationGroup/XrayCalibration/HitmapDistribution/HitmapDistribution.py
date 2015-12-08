@@ -13,7 +13,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROOT.gStyle.SetOptStat(0)
 
         HitMapOverview = self.ParentObject.ResultData['SubTestResults']['HitmapOverview_{Target}'.format(Target=self.Attributes['Target'])].ResultData['Plot']['ROOTObject']
-
+        try:
+            HitMapOverview.GetZaxis().SetRangeUser(0, HitMapOverview.GetBinContent(HitMapOverview.GetMaximumBin()))
+        except:
+            pass
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum())), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
         GraphEdges = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum())), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))
         GraphCorners = ROOT.TH1D(self.GetUniqueID(), "", int((HitMapOverview.GetMaximum()*1.05-HitMapOverview.GetMinimum())), float(HitMapOverview.GetMinimum()), float(HitMapOverview.GetMaximum()*1.05))

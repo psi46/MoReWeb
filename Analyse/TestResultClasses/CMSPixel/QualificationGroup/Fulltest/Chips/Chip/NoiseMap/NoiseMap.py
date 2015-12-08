@@ -22,7 +22,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'] = None
 
         if self.ResultData['Plot']['ROOTObject']:
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['htmin'], self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['HiddenData']['htmax'])
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, 200)
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.")
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
