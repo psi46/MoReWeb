@@ -221,7 +221,22 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
-
+        ### pixels with bad treshold ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "BadThreshold", "Title": "Pixels with bad threshold"}, "Key": "Section","Module": "Section"})
+        for Grade in ['All','A', 'B', 'C']:
+            self.SubPages.append(
+                {
+                    "Key": "ThresholdDefectsOverlay_{Grade}".format(Grade = Grade),
+                    "Module": "ThresholdDefectsOverlay",
+                    "InitialAttributes" : {
+                        "Test": "m20_2",
+                        "Grade": "{Grade}".format(Grade = Grade),
+                        "StorageKey" : "ThresholdDefectsOverlay_{Grade}".format(Grade = Grade),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
         ### pixels with too high or low gain ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "BadGain", "Title": "Pixels with bad gain"}, "Key": "Section","Module": "Section"})
         for Grade in ['All','A', 'B', 'C']:
