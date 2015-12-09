@@ -10,7 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_CalDel_TestResult'
         self.NameSingle = 'CalDel'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-        
+        self.ResultData['HiddenData']['DacParameters'] = {}
 
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0);
@@ -37,12 +37,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
                 ChipNo = ChipTestResultObject.Attributes['ChipNo']
                 ChipPosition = ChipNo + 1
-                strValue = ''
-                Keys=['Chips', '%s'%i, 'DacParameterOverview', 'DacParameters35','KeyValueDictPairs.json', 'caldel', 'Value']
-                Path = self.FinalResultsStoragePath + '/../' + '/'.join(Keys[0:-2])
-                JSONData = json.load(open(Path))
+                ChipTestResultObject = \
+                    self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
                 try:
-                    strValue = JSONData[Keys[-2]][Keys[-1]]
+                    strValue = ChipTestResultObject.ResultData['SubTestResults']['OpParameters'].ResultData[
+                        'KeyValueDictPairs']['CalDel']['Value']
                     Value = int(strValue)
                 except KeyError as e:
                     e.message += ' ' + str((Parameters['DataKey'], Parameters['DataParameterKey'], strValue))
