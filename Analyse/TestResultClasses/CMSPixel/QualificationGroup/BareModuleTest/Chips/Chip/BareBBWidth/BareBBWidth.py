@@ -83,6 +83,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                 #print 'New Cut at bin : ', ibinxCut0 , ' with entries: ', yCut0, ' x value : ', self.ResultData['Plot']['ROOTObject'].GetBinCenter(ibinxCut0)
 
+                #reset the cut value in casae is negative(!)
+                if (cut < 0):
+                    cut = 20.
+
+
                 self.ResultData['KeyValueDictPairs']['thrCutBB2Map']['Value'] = cut
                 self.ResultData['KeyList'].append('thrCutBB2Map')
             
