@@ -109,6 +109,30 @@ class TestResult(GeneralTestResult):
                     }
                 ],
             },
+            'PhOptimization': {
+                'ChipTests': [
+                    {
+                        'Key': 'PHMapMax',
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.PHMap',
+                        'Width': 4,
+                        'InitialAttributes': {
+                            'StorageKey': 'PhMapMax',
+                            'Map': 'MaxPHMap',
+                        },
+                    },
+                    {
+                        'Key': 'PHMapMin',
+                        'Module': 'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.PHMap',
+                        'Width': 4,
+                        'InitialAttributes': {
+                            'StorageKey': 'PhMapMin',
+                            'Map': 'MinPHMap',
+                        },
+                    },
+                ],
+                'Tests':
+                    [],
+            },
             'GainPedestal': {
                 'Fitting': [
                     {
@@ -210,21 +234,20 @@ class TestResult(GeneralTestResult):
                             'InitialAttributes': InitialAttributes,
 
                         })
-
             if 'ChipTests' in TestNameDictionary[TestName]:
-                 self.ResultData['SubTestResultDictList'].append(
-                    {
-                        'Key': 'Chips',
-                        'DisplayOptions': {
-                            'Order': 1,
-                            'Show': True,
-                        },
-                        'InitialAttributes': {
-                            'ModuleVersion': self.Attributes['ModuleVersion'],
-                            'Tests': TestNameDictionary[TestName]['ChipTests'],
-                            'NumberOfChips': self.Attributes['NumberOfChips'],
-                        },
-                    })
+                self.ResultData['SubTestResultDictList'].append(
+                {
+                    'Key': 'Chips',
+                    'DisplayOptions': {
+                        'Order': 1,
+                        'Show': True,
+                    },
+                    'InitialAttributes': {
+                        'ModuleVersion': self.Attributes['ModuleVersion'],
+                        'Tests': TestNameDictionary[TestName]['ChipTests'],
+                        'NumberOfChips': self.Attributes['NumberOfChips'],
+                    },
+                })
 
             Index = 2
             if 'Tests' in TestNameDictionary[TestName]:

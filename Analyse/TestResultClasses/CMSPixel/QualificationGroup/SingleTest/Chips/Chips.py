@@ -12,7 +12,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print '\tstartChip', self.ParentObject.Attributes['StartChip'],type(self.ParentObject.Attributes['StartChip'])
 
         for i in range(self.ParentObject.Attributes['NumberOfChips']-self.ParentObject.Attributes['StartChip']):
-            self.ResultData['SubTestResultDictList'].append( {
+            self.ResultData['SubTestResultDictList'].append({
                 'Key':'Chip'+str(i),
                 'Module':'Chip',
                 'InitialAttributes':{

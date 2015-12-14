@@ -216,7 +216,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 test = test.next()
 
         # single tests
-        singleTestsList = ['PixelAlive', 'ReadbackCal', 'BumpBonding', 'Scurves', 'Trim', 'GainPedestal', 'Hitmap']
+        singleTestsList = ['PixelAlive', 'ReadbackCal', 'BumpBonding', 'Scurves', 'Trim', 'GainPedestal', 'Hitmap', 'PhOptimization']
 
         # try to find tests from test list in ini file
         if not QualificationAdded:
@@ -241,6 +241,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             SubtestfolderRootFiles = glob.glob(SubtestfoldersPath)
             print "found at least some .root files:", SubtestfolderRootFiles
 
+            # these defines the histograms which are checked for existence in the .root file
+            # if found, the single test is added
             SingleTestsDicts = [
                 {'HistoDictSection': 'PixelMap',
                  'HistoDictEntry': 'Calibrate',
@@ -254,6 +256,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 {'HistoDictSection': 'GainPedestal',
                  'HistoDictEntry': 'GainPedestalP0',
                  'SingleTestName': 'GainPedestal'},
+                {'HistoDictSection': 'PHMap',
+                 'HistoDictEntry': 'MaxPHMap',
+                 'SingleTestName': 'PhOptimization'},
             ]
             for RootFileName in SubtestfolderRootFiles:
                 RootFile = ROOT.TFile.Open(RootFileName)
@@ -278,6 +283,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     RootFile.Close()
                 else:
                     print "cannot open root file '%s'"%RootFileName
+
+        if not QualificationAdded:
+            print "Could not find anything to analyze, check if:"
+            print "  - there is either a correct .ini file in configfiles subfolder containing the test list"
+            print "  - or a .root file in the test subfolder containing histograms with the correct naming convention (eg. like in pxar.cfg)"
 
         self.appendOperationDetails(self.ResultData['SubTestResultDictList'])
 
