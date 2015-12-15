@@ -1,3 +1,12 @@
+News
+=======
+
+Dec 15, 2015:
+
+- new improved BB2 cuts merged into master branch, thanks @andreavargas
+- development branch v0.7 which contains: new checks for bad double columns, FQ analysis speed up, more Readback test analysis, support for single test analysis and some improved plots -> will be merged into master branch in January 2016
+
+
 Info
 =======
 
