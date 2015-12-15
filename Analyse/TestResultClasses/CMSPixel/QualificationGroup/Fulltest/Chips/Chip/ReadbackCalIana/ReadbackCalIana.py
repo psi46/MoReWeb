@@ -58,7 +58,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].SetTitle()
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle('Iana [ADC]')
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitleOffset(1.3)
-                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle('Iana [ma]')
+                self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle('Iana [mA]')
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.4)
 
                 #Make linear fit with pol1 and get fit parameters
