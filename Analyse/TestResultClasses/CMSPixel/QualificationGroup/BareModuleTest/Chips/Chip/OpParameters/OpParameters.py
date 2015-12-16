@@ -12,4 +12,8 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Ch
     	
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_OpParameters_TestResult'
         self.NameSingle = 'OpParameters'
+        self.ResultData['HiddenData']['DacParameters'] = {}
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+
+
+

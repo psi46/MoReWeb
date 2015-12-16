@@ -44,6 +44,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':5,
                     }
                 },
+                {'Key':'BumpBondingMap',
+                    'DisplayOptions':{
+                        'Order':5,
+                    }
+                },                
                 {'Key':'AddressDecoding',
                     'DisplayOptions':{
                         'Order':9,
@@ -83,7 +88,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                  'DisplayOptions':{
                         'Order':1,
                         }
-                 },                
+                 },
+                {'Key':'Grading',
+                    'DisplayOptions':{
+                        'Show':False,
+                    }
+                },
                 ]
             
             

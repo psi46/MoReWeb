@@ -9,7 +9,7 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.BumpBond
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_BumpBondingMap_TestResult'
         self.NameSingle='BumpBondingMap'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-
+        self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = ''
 
     # PopulateResultData is inherited
     
