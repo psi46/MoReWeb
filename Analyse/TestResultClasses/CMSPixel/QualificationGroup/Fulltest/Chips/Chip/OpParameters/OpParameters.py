@@ -24,13 +24,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         trimVcalString = ''
         
         # try to get the value from the fulltest logfile
-        if self.ParentObject.ParentObject.ParentObject.trimVcal:
-            vcalTrim = self.ParentObject.ParentObject.ParentObject.trimVcal
-            DacParametersFileName = '{Directory}/dacParameters{trimVcal}_C{ChipNo}.dat'.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'],trimVcal=vcalTrim)
-            if os.path.isfile(DacParametersFileName):
-                foundParametersFile = True
-                trimVcalString = str(vcalTrim)
-
+        try:
+            if self.ParentObject.ParentObject.ParentObject.trimVcal:
+                vcalTrim = self.ParentObject.ParentObject.ParentObject.trimVcal
+                DacParametersFileName = '{Directory}/dacParameters{trimVcal}_C{ChipNo}.dat'.format(Directory=Directory,ChipNo=self.ParentObject.Attributes['ChipNo'],trimVcal=vcalTrim)
+                if os.path.isfile(DacParametersFileName):
+                    foundParametersFile = True
+                    trimVcalString = str(vcalTrim)
+        except:
+            print 'No trim File found'
         # otherwise pick the newest one
         if not foundParametersFile:
             # get all dacParameters files
