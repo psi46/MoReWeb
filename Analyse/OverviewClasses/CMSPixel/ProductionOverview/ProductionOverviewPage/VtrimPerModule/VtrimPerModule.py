@@ -6,9 +6,9 @@ import json
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-        self.NameSingle='CalDelPerModule'
+        self.NameSingle='VtrimPerModule'
     	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
-        self.Title = 'CalDel difference'
+        self.Title = 'Vtrim difference'
         self.DisplayOptions = {
             'Width': 1,
         }
@@ -49,7 +49,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     Value = 0
                     if TestType == self.Attributes['Test']:
                         Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary1', 'KeyValueDictPairs.json', 'Grade', 'Value'])
-                        Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'CalDel', 'KeyValueDictPairs.json', "caldelspread", 'Value'])
+                        Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Vtrim', 'KeyValueDictPairs.json', "vtrimspread", 'Value'])
                         if Grade is not None:
                             try:
                                 ModuleGrade[Grade].append(float(Value))
@@ -112,7 +112,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         Histogram.Draw("")
         
        
-        Histogram.GetXaxis().SetTitle("CalDel [ADC]")
+        Histogram.GetXaxis().SetTitle("Vtrim [ADC]")
         Histogram.GetYaxis().SetTitle("# modules")
         Histogram.GetYaxis().SetTitleOffset(1.5)
 
@@ -145,7 +145,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         title.SetNDC()
         title.SetTextAlign(12)
         title.SetTextSize(0.03)
-        Subtitle = "CalDel spread, modules:{NROCs}".format(NROCs=NROCs)
+        Subtitle = "Vtrim spread, modules:{NROCs}".format(NROCs=NROCs)
         title.DrawText(0.15,0.95,Subtitle)
 
         title4 = ROOT.TText()

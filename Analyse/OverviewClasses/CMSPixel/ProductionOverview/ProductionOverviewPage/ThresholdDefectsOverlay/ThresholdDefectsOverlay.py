@@ -6,9 +6,9 @@ import glob
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-        self.NameSingle='GainOverlay'
+        self.NameSingle='ThresholdDefectsOverlay'
         self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
-        self.Title = 'Bad gain Overlay, Test: %s Grade: %s'%(self.Attributes['Test'], self.Attributes['Grade'])
+        self.Title = 'Threshold Defect Overlay, Test: %s Grade: %s'%(self.Attributes['Test'], self.Attributes['Grade'])
         self.DisplayOptions = {
             'Width': 2.5,
         }
@@ -16,6 +16,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.SavePlotFile = True
         self.Canvas.SetCanvasSize(1330, 430)
         self.Canvas.Update()
+
 
     def GenerateOverview(self):
         ROOT.gStyle.SetOptStat(0)
@@ -29,10 +30,12 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         nRowsModule = 2 * self.nRows
         SummaryMap = ROOT.TH2D(self.GetUniqueID(), "", nColsModule, 0, nColsModule, nRowsModule, 0, nRowsModule)
 
-        gainMin = float(self.TestResultEnvironmentObject.GradingParameters['gainMin'])
-        gainMax = float(self.TestResultEnvironmentObject.GradingParameters['gainMax'])
-
         NModules = 0
+        trimThr = float(self.TestResultEnvironmentObject.GradingParameters['trimThr'])
+        tthrTol = float(self.TestResultEnvironmentObject.GradingParameters['tthrTol'])
+        pixelThrMin = int(trimThr) - int(tthrTol)
+        pixelThrMax = int(trimThr) + int(tthrTol)
+
         for ModuleID in ModuleIDsList:
 
             for RowTuple in Rows:
@@ -40,19 +43,19 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     TestType = RowTuple['TestType']
                     if TestType == self.Attributes['Test'] and (RowTuple['Grade'] == self.Attributes['Grade'] or self.Attributes['Grade'] == 'All'):
                         for Chip in range(0,16):
-                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'PHCalibrationGainMap', '*.root'])
+                            Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'VcalThresholdTrimmedMap', '*.root'])
                             RootFiles = glob.glob(Path)
-                            ROOTObject = self.GetHistFromROOTFile(RootFiles, "PHCalibrationGainMap")
+                            ROOTObject = self.GetHistFromROOTFile(RootFiles, "VcalThresholdTrimmedMap")
                             if ROOTObject:
                                 for col in range(0, self.nCols):
                                     for row in range(0, self.nRows):
-                                        if ROOTObject.GetBinContent(1+col, 1+row) < gainMin or ROOTObject.GetBinContent(1+col, 1+row) > gainMax:
+                                        if ROOTObject.GetBinContent(1+col, 1+row) < pixelThrMin or ROOTObject.GetBinContent(1+col, 1+row) > pixelThrMax:
                                             self.UpdatePlot(SummaryMap, Chip, col, row, 1)
                                 ROOTObject.Delete()
                             else:
                                 self.ProblematicModulesList.append(ModuleID)
                                 if self.Verbose:
-                                    print "      Dead Pixel map not found for module '%s' Chip '%d'"%(ModuleID, Chip)
+                                    print " Threshold map not found for module '%s' Chip '%d'"%(ModuleID, Chip)
 
                         NModules += 1
 

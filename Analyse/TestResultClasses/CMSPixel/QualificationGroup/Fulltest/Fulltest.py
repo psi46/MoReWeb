@@ -175,6 +175,17 @@ class TestResult(GeneralTestResult):
                 {'Key': 'Parameter1', 'DisplayOptions': {'Order': 13, }}
             ]
 
+
+
+        self.ResultData['SubTestResultDictList'] += [
+            {'Key': 'CalDel', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'PHScale', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'PHOffset', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'VthrComp', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'Vtrim', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'Vana', 'DisplayOptions': {'Order': 14, }},
+        ]
+
         self.ResultData['SubTestResultDictList'] += [
             {
                 'Key': 'Grading',

@@ -41,6 +41,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':4,
                     }
                 },# depends on
+                {'Key':'VcalThresholdTrimmedMap',
+                'InitialAttributes' :{'StorageKey': 'VcalThresholdTrimmedMap'},
+                    'DisplayOptions':{
+                        'Order':4,
+                    }
+                },# depends on SCurveWidths'''
                 {'Key':'BumpBonding',
                     'DisplayOptions':{
                         'Order':6,
