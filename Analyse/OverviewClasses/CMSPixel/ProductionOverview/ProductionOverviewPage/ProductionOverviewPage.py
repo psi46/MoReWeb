@@ -73,6 +73,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 'Xmin': -0.001,
                 'Xmax': 0.001
             },
+            {
+                'Parameter': 'par0ia',
+                'Xmin': -50,
+                'Xmax': 50
+            },
+            {
+                'Parameter': 'par1ia',
+                'Xmin': 0,
+                'Xmax': 1
+            },
         ]
 
         self.SubPages.append({
