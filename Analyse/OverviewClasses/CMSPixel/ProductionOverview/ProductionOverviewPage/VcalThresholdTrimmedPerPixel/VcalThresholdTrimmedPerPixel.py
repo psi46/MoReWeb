@@ -1,14 +1,13 @@
 import ROOT
 import AbstractClasses
-import glob
-import json
+
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
 
         self.NameSingle='VcalThresholdTrimmedPerPixel'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = 'Vcal Thr Trimmed {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
             'Width': 1,
@@ -20,7 +19,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
     def GenerateOverview(self):
         Rows = self.FetchData()
         ModuleIDsList = self.GetModuleIDsList(Rows)
-        HTML = ""
 
         # define for which grades to plot histogram
         HistogramDict = {
