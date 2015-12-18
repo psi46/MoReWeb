@@ -20,8 +20,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
     def GenerateOverview(self):
         ROOT.gStyle.SetOptStat(0)
 
-        TableData = []
-
         Rows = self.FetchData()
 
         ModuleIDsList = []
@@ -29,10 +27,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             if not RowTuple['ModuleID'] in ModuleIDsList:
                 ModuleIDsList.append(RowTuple['ModuleID'])
 
-        HTML = ""
-
-        nCols = 8 * 52+1
-        nRows = 2 * 80+1
+        nCols = 8 * 52
+        nRows = 2 * 80
         SummaryMap = ROOT.TH2D(self.GetUniqueID(), "", nCols, 0, nCols, nRows, 0, nRows)
 
         SubtestSubfolder = "BumpBondingProblems_150"
@@ -49,7 +45,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
                         ROOTObject = self.GetHistFromROOTFile(RootFiles, "BumpBonding")
                         if ROOTObject:
-                            SummaryMap.Add(ROOTObject)
+
+                            if ROOTObject.GetNbinsX != nCols or ROOTObject.GetNbinsY != nRows:
+                                for x in range(1, nCols+1):
+                                    for y in range(1, nRows+1):
+                                        SummaryMap.Fill(x, y, ROOTObject.GetBinContent(x,y))
+                            else:
+                                SummaryMap.Add(ROOTObject)
                             NModules += 1
                         else:
                             self.ProblematicModulesList.append(ModuleID)
