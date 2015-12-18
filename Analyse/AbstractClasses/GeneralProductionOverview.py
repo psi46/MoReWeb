@@ -113,13 +113,20 @@ class GeneralProductionOverview:
 
         return directory + Name + '.' + Suffix
 
-    def SaveCanvas(self):
+    def SaveCanvas(self, Format = None):
         if self.SavePlotFile:
             if self.Canvas:
                 self.Canvas.Update()
-                # save svg
-                self.Canvas.SaveAs(self.GetPlotFileName('svg', True))
-                self.Attributes['ImageFile'] = self.GetPlotFileName('svg', False)
+
+                if Format:
+                    # save
+                    self.Canvas.SaveAs(self.GetPlotFileName(Format, True))
+                    self.Attributes['ImageFile'] = self.GetPlotFileName(Format, False)
+                else:
+                    # save svg
+                    self.Canvas.SaveAs(self.GetPlotFileName('svg', True))
+                    self.Attributes['ImageFile'] = self.GetPlotFileName('svg', False)
+
                 # save pdf
                 PlotFileNamePDF = self.GetPlotFileName('pdf', True)
                 self.Canvas.SaveAs(PlotFileNamePDF)

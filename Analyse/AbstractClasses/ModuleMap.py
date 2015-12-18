@@ -14,10 +14,9 @@ class ModuleMap:
         self.nChips = nChips
         self.StartChip = StartChip
 
-        xBins = self.nCols * self.nColsRoc
-        yBins = self.nRows * self.nRowsRoc
-        self.Map2D = ROOT.TH2D(self.GetUniqueID(), "", xBins, 0., xBins, yBins, 0., yBins)
-
+        self.nBinsX = self.nCols * self.nColsRoc
+        self.nBinsY = self.nRows * self.nRowsRoc
+        self.Map2D = ROOT.TH2D(self.GetUniqueID(), "", self.nBinsX, 0., self.nBinsX, self.nBinsY, 0., self.nBinsY)
 
     def UpdatePlot(self, chipNo, col, row, value):
         if chipNo < self.nCols:
@@ -40,6 +39,29 @@ class ModuleMap:
     def SetContour(self, NContours):
         if self.Map2D:
             self.Map2D.SetContour(NContours)
+
+    def AddTH2D(self, ROOTObject, CountMissing=False, GoodRange=None):
+        if ROOTObject.GetNbinsX != self.nBinsX or ROOTObject.GetNbinsY != self.nBinsY:
+            for x in range(1, self.nBinsX+1):
+                for y in range(1, self.nBinsY+1):
+                    BinContent = ROOTObject.GetBinContent(x,y)
+                    if CountMissing:
+                        if BinContent < 1:
+                            self.Map2D.Fill(x, y, 1)
+                    elif GoodRange is not None:
+                        if BinContent < GoodRange[0] or BinContent > GoodRange[1]:
+                            self.Map2D.Fill(x, y, 1)
+                    else:
+                        self.Map2D.Fill(x, y, ROOTObject.GetBinContent(x,y))
+
+        else:
+            self.Map2D.Add(ROOTObject)
+
+    def GetNbinsX(self):
+        return self.nBinsX
+
+    def GetNbinsY(self):
+        return self.nBinsY
 
     def Draw(self, Canvas, TitleZ = None):
 

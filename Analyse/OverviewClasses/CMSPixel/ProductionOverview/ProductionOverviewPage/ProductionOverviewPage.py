@@ -204,6 +204,20 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
+        for Grade in ['All','A', 'B', 'C']:
+            self.SubPages.append(
+                {
+                    "Key": "BumpBondingOverlay_{Grade}".format(Grade = Grade),
+                    "Module": "BumpBondingOverlay",
+                    "InitialAttributes" : {
+                        "Grade": "{Grade}".format(Grade = Grade),
+                        "StorageKey" : "BumpBondingOverlayX_{Grade}".format(Grade = Grade),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                        "Xray": True,
+                    }
+                }
+            )
         self.SubPages.append(
             {
                 "Key": "BumpBondingVsId",

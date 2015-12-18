@@ -60,7 +60,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         else:
                             self.ProblematicModulesList.append(RowTuple['ModuleID'])
 
-        print "#########",HistogramData,"$$$$$$$$"
         HistogramOptions = {
             'GradeAB': None,
             'GradeBC': None,
