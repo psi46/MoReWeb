@@ -113,13 +113,20 @@ class GeneralProductionOverview:
 
         return directory + Name + '.' + Suffix
 
-    def SaveCanvas(self):
+    def SaveCanvas(self, Format = None):
         if self.SavePlotFile:
             if self.Canvas:
                 self.Canvas.Update()
-                # save svg
-                self.Canvas.SaveAs(self.GetPlotFileName('svg', True))
-                self.Attributes['ImageFile'] = self.GetPlotFileName('svg', False)
+
+                if Format:
+                    # save
+                    self.Canvas.SaveAs(self.GetPlotFileName(Format, True))
+                    self.Attributes['ImageFile'] = self.GetPlotFileName(Format, False)
+                else:
+                    # save svg
+                    self.Canvas.SaveAs(self.GetPlotFileName('svg', True))
+                    self.Attributes['ImageFile'] = self.GetPlotFileName('svg', False)
+
                 # save pdf
                 PlotFileNamePDF = self.GetPlotFileName('pdf', True)
                 self.Canvas.SaveAs(PlotFileNamePDF)
@@ -716,3 +723,269 @@ class GeneralProductionOverview:
             title.SetTextAlign(12)
             title.SetTextSize(0.03)
             title.DrawText(0.15, 0.96, "#roc: %d,  #pix: %d"%(NROCs, NPix))
+
+    def DrawGradingRegionPlot(self, HistogramData, NBins, HistogramMin, HistogramMax, AdditionalHistogramOptions):
+
+        ROOT.gStyle.SetOptStat(0)
+
+        # default options
+        HistogramOptions = {
+            'TextX1': 0.6,
+            'TextY1': 0.6,
+            'TextX2': 0.9,
+            'TextY2': 0.9,
+            'TextOptions': 'NDCNB',
+            'TextSize': 0.025,
+            'GradeLegend': True,
+            'LogY': False,
+            'LogX': False,
+            'TitleX': '',
+            'TitleY': '# ROCs',
+            'Caption': True,
+            'NewCanvasStyle': True,
+            'ShadeRegions': True,
+        }
+        HistogramOptions.update(AdditionalHistogramOptions)
+
+        if HistogramOptions['LogY']:
+            ROOT.gPad.SetLogy(1)
+        if HistogramOptions['LogX']:
+            ROOT.gPad.SetLogx(1)
+
+        if HistogramOptions['NewCanvasStyle']:
+            self.Canvas.SetFrameLineStyle(0)
+            self.Canvas.SetFrameLineWidth(1)
+            self.Canvas.SetFrameBorderMode(0)
+            self.Canvas.SetFrameBorderSize(1)
+
+        Histogram = ROOT.THStack(self.GetUniqueID(), "")
+
+        hA = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hB = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hC = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hN = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        h = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+        hAB = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+
+        hA.SetFillStyle(1001)
+        hA.SetFillColor(self.GetGradeColor('A'))
+        hA.SetLineColor(self.GetGradeColor('A'))
+        hB.SetFillStyle(1001)
+        hB.SetFillColor(self.GetGradeColor('B'))
+        hB.SetLineColor(self.GetGradeColor('B'))
+        hC.SetFillStyle(1001)
+        hC.SetFillColor(self.GetGradeColor('C'))
+        hC.SetLineColor(self.GetGradeColor('C'))
+
+        for x in HistogramData['A']:
+            hA.Fill(x)
+        for x in HistogramData['B']:
+            hB.Fill(x)
+        for x in HistogramData['C']:
+            hC.Fill(x)
+        for x in HistogramData['N']:
+            hN.Fill(x)
+
+        Histogram.Add(hA)
+        Histogram.Add(hB)
+        Histogram.Add(hC)
+        Histogram.Add(hN)
+
+        GradeAB = HistogramOptions['GradeAB']
+        GradeBC = HistogramOptions['GradeBC']
+
+        PM = Histogram.GetMaximum()*1.1
+        Histogram.SetMaximum(PM)
+
+        PlotMaximum = Histogram.GetMaximum()*3.0
+
+        h.GetXaxis().SetTitle(HistogramOptions['TitleX'])
+        h.GetYaxis().SetTitle(HistogramOptions['TitleY'])
+        h.GetYaxis().SetTitleOffset(1.5)
+
+        h.Draw("hist")
+        if HistogramOptions['LogY']:
+            h.SetMinimum(0.5)
+        else:
+            h.SetMinimum(0)
+        h.SetMaximum(PM)
+
+        # plot colored grade regions
+        # needs ROOT >= v5.34.19
+        if HistogramOptions['ShadeRegions']:
+            try:
+                if GradeAB < GradeBC:
+                    CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+                    for i in range(1, NBins+1):
+                        if CloneHistogram.GetBinLowEdge(i) >= GradeAB and CloneHistogram.GetBinLowEdge(i) < GradeBC:
+                            CloneHistogram.SetBinContent(i, PlotMaximum)
+
+                    CloneHistogram.SetFillColorAlpha(ROOT.kBlue, 0.12)
+                    CloneHistogram.SetFillStyle(1001)
+                    CloneHistogram.Draw("same;b")
+
+                    CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+                    for i in range(1,NBins+1):
+                        if CloneHistogram2.GetBinLowEdge(i) >= GradeBC:
+                            CloneHistogram2.SetBinContent(i, PlotMaximum)
+
+                    CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
+                    CloneHistogram2.SetFillStyle(1001)
+                    CloneHistogram2.Draw("same;b")
+
+                    CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+                    for i in range(1,NBins+1):
+                        if CloneHistogram3.GetBinLowEdge(i) < GradeAB:
+                            CloneHistogram3.SetBinContent(i, PlotMaximum)
+
+                    CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)
+                    CloneHistogram3.SetFillStyle(1001)
+                    CloneHistogram3.Draw("same;b")
+                else:
+                    CloneHistogram = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+                    for i in range(1, NBins+1):
+                        if CloneHistogram.GetBinLowEdge(i) > GradeBC and CloneHistogram.GetBinLowEdge(i) <= GradeAB:
+                            CloneHistogram.SetBinContent(i, PlotMaximum)
+
+                    CloneHistogram.SetFillColorAlpha(ROOT.kBlue, 0.12)
+                    CloneHistogram.SetFillStyle(1001)
+                    CloneHistogram.Draw("same;b")
+
+                    CloneHistogram2 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+                    for i in range(1,NBins+1):
+                        if CloneHistogram2.GetBinLowEdge(i) > GradeAB:
+                            CloneHistogram2.SetBinContent(i, PlotMaximum)
+
+                    CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
+                    CloneHistogram2.SetFillStyle(1001)
+                    CloneHistogram2.Draw("same;b")
+
+                    CloneHistogram3 = ROOT.TH1D(self.GetUniqueID(), "", NBins, HistogramMin, HistogramMax)
+                    for i in range(1,NBins+1):
+                        if CloneHistogram3.GetBinLowEdge(i) <= GradeBC:
+                            CloneHistogram3.SetBinContent(i, PlotMaximum)
+
+                    CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)
+                    CloneHistogram3.SetFillStyle(1001)
+                    CloneHistogram3.Draw("same;b")
+
+            except:
+                pass
+
+        # cuts
+        if GradeAB:
+            CutAB = ROOT.TCutG('lLower', 2)
+            CutAB.SetPoint(0, GradeAB, -1e8)
+            CutAB.SetPoint(1, GradeAB, +1e8)
+            CutAB.SetLineColor(ROOT.kRed)
+            CutAB.SetLineStyle(2)
+            CutAB.Draw('same')
+
+        if GradeBC:
+            CutBC = ROOT.TCutG('lHigher', 2)
+            CutBC.SetPoint(0, GradeBC, -1e8)
+            CutBC.SetPoint(1, GradeBC, +1e8)
+            CutBC.SetLineColor(ROOT.kRed)
+            CutBC.SetLineStyle(2)
+            CutBC.Draw('same')
+
+        # draw histograms
+        Histogram.Draw("same")
+        Histogram.SetMinimum(0)
+        Histogram.SetMaximum(PM)
+
+
+        # set titles
+        Histogram.GetXaxis().SetTitle(HistogramOptions['TitleX'])
+        Histogram.GetYaxis().SetTitle(HistogramOptions['TitleY'])
+        Histogram.GetYaxis().SetTitleOffset(1.5)
+
+        # statistics
+        h.Add(hA)
+        h.Add(hB)
+        h.Add(hC)
+        h.Add(hN)
+        hAB.Add(hA)
+        hAB.Add(hB)
+
+        Mean = h.GetMean()
+        if Mean > 100:
+            NDigits = 1
+        elif Mean > 10:
+            NDigits = 2
+        elif Mean > 1:
+            NDigits = 3
+        else:
+            NDigits = 4
+
+        meanAll = round(h.GetMean(), NDigits)
+        meanAB = round(hAB.GetMean(), NDigits)
+        meanC = round(hC.GetMean(), NDigits)
+        RMSAll = round(h.GetRMS(), NDigits)
+        RMSAB = round(hAB.GetRMS(), NDigits)
+        RMSC = round(hC.GetRMS(), NDigits)
+        underAll = int(h.GetBinContent(0))
+        underAB = int(hAB.GetBinContent(0))
+        underC = int(hC.GetBinContent(0))
+        overAll = int(h.GetBinContent(NBins+1))
+        overAB = int(hAB.GetBinContent(NBins+1))
+        overC = int(hC.GetBinContent(NBins+1))
+
+        stats = ROOT.TPaveText(HistogramOptions['TextX1'], HistogramOptions['TextY1'],
+                               HistogramOptions['TextX2'], HistogramOptions['TextY2'], HistogramOptions['TextOptions'])
+        stats.SetFillColor(ROOT.kWhite)
+        stats.SetTextSize(HistogramOptions['TextSize'])
+        stats.SetTextAlign(10)
+        stats.SetTextFont(62)
+        stats.SetBorderSize(0)
+        stats.AddText("All: #mu = {0} #sigma = {1}".format(meanAll, RMSAll))
+        stats.AddText("  UF = {0}, OF = {1}".format(underAll,overAll))
+        stats.AddText("AB: #mu = {0} #sigma = {1}".format(meanAB, RMSAB))
+        stats.AddText("  UF = {0}, OF = {1}".format(underAB,overAB))
+        stats.AddText("C: #mu = {0} #sigma = {1}".format(meanC, RMSC))
+        stats.AddText("  UF = {0}, OF = {1}".format(underC,overC))
+        stats.Draw("same")
+
+        # display mean, rms and gauss fit sigma
+        if HistogramOptions['Caption']:
+            GaussFitFunction = ROOT.TF1("GaussFitFunction", "gaus(0)")
+            GaussFitFunction.SetParameter(0, h.GetBinContent(h.GetMaximumBin()))
+            GaussFitFunction.SetParameter(1, h.GetMean())
+            GaussFitFunction.SetParameter(2, h.GetRMS())
+            GaussFitFunction.SetParLimits(1, HistogramMin, HistogramMax)
+            GaussFitFunction.SetParLimits(2, 0, 2*h.GetRMS())
+            h.Fit(GaussFitFunction, "QB0")
+            GaussFitSigma = GaussFitFunction.GetParameter(2)
+
+            title = ROOT.TText()
+            title.SetNDC()
+            title.SetTextAlign(12)
+            title.SetTextSize(0.035)
+            FormatString = "Mean: %%d, RMS: %%.%df, Gauss-fit sigma: %%.%df"%(NDigits,NDigits)
+            TitleText = FormatString%(h.GetMean(), h.GetRMS(), GaussFitSigma)
+            title.DrawText(0.15, 0.965, TitleText)
+
+        # display legend for the different colors
+        if HistogramOptions['GradeLegend']:
+            title4 = ROOT.TText()
+            title4.SetNDC()
+            title4.SetTextAlign(12)
+            title4.SetTextSize(0.03)
+            title4.SetTextColor(self.GetGradeColor('A'))
+            title4.DrawText(0.72,0.9,"Grade A")
+
+            title2 = ROOT.TText()
+            title2.SetNDC()
+            title2.SetTextAlign(12)
+            title2.SetTextSize(0.03)
+            title2.SetTextColor(self.GetGradeColor('B'))
+            title2.DrawText(0.72,0.88,"Grade B")
+
+            title3 = ROOT.TText()
+            title3.SetNDC()
+            title3.SetTextAlign(12)
+            title3.SetTextSize(0.03)
+            title3.SetTextColor(self.GetGradeColor('C'))
+            title3.DrawText(0.72,0.86,"Grade C")
+
+        self.SaveCanvas()

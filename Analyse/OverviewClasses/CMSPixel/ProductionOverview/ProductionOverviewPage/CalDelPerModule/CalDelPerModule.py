@@ -29,7 +29,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         HistogramMin = 0
         HistogramMax =  100
-        NBins = 25
+        NBins = 50
 
         ModuleGrade = {
             'A' : [],
@@ -46,15 +46,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
                     TestType = RowTuple['TestType']
-                    Value = [0]*16
+                    Value = 0
                     if TestType == self.Attributes['Test']:
                         Grade = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary1', 'KeyValueDictPairs.json', 'Grade', 'Value'])
-                        for Chip in range(0, 16):
-                            Value[Chip] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip,  'DacParameterOverview', 'DacParameters35', 'KeyValueDictPairs.json', "caldel", 'Value'])
+                        Value = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'CalDel', 'KeyValueDictPairs.json', "caldelspread", 'Value'])
                         if Grade is not None:
                             try:
-                                diff = int(max(Value))-int(min(Value))
-                                ModuleGrade[Grade].append(float(diff))
+                                ModuleGrade[Grade].append(float(Value))
                                 NROCs += 1
                             except:
                                 self.ProblematicModulesList.append(ModuleID)
@@ -147,7 +145,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         title.SetNDC()
         title.SetTextAlign(12)
         title.SetTextSize(0.03)
-        Subtitle = "CalDel difference, modules:{NROCs}".format(NROCs=NROCs)
+        Subtitle = "CalDel spread, modules:{NROCs}".format(NROCs=NROCs)
         title.DrawText(0.15,0.95,Subtitle)
 
         title4 = ROOT.TText()

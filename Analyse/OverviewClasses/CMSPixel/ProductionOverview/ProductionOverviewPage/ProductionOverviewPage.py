@@ -73,6 +73,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 'Xmin': -0.001,
                 'Xmax': 0.001
             },
+            {
+                'Parameter': 'par0ia',
+                'Xmin': -50,
+                'Xmax': 50
+            },
+            {
+                'Parameter': 'par1ia',
+                'Xmin': 0,
+                'Xmax': 1
+            },
         ]
 
         self.SubPages.append({
@@ -207,6 +217,20 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
+        for Grade in ['All','A', 'B', 'C']:
+            self.SubPages.append(
+                {
+                    "Key": "BumpBondingOverlay_{Grade}".format(Grade = Grade),
+                    "Module": "BumpBondingOverlay",
+                    "InitialAttributes" : {
+                        "Grade": "{Grade}".format(Grade = Grade),
+                        "StorageKey" : "BumpBondingOverlayX_{Grade}".format(Grade = Grade),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                        "Xray": True,
+                    }
+                }
+            )
         self.SubPages.append(
             {
                 "Key": "BumpBondingVsId",
@@ -234,7 +258,22 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
-
+        ### pixels with bad treshold ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "BadThreshold", "Title": "Pixels with bad threshold"}, "Key": "Section","Module": "Section"})
+        for Grade in ['All','A', 'B', 'C']:
+            self.SubPages.append(
+                {
+                    "Key": "ThresholdDefectsOverlay_{Grade}".format(Grade = Grade),
+                    "Module": "ThresholdDefectsOverlay",
+                    "InitialAttributes" : {
+                        "Test": "m20_2",
+                        "Grade": "{Grade}".format(Grade = Grade),
+                        "StorageKey" : "ThresholdDefectsOverlay_{Grade}".format(Grade = Grade),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
         ### pixels with too high or low gain ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "BadGain", "Title": "Pixels with bad gain"}, "Key": "Section","Module": "Section"})
         for Grade in ['All','A', 'B', 'C']:
@@ -253,22 +292,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             )
 
         ### performance parameters ###
+        
         self.SubPages.append({"InitialAttributes" : {"Anchor": "PerformanceParameters", "Title": "Performance Parameters per ROC"}, "Key": "Section","Module": "Section"})
-
-        for Test in TestsList:
-            self.SubPages.append(
-                {
-                    "Key": "CalDelPerModule_{Test}".format(Test = Test),
-                    "Module": "CalDelPerModule",
-                    "InitialAttributes" : {
-                        "Test": "{Test}".format(Test = Test),
-                        "StorageKey" : "CalDelPerModule_{Test}".format(Test = Test),
-                        "DateBegin": self.Attributes['DateBegin'],
-                        "DateEnd": self.Attributes['DateEnd'],
-                    }
-                }
-            )
-
         for Test in TestsList:
             self.SubPages.append(
                 {
@@ -410,6 +435,25 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         }
                     )
 
+        for Test in TestsList:
+            for Trim in TrimThresholds:
+                for DACX,DACY in [ ['vthrcomp', 'vtrim'], ['phscale', 'phoffset'], ['vana', 'vthrcomp'] ]:
+                    self.SubPages.append(
+                        {
+                            "Key": "Dac2D_{Test}".format(Test = Test),
+                            "Module": "Dac2D",
+                            "InitialAttributes" : {
+                                "Test": "{Test}".format(Test = Test),
+                                "Trim": "{Trim}".format(Trim = Trim),
+                                "DACX": "{DACX}".format(DACX = DACX),
+                                "DACY": "{DACY}".format(DACY = DACY),
+                                "StorageKey" : "Dac2D_{Test}_{DACX}_{DACY}_{Trim}".format(Test=Test, DACX=DACX, DACY=DACY, Trim=Trim),
+                                "DateBegin": self.Attributes['DateBegin'],
+                                "DateEnd": self.Attributes['DateEnd'],
+                            }
+                        }
+                    )
+
         ### TrimBits ###
         for Test in TestsList:
             for Trim in TrimThresholds:
@@ -445,6 +489,92 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         }
                     }
                 )
+
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "DACDSpread35", "Title": "DAC parameter spread per module - 35"}, "Key": "Section","Module": "Section"})
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "CalDelPerModule_{Test}".format(Test = Test),
+                    "Module": "CalDelPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "CalDelPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "PHScalePerModule_{Test}".format(Test = Test),
+                    "Module": "PHScalePerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "PHScalePerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "PHOffsetPerModule_{Test}".format(Test = Test),
+                    "Module": "PHOffsetPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "PHOffsetPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "VthrCompPerModule_{Test}".format(Test = Test),
+                    "Module": "VthrCompPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "VthrCompPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "VtrimPerModule_{Test}".format(Test = Test),
+                    "Module": "VtrimPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "VtrimPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
+        for Test in TestsList:
+            self.SubPages.append(
+                {
+                    "Key": "VanaPerModule_{Test}".format(Test = Test),
+                    "Module": "VanaPerModule",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "VanaPerModule_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
 
         ### Full test duration ###
         self.SubPages.append(

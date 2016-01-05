@@ -74,5 +74,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             ReadbackCalibrated = False
 
+        try:
+            par0ia = self.ParentObject.ResultData['SubTestResults']['ReadbackCalIana'].ResultData['KeyValueDictPairs']['par0ia']['Value']
+            par1ia = self.ParentObject.ResultData['SubTestResults']['ReadbackCalIana'].ResultData['KeyValueDictPairs']['par1ia']['Value']
+            self.ResultData['KeyValueDictPairs']['par0ia'] = {'Label': 'par0ia', 'Value': par0ia}
+            self.ResultData['KeyList'].append('par0ia')
+            self.ResultData['KeyValueDictPairs']['par1ia'] = {'Label': 'par1ia', 'Value': par1ia}
+            self.ResultData['KeyList'].append('par1ia')
+        except:
+            ReadbackCalibrated = False
+
         self.ResultData['KeyValueDictPairs']['ReadbackCalibrated'] = {'Label': 'Calibrated', 'Value': 'True' if ReadbackCalibrated else 'False'}
         self.ResultData['KeyList'].append('ReadbackCalibrated')

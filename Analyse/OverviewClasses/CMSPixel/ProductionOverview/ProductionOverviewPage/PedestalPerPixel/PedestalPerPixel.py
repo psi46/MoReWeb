@@ -1,8 +1,5 @@
 import ROOT
 import AbstractClasses
-import glob
-import json
-import copy
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
@@ -18,11 +15,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.Canvas.SetCanvasSize(400,500)
 
     def GenerateOverview(self):
-        TableData = []
-
         Rows = self.FetchData()
         ModuleIDsList = self.GetModuleIDsList(Rows)
-        HTML = ""
 
         # define for which grades to plot histogram
         HistogramDict = {

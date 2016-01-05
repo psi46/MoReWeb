@@ -1,4 +1,5 @@
 import AbstractClasses
+import copy
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
@@ -11,20 +12,44 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = 'Chip '+str(self.Attributes['ChipNo'])
 
         for ChipTest in self.Attributes['Tests']:
-            self.ResultData['SubTestResultDictList'].append(
-                {
-                    'Key': ChipTest.split('.')[-1],
-                    'Module': ChipTest,
-                    'DisplayOptions': {
-                        'Order': 100,
-                        'Show': True,
-                    },
-                    'InitialAttributes':{
-                        'ChipNo': self.Attributes['ChipNo'],
-                        'StorageKey':'Chip%d_%s'%(self.Attributes['ChipNo'], ChipTest.split('.')[-1]),
-                        'ModuleVersion':self.Attributes['ModuleVersion'],
-                    },
+
+            if type(ChipTest) is dict:
+                SubtestDict = copy.deepcopy(ChipTest)
+                if not 'InitialAttributes' in SubtestDict:
+                    SubtestDict['InitialAttributes'] = {}
+
+                if 'StorageKey' in SubtestDict['InitialAttributes']:
+                    StorageKey = SubtestDict['InitialAttributes']['StorageKey']
+                elif 'Key' in SubtestDict:
+                    StorageKey = SubtestDict['Key']
+                elif 'Module' in SubtestDict:
+                    StorageKey = SubtestDict['Module']
+                else:
+                    StorageKey = 'Subtest'
+
+                SubtestDict['InitialAttributes'].update({
+                            'ChipNo': self.Attributes['ChipNo'],
+                            'StorageKey':'Chip%d_%s'%(self.Attributes['ChipNo'], StorageKey),
+                            'ModuleVersion':self.Attributes['ModuleVersion'],
                 })
+
+                print "ST KEY:", 'Chip%d_%s'%(self.Attributes['ChipNo'], StorageKey)
+            else:
+                SubtestDict = {
+                        'Key': ChipTest.split('.')[-1],
+                        'Module': ChipTest,
+                        'DisplayOptions': {
+                            'Order': 100,
+                            'Show': True,
+                        },
+                        'InitialAttributes':{
+                            'ChipNo': self.Attributes['ChipNo'],
+                            'StorageKey':'Chip%d_%s'%(self.Attributes['ChipNo'], ChipTest.split('.')[-1]),
+                            'ModuleVersion':self.Attributes['ModuleVersion'],
+                        },
+                    }
+
+            self.ResultData['SubTestResultDictList'].append(SubtestDict)
 
 
     def PopulateResultData(self):
