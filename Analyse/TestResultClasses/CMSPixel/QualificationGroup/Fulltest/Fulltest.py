@@ -375,29 +375,6 @@ class TestResult(GeneralTestResult):
         if self.FileHandle:
             self.FileHandle.Close()
 
-    def GradeIV(self, i1,i2, slope, temp):
-        grade = ''
-
-        print "GRADING FUNCTION: input is ", i1,i2, slope, temp
-        
-        #
-        # note I2 = 150V!
-        #
-        # criteria from https://twiki.cern.ch/twiki/pub/CMS/BPixDB/BPIX_IV_Upload_Specification_1.2.pdf pag 9
-
-        if i2<2e-6:
-            grade='A'
-        elif i2<10e-6:
-            grade='B'
-        else:
-            grade='C'
-            
-        if (slope>2):
-            grade='C'
-            
-        print ' GRADE FUNCTION REURNING ',grade
-        return grade
-
     def CustomWriteToDatabase(self, ParentID):
         if self.verbose:
             print 'Write to DB: ',ParentID
@@ -746,13 +723,11 @@ class TestResult(GeneralTestResult):
                 i2 = float(IVCurveData['CurrentAtVoltage150V'])
                 slope = float(IVCurveData['IVSlope'])
 
-                gradeiv = self.GradeIV(
-                    float(IVCurveData['RecalculatedCurrentAtVoltage100V']),
-                    float(IVCurveData['RecalculatedCurrentAtVoltage150V']),
-                    slope, 
-                    float(IVCurveData['RecalculatedToTemperature']
-                          ))
-
+                try:
+                    gradeiv = self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['IVGrade']['Value']
+                except:
+                    gradeiv = 'None'
+                    print "error: Fulltest IV grade not found in 'Summary1'!"
 
                 iv = Test_IV(SESSION_ID=s.SESSION_ID,SENSOR_ID=sensor_id,
                              DATA_ID = ivdata_id.DATA_ID,
