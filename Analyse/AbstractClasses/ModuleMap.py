@@ -118,3 +118,35 @@ class ModuleMap:
                 newBox.SetBorderSize(1)
                 newBox.Draw()
                 boxes.append(newBox)
+
+    def DrawCaption(self, Options, posX = 0.15, posY = 0.965):
+        CaptionParts = []
+
+        if 'Caption' in Options:
+            CaptionParts.append(Options['Caption'])
+
+        if 'Test' in Options:
+            TestNames = {'m20_1' : 'Fulltest -20#circC BTC', 'm20_2': 'Fulltest -20#circC ATC', 'p17_1': 'Fulltest +17#circC'}
+            if Options['Test'] in TestNames:
+                CaptionParts.append(TestNames[Options['Test']])
+            else:
+                CaptionParts.append(Options['Test'])
+
+        if 'NModules' in Options:
+            CaptionParts.append("modules: %d"%Options['NModules'])
+        if 'NROCs' in Options:
+            CaptionParts.append("ROCs: %d"%Options['NROCs'])
+        if 'NPixels' in Options:
+            CaptionParts.append("pixels: %d"%Options['NPixels'])
+        if 'NDefects' in Options:
+            CaptionParts.append("defects: %d"%Options['NDefects'])
+        if 'Grades' in Options:
+            CaptionParts.append("Grades: %s"%Options['Grades'])
+
+        Caption = ', '.join(CaptionParts)
+
+        title = ROOT.TLatex()
+        title.SetNDC()
+        title.SetTextAlign(12)
+
+        title.DrawLatex(posX, posY, Caption)

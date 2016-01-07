@@ -61,16 +61,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         if self.ModuleMap:
             self.ModuleMap.Draw(self.Canvas)
 
-        title = ROOT.TText()
-        title.SetNDC()
-        title.SetTextAlign(12)
-
-        Subtitle = self.Attributes['Test']
-        TestNames = {'m20_1' : 'Fulltest -20°C BTC', 'm20_2': 'Fulltest -20°C ATC', 'p17_1': 'Fulltest +17°C'}
-        if TestNames.has_key(Subtitle):
-            Subtitle = TestNames[Subtitle]
-        Subtitle += ",  modules: %d, Grades: %s"%(NModules, self.Attributes['Grade'])
-        title.DrawText(0.15,0.965,Subtitle)
+        self.ModuleMap.DrawCaption({'Test': self.Attributes['Test'], 'NModules': NModules, 'Grades': self.Attributes['Grade']})
 
         self.SaveCanvas('png')
         HTML = self.Image(self.Attributes['ImageFile']) + self.BoxFooter("Number of modules: %d"%NModules)

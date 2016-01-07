@@ -632,6 +632,20 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             )
 
+        for Test in ['m20_1','m20_2']:
+            self.SubPages.append(
+                {
+                    "Key": "LeakageCurrentRatio_{Test}".format(Test = Test),
+                    "Module": "LeakageCurrentRatio",
+                    "InitialAttributes" : {
+                        "Test": "{Test}".format(Test = Test),
+                        "StorageKey" : "LeakageCurrentRatio_{Test}".format(Test = Test),
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
         ### Readback ###
         self.SubPages.append({"InitialAttributes" : {"Anchor": "Readback", "Title": "Readback"}, "Key": "Section","Module": "Section"})
         for Test in TestsList:
