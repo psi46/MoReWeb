@@ -1,5 +1,3 @@
-import AbstractClasses.Helper.HtmlParser
-import re
 import time
 import datetime
 import os
@@ -141,8 +139,6 @@ class GeneralProductionOverview:
         return d
 
     def FetchData(self, ModuleID = None):
-        HtmlParser = self.TestResultEnvironmentObject.HtmlParser
-
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             Rows = {}
         else:
@@ -251,7 +247,6 @@ class GeneralProductionOverview:
 
     def GenerateOverviewHTML(self):
 
-        ModuleData = self.FetchData()
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
 
         HTMLTemplate = self.TestResultEnvironmentObject.ProductionOverviewHTMLTemplate
@@ -329,7 +324,6 @@ class GeneralProductionOverview:
 
         ClickPathEntries = []
         ClickPathEntryTemplate = HtmlParser.getSubpart(HTMLTemplate, '###CLICKPATH_ENTRY###')
-        LevelPath = ''
         i = 0
         tmpTestResultObject = self
         for Level in Levels[2:]:
@@ -358,7 +352,6 @@ class GeneralProductionOverview:
             }
         ))
         ClickPathEntries.reverse()
-        CSSClasses = ''
 
         FinalHTML = HtmlParser.substituteSubpartArray(
             FinalHTML,
@@ -426,7 +419,7 @@ class GeneralProductionOverview:
         # fill rows
         NRows = 0
         NRowsHidden = 0
-        RowLimitReached = False
+
         for Row in TableData:
             NRows += 1
 
@@ -669,7 +662,6 @@ class GeneralProductionOverview:
             stats.SetTextSize(0.025)
             stats.SetTextAlign(10)
             stats.SetTextFont(62)
-            statsText = []
 
             First = True
             Counter = 0
@@ -704,7 +696,7 @@ class GeneralProductionOverview:
                     stats.DrawLatex(HistogramOptions['StatsPosition'][0], HistogramOptions['StatsPosition'][1] - StatsTextCounter*0.02, statsText)
                     StatsTextCounter += 1
 
-                    statsText = "N={N} UF={uf:1.0f}, OF={of:1.0f}".format(N=HistogramData['Histogram'].GetEntries(), uf=underflowCount, of=overflowCount)
+                    statsText = "N={N:1.0f} UF={uf:1.0f}, OF={of:1.0f}".format(N=HistogramData['Histogram'].GetEntries(), uf=underflowCount, of=overflowCount)
                     stats.DrawLatex(HistogramOptions['StatsPosition'][0], HistogramOptions['StatsPosition'][1] - StatsTextCounter*0.02, statsText)
                     StatsTextCounter += 1
 
@@ -722,7 +714,7 @@ class GeneralProductionOverview:
             title.SetNDC()
             title.SetTextAlign(12)
             title.SetTextSize(0.03)
-            title.DrawText(0.15, 0.96, "#roc: %d,  #pix: %d"%(NROCs, NPix))
+            title.DrawText(0.15, 0.948, "#roc: %d,  #pix: %d"%(NROCs, NPix))
 
     def DrawGradingRegionPlot(self, HistogramData, NBins, HistogramMin, HistogramMax, AdditionalHistogramOptions):
 
@@ -744,6 +736,7 @@ class GeneralProductionOverview:
             'Caption': True,
             'NewCanvasStyle': True,
             'ShadeRegions': True,
+            'CutColor': ROOT.kBlack,
         }
         HistogramOptions.update(AdditionalHistogramOptions)
 
@@ -877,7 +870,7 @@ class GeneralProductionOverview:
             CutAB = ROOT.TCutG('lLower', 2)
             CutAB.SetPoint(0, GradeAB, -1e8)
             CutAB.SetPoint(1, GradeAB, +1e8)
-            CutAB.SetLineColor(ROOT.kRed)
+            CutAB.SetLineColor(HistogramOptions['CutColor'])
             CutAB.SetLineStyle(2)
             CutAB.Draw('same')
 
@@ -885,7 +878,7 @@ class GeneralProductionOverview:
             CutBC = ROOT.TCutG('lHigher', 2)
             CutBC.SetPoint(0, GradeBC, -1e8)
             CutBC.SetPoint(1, GradeBC, +1e8)
-            CutBC.SetLineColor(ROOT.kRed)
+            CutBC.SetLineColor(HistogramOptions['CutColor'])
             CutBC.SetLineStyle(2)
             CutBC.Draw('same')
 

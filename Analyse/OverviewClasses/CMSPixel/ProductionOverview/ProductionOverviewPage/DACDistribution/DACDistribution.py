@@ -65,7 +65,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HistogramOptions = {
             'GradeAB': None,
             'GradeBC': None,
-            'TitleX': 'DAC Value',
+            'TitleX': '{DAC} DAC Value'.format(DAC=self.Attributes['DAC']),
             'TextSize': 0.02,
             'TextX1': 0.15,
             'TextY1': 0.75,
