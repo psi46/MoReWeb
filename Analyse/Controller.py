@@ -56,6 +56,8 @@ parser.add_argument('-tc', '--show-test-center', dest = 'show_test_center', acti
                     help = 'Show test-center in qualification list')
 parser.add_argument('-i', '--include-path', dest = 'additional_include_path', metavar='PATH', default = '',
                     help = argparse.SUPPRESS)
+parser.add_argument('-g', '--use-global-db', dest = 'use_global_db', action = 'store_true', default = False,
+                    help = argparse.SUPPRESS)
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -103,6 +105,9 @@ Configuration.read([
     'Configuration/ModuleInformation.cfg',
     'Configuration/ProductionOverview.cfg'
     ])
+
+if args.use_global_db:
+    Configuration.set('SystemConfiguration', 'UseGlobalDatabase', '1')
 
 if args.revision != -1:
     revisionNumber = int(args.revision)
