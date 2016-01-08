@@ -41,7 +41,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         #  [14:56:48.291]     INFO: i(loss) [mA/ROC]:     16.1  16.1  15.3  ->14.5<-  ->12.9<-  ->12.1<-  ->12.1<-  ->11.3<-  ->9.6<-  ->10.4<-  ->12.1<-  ->12.9<-  ->13.7<-  15.3  16.1  16.1
         IanaLossPerRoc = None
         IanaLossProblems = False
-        if os.path.isfile(self.ParentObject.logfilePath):
+        if self.ParentObject.logfilePath and os.path.isfile(self.ParentObject.logfilePath):
             with open(self.ParentObject.logfilePath, 'r') as logfile:
                 for line in logfile:
                     Keyword = 'i(loss) [mA/ROC]:'

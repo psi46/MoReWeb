@@ -102,19 +102,19 @@ class TestResult(GeneralTestResult):
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
             'Grade': gradeMapping[grade] if grade in gradeMapping else None,
             'initialCurrent': leakageCurrent,
-            'PixelDefects': None,
-            'ROCsLessThanOnePercent': None,
-            'ROCsMoreThanOnePercent': None,
-            'ROCsMoreThanFourPercent': None,
-            'Noise': None,
-            'Trimming': None,
-            'PHCalibration': None,
-            'CurrentAtVoltage150V': None,
-            'CurrentAtVoltage100V': None,
-            'RecalculatedCurrentAtVoltage150V': None,
-            'RecalculatedCurrentAtVoltage100V': None,
-            'RecalculatedToTemperature': None,
-            'IVSlope': None,
+            'PixelDefects': -1,
+            'ROCsLessThanOnePercent': -1,
+            'ROCsMoreThanOnePercent': -1,
+            'ROCsMoreThanFourPercent': -1,
+            'Noise': -1,
+            'Trimming': -1,
+            'PHCalibration': -1,
+            'CurrentAtVoltage150V': -1,
+            'CurrentAtVoltage100V': -1,
+            'RecalculatedCurrentAtVoltage150V': -1,
+            'RecalculatedCurrentAtVoltage100V': -1,
+            'RecalculatedToTemperature': -1,
+            'IVSlope': -1,
             'IVCurveFilePath': None,
             'TestTemperature': None,
             'Temperature': self.Attributes['Temperature'] if 'Temperature' in self.Attributes else None,
@@ -130,20 +130,20 @@ class TestResult(GeneralTestResult):
             #
 
             'nCycles': None,
-            'CycleTempLow': None,
-            'CycleTempHigh': None,
+            'CycleTempLow': -1,
+            'CycleTempHigh': -1,
 
             #
             # added by Tommaso
             #
-            'nMaskDefects': None,
-            'nDeadPixels': None,
-            'nBumpDefects': None,
-            'nTrimDefects': None,
-            'nNoisyPixels': None,
-            'nGainDefPixels': None,
-            'nPedDefPixels': None,
-            'nPar1DefPixels': None,
+            'nMaskDefects': -1,
+            'nDeadPixels': -1,
+            'nBumpDefects': -1,
+            'nTrimDefects': -1,
+            'nNoisyPixels': -1,
+            'nGainDefPixels': -1,
+            'nPedDefPixels': -1,
+            'nPar1DefPixels': -1,
 
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
@@ -152,29 +152,31 @@ class TestResult(GeneralTestResult):
             # added by Felix for the new Overview Table
             #
             # for A/B/C sub gradings
-            'PixelDefectsNGradeA': None,
-            'PixelDefectsNGradeB': None,
-            'PixelDefectsNGradeC': None,
+            'PixelDefectsNGradeA': -1,
+            'PixelDefectsNGradeB': -1,
+            'PixelDefectsNGradeC': -1,
 
-            'NoiseNGradeA': None,
-            'NoiseNGradeB': None,
-            'NoiseNGradeC': None,
+            'NoiseNGradeA': -1,
+            'NoiseNGradeB': -1,
+            'NoiseNGradeC': -1,
 
-            'VcalWidthNGradeA': None,
-            'VcalWidthNGradeB': None,
-            'VcalWidthNGradeC': None,
+            'VcalWidthNGradeA': -1,
+            'VcalWidthNGradeB': -1,
+            'VcalWidthNGradeC': -1,
 
-            'GainNGradeA': None,
-            'GainNGradeB': None,
-            'GainNGradeC': None,
+            'GainNGradeA': -1,
+            'GainNGradeB': -1,
+            'GainNGradeC': -1,
 
-            'PedSpreadNGradeA': None,
-            'PedSpreadNGradeB': None,
-            'PedSpreadNGradeC': None,
+            'PedSpreadNGradeA': -1,
+            'PedSpreadNGradeB': -1,
+            'PedSpreadNGradeC': -1,
 
-            'Par1NGradeA': None,
-            'Par1NGradeB': None,
-            'Par1NGradeC': None,
+            'Par1NGradeA': -1,
+            'Par1NGradeB': -1,
+            'Par1NGradeC': -1,
+            'Comments': '',
+
         }
         print 'fill row end'
 
