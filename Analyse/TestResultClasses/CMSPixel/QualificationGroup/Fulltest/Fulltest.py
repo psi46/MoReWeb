@@ -458,6 +458,8 @@ class TestResult(GeneralTestResult):
         except KeyError:
             grade = 'None'
         print 'fill row'
+
+        # fill meta data and default values
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
             'TestDate': self.Attributes['TestDate'],
