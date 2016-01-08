@@ -1,7 +1,7 @@
 import os
 import sys
 import ROOT
-import warnings
+import traceback
 
 import AbstractClasses
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
@@ -465,13 +465,13 @@ class TestResult(GeneralTestResult):
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
-            'PixelDefects': None,
-            'ROCsLessThanOnePercent': None,
-            'ROCsMoreThanOnePercent': None,
-            'ROCsMoreThanFourPercent': None,
-            'Noise': None,
-            'Trimming': None,
-            'PHCalibration': None,
+            'PixelDefects': -1,
+            'ROCsLessThanOnePercent': -1,
+            'ROCsMoreThanOnePercent': -1,
+            'ROCsMoreThanFourPercent': -1,
+            'Noise': -1,
+            'Trimming': -1,
+            'PHCalibration': -1,
             'CurrentAtVoltage150V': IVCurveData['CurrentAtVoltage150V'],
             'CurrentAtVoltage100V':IVCurveData['CurrentAtVoltage100V'],
             'RecalculatedCurrentAtVoltage150V': IVCurveData['RecalculatedCurrentAtVoltage150V'],
@@ -480,7 +480,7 @@ class TestResult(GeneralTestResult):
             'IVSlope': IVCurveData['IVSlope'],
             'IVCurveFilePath':IVCurveData['IVCurveFilePath'],
             'TestTemperature':IVCurveData['TestTemperature'],
-            'Temperature': None,
+            'Temperature': -1,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -494,20 +494,20 @@ class TestResult(GeneralTestResult):
 
             'initialCurrent': initialCurrent,
             'nCycles': None,
-            'CycleTempLow': None,
-            'CycleTempHigh': None,
+            'CycleTempLow': -1,
+            'CycleTempHigh': -1,
 
             #
             # added by Tommaso
             #
-            'nMaskDefects': None,
-            'nDeadPixels': None,
-            'nBumpDefects': None,
-            'nTrimDefects': None,
-            'nNoisyPixels': None,
-            'nGainDefPixels': None,
-            'nPedDefPixels': None,
-            'nPar1DefPixels': None,
+            'nMaskDefects': -1,
+            'nDeadPixels': -1,
+            'nBumpDefects': -1,
+            'nTrimDefects': -1,
+            'nNoisyPixels': -1,
+            'nGainDefPixels': -1,
+            'nPedDefPixels': -1,
+            'nPar1DefPixels': -1,
 
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
@@ -516,31 +516,32 @@ class TestResult(GeneralTestResult):
             # added by Felix for the new Overview Table
             #
             # for A/B/C sub gradings
-            'PixelDefectsNGradeA': None,
-            'PixelDefectsNGradeB': None,
-            'PixelDefectsNGradeC': None,
+            'PixelDefectsNGradeA': -1,
+            'PixelDefectsNGradeB': -1,
+            'PixelDefectsNGradeC': -1,
 
-            'NoiseNGradeA': None,
-            'NoiseNGradeB': None,
-            'NoiseNGradeC': None,
+            'NoiseNGradeA': -1,
+            'NoiseNGradeB': -1,
+            'NoiseNGradeC': -1,
 
-            'VcalWidthNGradeA': None,
-            'VcalWidthNGradeB': None,
-            'VcalWidthNGradeC': None,
+            'VcalWidthNGradeA': -1,
+            'VcalWidthNGradeB': -1,
+            'VcalWidthNGradeC': -1,
 
-            'GainNGradeA': None,
-            'GainNGradeB': None,
-            'GainNGradeC': None,
+            'GainNGradeA': -1,
+            'GainNGradeB': -1,
+            'GainNGradeC': -1,
 
-            'PedSpreadNGradeA': None,
-            'PedSpreadNGradeB': None,
-            'PedSpreadNGradeC': None,
+            'PedSpreadNGradeA': -1,
+            'PedSpreadNGradeB': -1,
+            'PedSpreadNGradeC': -1,
 
-            'Par1NGradeA': None,
-            'Par1NGradeB': None,
-            'Par1NGradeC': None,
+            'Par1NGradeA': -1,
+            'Par1NGradeB': -1,
+            'Par1NGradeC': -1,
         }
 
+        # check if any data is missing
         SubtestMissing = False
         if self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData'].has_key('MissingSubtests'):
             SubtestMissing = (int(self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MissingSubtests']['Value']) > 0)
@@ -548,6 +549,11 @@ class TestResult(GeneralTestResult):
 
         # pixel defects and performance parameters
         try:
+
+            # raise exception if any data is missing
+            if SubtestMissing:
+                raise Exception("Test data incomplete! => Module will be graded C")
+
             Row.update({
                 'PixelDefects': '{PixelDefects:d}'.format(PixelDefects=self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['PixelDefects'][
                     'NumericValue']),
@@ -640,14 +646,22 @@ class TestResult(GeneralTestResult):
                 'Temperature': self.ResultData['SubTestResults']['Summary2'].ResultData['KeyValueDictPairs']['TempC'][
                     'Value']
                 })
-        except:
-            warnings.warn("Fulltest is incomplete! Module will be graded C")
-            SubtestMissing = True
 
-        # check if any data is missing
-        if SubtestMissing:
+            print "Test data is complete!"
+        except:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            # Start red color
+            sys.stdout.write("\x1b[31m")
+            sys.stdout.flush()
+            # Print traceback
+            traceback.print_exception(exc_type, exc_obj, exc_tb)
+            # Stop red color
+            sys.stdout.write("\x1b[0m")
+            sys.stdout.flush()
+
             grade = 'C'
             Comment += 'Fulltest incomplete, graded C'
+
            
         #adding comment (if any) from manual grading
         if self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
