@@ -70,10 +70,13 @@ class TestResult(GeneralTestResult):
         invalid_filter = (len(filtered_array) == 0)
         if invalid_filter:
             filtered_array = array
-        min_array = min(filtered_array)
-        max_array = max(filtered_array)
-        median_array = self.median(filtered_array)
-        average_array = reduce(lambda x, y: x + y, filtered_array) / len(filtered_array)
+        min_array = min(filtered_array) if len(filtered_array) > 0 else -1
+        max_array = max(filtered_array) if len(filtered_array) > 0 else -1
+        try:
+            median_array = self.median(filtered_array)
+        except:
+            median_array = -1
+        average_array = (reduce(lambda x, y: x + y, filtered_array) / len(filtered_array)) if len(filtered_array) > 0 else -1
         if not 'MinY' in Parameters or not 'MaxY' in Parameters:
             warnings.warn('Cannot find Key in Parameters: {Paras}'.format(Paras=Parameters.keys()))
             if self.verbose:
