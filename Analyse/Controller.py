@@ -54,10 +54,27 @@ parser.add_argument('-pres', '--make-presentation', dest = 'make_presentation', 
                     help = 'Creates tex file for presentation in the end')
 parser.add_argument('-tc', '--show-test-center', dest = 'show_test_center', action = 'store_true', default = False,
                     help = 'Show test-center in qualification list')
+parser.add_argument('-i', '--include-path', dest = 'additional_include_path', metavar='PATH', default = '',
+                    help = argparse.SUPPRESS)
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
 verbose = args.verbose
+
+# allows to import PixelDB module from a different location
+if args.additional_include_path and len(args.additional_include_path) > 0:
+    AdditionalIncludePaths = args.additional_include_path.split(';')
+    for AdditionalIncludePath in AdditionalIncludePaths:
+        if verbose:
+            print "try adding additional python module include path: '%s'"%AdditionalIncludePath
+        try:
+            sys.path.append(AdditionalIncludePath)
+            if verbose:
+                print "ok."
+        except:
+            if verbose:
+                print "failed."
+
 
 import AbstractClasses.Helper.ROOTConfiguration as ROOTConfiguration
 
