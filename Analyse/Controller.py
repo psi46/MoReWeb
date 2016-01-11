@@ -675,9 +675,12 @@ if args.output_csv:
 
                 # leakage current for 17 degrees
                 if Row['Temperature'] and int(float(Row['Temperature'])) == 17:
-                    LeakageCurrent = float(Row['CurrentAtVoltage150V'])
-                    if LeakageCurrent > ModuleData[ModuleID]['LeakageCurrent']:
-                        ModuleData[ModuleID]['LeakageCurrent'] = LeakageCurrent
+                    try:
+                        LeakageCurrent = float(Row['CurrentAtVoltage150V'])
+                        if LeakageCurrent > ModuleData[ModuleID]['LeakageCurrent']:
+                            ModuleData[ModuleID]['LeakageCurrent'] = LeakageCurrent
+                    except:
+                        pass
 
         CSVPath = GlobalOverviewPath + '/ModuleResultDB.csv'
         with open(CSVPath, 'w') as csvfile:
