@@ -674,7 +674,7 @@ if args.output_csv:
                     ModuleData[ModuleID]['PixelDefects'] = PixelDefects
 
                 # leakage current for 17 degrees
-                if Row['Temperature'] and int(Row['Temperature']) == 17:
+                if Row['Temperature'] and int(float(Row['Temperature'])) == 17:
                     LeakageCurrent = float(Row['CurrentAtVoltage150V'])
                     if LeakageCurrent > ModuleData[ModuleID]['LeakageCurrent']:
                         ModuleData[ModuleID]['LeakageCurrent'] = LeakageCurrent
