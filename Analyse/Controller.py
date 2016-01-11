@@ -58,6 +58,8 @@ parser.add_argument('-i', '--include-path', dest = 'additional_include_path', me
                     help = argparse.SUPPRESS)
 parser.add_argument('-g', '--use-global-db', dest = 'use_global_db', action = 'store_true', default = False,
                     help = argparse.SUPPRESS)
+parser.add_argument('-C', '--csv', dest = 'output_csv', action = 'store_true', default = False,
+                    help = argparse.SUPPRESS)
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -635,6 +637,56 @@ if args.production_overview:
             sys.stdout.flush()
 
 
+# CSV output
+if args.output_csv:
+    print "CSV output"
+    print "-"*80
+    if TestResultEnvironmentInstance.Configuration['Database']['UseGlobal']:
+        print "\x1b[31merror: CSV export is not supported for global database!\x1b[0m"
+    else:
+        TestResultEnvironmentInstance.LocalDBConnectionCursor.execute(
+            'SELECT * FROM ModuleTestResults ORDER BY ModuleID ASC,TestType ASC,TestDate ASC'
+        )
+        Rows = TestResultEnvironmentInstance.LocalDBConnectionCursor.fetchall()
+
+        ModuleData = {}
+        GradeOrdering = {'M': 0, 'A':1, 'B':2, 'C':3, 'X':9999}
+
+        for Row in Rows:
+            ModuleID = Row['ModuleID']
+
+            # add new modules
+            if ModuleID not in ModuleData:
+                ModuleData[ModuleID] = {'Grade': 'M', 'LeakageCurrent': -1, 'PixelDefects': -1}
+
+            # add FullQualification data
+            if Row['QualificationType'] == 'FullQualification':
+                Grade = Row['Grade']
+                PixelDefects = int(Row['PixelDefects']) if Row['PixelDefects'] else -1
+
+                # grade, if worse
+                if Grade in GradeOrdering:
+                    if GradeOrdering[Grade] > GradeOrdering[ModuleData[ModuleID]['Grade']]:
+                        ModuleData[ModuleID]['Grade'] = Grade
+
+                # number of defects, if higher
+                if PixelDefects > ModuleData[ModuleID]['PixelDefects']:
+                    ModuleData[ModuleID]['PixelDefects'] = PixelDefects
+
+                # leakage current for 17 degrees
+                if Row['Temperature'] and int(Row['Temperature']) == 17:
+                    LeakageCurrent = float(Row['CurrentAtVoltage150V'])
+                    if LeakageCurrent > ModuleData[ModuleID]['LeakageCurrent']:
+                        ModuleData[ModuleID]['LeakageCurrent'] = LeakageCurrent
+
+        CSVPath = GlobalOverviewPath + '/ModuleResultDB.csv'
+        with open(CSVPath, 'w') as csvfile:
+            for ModuleID, Data in ModuleData.iteritems():
+                CSVLine = "%s, %s, %d, %e\n"%(ModuleID, Data['Grade'], Data['PixelDefects'], Data['LeakageCurrent'])
+                csvfile.write(CSVLine)
+                print CSVLine,
+
+        print "-"*80
 
 
 # display error list
