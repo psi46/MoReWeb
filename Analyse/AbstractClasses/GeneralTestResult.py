@@ -652,39 +652,40 @@ class GeneralTestResult(object):
             logfilesList = logfiles
 
         for logfile in logfilesList:
-            with open(logfile, 'r') as logfile:
-                for line in logfile:
-                    ErrorObject = {}
+            if logfile:
+                with open(logfile, 'r') as logfile:
+                    for line in logfile:
+                        ErrorObject = {}
 
-                    if 'WARNING:' in line and not 'Not unmasking DUT' in line:
-                        ErrorObject['type'] = 'warning'
-                    if 'ERROR:' in line:
-                        ErrorObject['type'] = 'error'
-                    if 'CRITICAL:' in line:
-                        ErrorObject['type'] = 'critical'
+                        if 'WARNING:' in line and not 'Not unmasking DUT' in line:
+                            ErrorObject['type'] = 'warning'
+                        if 'ERROR:' in line:
+                            ErrorObject['type'] = 'error'
+                        if 'CRITICAL:' in line:
+                            ErrorObject['type'] = 'critical'
 
-                    ErrorObject['channel'] = None
-                    lineParts = line.strip().split()
-                    if 'Channel' in lineParts:
-                        pos = lineParts.index('Channel')
-                        if pos < len(lineParts) - 1:
-                            try:
-                                ErrorObject['channel'] = int(lineParts[pos+1])
-                            except:
-                                pass
+                        ErrorObject['channel'] = None
+                        lineParts = line.strip().split()
+                        if 'Channel' in lineParts:
+                            pos = lineParts.index('Channel')
+                            if pos < len(lineParts) - 1:
+                                try:
+                                    ErrorObject['channel'] = int(lineParts[pos+1])
+                                except:
+                                    pass
 
-                    if ErrorObject.has_key('type'):
-                        Found = False
-                        for errorname, keywords in DetectMessages.iteritems():
-                            for keyword in keywords:
-                                if keyword in line:
-                                    ErrorObject['subtype'] = errorname
-                                    Found = True
-                                    break
-                        if not Found:
-                            ErrorObject['subtype'] = 'other'
+                        if ErrorObject.has_key('type'):
+                            Found = False
+                            for errorname, keywords in DetectMessages.iteritems():
+                                for keyword in keywords:
+                                    if keyword in line:
+                                        ErrorObject['subtype'] = errorname
+                                        Found = True
+                                        break
+                            if not Found:
+                                ErrorObject['subtype'] = 'other'
 
-                        ErrorObjects.append(ErrorObject)
+                            ErrorObjects.append(ErrorObject)
 
         KeyValueDictPairs['nCriticals'] = {'Label': '# Criticals', 'Value': '%d'%len([True for ErrorObject in ErrorObjects if ErrorObject['type'] == 'critical'])}
         KeyValueDictPairs['nErrors'] = {'Label': '# Errors', 'Value': '%d'%len([True for ErrorObject in ErrorObjects if ErrorObject['type'] == 'error'])}

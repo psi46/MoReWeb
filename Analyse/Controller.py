@@ -54,10 +54,31 @@ parser.add_argument('-pres', '--make-presentation', dest = 'make_presentation', 
                     help = 'Creates tex file for presentation in the end')
 parser.add_argument('-tc', '--show-test-center', dest = 'show_test_center', action = 'store_true', default = False,
                     help = 'Show test-center in qualification list')
+parser.add_argument('-i', '--include-path', dest = 'additional_include_path', metavar='PATH', default = '',
+                    help = argparse.SUPPRESS)
+parser.add_argument('-g', '--use-global-db', dest = 'use_global_db', action = 'store_true', default = False,
+                    help = argparse.SUPPRESS)
+parser.add_argument('-C', '--csv', dest = 'output_csv', action = 'store_true', default = False,
+                    help = argparse.SUPPRESS)
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
 verbose = args.verbose
+
+# allows to import PixelDB module from a different location
+if args.additional_include_path and len(args.additional_include_path) > 0:
+    AdditionalIncludePaths = args.additional_include_path.split(';')
+    for AdditionalIncludePath in AdditionalIncludePaths:
+        if verbose:
+            print "try adding additional python module include path: '%s'"%AdditionalIncludePath
+        try:
+            sys.path.append(AdditionalIncludePath)
+            if verbose:
+                print "ok."
+        except:
+            if verbose:
+                print "failed."
+
 
 import AbstractClasses.Helper.ROOTConfiguration as ROOTConfiguration
 
@@ -86,6 +107,9 @@ Configuration.read([
     'Configuration/ModuleInformation.cfg',
     'Configuration/ProductionOverview.cfg'
     ])
+
+if args.use_global_db:
+    Configuration.set('SystemConfiguration', 'UseGlobalDatabase', '1')
 
 if args.revision != -1:
     revisionNumber = int(args.revision)
@@ -613,6 +637,56 @@ if args.production_overview:
             sys.stdout.flush()
 
 
+# CSV output
+if args.output_csv:
+    print "CSV output"
+    print "-"*80
+    if TestResultEnvironmentInstance.Configuration['Database']['UseGlobal']:
+        print "\x1b[31merror: CSV export is not supported for global database!\x1b[0m"
+    else:
+        TestResultEnvironmentInstance.LocalDBConnectionCursor.execute(
+            'SELECT * FROM ModuleTestResults ORDER BY ModuleID ASC,TestType ASC,TestDate ASC'
+        )
+        Rows = TestResultEnvironmentInstance.LocalDBConnectionCursor.fetchall()
+
+        ModuleData = {}
+        GradeOrdering = {'M': 0, 'A':1, 'B':2, 'C':3, 'X':9999}
+
+        for Row in Rows:
+            ModuleID = Row['ModuleID']
+
+            # add new modules
+            if ModuleID not in ModuleData:
+                ModuleData[ModuleID] = {'Grade': 'M', 'LeakageCurrent': -1, 'PixelDefects': -1}
+
+            # add FullQualification data
+            if Row['QualificationType'] == 'FullQualification':
+                Grade = Row['Grade']
+                PixelDefects = int(Row['PixelDefects']) if Row['PixelDefects'] else -1
+
+                # grade, if worse
+                if Grade in GradeOrdering:
+                    if GradeOrdering[Grade] > GradeOrdering[ModuleData[ModuleID]['Grade']]:
+                        ModuleData[ModuleID]['Grade'] = Grade
+
+                # number of defects, if higher
+                if PixelDefects > ModuleData[ModuleID]['PixelDefects']:
+                    ModuleData[ModuleID]['PixelDefects'] = PixelDefects
+
+                # leakage current for 17 degrees
+                if Row['Temperature'] and int(Row['Temperature']) == 17:
+                    LeakageCurrent = float(Row['CurrentAtVoltage150V'])
+                    if LeakageCurrent > ModuleData[ModuleID]['LeakageCurrent']:
+                        ModuleData[ModuleID]['LeakageCurrent'] = LeakageCurrent
+
+        CSVPath = GlobalOverviewPath + '/ModuleResultDB.csv'
+        with open(CSVPath, 'w') as csvfile:
+            for ModuleID, Data in ModuleData.iteritems():
+                CSVLine = "%s, %s, %d, %e\n"%(ModuleID, Data['Grade'], Data['PixelDefects'], Data['LeakageCurrent'])
+                csvfile.write(CSVLine)
+                print CSVLine,
+
+        print "-"*80
 
 
 # display error list

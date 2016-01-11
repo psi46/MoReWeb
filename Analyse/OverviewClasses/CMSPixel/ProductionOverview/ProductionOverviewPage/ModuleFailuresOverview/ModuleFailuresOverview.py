@@ -17,7 +17,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def CustomInit(self):
         self.NameSingle='ModuleFailuresOverview'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = 'Module Failures Overview'
         self.DisplayOptions = {
             'Width': 5.4,
@@ -27,12 +27,14 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.SubPages = []
         self.SavePlotFile = True
         self.Canvas.SetCanvasSize(1600, 500)
+        self.Canvas.SetFrameLineStyle(0)
+        self.Canvas.SetFrameLineWidth(1)
+        self.Canvas.SetFrameBorderMode(0)
+        self.Canvas.SetFrameBorderSize(1)
         self.Canvas.Update()
 
     def GenerateOverview(self):
         ROOT.gStyle.SetOptStat(0)
-
-        TableData = []
 
         NumModules = int(self.Attributes['NumModules']) if 'NumModules' in self.Attributes else 9999
         Offset = int(self.Attributes['Offset']) if 'Offset' in self.Attributes else 0
@@ -48,7 +50,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         Summary.GetYaxis().SetTickLength(0)
-        BinNumber = 1
 
         YBinNumber = 1
         for YLabel in YLabels:
@@ -70,7 +71,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         GradeMaskDefectsAB = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsB'])
         GradeMaskDefectsBC = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsC'])
 
-        #time_start = time.time()
         DefectsDict = {}
 
         for ModuleID in ModuleIDsList:
@@ -80,7 +80,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 DefectsDict[ModuleID][DefectCategory] = {}
 
         ModulesCount = 0
-        ModulesProgressPercent = 0
         ModulesProgressPercentOld = 0
         nRows = len(Rows)
         for RowTuple in Rows:
@@ -466,7 +465,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         ROOT.gPad.SetRightMargin(0.03)
         Summary.Draw("col")
         Summary.GetZaxis().SetRangeUser(0, 1.0)
-        Summary.GetYaxis().SetLabelSize(0.055)
+        Summary.GetYaxis().SetLabelSize(0.045)
 
         Summary.GetXaxis().LabelsOption("v")
         if len(ModuleIDsList) > 200:
