@@ -682,6 +682,15 @@ if args.output_csv:
                     except:
                         pass
 
+            # add X-ray data
+            if Row['TestType'] == 'XRayHRQualification':
+                Grade = Row['Grade']
+
+                # grade, if worse
+                if Grade and Grade in GradeOrdering:
+                    if GradeOrdering[Grade] > GradeOrdering[ModuleData[ModuleID]['Grade']]:
+                        ModuleData[ModuleID]['Grade'] = Grade
+
         CSVPath = GlobalOverviewPath + '/ModuleResultDB.csv'
         with open(CSVPath, 'w') as csvfile:
             for ModuleID, Data in ModuleData.iteritems():
