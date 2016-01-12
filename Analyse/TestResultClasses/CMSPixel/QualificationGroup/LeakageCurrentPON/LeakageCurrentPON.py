@@ -1,13 +1,8 @@
 import os
-import ROOT
 import glob
-import math
-
-import AbstractClasses
-from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
+import sys
 
 from AbstractClasses.GeneralTestResult import GeneralTestResult
-import subprocess
 
 class TestResult(GeneralTestResult):
     def CustomInit(self):

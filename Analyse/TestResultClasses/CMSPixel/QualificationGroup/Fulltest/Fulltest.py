@@ -16,6 +16,7 @@ class TestResult(GeneralTestResult):
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Attributes['NumberOfChips'] = self.nTotalChips
+        self.AddCommentsToKeyValueDictPairs = True
         self.MergePyxarData()
 
         if self.Attributes['ModuleVersion'] == 1:
@@ -649,12 +650,29 @@ class TestResult(GeneralTestResult):
             sys.stdout.flush()
 
             grade = 'C'
-            Comment += 'Fulltest incomplete, graded C'
+            Comment += 'Test incomplete!'
 
-           
         #adding comment (if any) from manual grading
         if self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
             Comment += self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['GradeComment']['Value']
+
+        try:
+            if self.ParentObject.CommentFromFile:
+                if len(Comment) < 1:
+                    Comment = self.ParentObject.CommentFromFile
+                else:
+                    Comment += "; " + self.ParentObject.CommentFromFile
+        except:
+            pass
+
+        try:
+            if self.CommentFromFile:
+                if len(Comment) < 1:
+                    Comment = self.CommentFromFile
+                else:
+                    Comment += "; " + self.CommentFromFile
+        except:
+            pass
 
         # fill final grade and comments
         Comment = Comment.strip().strip('/')
@@ -858,6 +876,8 @@ class TestResult(GeneralTestResult):
 #                    
 
         else:
+            if self.verbose:
+                print "INSERT ROW:", Row
             with self.TestResultEnvironmentObject.LocalDBConnection:
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
                     'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',

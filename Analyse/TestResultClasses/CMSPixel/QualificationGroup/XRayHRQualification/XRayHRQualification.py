@@ -239,6 +239,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['NumberOfChips'] = self.nTotalChips
         #self.MergePyxarData()
 
+        self.AddCommentsToKeyValueDictPairs = True
         if self.Attributes['ModuleVersion'] == 1:
             if self.Attributes['ModuleType'] == 'a':
                 self.Attributes['StartChip'] = 0

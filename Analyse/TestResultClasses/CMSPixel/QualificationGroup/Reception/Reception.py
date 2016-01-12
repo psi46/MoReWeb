@@ -20,6 +20,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['ModuleVersion'] = 1
         self.Attributes['isDigital'] = 1
 
+        self.AddCommentsToKeyValueDictPairs = True
         self.ResultData['SubTestResultDictList'] = [
             {
                 'Key': 'Chips',
