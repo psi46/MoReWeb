@@ -21,6 +21,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['StartChip'] = 0
         self.Attributes['TargetNames'] = []
 
+        self.AddCommentsToKeyValueDictPairs = True
         if self.verbose:
             tag = self.Name + ": Custom Init"
             print "".ljust(len(tag), '=')

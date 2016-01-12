@@ -59,6 +59,8 @@ class GeneralTestResult(object):
         self.version = None
         self.nRocs = 0
         self.halfModule = 0
+        self.CommentFromFile = None
+        self.AddCommentsToKeyValueDictPairs = False
 
         if Key:
             self.Key = Key
@@ -343,11 +345,13 @@ class GeneralTestResult(object):
         dir_name = os.path.abspath(self.RawTestSessionDataPath)
         comment_files = glob.glob(dir_name + '/comment*')
         comment = ''
+        comment_short = ''
         for filename in comment_files:
             comment += '{filename}:\n'.format(filename=filename.split('/')[-1])
             with file(filename) as f:
                 s = f.read()
             comment += s + '\n\n'
+            comment_short += s + ' '
         # if self.ResultData:
         # if not 'KeyVaueDictPairs' in self.ResultData:
         # self.ResultData['KeyValueDictPairs'] = {}
@@ -359,11 +363,13 @@ class GeneralTestResult(object):
         if comment != '':
             if self.verbose:
                 print 'added comment', comment, 'to ', self.Name
-            self.ResultData['KeyValueDictPairs']['Comment'] = {
-                'Value': comment,
-                'Style': 'font-weight:bold;color:red;' if '!' in comment else 'font-weight:bold;',
-            }
-            self.ResultData['KeyList'].append('Comment')
+            if self.AddCommentsToKeyValueDictPairs:
+                self.ResultData['KeyValueDictPairs']['Comment'] = {
+                    'Value': comment,
+                    'Style': 'font-weight:bold;color:red;' if '!' in comment else 'font-weight:bold;',
+                }
+                self.ResultData['KeyList'].append('Comment')
+            self.CommentFromFile = comment_short
 
     def check_for_manualGrade(self):
         self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)

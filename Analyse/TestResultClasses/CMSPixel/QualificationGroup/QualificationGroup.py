@@ -21,6 +21,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Title = self.Attributes['QualificationType'] + " " + self.Attributes['ModuleID']
         self.initParser = None
+        self.AddCommentsToKeyValueDictPairs = True
 
         if self.verbose:
             tag = self.Name + ": Custom Init"

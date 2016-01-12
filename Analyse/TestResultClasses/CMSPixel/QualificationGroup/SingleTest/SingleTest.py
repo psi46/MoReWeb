@@ -21,6 +21,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['ModuleVersion'] = 1
         self.Attributes['isDigital'] = 1
 
+        self.AddCommentsToKeyValueDictPairs = True
         ROCtype, nRocs, halfModule = self.ReadModuleVersion()
 
         TestNameDictionary = {
