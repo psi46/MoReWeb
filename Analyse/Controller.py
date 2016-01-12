@@ -60,6 +60,8 @@ parser.add_argument('-g', '--use-global-db', dest = 'use_global_db', action = 's
                     help = argparse.SUPPRESS)
 parser.add_argument('-C', '--csv', dest = 'output_csv', action = 'store_true', default = False,
                     help = argparse.SUPPRESS)
+parser.add_argument('-ps', '--production-overview-single', dest = 'production_overview_single', default = '',
+                    help = argparse.SUPPRESS)
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -611,7 +613,13 @@ ModuleResultOverviewObject.GenerateOverviewHTMLFile()
 
 if args.production_overview:
     print "production overview:"
-    ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
+    if len(args.production_overview_single) > 0:
+        SingleSubtest = [x.strip() for x in args.production_overview_single.replace(';',',').split(',')]
+        print "produce plots only for following subtests:"
+        print "-%s"%SingleSubtest
+    else:
+        SingleSubtest = None
+    ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentObject=TestResultEnvironmentInstance, SingleSubtest=SingleSubtest, Verbose=args.verbose)
     ProductionOverviewObject.GenerateOverview()
 
     if args.make_presentation:
