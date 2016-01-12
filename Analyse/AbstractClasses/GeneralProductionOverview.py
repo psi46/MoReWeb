@@ -9,13 +9,13 @@ import copy
 class GeneralProductionOverview:
     LastUniqueIDCounter = 1
 
-    def __init__(self, TestResultEnvironmentObject = None, InitialAttributes = None, ParentObject=None):
+    def __init__(self, TestResultEnvironmentObject = None, InitialAttributes = None, ParentObject=None, SingleSubtest=None, Verbose=False):
         if TestResultEnvironmentObject:
             self.TestResultEnvironmentObject = TestResultEnvironmentObject
             self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
 
         self.Debug = False
-        self.Verbose = False
+        self.Verbose = Verbose
         self.Name = 'AbstractClasses_GeneralProductionOverview'
         self.NameSingle = 'GeneralProductionOverview'
         self.SubPages = []
@@ -33,6 +33,7 @@ class GeneralProductionOverview:
         self.Attributes = {
             'StorageKey': self.Name,
             'BasePath': '',
+            'SingleSubtest': SingleSubtest,
         }
         self.Attributes['DateBegin'] = None
         self.Attributes['DateEnd'] = None
@@ -301,7 +302,7 @@ class GeneralProductionOverview:
             InitialAttributes['BasePath'] = self.Attributes['BasePath']
 
             ### instanciate submodule
-            SubPageClass = SubPage['ProductionOverview'].ProductionOverview(TestResultEnvironmentObject=self.TestResultEnvironmentObject, InitialAttributes = InitialAttributes, ParentObject = self)
+            SubPageClass = SubPage['ProductionOverview'].ProductionOverview(TestResultEnvironmentObject=self.TestResultEnvironmentObject, InitialAttributes = InitialAttributes, ParentObject = self, Verbose=self.Verbose)
 
             ### generate html overview of submodule
             #try:

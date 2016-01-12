@@ -40,6 +40,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     for Chip in range(0,16):
                         Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips' ,'Chip%s'%Chip, 'VcalThresholdTrimmedMap', '*.root'])
                         RootFiles = glob.glob(Path)
+                        if self.Verbose:
+                            print "glob:", Path
+                            print "looking in .root files:", RootFiles
                         ROOTObject = self.GetHistFromROOTFile(RootFiles, "VcalThresholdTrimmedMap")
                         if ROOTObject:
                             for x in range(1, ROOTObject.GetNbinsX()+1):

@@ -10,7 +10,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
     def CustomInit(self, TestResultEnvironmentObject = 0):
         if TestResultEnvironmentObject:
             self.TestResultEnvironmentObject = TestResultEnvironmentObject
-        self.HTMLFileName = 'ProductionOverview.html'
+
+        self.singleSubtest = self.Attributes['SingleSubtest']
+        if self.singleSubtest:
+            self.HTMLFileName = 'ProductionOverview_%s.html'%('_'.join(self.singleSubtest))
+        else:
+            self.HTMLFileName = 'ProductionOverview.html'
+
         self.ImportPath = 'OverviewClasses.CMSPixel.ProductionOverview'
         self.NameSingle = 'ProductionOverview'
         self.Name = 'CMSPixel_%s'%self.NameSingle
@@ -36,6 +42,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         "StorageKey" : "ProductionOverviewPage_Total",
                         "ShowWeeklyPlots": "True",
                         "Title" : "Total production Overview",
+                        "SingleSubtest": self.Attributes['SingleSubtest'],
                     },
                 }
             )
