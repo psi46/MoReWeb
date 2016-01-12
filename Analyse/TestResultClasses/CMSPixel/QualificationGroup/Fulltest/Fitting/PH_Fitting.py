@@ -248,7 +248,7 @@ class PH_Fitting():
         outputFile.close()
         retVal = [maxChi2,[self.histoChi,self.histoFits]]
         if maxChi2[0]>2:
-            print "\t\x1b[31mMax Chi^2 for chip %s: %s chi^2/NDF at %s/%s => high Chi^2, check fits!\x1b[31m"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
+            print "\t\x1b[31mMax Chi^2 for chip %s: %s chi^2/NDF at %s/%s => high Chi^2, check fits!\x1b[0m"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
         else:
             print "\tMax Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
         if result:

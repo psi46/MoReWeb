@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-import ROOT
-import array
 import AbstractClasses
-import AbstractClasses.Helper.HistoGetter as HistoGetter
+import os
 
-import ROOT
-import datetime
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.NameSingle='Logfile'
@@ -24,7 +20,39 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             },
         ]
+        self.ResultData['KeyValueDictPairs'] = {'DTB_FW': {'Value': '', 'Label': 'DTB FW'}, 'pXar': {'Value': '', 'Label': 'pXar version'}}
+        self.ResultData['KeyList'] = []
 
     def PopulateResultData(self):
-        pass
+
+        LogfileName = self.ParentObject.logfilePath
+        if LogfileName:
+            if os.path.isfile(LogfileName):
+                DTBSectionFound = False
+                FWFound = False
+                pXarFound = False
+
+                with open(LogfileName) as Logfile:
+                    for Line in Logfile:
+                        if 'DTB info' in Line:
+                            DTBSectionFound = True
+                        if DTBSectionFound and 'SW version' in Line:
+                            try:
+                                self.ResultData['KeyValueDictPairs']['DTB_FW']['Value'] = Line.split(':')[-1].strip()
+                                FWFound = True
+                            except:
+                                pass
+
+                        if 'Instanciating API for pxar' in Line:
+                            posPxar = Line.find('pxar')
+                            if posPxar >=0:
+                                try:
+                                    self.ResultData['KeyValueDictPairs']['pXar']['Value'] = Line[posPxar + 5:] if len(Line) > posPxar + 5 else '?'
+                                    pXarFound = True
+                                except:
+                                    pass
+
+                        if FWFound and pXarFound:
+                            break
+
 

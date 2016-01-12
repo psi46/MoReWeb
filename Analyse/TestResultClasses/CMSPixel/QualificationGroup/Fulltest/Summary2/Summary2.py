@@ -61,7 +61,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
             'TestDuration': {
                 'Value': TestDuration,
-                'Label':'Test Duration'
+                'Label':'Duration'
             },
             'TempC': {
                 'Value':'{0:1.0f}'.format(self.ParentObject.Attributes['TestTemperature']),
@@ -86,11 +86,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
         }
         
-        self.ResultData['KeyList'] = ['TestCenter', 'TestDate','TestTime', 'TestDuration', 'TempC','TrimPHCal','TermCycl', 'TBM1', 'TBM2']
+        self.ResultData['KeyList'] = ['TestCenter', 'TestDate','TestTime', 'TestDuration', 'TempC', 'TBM1', 'TBM2']
 
-        if self.ParentObject.pxarVersion:
-            self.ResultData['KeyValueDictPairs']['PxarVersion'] = {'Label': 'pXar', 'Value': self.ParentObject.pxarVersion.replace("~","\n")}
-            self.ResultData['KeyList'].append('PxarVersion')
+        try:
+            pxarVersion = self.ParentObject.ResultData['SubTestResults']['Logfile'].ResultData['KeyValueDictPairs']['pXar']['Value']
+            if pxarVersion:
+                pxarVersion = pxarVersion.replace('~', ' ')
+                self.ResultData['KeyValueDictPairs']['PxarVersion'] = {'Label': 'pXar', 'Value': pxarVersion}
+                self.ResultData['KeyList'].append('PxarVersion')
+        except:
+            pass
+
+        try:
+            dtbFW = self.ParentObject.ResultData['SubTestResults']['Logfile'].ResultData['KeyValueDictPairs']['DTB_FW']['Value']
+            if dtbFW:
+                self.ResultData['KeyValueDictPairs']['DTB_FW'] = {'Label': 'DTB FW', 'Value': dtbFW}
+                self.ResultData['KeyList'].append('DTB_FW')
+        except:
+            pass
 
         try:
             if 'ModuleIa' in self.ParentObject.ResultData['SubTestResults']['AnalogCurrent'].ResultData['KeyValueDictPairs']:

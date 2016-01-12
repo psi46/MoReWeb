@@ -201,6 +201,14 @@ class TestResult(GeneralTestResult):
                 }
             },
             {
+                'Key': 'Logfile',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 120,
+                    'Show': True,
+                }
+            },
+            {
                 'Key': 'Errors',
                 'DisplayOptions': {
                     'Order': 101,
@@ -229,14 +237,6 @@ class TestResult(GeneralTestResult):
                 'Key': 'SummaryROCs',
                 'DisplayOptions': {
                     'Width': 5,
-                }
-            },
-            {
-                'Key': 'Logfile',
-                'DisplayOptions': {
-                    'Width': 1,
-                    'Order': 120,
-                    'Show': True,
                 }
             },
         ]
@@ -317,7 +317,6 @@ class TestResult(GeneralTestResult):
         # find pxar logfile of fulltest
         logfilePath = ("%s.log"%fileHandlePath[:-5]) if len(fileHandlePath) > 4 else ''
         self.trimVcal = None
-        self.pxarVersion = None
         if os.path.isfile(logfilePath):
             self.logfilePath = logfilePath
             try:
@@ -334,10 +333,6 @@ class TestResult(GeneralTestResult):
                                         print "-> Trimmed to Vcal %d"%self.trimVcal
                                     except:
                                         pass
-                        if 'Instanciating API for pxar' in line:
-                            posPxar = line.find('pxar')
-                            if posPxar >=0:
-                                self.pxarVersion = line[posPxar + 5:] if len(line) > posPxar + 5 else '?'
             except:
                 pass
 
