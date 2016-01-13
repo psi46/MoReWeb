@@ -708,12 +708,37 @@ if args.output_csv:
 
         print "-"*80
 
+'''
+            self.TestResultEnvironmentObject.ErrorList.append(
+                {'ModuleID': self.Attributes['TestedObjectID'] if 'TestedObjectID' in self.Attributes else '',
+                 'ModulePath': self.ModulePath,
+                 'ErrorCode': inst,
+                 'File': exc_tb.tb_frame.f_code.co_filename,
+                 'Line': exc_tb.tb_lineno,
+                 'FinalResultsStoragePath': self.FinalResultsStoragePath}
+                # 'FinalResultsStoragePath':i['TestResultObject'].FinalResultsStoragePath}
+'''
 
 # display error list
 print '\nErrorList:'
+ModulePath = ''
+ModuleID = ''
 for i in TestResultEnvironmentInstance.ErrorList:
-    print i
-    print '\t - %s: %s'%(i['ModulePath'],i['ErrorCode'])
+    if i['ModuleID'] != ModuleID:
+        print (i['ModuleID'] if len(i['ModuleID']) > 0 else 'MODULE') + ':'
+        ModulePath = ''
+        ModuleID = i['ModuleID']
+    if i['ModulePath'] != ModulePath:
+        print "  %s"%i['ModulePath']
+        ModulePath = i['ModulePath']
+    ColumnWidth = 10
+    if 'Message' in i:
+        print "    %s%s"%('ERROR: '.ljust(ColumnWidth), i['Message'])
+    else:
+        print "    %s%s"%('ERROR: '.ljust(ColumnWidth), i['ErrorCode'] if 'ErrorCode' in i else '')
+
+    print "    %s%s"%('in ', i['File'] if 'File' in i else '')
+    print "    %s%s"%('PATH: '.ljust(ColumnWidth), i['FinalResultsStoragePath'] if 'FinalResultsStoragePath' in i else '')
 
 
 ExitCode = -2

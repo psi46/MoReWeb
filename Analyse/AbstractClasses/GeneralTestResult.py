@@ -479,8 +479,11 @@ class GeneralTestResult(object):
                     sys.stdout.flush()
 
                     self.TestResultEnvironmentObject.ErrorList.append(
-                        {'ModulePath': i['TestResultObject'].ModulePath,
+                        {'ModuleID': self.Attributes['TestedObjectID'] if 'TestedObjectID' in self.Attributes else '',
+                         'ModulePath': i['TestResultObject'].ModulePath,
                          'ErrorCode': inst,
+                         'Message': traceback.format_exception(exc_type, exc_obj, exc_tb)[-1].strip('\n'),
+                         'File': traceback.format_exception(exc_type, exc_obj, exc_tb)[-2].strip('\n'),
                          'FinalResultsStoragePath': i['TestResultObject'].FinalResultsStoragePath}
                     )
                     # todo Felix: handel exceptions
@@ -503,8 +506,11 @@ class GeneralTestResult(object):
             sys.stdout.flush()
 
             self.TestResultEnvironmentObject.ErrorList.append(
-                {'ModulePath': self.ModulePath,
+                {'ModuleID': self.Attributes['TestedObjectID'] if 'TestedObjectID' in self.Attributes else '',
+                 'ModulePath': self.ModulePath,
                  'ErrorCode': inst,
+                 'Message': traceback.format_exception(exc_type, exc_obj, exc_tb)[-1].strip('\n'),
+                 'File': traceback.format_exception(exc_type, exc_obj, exc_tb)[-2].strip('\n'),
                  'FinalResultsStoragePath': self.FinalResultsStoragePath}
                 # 'FinalResultsStoragePath':i['TestResultObject'].FinalResultsStoragePath}
             )
