@@ -19,7 +19,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
         self.chipNo = self.ParentObject.Attributes['ChipNo']
 
-        self.ResultData['KeyValueDictPairs']['DeadBumps'] = {'Value': self.DeadBumpList, 'Label': 'Dead Bumps'}
+        self.ResultData['KeyValueDictPairs']['DeadBumps'] = {'Value': None, 'Label': 'Dead Bumps'}
         self.ResultData['KeyValueDictPairs']['NDeadBumps'] = {'Value': -1, 'Label': 'N Dead Bumps'}
 
 

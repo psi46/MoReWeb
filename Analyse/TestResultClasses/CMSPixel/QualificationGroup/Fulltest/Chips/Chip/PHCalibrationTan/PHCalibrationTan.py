@@ -10,6 +10,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Par1DefectsList = set()
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
+        self.ResultData['KeyValueDictPairs']['Par1Defects'] = {'Value': None, 'Label': 'Par1 defects'}
+
     def PopulateResultData(self):
         #PHCalibrationTan = Parameter1
 

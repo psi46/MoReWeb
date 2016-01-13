@@ -1,70 +1,73 @@
-import ROOT
 import AbstractClasses
-import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 try:
        set
 except NameError:
        from sets import Set as set
+
+def defectsListLength(defectsList):
+    if defectsList is not None:
+        return "%d"%len(defectsList)
+    else:
+        return '0'
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
+
     def CustomInit(self):
-        self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_Summary_TestResult'
-        self.NameSingle='Summary'
+        self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_Summary_TestResult'
+        self.NameSingle = 'Summary'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         
     # grading and related functions (HasBumpBondingProblems, etc.) moved to Grading.py
-    
-
     def PopulateResultData(self):
-
 
         self.ResultData['KeyValueDictPairs'] = {
             'Total': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['TotalList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['TotalList']),
                 'Label':'Total'
             },
             'nDeadPixel': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadPixelList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadPixelList']),
                 'Label':' - Dead Pixels'
             },
             'nNoisy1Pixel': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noisy1PixelList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Noisy1PixelList']),
                 'Label':'>100% efficiency in alive map'
             },
             'nMaskDefect': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MaskDefectList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['MaskDefectList']),
                 'Label':' - Mask Defects'
             },
             'nDeadBumps': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadBumpList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadBumpList']),
                 'Label':' - Dead Bumps %s'%(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SpecialBumpBondingTestName'] if self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData'].has_key('SpecialBumpBondingTestName') else '') 
             },
             'nDeadTrimbits': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadTrimbitsList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DeadTrimbitsList']),
                 'Label':' - Dead Trimbits'
             },
             'nAddressProblems': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['AddressProblemList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['AddressProblemList']),
                 'Label':' - Address Problems'
             },
             'nNoisy2Pixel': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefectList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NoiseDefectList']),
                 'Label':'Noisy Pixels'
             },
             'nThrDefect': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ThrDefectList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ThrDefectList']),
                 'Label':'Trim Problems'
             },
             'nGainDefect': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['GainDefectList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['GainDefectList']),
                 'Label':'PH Gain defects'
             },
             'nPedDefect': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['PedDefectList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['PedDefectList']),
                 'Label':'PH Pedestal defects'
             },
             'nPar1Defect': {
-                'Value':'{0:1.0f}'.format(len(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Par1DefectList'])),
+                'Value': defectsListLength(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['Par1DefectList']),
                 'Label':'PH Parameter1 Defects'
             },
             'PixelDefectsGrade':{

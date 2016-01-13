@@ -152,6 +152,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             MissingSubtests = True
             ModuleGrade = 3
 
+        ChipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
+        for j in ChipResults:
+            ChipGradingTestResultObject = j['TestResultObject'].ResultData['SubTestResults']['Grading']
+            if not ChipGradingTestResultObject.ResultData['HiddenData']['DefectsGradingComplete']:
+                MissingSubtests = True
+                ModuleGrade = 3
+
+
         # electrical grade = ModuleGrade before IV
         ElectricalGrade = ModuleGrade
 

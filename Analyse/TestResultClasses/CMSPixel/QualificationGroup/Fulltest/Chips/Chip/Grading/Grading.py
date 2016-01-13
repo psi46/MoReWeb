@@ -1,11 +1,16 @@
-import ROOT
 import AbstractClasses
-import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 try:
        set
 except NameError:
        from sets import Set as set
+
+def defectsListLength(defectsList):
+    if defectsList is not None:
+        return "%4d"%len(defectsList)
+    else:
+        return 'INCOMPLETE'
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_Grading_TestResult'
@@ -24,6 +29,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['PedDefectList'] = set()
         self.ResultData['HiddenData']['Par1DefectList'] = set()
         self.ResultData['HiddenData']['TotalList'] = set()
+        self.ResultData['HiddenData']['DefectsGradingComplete'] = False
         self.isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
 
     def GetSingleChipSubtestGrade(self, SpecialPopulateDataParameters, CurrentGrade, IncludeDefects = True):
@@ -74,7 +80,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['HiddenData']['DeadBumpList'] = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['DeadBumps']['Value']
             self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = ''
 
-
+        # other pixel defects
         self.ResultData['HiddenData']['DeadPixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
         self.ResultData['HiddenData']['DeadTrimbitsList'] = self.ParentObject.ResultData['SubTestResults']['TrimBitProblems'].ResultData['KeyValueDictPairs']['DeadTrimbits']['Value']
         self.ResultData['HiddenData']['GainDefectList'] = self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['GainDefects']['Value']
@@ -85,26 +91,32 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['Par1DefectList'] = self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData['KeyValueDictPairs']['Par1Defects']['Value']
         self.ResultData['HiddenData']['ThrDefectList'] = self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['TrimProblems']['Value']
 
+        # check if some data is missing and make unique list of total pixel defects
+        self.ResultData['HiddenData']['DefectsGradingComplete'] = True
+        self.ResultData['HiddenData']['TotalList'] = set([])
+        for IndividualDefectsList in [
+            self.ResultData['HiddenData']['DeadPixelList'],
+            self.ResultData['HiddenData']['DeadTrimbitsList'],
+            self.ResultData['HiddenData']['GainDefectList'],
+            self.ResultData['HiddenData']['IneffPixelList'],
+            self.ResultData['HiddenData']['MaskDefectList'],
+            self.ResultData['HiddenData']['Noisy1PixelList'],
+            self.ResultData['HiddenData']['NoiseDefectList'],
+            self.ResultData['HiddenData']['Par1DefectList'],
+            self.ResultData['HiddenData']['ThrDefectList'],
+            self.ResultData['HiddenData']['DeadBumpList'],
+            self.ResultData['HiddenData']['AddressProblemList'],
+        ]:
+            if IndividualDefectsList is not None:
+                self.ResultData['HiddenData']['TotalList'] = self.ResultData['HiddenData']['TotalList'] | IndividualDefectsList
+            else:
+                self.ResultData['HiddenData']['DefectsGradingComplete'] = False
+
+        # subtract dead pixels explicitly from individual defects which do not exclude them implicitly
         self.ResultData['HiddenData']['AddressProblemList'] = self.ResultData['HiddenData']['AddressProblemList'] - self.ResultData['HiddenData']['DeadPixelList']
         self.ResultData['HiddenData']['DeadBumpList'] = self.ResultData['HiddenData']['DeadBumpList'] - self.ResultData['HiddenData']['DeadPixelList']
         self.ResultData['HiddenData']['DeadTrimbitsList'] = self.ResultData['HiddenData']['DeadTrimbitsList'] - self.ResultData['HiddenData']['DeadPixelList']
         self.ResultData['HiddenData']['MaskDefectList'] = self.ResultData['HiddenData']['MaskDefectList'] - self.ResultData['HiddenData']['DeadPixelList']
-
-
-
-        # make unique list of total pixel defects
-        self.ResultData['HiddenData']['TotalList'] = (
-            self.ResultData['HiddenData']['AddressProblemList'] |
-            self.ResultData['HiddenData']['DeadBumpList'] |
-            self.ResultData['HiddenData']['DeadPixelList'] |
-            self.ResultData['HiddenData']['DeadTrimbitsList'] |
-            self.ResultData['HiddenData']['GainDefectList'] |
-            self.ResultData['HiddenData']['IneffPixelList'] |
-            self.ResultData['HiddenData']['MaskDefectList'] |
-            self.ResultData['HiddenData']['NoiseDefectList'] |
-            self.ResultData['HiddenData']['Par1DefectList'] |
-            self.ResultData['HiddenData']['ThrDefectList']
-        )
 
         # total defects grading
         PixelDefectsGradeALimit = self.TestResultEnvironmentObject.GradingParameters['defectsB']
@@ -133,19 +145,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             pass
 
+        if not self.ResultData['HiddenData']['DefectsGradingComplete']:
+            Grade = GradeMapping[3]
+
         print '\nChip %d Pixel Defects Grade %s'%(self.chipNo, Grade)
 
-        print '\ttotal: %4d'%len(self.ResultData['HiddenData']['TotalList'])
-        print '\tdead:  %4d'%len(self.ResultData['HiddenData']['DeadPixelList'])
-        print '\tinef:  %4d'%len(self.ResultData['HiddenData']['IneffPixelList'])
-        print '\tmask:  %4d'%len(self.ResultData['HiddenData']['MaskDefectList'])
-        print '\taddr:  %4d'%len(self.ResultData['HiddenData']['AddressProblemList'])
-        print '\tbump:  %4d'%len(self.ResultData['HiddenData']['DeadBumpList'])
-        print '\ttrim:  %4d'%len(self.ResultData['HiddenData']['ThrDefectList'])
-        print '\ttbit:  %4d'%len(self.ResultData['HiddenData']['DeadTrimbitsList'])
-        print '\tnois:  %4d'%len(self.ResultData['HiddenData']['NoiseDefectList'])
-        print '\tgain:  %4d'%len(self.ResultData['HiddenData']['GainDefectList'])
-        print '\tpar1:  %4d'%len(self.ResultData['HiddenData']['Par1DefectList'])
+        print '\ttotal: %s'%defectsListLength(self.ResultData['HiddenData']['TotalList'])
+        print '\tdead:  %s'%defectsListLength(self.ResultData['HiddenData']['DeadPixelList'])
+        print '\tinef:  %s'%defectsListLength(self.ResultData['HiddenData']['IneffPixelList'])
+        print '\tmask:  %s'%defectsListLength(self.ResultData['HiddenData']['MaskDefectList'])
+        print '\taddr:  %s'%defectsListLength(self.ResultData['HiddenData']['AddressProblemList'])
+        print '\tbump:  %s'%defectsListLength(self.ResultData['HiddenData']['DeadBumpList'])
+        print '\ttrim:  %s'%defectsListLength(self.ResultData['HiddenData']['ThrDefectList'])
+        print '\ttbit:  %s'%defectsListLength(self.ResultData['HiddenData']['DeadTrimbitsList'])
+        print '\tnois:  %s'%defectsListLength(self.ResultData['HiddenData']['NoiseDefectList'])
+        print '\tgain:  %s'%defectsListLength(self.ResultData['HiddenData']['GainDefectList'])
+        print '\tpar1:  %s'%defectsListLength(self.ResultData['HiddenData']['Par1DefectList'])
 
         print '-'*78
 

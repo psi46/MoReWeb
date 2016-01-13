@@ -11,6 +11,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle = 'TrimBitProblems'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.chipNo = self.ParentObject.Attributes['ChipNo']
+        self.ResultData['KeyValueDictPairs']['DeadTrimbits'] = {'Value': None, 'Label':'Dead Trimbits'}
 
     def PopulateResultData(self):
         ROOT.gPad.SetLogy(0)

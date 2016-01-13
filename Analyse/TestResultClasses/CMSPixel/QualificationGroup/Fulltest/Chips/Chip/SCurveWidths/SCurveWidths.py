@@ -21,7 +21,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label':'RMS'
             },
             'NoiseDefects':{
-                'Value':'',
+                'Value': None,
                 'Label':'Noise defects'
             },
             'NNoiseDefects':{

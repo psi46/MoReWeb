@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 import warnings
-
 import ROOT
-
 import AbstractClasses
-import AbstractClasses.GeneralTestResult as GeneralTestResult
-
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -14,6 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.verbose = False
         self.GainDefectsList = set([])
+        self.ResultData['KeyValueDictPairs']['GainDefects'] = {'Value': None, 'Label': 'Gain defects'}
 
     def fill_histograms(self):
         Directory = self.RawTestSessionDataPath

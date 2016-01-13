@@ -10,11 +10,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.ThrDefectList = set()
         self.chipNo = self.ParentObject.Attributes['ChipNo']
+        self.ResultData['KeyValueDictPairs']['TrimProblems'] = {'Value': None, 'Label':'Trim Problems'}
 
     def PopulateResultData(self):
 
-        ROOT.gPad.SetLogy(1);
-        ROOT.gStyle.SetOptStat(1);
+        ROOT.gPad.SetLogy(1)
+        ROOT.gStyle.SetOptStat(1)
         ChipNo=self.ParentObject.Attributes['ChipNo']
         try:
             DeadPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
@@ -132,8 +133,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.Title = 'Vcal Threshold Trimmed'
         self.SaveCanvas()
-        self.ResultData['KeyValueDictPairs']['TrimProblems'] = { 'Value':self.ThrDefectList, 'Label':'Trim Problems'}
-        self.ResultData['KeyValueDictPairs']['NTrimProblems'] = { 'Value':len(self.ThrDefectList), 'Label':'N Trim Problems'}
+        self.ResultData['KeyValueDictPairs']['TrimProblems'] = {'Value': self.ThrDefectList, 'Label':'Trim Problems'}
+        self.ResultData['KeyValueDictPairs']['NTrimProblems'] = {'Value': len(self.ThrDefectList), 'Label':'N Trim Problems'}
         self.ResultData['KeyList'].append('NTrimProblems')
 
 

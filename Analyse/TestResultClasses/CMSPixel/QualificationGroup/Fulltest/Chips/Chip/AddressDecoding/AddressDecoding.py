@@ -9,6 +9,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.AddressProblemList = set()
         self.chipNo = self.ParentObject.Attributes['ChipNo']
 
+        self.ResultData['KeyValueDictPairs']['AddressDecodingProblems'] = {'Value': None, 'Label':'Address Decoding Problems'}
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0);
