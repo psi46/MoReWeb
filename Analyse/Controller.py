@@ -132,6 +132,7 @@ if verbose:
     print 'RevisionString "%s"'%RevisionString
 GlobalDataDirectory = Configuration.get('Paths', 'GlobalDataDirectory')
 GlobalOverviewPath = Configuration.get('Paths', 'GlobalOverviewPath')
+
 if Configuration.has_option('Paths','GlobalFinalResultsPath'):
     if args.norev:
         GlobalFinalResultsPath = Configuration.get('Paths','GlobalFinalResultsPath')
@@ -139,6 +140,7 @@ if Configuration.has_option('Paths','GlobalFinalResultsPath'):
         GlobalFinalResultsPath = Configuration.get('Paths','GlobalFinalResultsPath')+'/REV%03d'%revisionNumber
 else:
     GlobalFinalResultsPath = ''
+
 print 'GlobalFinalResultsPath: "%s"'%GlobalFinalResultsPath
 if GlobalFinalResultsPath!= '' and not os.path.exists(GlobalFinalResultsPath):
     try:

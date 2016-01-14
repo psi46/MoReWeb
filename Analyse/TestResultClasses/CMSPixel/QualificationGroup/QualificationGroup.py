@@ -3,6 +3,7 @@ import ROOT
 import copy
 import os
 import os.path
+import fnmatch
 import AbstractClasses.Helper.BetterConfigParser
 import AbstractClasses.Helper.HtmlParser
 import AbstractClasses.Helper.environment
@@ -744,6 +745,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Table'] = ModuleResultOverviewObject.TableData(self.Attributes['ModuleID'],
                                                                         self.Attributes['TestDate'],
                                                                         GlobalOverviewList=False)
-
     def PostWriteToDatabase(self):
-        self.PopulateResultData();
+        self.PopulateResultData()

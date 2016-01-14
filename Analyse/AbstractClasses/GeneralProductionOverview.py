@@ -5,9 +5,11 @@ import ROOT
 import glob
 import json
 import copy
+import sys
 
 class GeneralProductionOverview:
     LastUniqueIDCounter = 1
+    JSONCache = {}
 
     def __init__(self, TestResultEnvironmentObject = None, InitialAttributes = None, ParentObject=None, SingleSubtest=None, Verbose=False):
         if TestResultEnvironmentObject:
@@ -543,6 +545,24 @@ class GeneralProductionOverview:
             return ROOT.kBlack
 
     def GetJSONValue(self, Keys):
+        DictionaryPath = self.GlobalOverviewPath + '/' + '/'.join(Keys[0:2]) + '/Dictionary.json'
+        if DictionaryPath not in self.JSONCache:
+            try:
+                with open(DictionaryPath) as DictionaryFile:
+                    self.JSONCache[DictionaryPath] = json.load(DictionaryFile)
+            except:
+                pass
+
+        DictionaryKey = '/'.join(Keys[2:-2])
+        if DictionaryPath in self.JSONCache and DictionaryKey in self.JSONCache[DictionaryPath]:
+            # the requested value is in the merged dictionary, read it from there!
+            try:
+                value = self.JSONCache[DictionaryPath][DictionaryKey][Keys[-2]][Keys[-1]]
+            except:
+                value = None
+            return value
+
+        # otherwise access individual .json file directly
         Path = self.GlobalOverviewPath + '/' + '/'.join(Keys[0:-2])
 
         try:

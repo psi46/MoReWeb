@@ -954,6 +954,13 @@ class TestResult(GeneralTestResult):
 
         print 'fill row end'
 
+        # json dictionary
+        try:
+            self.CreateJSONIndexFile()
+            print "JSON dictionary created"
+        except:
+            print "could not create JSON dictionary"
+
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             DebugGlobalDB = True
             GlobalDBRowTemplate = copy.deepcopy(Row)

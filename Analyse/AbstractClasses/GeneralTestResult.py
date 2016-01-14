@@ -7,7 +7,10 @@ import traceback
 import warnings
 import os
 import ConfigParser
-from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
+import fnmatch
+
+from Helper.SetEncoder import SetEncoder
+from Helper.BetterConfigParser import BetterConfigParser
 import subprocess
 import traceback
 import ROOT
@@ -19,12 +22,6 @@ except NameError:
     from sets import Set as set
 import Helper.ROOTConfiguration as ROOTConfiguration
 import glob
-
-class SetEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, set):
-            return list(obj)
-        return json.JSONEncoder.default(self, obj)
 
 class GeneralTestResult(object):
     nRows = 80
@@ -1335,6 +1332,28 @@ class GeneralTestResult(object):
 
     def PostWriteToDatabase(self):
         pass
+
+    def CreateJSONIndexFile(self):
+        # find all .json files in subdirectories
+        matches = []
+        basePath = '/' + self.FinalResultsStoragePath.strip('/') + '/'
+        print "-basePath:", basePath
+        for root, dirnames, filenames in os.walk(self.FinalResultsStoragePath):
+            for filename in fnmatch.filter(filenames, '*.json'):
+                if 'KeyValueDictPairs' in filename or 'HiddenData' in filename:
+                    absolutePath = '/' + os.path.join(root, filename).strip('/')
+                    relativePath = absolutePath.replace(basePath, '')
+                    matches.append([relativePath, absolutePath])
+        print "-#files:",len(matches)
+        # merge them to one single .json file
+        JSONDictionary = {}
+        f = open(self.FinalResultsStoragePath + '/Dictionary.json', 'w')
+        for jsonFileName, absolutePath in matches:
+            with open(absolutePath) as data_file:
+                JSONData = json.load(data_file)
+            JSONDictionary[jsonFileName] = JSONData
+        f.write(json.dumps(JSONDictionary, sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
+        f.close()
 
     def __del__(self):
         self.CloseSubTestResultFileHandles()

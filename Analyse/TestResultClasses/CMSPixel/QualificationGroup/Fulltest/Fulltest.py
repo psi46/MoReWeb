@@ -2,6 +2,7 @@ import os
 import sys
 import ROOT
 import traceback
+from AbstractClasses.Helper.SetEncoder import SetEncoder
 
 import AbstractClasses
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
@@ -688,6 +689,14 @@ class TestResult(GeneralTestResult):
             })
 
         print 'fill row end'
+
+        # json dictionary
+        try:
+            self.CreateJSONIndexFile()
+            print "JSON dictionary created"
+        except:
+            print "could not create JSON dictionary"
+
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             from PixelDB import *
             # modified by Tommaso
