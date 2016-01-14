@@ -21,6 +21,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['StartChip'] = 0
         self.Attributes['TargetNames'] = []
 
+        self.CreateJSONIndex = True
         self.AddCommentsToKeyValueDictPairs = True
         if self.verbose:
             tag = self.Name + ": Custom Init"
@@ -383,13 +384,6 @@ class TestResult(GeneralTestResult):
                 }
 
         print 'fill row end'
-
-        # json dictionary
-        try:
-            self.CreateJSONIndexFile()
-            print "JSON dictionary created"
-        except:
-            print "could not create JSON dictionary"
 
         # TODO: Please check if uplaod to DB is ok in this way...
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:

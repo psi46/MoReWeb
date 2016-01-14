@@ -18,6 +18,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Attributes['NumberOfChips'] = self.nTotalChips
         self.AddCommentsToKeyValueDictPairs = True
+        self.CreateJSONIndex = True
         self.MergePyxarData()
 
         if self.Attributes['ModuleVersion'] == 1:
@@ -689,13 +690,6 @@ class TestResult(GeneralTestResult):
             })
 
         print 'fill row end'
-
-        # json dictionary
-        try:
-            self.CreateJSONIndexFile()
-            print "JSON dictionary created"
-        except:
-            print "could not create JSON dictionary"
 
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             from PixelDB import *

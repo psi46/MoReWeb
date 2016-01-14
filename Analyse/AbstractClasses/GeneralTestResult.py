@@ -58,6 +58,7 @@ class GeneralTestResult(object):
         self.halfModule = 0
         self.CommentFromFile = None
         self.AddCommentsToKeyValueDictPairs = False
+        self.CreateJSONIndex = False
 
         if Key:
             self.Key = Key
@@ -1284,6 +1285,8 @@ class GeneralTestResult(object):
                 else:
                     warnings.warn('Cannot create JSON for %s.' % (repr(data)))
 
+        if self.CreateJSONIndex:
+            self.CreateJSONIndexFile()
     '''
         Generate file from ResultData['KeyValueDictPairs'] Key/Value pairs in ASCII format
         @final

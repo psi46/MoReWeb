@@ -754,6 +754,44 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             )
 
+
+        ### Errors ###
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "VcalCalibration", "Title": "Readout Errors", "Caption": "<i>First bin means <strong>no errors</strong> and last bin includes overflow.</i>"}, "Key": "Section", "Module": "Section"})
+        if not self.singleSubtest or 'Errors' in self.singleSubtest:
+            for ErrorType in ['nErrors', 'nWarnings', 'nCriticals', 'message_daqerror_count',
+                              'message_datasize_count','message_deser400_count', 'message_eventid_count',
+                              'message_missingevents_count', 'message_notokenpass_count', 'message_readback_count',
+                              'message_tokenchain_count', 'message_usbtimeout_count']:
+                self.SubPages.append(
+                    {
+                        "Key": "ErrorsVsFW",
+                        "Module": "ErrorsVsFW",
+                        "InitialAttributes" : {
+                            "StorageKey" : "ErrorsVsFW_%s"%ErrorType,
+                            "DateBegin": self.Attributes['DateBegin'],
+                            "DateEnd": self.Attributes['DateEnd'],
+                            "ErrorType": ErrorType,
+                        }
+                    }
+                )
+
+            for ErrorType in ['nErrors', 'nWarnings', 'nCriticals', 'message_daqerror_count',
+                              'message_datasize_count','message_deser400_count', 'message_eventid_count',
+                              'message_missingevents_count', 'message_notokenpass_count', 'message_readback_count',
+                              'message_tokenchain_count', 'message_usbtimeout_count']:
+                self.SubPages.append(
+                    {
+                        "Key": "ErrorsVsId",
+                        "Module": "ErrorsVsId",
+                        "InitialAttributes" : {
+                            "StorageKey" : "ErrorsVsId_%s"%ErrorType,
+                            "DateBegin": self.Attributes['DateBegin'],
+                            "DateEnd": self.Attributes['DateEnd'],
+                            "ErrorType": ErrorType,
+                        }
+                    }
+                )
+
     def GenerateOverview(self):
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
