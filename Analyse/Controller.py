@@ -45,13 +45,15 @@ parser.add_argument('-c', '--comment', dest = 'comment', action = 'store_true', 
 parser.add_argument('-d', '--delete-row', dest = 'deleterow', action = 'store_true', default = False,
                     help = 'Let you select a row in the local database to delete.')
 parser.add_argument('-r', '--refit', dest = 'refit', action = 'store_true', default = False,
-                    help = 'Forces refitting even if files exist')
+                    help = 'Forces refitting even if fit result files exist')
 parser.add_argument('-p', '--production-overview', dest = 'production_overview', action = 'store_true', default = False,
-                    help = 'Creates production overview page in the end')
+                    help = 'Creates production overview page')
 parser.add_argument('-new', '--new-folders-only', dest = 'no_re_analysis', action = 'store_true', default = False,
                     help = 'Do not analyze folder if it already exists in DB, even if MoReWeb version has changed')
+parser.add_argument('-m', '--modules', dest = 'modules_list', default = '',
+                    help = 'Comma separated list of modules which shall be analyzed')
 parser.add_argument('-pres', '--make-presentation', dest = 'make_presentation', action = 'store_true', default = False,
-                    help = 'Creates tex file for presentation in the end')
+                    help = 'Creates tex file and pdf with presentation, needs -p')
 parser.add_argument('-tc', '--show-test-center', dest = 'show_test_center', action = 'store_true', default = False,
                     help = 'Show test-center in qualification list')
 parser.add_argument('-i', '--include-path', dest = 'additional_include_path', metavar='PATH', default = '',
@@ -249,6 +251,16 @@ def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):
         return True
     md5FileName= FinalModuleResultsPath+'/'+ 'checksum.md5'
     retVal = True
+
+    if len(args.modules_list) > 0:
+        ModulesList = [x.strip().upper() for x in args.modules_list.replace(';',',').split(',')]
+        if ModuleInformation['ModuleID'].upper() in ModulesList:
+            print 'analyse folder '+ FinalModuleResultsPath +'\n'
+            return True
+        else:
+            print 'do not analyse folder '+ FinalModuleResultsPath +'\n'
+            return False
+
     if os.path.exists(md5FileName):
         if verbose: print 'md5 sum exists %s'%md5FileName
         bSameFiles = hasher.compare_two_files('checksum.md5',md5FileName)
