@@ -57,8 +57,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         # set histogram options
         HistogramOptions = {
             'RootFileHistogramName': 'PHCalibrationGain',
-            'GradeJsonPath': ['Chips','Chip{Chip}', 'Grading','KeyValueDictPairs.json','PixelDefectsGrade','Value'],
-            'RootFilePath': ['Chips' ,'Chip{Chip}', 'PHCalibrationGain', '*.root'],
+            'GradeJsonPath': ['Chips', 'Chip{Chip}', 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsGrade', 'Value'],
+            'RootFilePath': ['Chips', 'Chip{Chip}', 'PHCalibrationGain', 'PHCalibrationGain.root'],
             'StatsPosition': [0.20,0.88,0.80,0.88],
             'LegendPosition': [0.2, 0.88],
             'XTitle': "Gain [Vcal/ADC]",

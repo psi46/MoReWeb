@@ -33,7 +33,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             'ModuleVersion':self.Attributes['ModuleVersion'],
                 })
 
-                print "ST KEY:", 'Chip%d_%s'%(self.Attributes['ChipNo'], StorageKey)
             else:
                 SubtestDict = {
                         'Key': ChipTest.split('.')[-1],

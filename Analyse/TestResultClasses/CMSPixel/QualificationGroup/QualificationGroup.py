@@ -82,6 +82,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         try:
             if len(self.ResultData['SubTestResultDictList']) > 0:
                 TestCenter = self.ResultData['SubTestResultDictList'][0]['InitialAttributes']['TestCenter']
+            else:
+                TestCenter = ''
         except:
             TestCenter = ''
 
@@ -159,20 +161,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def analyse_test_list(self, testList):
         tests = []
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
-        test = testchain.next()
-        Testnames = []
-        while test:
-            env = AbstractClasses.Helper.environment.environment(test.test_str, self.initParser)
-            test.environment = env
-            test.testname = test.test_str.split("@")[0]
-            Testnames.append(test.test_str.split("@")[0])
-            test = test.next()
-        index = 0
-        test = testchain.next()
-        if not ('HREfficiency' in Testnames):
-            tests, test, index = self.appendTemperatureGraph(tests, test, index)
-            tests, test, index = self.appendHumidityGraph(tests, test, index)
-        HRTestAdded = False
+        if testchain:
+            test = testchain.next()
+            Testnames = []
+            while test:
+                env = AbstractClasses.Helper.environment.environment(test.test_str, self.initParser)
+                test.environment = env
+                test.testname = test.test_str.split("@")[0]
+                Testnames.append(test.test_str.split("@")[0])
+                test = test.next()
+            index = 0
+            test = testchain.next()
+            if not ('HREfficiency' in Testnames):
+                tests, test, index = self.appendTemperatureGraph(tests, test, index)
+                tests, test, index = self.appendHumidityGraph(tests, test, index)
+            HRTestAdded = False
+        else:
+            test = None
 
         self.TestResultEnvironmentObject.IVCurveFiles = {}
 
@@ -224,18 +229,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if not QualificationAdded:
             print "no qualifications found, looking for single tests"
             #testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
-            test = testchain.next()
-            index = 0
-            while test:
-                if test.testname.lower() in [x.lower() for x in singleTestsList]:
-                    print '\t-> appendSingleTest %s'%test.testname
-                    tests, test, index = self.appendSingleTest(tests, test, index)
-                    QualificationAdded = True
-                else:
-                    if self.verbose:
-                        print '\t-> cannot convert ', test.testname
-                    index += 1
-                    test = test.next()
+            if testchain:
+                test = testchain.next()
+                index = 0
+                while test:
+                    if test.testname.lower() in [x.lower() for x in singleTestsList]:
+                        print '\t-> appendSingleTest %s'%test.testname
+                        tests, test, index = self.appendSingleTest(tests, test, index)
+                        QualificationAdded = True
+                    else:
+                        if self.verbose:
+                            print '\t-> cannot convert ', test.testname
+                        index += 1
+                        test = test.next()
 
         # check root files in subfolders directly and try to find something...
         if not QualificationAdded:

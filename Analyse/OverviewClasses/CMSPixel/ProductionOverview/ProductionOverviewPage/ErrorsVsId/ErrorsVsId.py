@@ -109,7 +109,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for DTB_FW in DTB_FWs:
                 binX = 1
                 for nErrors in data[DTB_FW]:
-                    print "SBC:", DTB_FW, binX, nErrors
                     Histograms[DTB_FW].SetBinContent(binX, nErrors)
                     binX += 1
 

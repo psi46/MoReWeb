@@ -659,7 +659,7 @@ class GeneralProductionOverview:
 
                         Path = '/'.join(RootFilePath)
                         RootFiles = glob.glob(Path)
-                        ROOTObject = copy.copy(self.GetHistFromROOTFile(RootFiles, HistogramOptions['RootFileHistogramName'])) # (called PHCalibrationGain) todo: name consistently in creation of .root file
+                        ROOTObject = copy.copy(self.GetHistFromROOTFile(RootFiles, HistogramOptions['RootFileHistogramName']))
 
                         if ROOTObject:
                             NROCs += 1

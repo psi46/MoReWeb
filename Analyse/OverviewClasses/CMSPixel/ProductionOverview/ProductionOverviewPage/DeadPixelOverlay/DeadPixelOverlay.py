@@ -53,6 +53,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         # draw module map
         if self.ModuleMap:
+            ROOT.gStyle.SetOptStat(0)
             self.ModuleMap.Draw(self.Canvas)
 
         self.ModuleMap.DrawCaption({'Test': self.Attributes['Test'], 'NModules': NModules, 'Grades': self.Attributes['Grade']})

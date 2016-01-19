@@ -41,7 +41,11 @@ class ModuleMap:
             self.Map2D.SetContour(NContours)
 
     def AddTH2D(self, ROOTObject, CountMissing=False, GoodRange=None):
-        if ROOTObject.GetNbinsX != self.nBinsX or ROOTObject.GetNbinsY != self.nBinsY:
+        if ROOTObject.GetXaxis().GetNbins() != self.nBinsX or ROOTObject.GetYaxis().GetNbins() != self.nBinsY:
+            if self.verbose:
+                print "cannot copy directly because of different #bins:"
+                print " self: ", self.nBinsX,"x",self.nBinsY
+                print " add: ", ROOTObject.GetXaxis().GetNbins(),"x",ROOTObject.GetYaxis().GetNbins()
             for x in range(1, self.nBinsX+1):
                 for y in range(1, self.nBinsY+1):
                     BinContent = ROOTObject.GetBinContent(x,y)
@@ -56,6 +60,13 @@ class ModuleMap:
 
         else:
             self.Map2D.Add(ROOTObject)
+
+    def AddTH2DChip(self, ROOTObject, Chip, FillFunction):
+        ROOTObjectNbinsX = ROOTObject.GetXaxis().GetNbins()
+        ROOTObjectNbinsY = ROOTObject.GetYaxis().GetNbins()
+        for x in range(1, ROOTObjectNbinsX+1):
+            for y in range(1, ROOTObjectNbinsY+1):
+                self.UpdatePlot(Chip, x, y, FillFunction(ROOTObject.GetBinContent(x, y)))
 
     def GetNbinsX(self):
         return self.nBinsX
