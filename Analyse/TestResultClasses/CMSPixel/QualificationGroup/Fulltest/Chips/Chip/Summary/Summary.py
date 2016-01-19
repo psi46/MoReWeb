@@ -9,7 +9,7 @@ def defectsListLength(defectsList):
     if defectsList is not None:
         return "%d"%len(defectsList)
     else:
-        return '0'
+        return '#'
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 

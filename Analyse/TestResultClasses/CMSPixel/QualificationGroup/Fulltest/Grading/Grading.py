@@ -55,19 +55,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             SubGrading = []
             ChipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
             for j in ChipResults:
-                ChipGradingTestResultObject = j['TestResultObject'].ResultData['SubTestResults']['Grading']
+                try:
+                    ChipGradingTestResultObject = j['TestResultObject'].ResultData['SubTestResults']['Grading']
 
-                # Grading 
-                ChipGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
-                    TestResultObject.Attributes['SpecialPopulateDataParameters'], 1)
-                SubGrading.append('%d' % ChipGrade)
+                    # Grading
+                    ChipGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
+                        TestResultObject.Attributes['SpecialPopulateDataParameters'], 1)
+                    SubGrading.append('%d' % ChipGrade)
 
-                ChipGradeMean = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
-                    TestResultObject.Attributes['SpecialPopulateDataParameters'], 1, False)
-                self.ResultData['HiddenData']['SubGrading_%s_Mean_C%d'%(i, j['TestResultObject'].Attributes["ChipNo"])] = {'Label': 'Subgrade', 'Value': ChipGradeMean}
+                    ChipGradeMean = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
+                        TestResultObject.Attributes['SpecialPopulateDataParameters'], 1, False)
+                    self.ResultData['HiddenData']['SubGrading_%s_Mean_C%d'%(i, j['TestResultObject'].Attributes["ChipNo"])] = {'Label': 'Subgrade', 'Value': ChipGradeMean}
 
-                ModuleGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
-                    TestResultObject.Attributes['SpecialPopulateDataParameters'], ModuleGrade)
+                    ModuleGrade = ChipGradingTestResultObject.GetSingleChipSubtestGrade(
+                        TestResultObject.Attributes['SpecialPopulateDataParameters'], ModuleGrade)
+                except:
+                    SubGrading.append('C')
 
             if self.verbose:
                 print '%s: %s'%(i,SubGrading)

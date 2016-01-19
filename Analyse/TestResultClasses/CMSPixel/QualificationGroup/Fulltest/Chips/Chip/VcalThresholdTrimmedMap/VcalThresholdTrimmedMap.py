@@ -35,7 +35,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for col in range(0, ThresholdMap.GetNbinsX()):
             for row in range(0, ThresholdMap.GetNbinsY()):
                 threshold = ThresholdMap.GetBinContent(col + 1, row + 1)
-                if (ChipNo, col, row) not in DeadPixelList:
+                if DeadPixelList is None or (ChipNo, col, row) not in DeadPixelList:
                     self.ResultData['Plot']['ROOTObject'].Fill(col, row, threshold)
 
 

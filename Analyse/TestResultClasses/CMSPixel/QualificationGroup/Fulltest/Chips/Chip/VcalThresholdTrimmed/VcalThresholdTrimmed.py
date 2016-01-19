@@ -32,7 +32,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for col in range(0, ThresholdMap.GetNbinsX()):
             for row in range(0, ThresholdMap.GetNbinsY()):
                 threshold = ThresholdMap.GetBinContent(col + 1, row + 1)
-                if (ChipNo, col, row) not in DeadPixelList:
+                if DeadPixelList is None or (ChipNo, col, row) not in DeadPixelList:
                     self.ResultData['Plot']['ROOTObject'].Fill(threshold)
 
         bin_min = self.ResultData['Plot']['ROOTObject'].FindFirstBinAbove()
@@ -128,7 +128,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['Plot']['ROOTObject_Map']:
             for column in range(self.nCols):  # Column
                 for row in range(self.nRows):  # Row
-                    if (ChipNo, column, row) not in DeadPixelList:
+                    if DeadPixelList is None or (ChipNo, column, row) not in DeadPixelList:
                         self.HasThresholdDefect(column, row)
 
         self.Title = 'Vcal Threshold Trimmed'

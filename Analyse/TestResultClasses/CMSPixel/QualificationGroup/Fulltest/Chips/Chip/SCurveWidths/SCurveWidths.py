@@ -100,9 +100,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         Threshold = float(LineArray[0])
                         Width = float(LineArray[1])
 
-                        if self.verbose:  print column, row, Threshold, Width
+                        if self.verbose:
+                            print column, row, Threshold, Width
 
-                        if (ChipNo, column, row) not in DeadPixelList:
+                        if DeadPixelList is None or (ChipNo, column, row) not in DeadPixelList:
                             self.ResultData['Plot']['ROOTObject'].Fill(Width)
 
                             if Width < NoiseMin or Width > NoiseMax:

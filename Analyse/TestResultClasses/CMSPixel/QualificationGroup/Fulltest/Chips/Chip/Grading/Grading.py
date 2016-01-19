@@ -113,10 +113,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['HiddenData']['DefectsGradingComplete'] = False
 
         # subtract dead pixels explicitly from individual defects which do not exclude them implicitly
-        self.ResultData['HiddenData']['AddressProblemList'] = self.ResultData['HiddenData']['AddressProblemList'] - self.ResultData['HiddenData']['DeadPixelList']
-        self.ResultData['HiddenData']['DeadBumpList'] = self.ResultData['HiddenData']['DeadBumpList'] - self.ResultData['HiddenData']['DeadPixelList']
-        self.ResultData['HiddenData']['DeadTrimbitsList'] = self.ResultData['HiddenData']['DeadTrimbitsList'] - self.ResultData['HiddenData']['DeadPixelList']
-        self.ResultData['HiddenData']['MaskDefectList'] = self.ResultData['HiddenData']['MaskDefectList'] - self.ResultData['HiddenData']['DeadPixelList']
+        if  self.ResultData['HiddenData']['DeadPixelList'] is not None:
+            self.ResultData['HiddenData']['AddressProblemList'] = self.ResultData['HiddenData']['AddressProblemList'] - self.ResultData['HiddenData']['DeadPixelList'] if self.ResultData['HiddenData']['AddressProblemList'] is not None else None
+            self.ResultData['HiddenData']['DeadBumpList'] = self.ResultData['HiddenData']['DeadBumpList'] - self.ResultData['HiddenData']['DeadPixelList'] if self.ResultData['HiddenData']['DeadBumpList'] is not None else None
+            self.ResultData['HiddenData']['DeadTrimbitsList'] = self.ResultData['HiddenData']['DeadTrimbitsList'] - self.ResultData['HiddenData']['DeadPixelList'] if self.ResultData['HiddenData']['DeadTrimbitsList'] is not None else None
+            self.ResultData['HiddenData']['MaskDefectList'] = self.ResultData['HiddenData']['MaskDefectList'] - self.ResultData['HiddenData']['DeadPixelList'] if self.ResultData['HiddenData']['MaskDefectList'] is not None else None
 
         # total defects grading
         PixelDefectsGradeALimit = self.TestResultEnvironmentObject.GradingParameters['defectsB']
@@ -132,7 +133,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # mask defects grading
         MaskDefectsGradeALimit = self.TestResultEnvironmentObject.GradingParameters['maskDefectsB']
         MaskDefectsGradeBLimit = self.TestResultEnvironmentObject.GradingParameters['maskDefectsC']
-        maskDefects = len(self.ResultData['HiddenData']['MaskDefectList'])
+        maskDefects = len(self.ResultData['HiddenData']['MaskDefectList']) if self.ResultData['HiddenData']['MaskDefectList'] is not None else 0
         if pixelDefectsGrade == 1 and maskDefects >= MaskDefectsGradeALimit:
             pixelDefectsGrade = 2
         if maskDefects >= MaskDefectsGradeBLimit:
