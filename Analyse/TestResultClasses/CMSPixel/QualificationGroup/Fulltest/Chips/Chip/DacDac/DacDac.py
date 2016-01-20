@@ -17,7 +17,10 @@ class TestResult(GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         ROOTFile = self.ParentObject.ParentObject.FileHandle
 
-        self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(ROOTFile, HistoName, rocNo=ChipNo).Clone(self.GetUniqueID())
+        try:
+            self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(ROOTFile, HistoName, rocNo=ChipNo).Clone(self.GetUniqueID())
+        except:
+            self.ResultData['Plot']['ROOTObject'] = None
 
         if self.ResultData['Plot']['ROOTObject']:
             self.ResultData['Plot']['ROOTObject'].Draw("colz")
