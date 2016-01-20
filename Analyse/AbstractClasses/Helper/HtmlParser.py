@@ -70,14 +70,19 @@ class HtmlParser:
         if stop<0 :
             return '';
         
-    
         content = content[start:stop];
+
+        #added Nov16,2015: little speedup
+        contentS = content.strip()
+        if contentS.startswith('-->') and contentS.endswith('<!--'):
+            return contentS[3:-4]
+
         matches = {};
-        
         matches = re.search('^([^\\<]*\\-\\-\\>)((.|\n)*)(\\<\\!\\-\\-[^\\>]*)$', content)
         if matches :
             return matches.group(2);
         
+
     
         # Resetting matches
         matches = {};
@@ -104,27 +109,27 @@ class HtmlParser:
     * @param boolean recursive If recursive is set, the function calls itself with the content set to the remaining part of the content after the second marker. This means that proceding subparts are ALSO substituted!
     * @param boolean keepMarker If set, the marker around the subpart is not removed, but kept in the output
     * @return string Processed input content
+
+    * modified: 16. Nov2015: replace slow regular expression by python string functions   (~20 times faster!!)
     '''
     def substituteSubpart(self, content, marker, subpartContent, recursive = True, keepMarker = False) :
         start = content.find( marker);
         if start < 0  :
             return content;
-        
-    
+
         startAM = start + len(marker);
         stop = content.find( marker, startAM);
         if stop < 0 :
             return content;
-        
-    
+
         stopAM = stop + len(marker);
         before = content[0:start];
+
         after = content[stopAM:];
         between = content[startAM:stop - startAM];
         if recursive :
             after = self.substituteSubpart(after, marker, subpartContent, recursive, keepMarker);
-        
-    
+
         if keepMarker :
             matches = {};
             matches = re.search('^([^\\<]*\\-\\-\\>)((.|\n)*)(\\<\\!\\-\\-[^\\>]*)$', between)
@@ -148,46 +153,37 @@ class HtmlParser:
                     else :
                         before += marker;
                         after = marker + after;
-            
-    
-        
+
         else :
-            matches = {};
-            matches = re.search('^((.|\n)*)\\<\\!\\-\\-[^\\>]*$', before) 
-            if matches:
-                before = matches.group(1);
+            if before.strip().endswith('<!--'):
+                before=before.strip()[0:-4]
             
-            if isinstance(subpartContent, list) or isinstance(subpartContent, dict) :
-                matches = {};
-                matches = re.search('^([^\\<]*\\-\\-\\>)((.|\n)*)(\\<\\!\\-\\-[^\\>]*)$', between)
-                if  matches :
-                    between = matches.group(2);
+            if isinstance(subpartContent, list) or isinstance(subpartContent, dict):
+
+                pos1 = between.find('-->')
+                pos2 = between.rfind('<!--')
+                if pos1 > -1 and pos2 > -1:
+                    between = between[pos1+3:pos2]
                 else:
-                    matches = matches = re.search('^((.|\n)*)(\\<\\!\\-\\-[^\\>]*)$', between)
-                    if  matches :
-                        between = matches.group(1);
+                    pos2 = between.rfind('<!--')
+                    if pos2 > -1:
+                        between = between[0:pos2]
                     else:
-                        matches = re.search('^([^\\<]*\\-\\-\\>)((.|\n)*)$', between)
-                        if  matches :
-                            between = matches.group(2);
-            
-    
-            
-            matches = {};
-            # resetting matches
-            matches = re.search('^[^\\<]*\\-\\-\\>((.|\n)*)$', after)
-            if  matches :
-                after = matches.group(1);
-            
-        
-    
+                        pos1 = between.find('-->')
+                        if pos1 > -1:
+                            between = between[pos1+3:]
+
+            pos1 = after.find('-->')
+            if pos1 > -1:
+                after = after[pos1+3:]
+
+
         if isinstance(subpartContent, list) or isinstance(subpartContent, dict) :
             between = subpartContent[0] + between + subpartContent[1];
         
         else :
             between = subpartContent;
-        
-    
+
         return before + between + after;
     
 
