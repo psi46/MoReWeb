@@ -209,7 +209,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grade = '('+Grade+')'
             self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value'] = (self.ResultData['KeyValueDictPairs']['EfficiencyGrade']['Value']+'/'+Grade).strip('/')
 
-        EfficiencyFit = "chi2/ndf: {chi2}, # points: {n}".format(chi2=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value'], n=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['NumberFitPoints']['Value'])
+        try:
+            EfficiencyFit = "chi2/ndf: {chi2}, # points: {n}".format(chi2=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value'], n=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['NumberFitPoints']['Value'])
+        except:
+            EfficiencyFit = "fit failed"
         self.ResultData['KeyValueDictPairs']['EfficiencyFit']['Value'] = EfficiencyFit
 
         AliveMapROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
