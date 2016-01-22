@@ -633,7 +633,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     Numbers['nDC'] += 1
                     done = 1
                 for d, grade in defects.iteritems():
-                    if (d == 'lowHR Efficiency' and grade!="" and done == 0 and mod not in modNorate):
+                    if (d == 'lowHREfficiency' and grade!="" and done == 0 and mod not in modNorate):
                         if grade == "C":
                             Numbers['nLowHREf'] += 1
                             done = 1
