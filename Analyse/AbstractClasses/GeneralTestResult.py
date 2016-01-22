@@ -1352,8 +1352,11 @@ class GeneralTestResult(object):
         JSONDictionary = {}
         f = open(self.FinalResultsStoragePath + '/Dictionary.json', 'w')
         for jsonFileName, absolutePath in matches:
-            with open(absolutePath) as data_file:
-                JSONData = json.load(data_file)
+            try:
+                with open(absolutePath) as data_file:
+                    JSONData = json.load(data_file)
+            except:
+                JSONData = {'file': 'missing or corrupted'}
             JSONDictionary[jsonFileName] = JSONData
         f.write(json.dumps(JSONDictionary, sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
         f.close()
