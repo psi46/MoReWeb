@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-import ROOT
 import AbstractClasses
 import ROOT
-import json
-
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -13,7 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['DacParameters'] = {}
 
     def PopulateResultData(self):
-        ROOT.gPad.SetLogy(0);
+        ROOT.gPad.SetLogy(0)
         NChips = self.ParentObject.Attributes['NumberOfChips']
         StartChip = self.ParentObject.Attributes['StartChip']
        
@@ -22,7 +19,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Ymin = 0.  # minimum / maximum of y-axis values
         Ymax = 255.
 
-        #Line = ROOT.TLine()
         Sum = 0.
         Mean = 0.
         Difference = 0
@@ -43,49 +39,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     strValue = ChipTestResultObject.ResultData['SubTestResults']['OpParameters'].ResultData[
                         'KeyValueDictPairs']['CalDel']['Value']
                     Value = int(strValue)
-                except KeyError as e:
-                    e.message += ' ' + str((Parameters['DataKey'], Parameters['DataParameterKey'], strValue))
-                    if Parameters['DataKey'] not in ChipTestResultObject.ResultData['SubTestResults']:
-                        e.message += '\n\tMissing: %s, Keys: %s' % (
-                            Parameters['DataKey'], ChipTestResultObject.ResultData['SubTestResults'].keys())
-                    elif Parameters['DataParameterKey'] not in \
-                            ChipTestResultObject.ResultData['SubTestResults'][Parameters['DataKey']].ResultData[
-                                'KeyValueDictPairs']:
-                        e.message += '\n\tMissing: %s, Keys: %s ' % (Parameters['DataParameterKey'],
-                                                                     ChipTestResultObject.ResultData['SubTestResults'][
-                                                                         Parameters['DataKey']].ResultData[
-                                                                         'KeyValueDictPairs'].keys())
-                    raise e
-                except TypeError as e:
-                    e.message += ' ' + str((Parameters['DataKey'], Parameters['DataParameterKey'], strValue))
-                    e.message += '.\n\tParamters: %s' % Parameters
-                    e.message += '\n\t Value: %s' % strValue
-                    raise e
+                    Sum += Value
+                    if (CalDelMax<Value):
+                        CalDelMax=Value
+                    if (CalDelMin>Value):
+                        CalDelMin=Value
 
-                except ValueError as e:
-                    e.message += ' ' + str((Parameters['DataKey'], Parameters['DataParameterKey'], strValue))
-                    e.message += '.\n\tParamters: %s' % Parameters
-                    e.message += '\n\t Value: %s' % strValue
-                    raise e
-
-
-                
-                Value = int(Value)
-                Sum += Value
-                if (CalDelMax<Value):
-                    CalDelMax=Value
-                if (CalDelMin>Value):
-                    CalDelMin=Value
-
-                self.ResultData['Plot']['ROOTObject'].SetBinContent(ChipPosition, Value)
-                if 1.2 * Value > Ymax:
-                    Ymax = 1.2 * Value
-                elif 1.2 * Value <= Ymin:
-                    Ymin = 1.2 * Value
-                NChipResults += 1
+                    self.ResultData['Plot']['ROOTObject'].SetBinContent(ChipPosition, Value)
+                    if 1.2 * Value > Ymax:
+                        Ymax = 1.2 * Value
+                    elif 1.2 * Value <= Ymin:
+                        Ymin = 1.2 * Value
+                    NChipResults += 1
+                except:
+                    print "WARNING: cannot read CalDel DAC!"
 
             Mean = Sum / NChipResults if NChipResults > 0 else 0
-            Difference = CalDelMax -  CalDelMin
+            Difference = CalDelMax - CalDelMin
 
             self.ResultData['Plot']['ROOTObject'].SetMarkerColor(ROOT.kPink)
             self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kPink)
@@ -120,5 +90,3 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
         self.ResultData['KeyList'] = ['mu','caldelspread']
-        
-        

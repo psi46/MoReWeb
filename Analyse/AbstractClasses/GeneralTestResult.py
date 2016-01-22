@@ -356,8 +356,6 @@ class GeneralTestResult(object):
         #
         # if not 'KeyValueList' in self.ResultData:
         # self.ResultData['KeyValueList'] = []
-        if self.verbose:
-            print 'checking', self.RawTestSessionDataPath, comment_files
         if comment != '':
             if self.verbose:
                 print 'added comment', comment, 'to ', self.Name

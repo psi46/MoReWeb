@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
-import ROOT
+import AbstractClasses.Helper.HistoGetter as HistoGetter
 import os
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
@@ -26,9 +26,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Max': {
                 'Value': '{0:1.2f}'.format(0),
                 'Label': 'max'
-            }
+            },
+            'NROCsNotProgrammable': {
+                'Value': '0',
+                'Label': 'ROCs not programmable',
+            },
         }
-        self.ResultData['KeyList'] = ['IanaLossProblems', 'Mean', 'Min', 'Max']
+        self.ResultData['KeyList'] = ['IanaLossProblems', 'Mean', 'Min', 'Max', 'NROCsNotProgrammable']
+        self.ResultData['HiddenData']['IanaLossProblems'] = False
+        self.ResultData['HiddenData']['ROCsNotProgrammable'] = []
 
     def PopulateResultData(self):
 
@@ -54,11 +60,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             IanaLossPerRoc = [float(x.replace('->', '').replace('<-', '').strip()) for x in IanaLossString.strip().split(' ') if len(x.replace('->', '').replace('<-', '').strip()) > 0]
                             break
 
+        # check if ROCs are not programmable
+        try:
+            HistogramName = self.ParentObject.HistoDict.get('Pretest', 'ProgramROC')
+            ProgramROCHistogram = HistoGetter.get_histo(self.ParentObject.FileHandle, HistogramName)
+        except Exception as e:
+            print "WARNING: program ROC histogram not found!"
+            ProgramROCHistogram = None
+
+        if ProgramROCHistogram:
+            NBins = ProgramROCHistogram.GetXaxis().GetNbins()
+            for i in range(1, NBins + 1):
+                if ProgramROCHistogram.GetBinContent(i) < 5:
+                    self.ResultData['HiddenData']['ROCsNotProgrammable'].append(i)
+            NROCsNotProgrammable = len(self.ResultData['HiddenData']['ROCsNotProgrammable'])
+            self.ResultData['KeyValueDictPairs']['NROCsNotProgrammable']['Value'] = NROCsNotProgrammable
+
         # draw plot if data exists
         if IanaLossPerRoc:
 
             if IanaLossProblems:
                 self.ResultData['KeyValueDictPairs']['IanaLossProblems']['Value'] = 'Yes'
+                self.ResultData['HiddenData']['IanaLossProblems'] = True
             else:
                 self.ResultData['KeyValueDictPairs']['IanaLossProblems']['Value'] = 'No'
 

@@ -144,6 +144,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             delta = abs(binContent - self.vcalTrim)
             if  delta > self.TestResultEnvironmentObject.GradingParameters['tthrTol']:
                 self.ThrDefectList.add((self.chipNo, column, row))
-                print 'ThresholdDefect %2d %2d %2d ' % (self.chipNo, column, row), self.vcalTrim, delta, self.TestResultEnvironmentObject.GradingParameters['tthrTol']
+                if self.verbose:
+                    print 'ThresholdDefect %2d %2d %2d ' % (self.chipNo, column, row), self.vcalTrim, delta, self.TestResultEnvironmentObject.GradingParameters['tthrTol']
                 return True
         return False

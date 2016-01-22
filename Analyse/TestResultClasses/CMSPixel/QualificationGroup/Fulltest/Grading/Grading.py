@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import ROOT
 import AbstractClasses
 
 
@@ -10,11 +9,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = 'Grading'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
-
     def getNumberOfRocsWithGrade(self, Grade, GradeList):
         l = [i for i in GradeList if i == Grade]
         return len(l)
-
 
     def PopulateResultData(self):
         SubGradings = {}
@@ -24,28 +21,30 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             2: 'B',
             3: 'C'
         }
-
+        self.ResultData['HiddenData']['SpecialDefects'] = []
         PixelDefectsRocsA = 0
         PixelDefectsRocsB = 0
         PixelDefectsRocsC = 0
         chipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
         SubGrading = []
+
+        # Grading
+
+        # Chip Grading
         for i in chipResults:
-            if int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
-                'Total']['Value']) > 0.04 * self.nCols * self.nRows:
+
+            ROCSummaryResult = i['TestResultObject'].ResultData['SubTestResults']['Summary']
+            TotalPixelDefectsROC = int(ROCSummaryResult.ResultData['KeyValueDictPairs']['Total']['Value'])
+
+            if TotalPixelDefectsROC > 0.04 * self.nCols * self.nRows:
                 PixelDefectsRocsC += 1
-            elif int(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
-                'Total']['Value']) > 0.01 * self.nCols * self.nRows:
+            elif TotalPixelDefectsROC > 0.01 * self.nCols * self.nRows:
                 PixelDefectsRocsB += 1
             else:
                 PixelDefectsRocsA += 1
+            SubGrading.append(TotalPixelDefectsROC)
 
-            SubGrading.append([
-                i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs'][
-                    'PixelDefectsGrade']['Value'] for i in chipResults])
         SubGradings['PixelDefects'] = SubGrading
-
-        # Grading
 
         # performance parameters grading
         for i in ['Noise', 'VcalThresholdWidth', 'RelativeGainWidth', 'PedestalSpread', 'Parameter1']:
@@ -78,20 +77,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # IV Grading
         IVGrade = 0
-        CurrentAtVoltage150V = 0
-        RecalculatedCurrentAtVoltage150V = 0
-        RecalculatedCurrentVariation = 0
-        CurrentVariation = 0
         if self.ParentObject.ResultData['SubTestResults'].has_key('IVCurve'):
             IVGrade = 1
             IVTestResult = self.ParentObject.ResultData['SubTestResults']['IVCurve']
             CurrentAtVoltage150V = float(IVTestResult.ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
-            if IVTestResult.ResultData['KeyValueDictPairs'].has_key('recalculatedCurrentAtVoltage150V'):
-                RecalculatedCurrentAtVoltage150V = float(
-                    IVTestResult.ResultData['KeyValueDictPairs']['recalculatedCurrentAtVoltage150V']['Value'])
-            if IVTestResult.ResultData['KeyValueDictPairs'].has_key('recalculatedCurrentVariation'):
-                RecalculatedCurrentVariation = float(
-                    IVTestResult.ResultData['KeyValueDictPairs']['recalculatedCurrentVariation']['Value'])
             CurrentVariation = float(IVTestResult.ResultData['KeyValueDictPairs']['Variation']['Value'])
 
             # current
@@ -126,8 +115,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         IVGrade = 2
                 else:
                     print "#"*80,"\nWARNING: could not calculate I(+17)/I(-20) ratio, no grading on ratio is done!\n","#"*80
-
-
         else:
             pass
 
@@ -137,15 +124,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if PixelDefectsRocsC > 0:
             ModuleGrade = 3
 
-        nPixelDefectsTotal = 0
+        # HDI ground resistance
+        if self.ParentObject.ResultData['SubTestResults']['IanaLoss'].ResultData['HiddenData']['IanaLossProblems']:
+            print "#"*80,"\nWARNING: module seems to have HDI ground resistance problem!\n","#"*80
+            self.ResultData['HiddenData']['SpecialDefects'].append('HDI_RESISTANCE')
+            ModuleGrade = 3
+
+        # ROCs not programmable
         try:
-            nPixelDefectsGradeA = self.getNumberOfRocsWithGrade('1', SubGradings['PixelDefects'])
-            nPixelDefectsGradeB = self.getNumberOfRocsWithGrade('2', SubGradings['PixelDefects'])
-            nPixelDefectsGradeC = self.getNumberOfRocsWithGrade('3', SubGradings['PixelDefects'])
-        except KeyError as e:
-            print 'Errror', e
-            print SubGradings.keys()
-            raise e
+            NROCsNotProgrammable = int(self.ParentObject.ResultData['SubTestResults']['IanaLoss'].ResultData['KeyValueDictPairs']['NROCsNotProgrammable']['Value'])
+        except:
+            # if no pretest ahs been done
+            NROCsNotProgrammable = 0
+        if NROCsNotProgrammable > 0:
+            print "#"*80,"\nWARNING: some ROCs are not programmable!\n","#"*80
+            self.ResultData['HiddenData']['SpecialDefects'].append('NOT_PROGRAMMABLE')
+            ModuleGrade = 3
 
         # missing subtest results
         MissingSubtests = False
@@ -224,15 +218,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label': 'ROCs < 4% defects'
             },
             'nPixelDefectsGradeA': {
-                'Value': '{0:1.0f}'.format(nPixelDefectsGradeA),
+                'Value': '{0:1.0f}'.format(PixelDefectsRocsA),
                 'Label': 'ROCs with Grade A'
             },
             'nPixelDefectsGradeB': {
-                'Value': '{0:1.0f}'.format(nPixelDefectsGradeB),
+                'Value': '{0:1.0f}'.format(PixelDefectsRocsB),
                 'Label': 'ROCs with Grade B'
             },
             'nPixelDefectsGradeC': {
-                'Value': '{0:1.0f}'.format(nPixelDefectsGradeC),
+                'Value': '{0:1.0f}'.format(PixelDefectsRocsC),
                 'Label': 'ROCs with Grade C'
             },
             'GradeComment': {
