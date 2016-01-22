@@ -35,6 +35,8 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         'nlcstartupC' : 0,
         'nIV150B' : 0,
         'nIV150C' : 0,
+        'nIV150B+' : 0,
+        'nIV150C+' : 0,
         'nIV150m20B' : 0,
         'nIV150m20C' : 0,
         'nIVSlopeB' : 0,
@@ -78,13 +80,16 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         'nBrokenROC' : 0,
         'nHDIf' : 0,
         'nIV' : 0,
+        'nIVP' : 0,
         'ntotDefects' : 0,
         'nSinglePixDefect' : 0,
         'nDC' : 0,
         'nLowHREf' : 0,
         'nOthers' : 0,
         'commentsgradechange' : '',
-        'commentsgradechangeX' : ''
+        'commentsgradechangeX' : '',
+        'nFirstModule' : '',
+        'nLastModule' : '',
 }
 
 
@@ -96,6 +101,10 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
             if not RowTuple['ModuleID'] in ModuleIDsList:
                 ModuleIDsList.append(RowTuple['ModuleID'])
         ModuleIDsList.sort(reverse=True)
+
+        Numbers['nFirstModule'] = ModuleIDsList[0]
+        Numbers['nLastModule'] = ModuleIDsList[len(ModuleIDsList)-1]
+
 
         FullTests = ['m20_1','m20_2','p17_1'][::-1]
         TestTypeLeakageCurrentPON = ['LeakageCurrentPON']
@@ -129,6 +138,10 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
             Complete = ''
 
             ModuleGrades = []
+
+
+
+                
 
             for RowTuple in Rows:
                 if RowTuple['ModuleID']==ModuleID:
@@ -195,14 +208,8 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                         elif TestType == 'XRayHRQualification':
                             for i in range (0,16):
                                 PixdefectsX[i] = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%i, 'Grading' ,'KeyValueDictPairs.json', 'PixelDefects', 'Value'])
-                            	Nuniformity[i] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%i,'Grading' ,'KeyValueDictPairs.json', 'NumberOfNonUniformColumns','Value'])
-                                NnoiseX[i] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],'Chips','Chip%d'%i,'SCurveWidths_100','KeyValueDictPairs.json','over','Value'])
+                            	NnoiseX[i] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],'Chips','Chip%d'%i,'SCurveWidths_100','KeyValueDictPairs.json','over','Value'])
                                 NrateX[i] = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],'Chips','Chip%d'%i,'EfficiencyInterpolation','KeyValueDictPairs.json','InterpolatedEfficiency50','Value'])
-                                try:
-                                    if (int(Nuniformity[i])>0 and int(Nuniformity[i])<3):
-                                        modDC.append(RowTuple['ModuleID'])
-                                except:
-                                    pass
                                 try: 
                                     if float(NnoiseX[i])>500:
                                         brokenrocsx.append(RowTuple['ModuleID'])
@@ -274,6 +281,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 elif 'A' in finalF:
                                     final = 'A'
 
+
                                
                         except:
                             pass
@@ -287,6 +295,10 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 modHDI.append(RowTuple['ModuleID'])  
                             if ("bad double column" in hdicomment):
                                 modDC.append(RowTuple['ModuleID'])
+                            if ("NOT PROGRAMMABLE" in hdicomment):
+                                brokenrocs.append(RowTuple['ModuleID'])
+                            if ("ROC " in hdicomment):
+                                brokenrocs.append(RowTuple['ModuleID'])
                         except:
                             pass
 
@@ -297,7 +309,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 modlc.append(RowTuple['ModuleID'])
                         except:
                             pass
-
+                   
 
 
 
@@ -362,7 +374,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         Path = p
 
         filename = "{Path}/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview/KeyValueDictPairs.json".format(Path=Path)
-        #print filename
+        
     	data = open(filename, 'r')
         moduledefects = json.load(data)
        
@@ -398,6 +410,12 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
 
             for d, grade in defects.iteritems():
 
+                if (d == 'DoubleColumn' and grade!=""):
+                    if grade == "B" :
+                        modDC.append(mod)
+                    elif grade == "C":
+                        modDC.append(mod)
+
                 if (d == 'AddressDefects' and grade!=""):
                     tag = "A"
                     for test, g in grade.iteritems():
@@ -427,7 +445,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                         Numbers['nBBXrayB'] += 1
                     elif grade == "C":
                         Numbers['nBBXrayC'] += 1
-
+                """
                 if (d == 'IV150' and grade!=""):
                     for test, g in grade.iteritems():
                         if g != "" :
@@ -439,8 +457,9 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                                 Numbers['nIV150B'] += 1
                             elif test == "p17_1" and g == "C":
                             	Numbers['nIV150C'] += 1
-	                                           
-	                                            
+	            """                    
+
+
 
                 if (d == 'IVRatio150' and grade!=""):
                     tag = "A"
@@ -599,7 +618,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                 for d, grade in defects.iteritems():
                     if (d == 'LCStartup' and grade!="" and done == 0):
                         if grade == "C":
-                            Numbers['nIV'] += 1
+                            Numbers['nIVP'] += 1
                             done = 1
                 if (mod in modlc and done ==0):
                     Numbers['nIV'] += 1
@@ -614,7 +633,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     Numbers['nDC'] += 1
                     done = 1
                 for d, grade in defects.iteritems():
-                    if (d == 'lowHREfficiency' and grade!="" and done == 0 and mod not in modNorate):
+                    if (d == 'lowHR Efficiency' and grade!="" and done == 0 and mod not in modNorate):
                         if grade == "C":
                             Numbers['nLowHREf'] += 1
                             done = 1
@@ -625,38 +644,47 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'BB_Fulltest' and grade!="" and done == 0):
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'Noise' and grade!="" and done == 0):
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'PedestalSpread' and grade!="" and done == 0):
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'RelativeGainWidth' and grade!="" and done == 0):
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'VcalThrWidth' and grade!="" and done == 0):
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'deadPixels' and grade!="" and done == 0):
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'maskDefects' and grade!="" and done == 0):
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'trimbitDefects' and grade!="" and done == 0):
                         for test, g in grade.iteritems():
                             if g == "C":
                                 numberdefects += 1
+                                break
                     if (d == 'BB_X-ray' and grade!="" and done == 0):
                         if grade == "C":
                             numberdefects += 1
@@ -670,6 +698,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                         for test, g in grade.iteritems():
                             if g == "C":
                                 totdefects += 1
+                                break
                 if numberdefects == 1 and done == 0:
                     Numbers['nSinglePixDefect'] += 1
                     done = 1
@@ -682,6 +711,51 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     Numbers['nOthers'] += 1
                     done = 1
 
+
+        for ModuleID in ModuleIDsList:
+
+            lcm20 = 0
+            lcp17 = 0
+
+
+                
+
+            for RowTuple in Rows:
+                if RowTuple['ModuleID']==ModuleID:
+                    TestType = RowTuple['TestType']
+
+                    if (TestType == "m20_2"):
+                        try: 
+                            lcm20 = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'ModuleFulltestPxar_m20_2', 'IVCurve','KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
+                            if not lcm20:
+                                lcm20 = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'ModuleFulltest_m20_2', 'IVCurve','KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
+                        except:
+                            pass
+
+                    if (TestType == "p17_1"):
+                        try: 
+                            lcp17 = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'ModuleFulltestPxar_p17_1', 'IVCurve','KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
+                            if not lcp17:
+                                lcp17 = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'ModuleFulltest_p17_1', 'IVCurve','KeyValueDictPairs.json', 'CurrentAtVoltage150V', 'Value'])
+                        except:
+                            pass
+                                
+
+
+            if (ModuleID not in modHDI):
+                try:
+                    if (float(lcp17)>10 and float(lcm20)<2): 
+                        Numbers['nIV150C'] += 1
+                    elif (float(lcp17)>2 and float(lcm20)<2):
+                        Numbers['nIV150B'] += 1
+                    elif (float(lcp17)>10 and float(lcm20)>2): 
+                        Numbers['nIV150C+'] += 1
+                    elif (float(lcp17)>2 and float(lcm20)>2):
+                        Numbers['nIV150B+'] += 1
+                    if (float(lcm20)>2):
+                        Numbers['nIV150m20B'] += 1
+                except:
+                    pass
 
         Numbers['commentsgradechange'] = comments
         Numbers['commentsgradechangeX'] = commentsX

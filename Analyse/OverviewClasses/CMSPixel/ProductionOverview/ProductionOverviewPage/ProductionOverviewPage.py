@@ -213,7 +213,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             )
 
 
-
+        """
         ### bump bonding ###
         if not self.singleSubtest or 'BumpBonding' in self.singleSubtest:
             self.SubPages.append({"InitialAttributes" : {"Anchor": "BumpBonding", "Title": "BumpBonding Defects"}, "Key": "Section","Module": "Section"})
@@ -603,7 +603,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         }
                     }
                 )
-
+        """
         ### Full test duration ###
         if not self.singleSubtest or 'Duration' in self.singleSubtest:
             self.SubPages.append(
