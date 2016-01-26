@@ -46,7 +46,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         except:
             pass
 
-        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'BB_X-ray', 'lowHREfficiency', 'DoubleColumn', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
+        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'ManualGradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'ManualGradeHR', 'BB_X-ray', 'lowHREfficiency', 'DoubleColumn', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         Summary.GetYaxis().SetTickLength(0)
@@ -62,6 +62,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TestTypeLeakageCurrentPON = ['LeakageCurrentPON']
         TestTypeXrayHR = 'XRayHRQualification'
 
+        ColorA = 0.5
         ColorB = 0.84
         ColorC = 1.00
 
@@ -158,6 +159,25 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 DefectsDict[ModuleID]['GradeFT'][RowTuple['TestType']] = 'C'
                             elif Value == 2:
                                 DefectsDict[ModuleID]['GradeFT'][RowTuple['TestType']] = 'B'
+                        except:
+                            self.ProblematicModulesList.append(ModuleID)
+
+        ### ManualGradeFT
+                    Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ManualGrade', 'Value'])
+                    if Value is not None:
+                        try:
+                            GradeNames = ['A', 'B', 'C']
+                            if Value in GradeNames:
+                                Value = 1 + GradeNames.index(Value)
+                            else:
+                                Value = int(Value)
+                            if Value == 3:
+                                DefectsDict[ModuleID]['ManualGradeFT'][RowTuple['TestType']] = 'C'
+                            elif Value == 2:
+                                DefectsDict[ModuleID]['ManualGradeFT'][RowTuple['TestType']] = 'B'
+                            elif Value == 1:
+                                # also list grade A here because it can negate effect of other defects!
+                                DefectsDict[ModuleID]['ManualGradeFT'][RowTuple['TestType']] = 'A'
                         except:
                             self.ProblematicModulesList.append(ModuleID)
 
@@ -323,6 +343,24 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 DefectsDict[ModuleID]['GradeHR'] = 'B'
                         except:
                             self.ProblematicModulesList.append(ModuleID)
+        ### ManualGradeHR
+                    Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ManualGrade', 'Value'])
+                    if Value is not None:
+                        try:
+                            GradeNames = ['A', 'B', 'C']
+                            if Value in GradeNames:
+                                Value = 1 + GradeNames.index(Value)
+                            else:
+                                Value = int(Value)
+                            if Value == 3:
+                                DefectsDict[ModuleID]['ManualGradeHR'] = 'C'
+                            elif Value == 2:
+                                DefectsDict[ModuleID]['ManualGradeHR'] = 'B'
+                            elif Value == 1:
+                                # also list grade A here because it can negate effect of other defects!
+                                DefectsDict[ModuleID]['ManualGradeHR'] = 'A'
+                        except:
+                            self.ProblematicModulesList.append(ModuleID)
 
         ### defectiveBumps X-ray
                     BBGrades = []
@@ -448,6 +486,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorC)
                         elif Grade == 'B':
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorB)
+                        elif Grade == 'A':
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorA)
                         else:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ROOT.kBlue)
                 else:
@@ -457,6 +497,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorC)
                         elif Grade == 'B':
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorB)
+                        elif Grade == 'A':
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorA)
                         else:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ROOT.kBlue)
  
