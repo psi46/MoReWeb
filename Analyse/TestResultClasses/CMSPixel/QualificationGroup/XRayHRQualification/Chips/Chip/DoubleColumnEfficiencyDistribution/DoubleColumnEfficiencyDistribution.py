@@ -10,7 +10,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_%s_TestResult'%self.NameSingle
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
         self.ResultData['KeyValueDictPairs'] = {}
-        
+        self.ResultData['KeyValueDictPairs']['NBadDoubleColumns'] = {
+            'Label': 'Bad Double Columns',
+            'Value': '-1'
+        }
+
         
     def PopulateResultData(self):
         self.Canvas.Clear()
@@ -33,6 +37,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # calculate efficiencies for all rates
         DoubleColumnEfficiencies = []
         BadDoubleColumns = []
+        NonEmptyDoubleColumnFound = False
         for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             DoubleColumnEfficienciesRate = []
 
@@ -92,43 +97,47 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
                 try:
-                    cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 5, 150)
-                    cubicFit.SetParameter(0, 100.0)
-                    cubicFit.SetParLimits(0, 0.0, 110.0)
-                    cubicFit.SetParameter(1, 5.0e-7)
-                    cubicFit.SetParLimits(1, 0, 1.0e-5)
+                    if len(DoubleColumnRateList) > 0:
+                        cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 5, 150)
+                        cubicFit.SetParameter(0, 100.0)
+                        cubicFit.SetParLimits(0, 0.0, 110.0)
+                        cubicFit.SetParameter(1, 5.0e-7)
+                        cubicFit.SetParLimits(1, 0, 1.0e-5)
 
-                    EfficiencyGraph = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList)
-                    EfficiencyGraph.Fit(cubicFit, 'QRB')
-                    InterpolatedEfficiency = cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor)
+                        EfficiencyGraph = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList)
+                        EfficiencyGraph.Fit(cubicFit, 'QRB')
+                        InterpolatedEfficiency = cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor)
 
-                    if InterpolationRate < 121:
-                        if DoubleColumn in [0,25]:
-                            if InterpolatedEfficiency*0.01 < MinDCEfficiencyEdge:
-                                print "        Edge DC with bad efficiency found!"
-                                print "            rates:", DoubleColumnRateList
-                                print "            eff:", DoubleColumnEfficiencyList
+                        if InterpolationRate < 121:
+                            if DoubleColumn in [0,25]:
+                                if InterpolatedEfficiency*0.01 < MinDCEfficiencyEdge:
+                                    print "        Edge DC with bad efficiency found!"
+                                    print "            rates:", DoubleColumnRateList
+                                    print "            eff:", DoubleColumnEfficiencyList
 
-                                print "        -> e(120MHz/cm2) =  ", InterpolatedEfficiency
-                                BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
-                        else:
-                            if InterpolatedEfficiency*0.01 < MinDCEfficiencyFiducial:
-                                print "        DC with bad efficiency found!"
-                                print "            rates:", DoubleColumnRateList
-                                print "            eff:", DoubleColumnEfficiencyList
+                                    print "        -> e(120MHz/cm2) =  ", InterpolatedEfficiency
+                                    BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
+                            else:
+                                if InterpolatedEfficiency*0.01 < MinDCEfficiencyFiducial:
+                                    print "        DC with bad efficiency found!"
+                                    print "            rates:", DoubleColumnRateList
+                                    print "            eff:", DoubleColumnEfficiencyList
 
-                                print "        -> e(120MHz/cm2) =  ", InterpolatedEfficiency
-                                BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
+                                    print "        -> e(120MHz/cm2) =  ", InterpolatedEfficiency
+                                    BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
 
-                    DoubleColumnEfficienciesRate.append(InterpolatedEfficiency)
-                    cubicFit.Delete()
-                    EfficiencyGraph.Delete()
+                        DoubleColumnEfficienciesRate.append(InterpolatedEfficiency)
+                        cubicFit.Delete()
+                        EfficiencyGraph.Delete()
+                        NonEmptyDoubleColumnFound = True
+                    else:
+                        pass
+
                 except:
                     BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_FIT})
 
             DoubleColumnEfficiencies.append(DoubleColumnEfficienciesRate)
 
-        
         # get minimum efficiency
         AllDoubleColumnEfficiencies = [item for sublist in DoubleColumnEfficiencies for item in sublist]
         try:
@@ -170,7 +179,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.SaveCanvas()
 
         self.ResultData['HiddenData']['BadDoubleColumns'] = BadDoubleColumns
-        self.ResultData['KeyValueDictPairs']['NBadDoubleColumns'] = {'Label': 'Bad Double Columns', 'Value': len(set([BadDoubleColumn['DoubleColumn'] for BadDoubleColumn in BadDoubleColumns]))}
+        if NonEmptyDoubleColumnFound:
+            self.ResultData['KeyValueDictPairs']['NBadDoubleColumns']['Value'] = len(set([BadDoubleColumn['DoubleColumn'] for BadDoubleColumn in BadDoubleColumns]))
+
         self.ResultData['KeyList'].append('NBadDoubleColumns')
 
         try:

@@ -58,6 +58,8 @@ class GeneralProductionOverview:
         self.ParentObject = ParentObject
         self.ProblematicModulesList = []
         self.FullQualificationFullTests = ['m20_1', 'm20_2', 'p17_1']
+        self.HiddenData = {}
+        self.SubtestResults = {}
         ### custom init
         self.CustomInit()
 
@@ -304,16 +306,20 @@ class GeneralProductionOverview:
             InitialAttributes['BasePath'] = self.Attributes['BasePath']
 
             ### instanciate submodule
-            SubPageClass = SubPage['ProductionOverview'].ProductionOverview(TestResultEnvironmentObject=self.TestResultEnvironmentObject, InitialAttributes = InitialAttributes, ParentObject = self, Verbose=self.Verbose)
+            SubPageObject = SubPage['ProductionOverview'].ProductionOverview(TestResultEnvironmentObject=self.TestResultEnvironmentObject, InitialAttributes = InitialAttributes, ParentObject = self, Verbose=self.Verbose)
 
             ### generate html overview of submodule
             #try:
-            SubPageContentHTML = SubPageClass.GenerateOverview()
+            SubPageContentHTML = SubPageObject.GenerateOverview()
+
+            self.SubtestResults[SubPage['Key']] = {}
+            self.SubtestResults[SubPage['Key']]['HiddenData'] = SubPageObject.HiddenData
             #except:
             #    SubPageContentHTML = "sub page module not found or 'SubPage['ProductionOverview'].GenerateOverview()' failed"
 
             ### add to this module html page
-            ContentHTML += SubPageContentHTML
+            if SubPageContentHTML is not None:
+                ContentHTML += SubPageContentHTML
 
         FinalHTML = HtmlParser.substituteSubpart(
             FinalHTML,

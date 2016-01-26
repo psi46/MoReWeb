@@ -173,7 +173,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 while (NumModulesToShow > 0):
                     self.SubPages.append(
                         {
-                            "Key": "ModuleFailuresOverview",
+                            "Key": "ModuleFailuresOverview_%d"%Offset,
                             "Module": "ModuleFailuresOverview",
                             "InitialAttributes" : {
                                 "StorageKey" : "ModuleFailuresOverview_%d"%Offset,
@@ -213,6 +213,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             )
 
 
+
+        self.SubPages.append(
+            {
+                "Key": "PrimaryFailureReason",
+                "Module": "PrimaryFailureReason",
+                "InitialAttributes" : {
+                    "DateBegin": self.Attributes['DateBegin'],
+                    "DateEnd": self.Attributes['DateEnd'],
+                },
+            }
+        )
 
         ### bump bonding ###
         if not self.singleSubtest or 'BumpBonding' in self.singleSubtest:
@@ -337,7 +348,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         }
                     }
                 )
-        if not self.singleSubtest or 'ModuleFailureOverview' in self.singleSubtest:
+        if not self.singleSubtest or 'PedestalSpread' in self.singleSubtest:
             for Test in TestsList:
                 self.SubPages.append(
                     {

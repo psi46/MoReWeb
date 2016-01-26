@@ -67,7 +67,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             except:
                 PixelDefects = -1
 
-            if PixelDefects > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_C']:
+            if PixelDefects < 0:
+                TableRow.append(GradeCHTMLTemplate%("#"))
+            elif PixelDefects > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_C']:
                 TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=PixelDefects)))
             elif PixelDefects > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_pixel_defects_B']:
                 TableRow.append(GradeBHTMLTemplate%("{Value:1.0f}".format(Value=PixelDefects)))
@@ -79,7 +81,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 DCDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'])
             except:
                 DCDefects = -1
-            if DCDefects > 0:
+
+            if DCDefects < 0:
+                TableRow.append(GradeCHTMLTemplate%('#'))
+            elif DCDefects > 0:
                 TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=DCDefects)))
             else:
                 TableRow.append("{Value:1.0f}".format(Value=DCDefects))
@@ -88,7 +93,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             RateIndex = 1
             for Rate in self.ParentObject.Attributes['InterpolatedEfficiencyRates']:
                 Efficiency = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value'])
-                if Efficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate%d'%RateIndex]:
+                if Efficiency < 0:
+                    TableRow.append(GradeCHTMLTemplate%("#"))
+                elif Efficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate%d'%RateIndex]:
                     TableRow.append(GradeCHTMLTemplate%("{Value:1.2f}".format(Value=Efficiency)))
                 elif Efficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate%d'%RateIndex]:
                     TableRow.append(GradeBHTMLTemplate%("{Value:1.2f}".format(Value=Efficiency)))
@@ -97,10 +104,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 RateIndex += 1
 
             try:
-                Chi2NDF = ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value']
+                Chi2NDF = float(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value'])
+                if Chi2NDF > 0:
+                    Chi2NDFFormatted = Chi2NDF
+                else:
+                    Chi2NDFFormatted = GradeCHTMLTemplate%("#")
             except:
-                Chi2NDF = -1
-            TableRow.append(Chi2NDF)
+                Chi2NDFFormatted = GradeCHTMLTemplate%("#")
+            TableRow.append(Chi2NDFFormatted)
 
             # rate and bb defects
             for Rate in self.ParentObject.Attributes['Rates']['HRData']:
@@ -132,19 +143,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             try:
                 NonUniformColumns = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
             except:
-                NonUniformColumns = 0
+                NonUniformColumns = -1
 
             try:
                 NonUniformColumnEventsList = ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnEvents']['Value']
                 NonUniformColumnEvents = sum([int(x) for x in NonUniformColumnEventsList.split('/')])
             except:
-                NonUniformColumnEvents = 0
+                NonUniformColumnEvents = -1
 
             if NonUniformColumns > 0 or NonUniformColumnEvents > 0:
                 if NonUniformColumnEvents > 0:
                     TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}+{Value2}".format(Value=NonUniformColumns, Value2=NonUniformColumnEventsList)))
                 else:
                     TableRow.append(GradeCHTMLTemplate%("{Value:1.0f}".format(Value=NonUniformColumns)))
+            elif NonUniformColumns < 0:
+                TableRow.append(GradeCHTMLTemplate%"#")
             else:
                 TableRow.append("{Value:1.0f}".format(Value=NonUniformColumns))
 

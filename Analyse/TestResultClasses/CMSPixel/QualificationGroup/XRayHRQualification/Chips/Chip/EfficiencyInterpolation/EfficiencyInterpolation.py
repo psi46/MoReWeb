@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
-import AbstractClasses.Helper.HistoGetter as HistoGetter
 import array
 import numpy as np
-import math
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -32,7 +30,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Label':'# Bad DCs (excluded from fit)'
         }
         self.ResultData['KeyList'].append('BadDoubleColumns')
-        
+        self.HiddenDataInterpolationRates = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+        for InterpolationRate in self.HiddenDataInterpolationRates:
+            self.ResultData['HiddenData']['InterpolatedEfficiency%d'%int(InterpolationRate)] = {
+                'Label': 'Interpolated Efficiency at %s Mhz/cm2'%int(InterpolationRate),
+                'Value': '-1',
+                'Unit': '%',
+            }
+            self.ResultData['HiddenData']['InterpolatedEfficiency%dError'%int(InterpolationRate)] = {
+                'Label': 'Interpolated Efficiency at %s Mhz/cm2 error'%int(InterpolationRate),
+                'Value': '-1',
+                'Unit': '%',
+            }
+        self.ResultData['KeyValueDictPairs']['Chi2NDF'] = {'Label':'chi2/ndf', 'Value': '-1'}
+        self.ResultData['KeyValueDictPairs']['NumberFitPoints'] = {'Label':'# fit points', 'Value': '-1'}
+
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         
@@ -41,18 +53,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         RealHitrateList = array.array('d', [0])
         EfficiencyList = array.array('d', [100])
         ScalingFactor = 1e-6
-        HiddenDataInterpolationRates = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
-        for InterpolationRate in HiddenDataInterpolationRates:
-            self.ResultData['HiddenData']['InterpolatedEfficiency%d'%int(InterpolationRate)] = {
-                'Label': 'Interpolated Efficiency at %s Mhz/cm2'%int(InterpolationRate),
-                'Value': '0',
-                'Unit': '%',
-            }
-            self.ResultData['HiddenData']['InterpolatedEfficiency%dError'%int(InterpolationRate)] = {
-                'Label': 'Interpolated Efficiency at %s Mhz/cm2 error'%int(InterpolationRate),
-                'Value': '0',
-                'Unit': '%',
-            }
+
+
         DoubleColumnRateList = array.array('d')
         DoubleColumnEfficiencyList = array.array('d')
 
@@ -137,10 +139,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].SetTitle("")
                 InterpolationFunction = cubicFit
 
-                self.ResultData['KeyValueDictPairs']['Chi2NDF'] = {'Label':'chi2/ndf', 'Value': '{0:1.2f}'.format(cubicFit.GetChisquare() / max(cubicFit.GetNDF(), 1))}
+                self.ResultData['KeyValueDictPairs']['Chi2NDF']['Value'] = '{0:1.2f}'.format(cubicFit.GetChisquare() / max(cubicFit.GetNDF(), 1))
                 self.ResultData['KeyList'].append('Chi2NDF')
 
-                self.ResultData['KeyValueDictPairs']['NumberFitPoints'] = {'Label':'# fit points', 'Value': cubicFit.GetNumberFitPoints()}
+                self.ResultData['KeyValueDictPairs']['NumberFitPoints']['Value'] = cubicFit.GetNumberFitPoints()
                 self.ResultData['KeyList'].append('NumberFitPoints')
 
                 self.ResultData['KeyValueDictPairs']['p0'] = {'Label':'p0', 'Value': '{0:1.2f}'.format(cubicFit.GetParameter(0))}
@@ -148,6 +150,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                 self.ResultData['KeyValueDictPairs']['p1'] = {'Label':'p1', 'Value': '{0:1.2e}'.format(cubicFit.GetParameter(1))}
                 self.ResultData['KeyList'].append('p1')
+
 
                 # values to show in summary
                 for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
@@ -173,12 +176,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     #self.ResultData['KeyList'] += ['InterpolatedEfficiency%dError'%int(InterpolationRate)]
 
                 # always interpolate at this rates, but don't show them in summary
-                for InterpolationRate in HiddenDataInterpolationRates:
+                for InterpolationRate in self.HiddenDataInterpolationRates:
                     self.ResultData['HiddenData']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
 
         else:
                 for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
-                    self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=0)
+                    self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=-1)
                     self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)]
 
         self.Title = 'Efficiency Interpolation: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])

@@ -46,7 +46,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         except:
             pass
 
-        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'ManualGradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'ManualGradeHR', 'BB_X-ray', 'lowHREfficiency', 'DoubleColumn', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
+        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'ManualGradeFT', 'DeadROC', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'ManualGradeHR', 'BB_X-ray', 'lowHREfficiency', 'DoubleColumn', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         Summary.GetYaxis().SetTickLength(0)
@@ -180,6 +180,22 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 DefectsDict[ModuleID]['ManualGradeFT'][RowTuple['TestType']] = 'A'
                         except:
                             self.ProblematicModulesList.append(ModuleID)
+
+        ### DeadROC
+                    DeadROCs = 0
+                    for Chip in range(0,16):
+                        NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Summary', 'KeyValueDictPairs.json', 'Total', 'Value'])
+                        if NDefects:
+                            try:
+                                NDefects = int(NDefects)
+                                if NDefects > 3999:
+                                    DeadROCs +=1
+                            except:
+                                self.ProblematicModulesList.append(ModuleID)
+
+                    if DeadROCs > 0:
+                        DefectsDict[ModuleID]['DeadROC'][RowTuple['TestType']] = 'C'
+
 
         ### Pedestal Spread
                     ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PedestalSpreadGradeBROCs', 'Value'])
@@ -460,6 +476,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     elif 'B' in RocGrades:
                         DefectsDict[ModuleID]['TotalDefects_X-ray'] = 'B'
 
+        self.HiddenData['DefectsDict'] = DefectsDict
         # save defects dictionary as json file
         JsonFileName = ''
         try:
