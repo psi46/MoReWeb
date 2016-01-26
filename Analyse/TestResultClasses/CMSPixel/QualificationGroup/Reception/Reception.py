@@ -202,7 +202,7 @@ class TestResult(GeneralTestResult):
                 'CurrentList':[]
             }
         }
-        if self.ResultData['SubTestResults'].has_key('IVCurve'):
+        if 'IVCurve' in self.ResultData['SubTestResults']:
             IVCurveTestResultData = self.ResultData['SubTestResults']['IVCurve'].ResultData
             IVCurveData['CurrentAtVoltage150V'] = 0
             # RecalculatedVoltage = 0
@@ -226,15 +226,14 @@ class TestResult(GeneralTestResult):
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage150V'] = IVCurveData['CurrentAtVoltage150V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
-                
+
             if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
                 IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
             if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
                 IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
             if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
                 IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
-            
-            
+
             if IVCurveTestResultData['KeyValueDictPairs'].has_key(
                     'recalculatedCurrentAtVoltage100V'):
                 IVCurveData['RecalculatedCurrentAtVoltage100V'] = float(
@@ -244,11 +243,10 @@ class TestResult(GeneralTestResult):
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage100V'] = IVCurveData['CurrentAtVoltage100V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
-                
+
             if IVCurveTestResultData['KeyValueDictPairs'].has_key('Variation'):
                 IVCurveData['IVSlope'] = float(
                     IVCurveTestResultData['KeyValueDictPairs']['Variation']['Value'])
-
 
         # fill DB row
         Row = {
@@ -256,19 +254,20 @@ class TestResult(GeneralTestResult):
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
-            'PixelDefects': None,
-            'ROCsLessThanOnePercent': None,
-            'ROCsMoreThanOnePercent': None,
-            'ROCsMoreThanFourPercent': None,
-            'Noise': None,
-            'Trimming': None,
-            'PHCalibration': None,
-            'CurrentAtVoltage150V': None,
-            'CurrentAtVoltage100V': None,
-            'IVSlope': None,
-            'IVCurveFilePath': None,
-            'TestTemperature': None,
-            'Temperature': None,
+            'Grade': None,
+            'PixelDefects': -1,
+            'ROCsLessThanOnePercent': -1,
+            'ROCsMoreThanOnePercent': -1,
+            'ROCsMoreThanFourPercent': -1,
+            'Noise': -1,
+            'Trimming': -1,
+            'PHCalibration': -1,
+            'CurrentAtVoltage150V': -1,
+            'CurrentAtVoltage100V': -1,
+            'IVSlope': -1,
+            'IVCurveFilePath': '',
+            'TestTemperature': -1,
+            'Temperature': -1,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -284,6 +283,7 @@ class TestResult(GeneralTestResult):
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
             'Operator': self.Attributes['Operator'],
+            'Comments': '',
         }
 
         try:
@@ -294,10 +294,14 @@ class TestResult(GeneralTestResult):
                 'IVSlope': IVCurveData['IVSlope'],
                 'IVCurveFilePath':IVCurveData['IVCurveFilePath'],
                 'TestTemperature':IVCurveData['TestTemperature'],
-                'Grade': None,
-                'Comments': None,
+                'Grade': self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Grade']['Value'],
+                'ROCsLessThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'],
+                'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanOnePercent'],
+                'ROCsMoreThanFourPercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanFourPercent'],
+                'Comments': '',
             })
         except:
+            raise
             pass
             #test incomplete
 
