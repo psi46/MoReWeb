@@ -161,6 +161,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def analyse_test_list(self, testList):
         tests = []
         testchain = AbstractClasses.Helper.testchain.parse_test_list(testList)
+
         if testchain:
             test = testchain.next()
             Testnames = []
@@ -175,6 +176,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if not ('HREfficiency' in Testnames):
                 tests, test, index = self.appendTemperatureGraph(tests, test, index)
                 tests, test, index = self.appendHumidityGraph(tests, test, index)
+            tests, test, index = self.appendCurrentGraph(tests, test, index)
             HRTestAdded = False
         else:
             test = None
@@ -361,6 +363,44 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'ModuleType': self.Attributes['ModuleType'],
                         'TestType': 'Humidity',
                         'LogFileName': HumidityLogFileName,
+                    },
+                    'DisplayOptions': {
+                        'Order': len(tests) + 1,
+                        'Width': 5,
+                    }
+                })
+        return tests, test, index
+
+    def appendCurrentGraph(self, tests, test, index):
+        CurrentLogFileName = None
+
+
+
+        FileNamesToCheck = [
+            self.RawTestSessionDataPath+'/IV.log',
+            self.RawTestSessionDataPath+'/logfiles/IV.log',
+        ]
+
+        for FileNameToCheck in FileNamesToCheck:
+            if os.path.isfile(FileNameToCheck):
+                CurrentLogFileName = FileNameToCheck
+                break
+
+
+
+        if CurrentLogFileName is not None:
+            tests.append(
+                {
+                    'Key': 'Current',
+                    'Module': 'Current',
+                    'InitialAttributes': {
+                        'StorageKey': 'ModuleQualification_SumOfCurrents',
+                        'TestResultSubDirectory': 'logfiles',
+                        'ModuleID': self.Attributes['ModuleID'],
+                        'ModuleVersion': self.Attributes['ModuleVersion'],
+                        'ModuleType': self.Attributes['ModuleType'],
+                        'TestType': 'Current',
+                        'LogFileName': CurrentLogFileName,
                     },
                     'DisplayOptions': {
                         'Order': len(tests) + 1,

@@ -212,8 +212,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             )
 
-
-
         self.SubPages.append(
             {
                 "Key": "PrimaryFailureReason",

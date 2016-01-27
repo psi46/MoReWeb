@@ -71,7 +71,8 @@ class MakeProductionSummary:
 
     filename = OutputDirectoryPath + "/ModuleProductionOverview_Week{0}.tex".format(week)
     
-    totIV = args['nIV']
+    totIV = args['nIV'] + args['nIVP']
+    totIVP = args['nIVP']
     totHDI = args['nHDIf']
     totROC = args['nBrokenROC']
     totDC = args['nDC']
@@ -102,6 +103,8 @@ class MakeProductionSummary:
     lcstartupC = args['nlcstartupC']
     IV150B = args['nIV150B']
     IV150C = args['nIV150C']
+    IV150Bandm20 = args['nIV150B+']
+    IV150Candm20 = args['nIV150C+']
     IV150m20B = args['nIV150m20B']
     IV150m20C = args['nIV150m20C']
     IRatio150B = args['nCurrentRatioB']
@@ -140,6 +143,8 @@ class MakeProductionSummary:
     LowHREfC = args['nLowHREfC']
     comments = args['commentsgradechange']
     commentsX = args['commentsgradechangeX']
+    nFirstModule = args['nFirstModule']
+    nLastModule = args['nLastModule']
 
  
 
@@ -150,6 +155,7 @@ class MakeProductionSummary:
 
     lcstartup = round(float(lcstartupC)/nQ*100,1) if nQ > 0 else 0
     IV150 = round(float(IV150C)/nQ*100,1) if nQ > 0 else 0
+    IV150andm20 = round(float(IV150Candm20)/nQ*100,1) if nQ > 0 else 0
     IV150m20 = round(float(IV150m20C)/nQ*100,1) if nQ > 0 else 0
     IVSlope = round(float(IVSlopeC)/nQ*100,1) if nQ > 0 else 0
     totDefects = round(float(totDefectsC)/nQ*100,1) if nQ > 0 else 0
@@ -174,6 +180,7 @@ class MakeProductionSummary:
 
     FHDI = round(float(totHDI)/nQ*100,1) if nQ > 0 else 0
     FIV = round(float(totIV)/nQ*100,1) if nQ > 0 else 0
+    FIVP = round(float(totIVP)/nQ*100,1) if nQ > 0 else 0
     FDC = round(float(totDC)/nQ*100,1) if nQ > 0 else 0
     F1PD = round(float(tot1PD)/nQ*100,1) if nQ > 0 else 0
     FPD = round(float(totPD)/nQ*100,1) if nQ > 0 else 0
@@ -252,7 +259,9 @@ class MakeProductionSummary:
     \end{{table}}
     \\vspace{{1cm}}
     $\Rightarrow$ {Pass} \% yield \\\\
-    $\Rightarrow$ {nQ} modules out of {nT} are completely tested.
+    $\Rightarrow$ {nQ} modules out of {nT} are completely tested. \\\\
+    \\vspace{{0.6cm}}
+    Range of tested modules: {nLastModule} - {nFirstModule}
     }}
 
     \\begin{{frame}}[label=GradeCmodules]
@@ -283,10 +292,11 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
     \\toprule
                                     & Defects             & B & C &  C (\%$^*$)\\\\ \midrule
     \multirow{{5}}{{*}}{{Sensor}}   & $I_{{leak}}$ startup & {lcstartupB} & {lcstartupC} & {lcstartup}\\\\
-                                    & $I_{{leak}}$ (+17)   & {IV150B}     & {IV150C}     & {IV150} \\\\
-                                    & $I_{{leak}}$ (-20)   & {IV150m20B}  & {IV150m20C}  & {IV150m20} \\\\ 
+                                    & $I_{{leak}}$ (+17 and $>$ 2 $\mu$A at -20)   & {IV150Bandm20}  & {IV150Candm20}  & {IV150andm20} \\\\ 
+                                    & $I_{{leak}}$ (+17 and $<$ 2 $\mu$A at -20)   & {IV150B}     & {IV150C}     & {IV150} \\\\
+                                    & $I_{{leak}}$ ($>$2 $\mu$A at -20)   & {IV150m20B}  & {IV150m20C}  & {IV150m20} \\\\ 
                                     & I(+17)/I(-20)         & {IRatio150B} & {IRatio150C} & {IRatio150} \\\\ 
-                                     & IV slope             & {IVSlopeB}   & {IVSlopeC}   & {IVSlope} \\\\ \midrule
+                                    & IV slope             & {IVSlopeB}   & {IVSlopeC}   & {IVSlope} \\\\ \midrule
     \multirow{{6}}{{*}}{{Chip performance}} & Noise         & {NoiseB}     & {NoiseC}     & {Noise} \\\\
                                     & Noise X-ray           & {NoiseXrayB} & {NoiseXrayC} & {NoiseXray} \\\\
                                     & Pedestal spread       & {PedSpreadB} & {PedSpreadC} & {PedSpread} \\\\
@@ -823,12 +833,12 @@ There is no double counting, if more than one grade C defect is present, only th
 \\begin{{itemize}}
     \item \\textbf{{Leakage current}}: $I_{{leak}}>10\mu$A at 17$^{{\circ}}$C or -20 $^{{\circ}}$C
     \item \\textbf{{HDI}}: Any HDI problem specified in the "comments.txt" file
-    \item \\textbf{{Defective ROC}}: ROCs with more than 500 pixel defects or with more than 20 non-uniform columns in the X-ray qualification
-    \item \\textbf{{Double column defects}}: ROCs with 1 or 2  non-uniform columns 
+    \item \\textbf{{Defective ROC}}: ROCs with more than 500 pixel defects or with more than 20 non-uniform columns in the X-ray qualification or that are not programmable
+    \item \\textbf{{Double column defects}}: ROCs with at least 1 bad DC
     \item \\textbf{{Low HR efficiency}}: columns where the efficiency is $<95\%$
     \item \\textbf{{Single pixel defect}}: ROCs where a single pixel defect (see list on slide \\ref{{Pixeldefects}}) leads to a grade C
     \item \\textbf{{Sum of pixel defects}}: ROCs where only the combination of different pixel defects leads to a grade C
-    \item \\textbf{{Others - for now}}: Not programmable module (defective TBM?) 
+    \item \\textbf{{Others - for now}}: 
 \end{{itemize}}       
 }}
     
@@ -839,10 +849,10 @@ There is no double counting, if more than one grade C defect is present, only th
 \\begin{{tabular}}{{@{{}}lcc@{{}}}}
 \\toprule
                                              & B & C \\\\ \midrule
-Measured $I_{{leak}}$ (17$^{{\circ}}$, 150V, pretest) [$\mu$A] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
+Measured $I_{{leak}}$ (17$^{{\circ}}$C, 150V, pretest) [$\mu$A] &  $<{LeakageCurrentPON_B}$  & $<{LeakageCurrentPON_C}$ \\\\
 Measured $I_{{leak}}$ (150V) [$\mu$A] & $>{currentB}$   &  $>{currentC}$ \\\\
-Slope (T=17$^{{\circ}}$)                       &  $>{slopeivB}$  & - \\\\
-I(17$^{{\circ}}$, 150V)/I(-20$^{{\circ}}$, 150V) &  $<{leakageCurrentRatioB}$  & - \\\\ \\bottomrule
+Slope (T=17$^{{\circ}}$C)                       &  $>{slopeivB}$  & - \\\\
+I(17$^{{\circ}}$C, 150V)/I(-20$^{{\circ}}$C, 150V) &  $<{leakageCurrentRatioB}$  & - \\\\ \\bottomrule
 \end{{tabular}}
 \end{{table}}
 }}
@@ -952,6 +962,8 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
       "lcstartupC" : lcstartupC,
       "IV150B" : IV150B,
       "IV150C" : IV150C,
+      "IV150Bandm20" : IV150Bandm20,
+      "IV150Candm20" : IV150Candm20,
       "IV150m20B" : IV150m20B,
       "IV150m20C" : IV150m20C,
       "IRatio150B" : IRatio150B,
@@ -991,6 +1003,7 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
       "LowHREfC" : LowHREfC,
       "lcstartup" : lcstartup,
       "IV150" : IV150,
+      "IV150andm20" : IV150andm20,
       "IV150m20" : IV150m20,
       "IVSlope" : IVSlope,
       "totDefects" : totDefects,
@@ -1029,6 +1042,7 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
       "nHDI" : nHDI,
       "HDI" : HDI,
       "totIV" : totIV,
+      "totIVP" : totIVP,
       "totHDI" : totHDI,
       "totDC" : totDC,
       "tot1PD" : tot1PD,
@@ -1037,6 +1051,7 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
       "totROC" : totROC,
       "totOthers" : totOthers,
       "FIV" : FIV,
+      "FIVP" : FIVP,
       "FHDI" : FHDI,
       "FDC" : FDC,
       "F1PD" : F1PD,
@@ -1073,7 +1088,9 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
       'XRayHighRateEfficiency_max_allowed_loweff_A_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_A_Rate1,
       'XRayHighRateEfficiency_max_allowed_loweff_B_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_B_Rate1,
       'comments' : comments,
-      'commentsX' : commentsX
+      'commentsX' : commentsX,
+      'nFirstModule' : nFirstModule,
+      'nLastModule' : nLastModule
 
     } 
 
