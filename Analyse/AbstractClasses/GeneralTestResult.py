@@ -387,7 +387,27 @@ class GeneralTestResult(object):
         else:
             print " => not found."
         return grade
-            
+
+    def check_for_defects(self):
+        self.RawTestSessionDataPath = os.path.abspath(self.RawTestSessionDataPath)
+        defectsfilename = self.RawTestSessionDataPath + '/defects.txt'
+        print "checking for special defects information in '%s'"%defectsfilename
+        Defects = []
+        if os.path.isfile(defectsfilename):
+            try:
+                with open(defectsfilename) as defectsfile:
+                    for line in defectsfile:
+                        if '#' in line:
+                            line = line.split('#')[0]
+                        line = line.strip()
+                        if len(line) > 0:
+                            Defects.append(line)
+            except:
+                warnings.warn('cannot open defects file {file}'.format(file=defectsfilename))
+            print "Reading defects \x1b[31m%s\x1b[0m specified by the user in %s"% (', '.join(Defects), str(defectsfilename))
+        else:
+            print " => not found."
+        return Defects
 
     def ReadModuleVersion(self):
         if self.verbose:

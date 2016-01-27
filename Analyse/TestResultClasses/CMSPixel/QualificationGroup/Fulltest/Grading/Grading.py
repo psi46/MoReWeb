@@ -8,6 +8,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle = 'Grading'
         self.Title = 'Grading'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
+        self.ResultData['KeyValueDictPairs']['SpecialDefects'] = {'Label': 'Defects', 'Value': ''}
 
     def getNumberOfRocsWithGrade(self, Grade, GradeList):
         l = [i for i in GradeList if i == Grade]
@@ -156,6 +157,26 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 MissingSubtests = True
                 ModuleGrade = 3
 
+        # special defects from 'defects.txt' => grade C
+        SpecialDefectsList = []
+        try:
+            if self.ParentObject.ResultData['SubTestResults']['IanaLoss'].ResultData['HiddenData']['IanaLossProblems']:
+                SpecialDefectsList.append('HDI')
+        except:
+            pass
+
+        try:
+            UserSpecifiedDefects = self.check_for_defects()
+            SpecialDefectsList += UserSpecifiedDefects
+        except:
+            print "checking for user specified defect information in defects.txt failed!"
+            pass
+
+        SpecialDefectsList = list(set(SpecialDefectsList))
+        if len(SpecialDefectsList) > 0:
+            ModuleGrade = 3
+            SpecialDefects = ", ".join(SpecialDefectsList)
+            self.ResultData['HiddenData']['SpecialDefects'] = SpecialDefects
 
         # electrical grade = ModuleGrade before IV
         ElectricalGrade = ModuleGrade
