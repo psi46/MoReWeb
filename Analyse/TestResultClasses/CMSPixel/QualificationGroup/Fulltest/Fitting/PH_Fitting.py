@@ -299,7 +299,7 @@ class PH_Fitting():
                 eph.append(self.ErrorPH)
                 evcal.append(self.ErrorVcal)
             i += 1
-        return  [n, phs, vcals, eph, evcal]
+        return [n, phs, vcals, eph, evcal]
 
     def GetGraph(self,calibrationPoints):
         if self.verbose:
@@ -312,9 +312,8 @@ class PH_Fitting():
         return graph
 
     def FitTanh(self,calibration):
-        calibrationPoints = self.getArrayOfCalibrationPoints(calibration, False, True)
+        calibrationPoints = self.getArrayOfCalibrationPoints(calibration, excludeLast=True, excludeSaturated=True)
         n = calibrationPoints[0]
-        phs = calibrationPoints[1]
         vcals = calibrationPoints[2]
         graph = self.GetGraph(calibrationPoints)
         phFitClone = self.phFit
