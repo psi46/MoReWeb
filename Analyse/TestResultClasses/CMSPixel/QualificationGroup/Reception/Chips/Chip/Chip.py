@@ -18,6 +18,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':1,
                     }
                 },
+                {'Key':'AddressDecoding',
+                    'DisplayOptions':{
+                        'Order':2,
+                    }
+                },
                 {'Key':'BumpBonding',
                     'DisplayOptions':{
                         'Order':10,
@@ -46,7 +51,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 {'Key':'DacDac',
                     'DisplayOptions':{
                     }
-                }
+                },
             ]
 
     def PopulateResultData(self):

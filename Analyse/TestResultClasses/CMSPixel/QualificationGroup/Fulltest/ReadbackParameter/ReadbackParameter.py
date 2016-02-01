@@ -25,4 +25,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         
         ROOT.gPad.SetLogy(0)
-        self.ParentObject.ResultData['SubTestResults']['Noise'].SpecialPopulateData(self, self.Attributes['SpecialPopulateDataParameters'])
+        self.SpecialPopulateData(self, self.Attributes['SpecialPopulateDataParameters'])

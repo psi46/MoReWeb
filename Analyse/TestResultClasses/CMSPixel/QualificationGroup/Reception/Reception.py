@@ -31,18 +31,7 @@ class TestResult(GeneralTestResult):
                 'InitialAttributes': {
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                 },
-            },  
-            {
-                'Key': 'Grading',
-                'DisplayOptions': {
-                    'Order': 15,
-                    'Width': 1,
-                    'Show': True,
-                },
-                'InitialAttributes': {
-                    'ModuleVersion': self.Attributes['ModuleVersion'],
-                },
-            },
+            }
         ]
 
         if self.Attributes['IncludeIVCurve']:
@@ -50,8 +39,8 @@ class TestResult(GeneralTestResult):
                 {
                     'Key': 'IVCurve',
                     'DisplayOptions': {
-                        'Order': 30,
-                        'Width': 1,
+                        'Order': 88,
+                        'Width': 2,
                     }
                 },
             ]
@@ -73,7 +62,7 @@ class TestResult(GeneralTestResult):
                 'Key': 'BumpBondingProblems',
                 'DisplayOptions': {
                     'Width': 4,
-                    'Order': 20,
+                    'Order': 41,
                 },
                 'InitialAttributes': {
                     'StorageKey': 'BumpBondingProblems'
@@ -92,6 +81,41 @@ class TestResult(GeneralTestResult):
                 }
             }
         ]
+        self.ResultData['SubTestResultDictList'] += [
+            {
+                'Key': 'IanaLoss',
+                'DisplayOptions': {
+                    'Order': 40,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
+                'Key': 'ReadbackStatus',
+                'DisplayOptions': {
+                    'Width': 3,
+                    'Order': 89,
+                },
+                'InitialAttributes': {
+                    'StorageKey': 'ReadbackStatus'
+                }
+            },
+            {
+                'Key': 'Grading',
+                'DisplayOptions': {
+                    'Order': 15,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+        ]
+
 
     def OpenFileHandle(self):
         self.check_Test_Software()
@@ -144,6 +168,21 @@ class TestResult(GeneralTestResult):
             else:
                 print 'There exist no ROOT file in "%s"' % self.RawTestSessionDataPath
 
+        # find pxar logfile of fulltest
+        logfilePath = ("%s.log"%fileHandlePath[:-5]) if len(fileHandlePath) > 4 else ''
+        self.pxarVersion = None
+        if os.path.isfile(logfilePath):
+            self.logfilePath = logfilePath
+            try:
+                with open(logfilePath, 'r') as logFile:
+                    for line in logFile:
+                        if 'Instanciating API for pxar' in line:
+                            posPxar = line.find('pxar')
+                            if posPxar >=0:
+                                self.pxarVersion = line[posPxar + 5:] if len(line) > posPxar + 5 else '?'
+            except:
+                pass
+
     def CustomWriteToDatabase(self, ParentID):
         if self.verbose:
             print 'Write to DB: ',ParentID
@@ -163,7 +202,7 @@ class TestResult(GeneralTestResult):
                 'CurrentList':[]
             }
         }
-        if self.ResultData['SubTestResults'].has_key('IVCurve'):
+        if 'IVCurve' in self.ResultData['SubTestResults']:
             IVCurveTestResultData = self.ResultData['SubTestResults']['IVCurve'].ResultData
             IVCurveData['CurrentAtVoltage150V'] = 0
             # RecalculatedVoltage = 0
@@ -187,15 +226,14 @@ class TestResult(GeneralTestResult):
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage150V'] = IVCurveData['CurrentAtVoltage150V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
-                
+
             if IVCurveTestResultData['HiddenData'].has_key('IVCurveFilePath'):
                 IVCurveData['IVCurveFilePath'] = IVCurveTestResultData['HiddenData']['IVCurveFilePath']
             if IVCurveTestResultData['HiddenData'].has_key('TestTemperature'):
                 IVCurveData['TestTemperature'] = IVCurveTestResultData['HiddenData']['TestTemperature']
             if IVCurveTestResultData['HiddenData'].has_key('IVCurveData'):
                 IVCurveData['IVCurveData'] = IVCurveTestResultData['HiddenData']['IVCurveData']
-            
-            
+
             if IVCurveTestResultData['KeyValueDictPairs'].has_key(
                     'recalculatedCurrentAtVoltage100V'):
                 IVCurveData['RecalculatedCurrentAtVoltage100V'] = float(
@@ -205,11 +243,10 @@ class TestResult(GeneralTestResult):
             else:
                 IVCurveData['RecalculatedCurrentAtVoltage100V'] = IVCurveData['CurrentAtVoltage100V']
                 IVCurveData['RecalculatedToTemperature'] = IVCurveData['TestTemperature']
-                
+
             if IVCurveTestResultData['KeyValueDictPairs'].has_key('Variation'):
                 IVCurveData['IVSlope'] = float(
                     IVCurveTestResultData['KeyValueDictPairs']['Variation']['Value'])
-
 
         # fill DB row
         Row = {
@@ -217,19 +254,20 @@ class TestResult(GeneralTestResult):
             'TestDate': self.Attributes['TestDate'],
             'TestType': self.Attributes['TestType'],
             'QualificationType': self.ParentObject.Attributes['QualificationType'],
-            'PixelDefects': None,
-            'ROCsLessThanOnePercent': None,
-            'ROCsMoreThanOnePercent': None,
-            'ROCsMoreThanFourPercent': None,
-            'Noise': None,
-            'Trimming': None,
-            'PHCalibration': None,
-            'CurrentAtVoltage150V': None,
-            'CurrentAtVoltage100V': None,
-            'IVSlope': None,
-            'IVCurveFilePath': None,
-            'TestTemperature': None,
-            'Temperature': None,
+            'Grade': None,
+            'PixelDefects': -1,
+            'ROCsLessThanOnePercent': -1,
+            'ROCsMoreThanOnePercent': -1,
+            'ROCsMoreThanFourPercent': -1,
+            'Noise': -1,
+            'Trimming': -1,
+            'PHCalibration': -1,
+            'CurrentAtVoltage150V': -1,
+            'CurrentAtVoltage100V': -1,
+            'IVSlope': -1,
+            'IVCurveFilePath': '',
+            'TestTemperature': -1,
+            'Temperature': -1,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -245,6 +283,7 @@ class TestResult(GeneralTestResult):
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
             'Operator': self.Attributes['Operator'],
+            'Comments': '',
         }
 
         try:
@@ -255,10 +294,14 @@ class TestResult(GeneralTestResult):
                 'IVSlope': IVCurveData['IVSlope'],
                 'IVCurveFilePath':IVCurveData['IVCurveFilePath'],
                 'TestTemperature':IVCurveData['TestTemperature'],
-                'Grade': None,
-                'Comments': None,
+                'Grade': self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Grade']['Value'],
+                'ROCsLessThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'],
+                'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanOnePercent'],
+                'ROCsMoreThanFourPercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanFourPercent'],
+                'Comments': '',
             })
         except:
+            raise
             pass
             #test incomplete
 

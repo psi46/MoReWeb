@@ -10,11 +10,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.ThrDefectList = set()
         self.chipNo = self.ParentObject.Attributes['ChipNo']
+        self.ResultData['KeyValueDictPairs']['TrimProblems'] = {'Value': None, 'Label':'Trim Problems'}
 
     def PopulateResultData(self):
 
-        ROOT.gPad.SetLogy(1);
-        ROOT.gStyle.SetOptStat(1);
+        ROOT.gPad.SetLogy(1)
+        ROOT.gStyle.SetOptStat(1)
         ChipNo=self.ParentObject.Attributes['ChipNo']
         try:
             DeadPixelList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
@@ -31,7 +32,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for col in range(0, ThresholdMap.GetNbinsX()):
             for row in range(0, ThresholdMap.GetNbinsY()):
                 threshold = ThresholdMap.GetBinContent(col + 1, row + 1)
-                if (ChipNo, col, row) not in DeadPixelList:
+                if DeadPixelList is None or (ChipNo, col, row) not in DeadPixelList:
                     self.ResultData['Plot']['ROOTObject'].Fill(threshold)
 
         bin_min = self.ResultData['Plot']['ROOTObject'].FindFirstBinAbove()
@@ -127,13 +128,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ResultData['Plot']['ROOTObject_Map']:
             for column in range(self.nCols):  # Column
                 for row in range(self.nRows):  # Row
-                    if (ChipNo, column, row) not in DeadPixelList:
+                    if DeadPixelList is None or (ChipNo, column, row) not in DeadPixelList:
                         self.HasThresholdDefect(column, row)
 
         self.Title = 'Vcal Threshold Trimmed'
         self.SaveCanvas()
-        self.ResultData['KeyValueDictPairs']['TrimProblems'] = { 'Value':self.ThrDefectList, 'Label':'Trim Problems'}
-        self.ResultData['KeyValueDictPairs']['NTrimProblems'] = { 'Value':len(self.ThrDefectList), 'Label':'N Trim Problems'}
+        self.ResultData['KeyValueDictPairs']['TrimProblems'] = {'Value': self.ThrDefectList, 'Label':'Trim Problems'}
+        self.ResultData['KeyValueDictPairs']['NTrimProblems'] = {'Value': len(self.ThrDefectList), 'Label':'N Trim Problems'}
         self.ResultData['KeyList'].append('NTrimProblems')
 
 
@@ -143,6 +144,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             delta = abs(binContent - self.vcalTrim)
             if  delta > self.TestResultEnvironmentObject.GradingParameters['tthrTol']:
                 self.ThrDefectList.add((self.chipNo, column, row))
-                print 'ThresholdDefect %2d %2d %2d ' % (self.chipNo, column, row), self.vcalTrim, delta, self.TestResultEnvironmentObject.GradingParameters['tthrTol']
+                if self.verbose:
+                    print 'ThresholdDefect %2d %2d %2d ' % (self.chipNo, column, row), self.vcalTrim, delta, self.TestResultEnvironmentObject.GradingParameters['tthrTol']
                 return True
         return False

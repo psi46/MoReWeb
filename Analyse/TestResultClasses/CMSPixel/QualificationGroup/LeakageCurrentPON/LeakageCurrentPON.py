@@ -171,7 +171,6 @@ class TestResult(GeneralTestResult):
             'Par1NGradeB': -1,
             'Par1NGradeC': -1,
             'Comments': '',
-
         }
         print 'fill row end'
 

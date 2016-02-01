@@ -21,6 +21,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['StartChip'] = 0
         self.Attributes['TargetNames'] = []
 
+        self.CreateJSONIndex = True
         self.AddCommentsToKeyValueDictPairs = True
         if self.verbose:
             tag = self.Name + ": Custom Init"
@@ -383,6 +384,7 @@ class TestResult(GeneralTestResult):
                 }
 
         print 'fill row end'
+
         # TODO: Please check if uplaod to DB is ok in this way...
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
 	    print "Global DB"

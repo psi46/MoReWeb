@@ -31,8 +31,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Label': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ModuleGrade']['Label']
             },
             'ManualGrade': {
-                'Value': ManualGrade if ManualGrade != '' else 'None',
-                'Label': 'Manual Grade'
+                'Value': ManualGrade if ManualGrade else 'None',
+                'Label': 'Manual Grade',
+                'Style': 'font-weight:bold;' if ManualGrade else '',
             },
             'ROCGrades': {
                 'Value': self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrades']['Value'],

@@ -19,7 +19,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         Maximum = 0
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            BumpBondingDefects = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=self.Attributes['Rate'])]['Value']
+            try:
+                BumpBondingDefects = float(ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['BumpBondingDefects_{Rate}'.format(Rate=self.Attributes['Rate'])]['Value'])
+            except:
+                BumpBondingDefects = 0
             ChipNo = ChipTestResultObject.Attributes['ChipNo']
             RocNumbers.append(ChipNo)
             BBProblems.append(BumpBondingDefects)

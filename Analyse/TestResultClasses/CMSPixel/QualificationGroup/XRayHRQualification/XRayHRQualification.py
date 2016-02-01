@@ -237,6 +237,7 @@ class TestResult(GeneralTestResult):
         self.Title = str(self.Attributes['ModuleID']) + ' ' + self.Attributes['StorageKey']
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Attributes['NumberOfChips'] = self.nTotalChips
+        self.CreateJSONIndex = True
         #self.MergePyxarData()
 
         self.AddCommentsToKeyValueDictPairs = True
@@ -795,15 +796,30 @@ class TestResult(GeneralTestResult):
             })
 
         self.ResultData['SubTestResultDictList'].append({
-                'Key': 'Errors',
+                'Key': 'Logfile',
                 'DisplayOptions': {
                     'GroupWithNext': False,
-                    'Order': 900,
+                    'Order': 905,
                     'Width': 1,
                 },
             })
         self.ResultData['SubTestResultDictList'].append({
-                'Key': 'Logfile',
+                'Key': 'ConfigFiles',
+                'DisplayOptions': {
+                    'GroupWithNext': False,
+                    'Show': False,
+                },
+            })
+        self.ResultData['SubTestResultDictList'].append({
+                'Key': 'Errors',
+                'DisplayOptions': {
+                    'GroupWithNext': False,
+                    'Order': 904,
+                    'Width': 1,
+                },
+            })
+        self.ResultData['SubTestResultDictList'].append({
+                'Key': 'TestEnvironment',
                 'DisplayOptions': {
                     'GroupWithNext': False,
                     'Order': 901,

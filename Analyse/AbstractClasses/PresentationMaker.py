@@ -138,46 +138,48 @@ class MakeProductionSummary:
     VcalThrWC = args['nVcalThrWC']
     LowHREfB = args['nLowHREfB']
     LowHREfC = args['nLowHREfC']
+    comments = args['commentsgradechange']
+    commentsX = args['commentsgradechangeX']
 
  
 
     nAB = int(nA) + int(nB)
     nT = nAB + int(nC) + int(nM)
     nQ = nAB + int(nC)
-    Pass = round(float(nAB)/nQ*100,1)
+    Pass = round(float(nAB)/nQ*100,1) if nQ > 0 else 0
 
-    lcstartup = round(float(lcstartupC)/nQ*100,1)
-    IV150 = round(float(IV150C)/nQ*100,1)
-    IV150m20 = round(float(IV150m20C)/nQ*100,1)
-    IVSlope = round(float(IVSlopeC)/nQ*100,1)
-    totDefects = round(float(totDefectsC)/nQ*100,1)
-    totDefectsXray = round(float(totDefectsXrayC)/nQ*100,1)
-    BBFull = round(float(BBFullC)/nQ*100,1)
-    BBXray = round(float(BBXrayC)/nQ*100,1)
-    Addressdef = round(float(AddressdefC)/nQ*100,1)
-    Trimbitdef = round(float(TrimbitdefC)/nQ*100,1)
-    Maskdef = round(float(MaskdefC)/nQ*100,1)
-    deadpix = round(float(deadpixC)/nQ*100,1)
-    uniformity = round(float(uniformityC)/nQ*100,1)
-    Noise = round(float(NoiseC)/nQ*100,1)
-    NoiseXray = round(float(NoiseXrayC)/nQ*100,1)
-    PedSpread = round(float(PedSpreadC)/nQ*100,1)
-    RelGainW = round(float(RelGainWC)/nQ*100,1)
-    VcalThrW = round(float(VcalThrWC)/nQ*100,1)
-    LowHREf = round(float(LowHREfC)/nQ*100,1)
-    IRatio150 = round(float(IRatio150C)/nQ*100,1)
-    BrokenROC = round(float(nBrokenROCs)/nQ*100,1)
-    BrokenROCX = round(float(nBrokenROCsX)/nQ*100,1)
-    HDI = round(float(nHDI)/nQ*100,1)
+    lcstartup = round(float(lcstartupC)/nQ*100,1) if nQ > 0 else 0
+    IV150 = round(float(IV150C)/nQ*100,1) if nQ > 0 else 0
+    IV150m20 = round(float(IV150m20C)/nQ*100,1) if nQ > 0 else 0
+    IVSlope = round(float(IVSlopeC)/nQ*100,1) if nQ > 0 else 0
+    totDefects = round(float(totDefectsC)/nQ*100,1) if nQ > 0 else 0
+    totDefectsXray = round(float(totDefectsXrayC)/nQ*100,1) if nQ > 0 else 0
+    BBFull = round(float(BBFullC)/nQ*100,1) if nQ > 0 else 0
+    BBXray = round(float(BBXrayC)/nQ*100,1) if nQ > 0 else 0
+    Addressdef = round(float(AddressdefC)/nQ*100,1) if nQ > 0 else 0
+    Trimbitdef = round(float(TrimbitdefC)/nQ*100,1) if nQ > 0 else 0
+    Maskdef = round(float(MaskdefC)/nQ*100,1) if nQ > 0 else 0
+    deadpix = round(float(deadpixC)/nQ*100,1) if nQ > 0 else 0
+    uniformity = round(float(uniformityC)/nQ*100,1) if nQ > 0 else 0
+    Noise = round(float(NoiseC)/nQ*100,1) if nQ > 0 else 0
+    NoiseXray = round(float(NoiseXrayC)/nQ*100,1)if nQ > 0 else 0
+    PedSpread = round(float(PedSpreadC)/nQ*100,1) if nQ > 0 else 0
+    RelGainW = round(float(RelGainWC)/nQ*100,1) if nQ > 0 else 0
+    VcalThrW = round(float(VcalThrWC)/nQ*100,1) if nQ > 0 else 0
+    LowHREf = round(float(LowHREfC)/nQ*100,1) if nQ > 0 else 0
+    IRatio150 = round(float(IRatio150C)/nQ*100,1) if nQ > 0 else 0
+    BrokenROC = round(float(nBrokenROCs)/nQ*100,1) if nQ > 0 else 0
+    BrokenROCX = round(float(nBrokenROCsX)/nQ*100,1) if nQ > 0 else 0
+    HDI = round(float(nHDI)/nQ*100,1) if nQ > 0 else 0
 
-    FHDI = round(float(totHDI)/nQ*100,1)
-    FIV = round(float(totIV)/nQ*100,1)
-    FDC = round(float(totDC)/nQ*100,1)
-    F1PD = round(float(tot1PD)/nQ*100,1)
-    FPD = round(float(totPD)/nQ*100,1)
-    FLowEf = round(float(totLowEf)/nQ*100,1)
-    FROC = round(float(totROC)/nQ*100,1)
-    FOthers = round(float(totOthers)/nQ*100,1)
+    FHDI = round(float(totHDI)/nQ*100,1) if nQ > 0 else 0
+    FIV = round(float(totIV)/nQ*100,1) if nQ > 0 else 0
+    FDC = round(float(totDC)/nQ*100,1) if nQ > 0 else 0
+    F1PD = round(float(tot1PD)/nQ*100,1) if nQ > 0 else 0
+    FPD = round(float(totPD)/nQ*100,1) if nQ > 0 else 0
+    FLowEf = round(float(totLowEf)/nQ*100,1) if nQ > 0 else 0
+    FROC = round(float(totROC)/nQ*100,1) if nQ > 0 else 0
+    FOthers = round(float(totOthers)/nQ*100,1) if nQ > 0 else 0
     
  
 
@@ -352,7 +354,17 @@ Others               & {totOthers} & {FOthers}   \\\\ \\bottomrule
     \end{{tabular}} \caption{{X-ray qualification}}
     \end{{minipage}}
     \end{{table}}
+    \\begin{{minipage}}[t]{{0.45\linewidth}}
+    \centering
+    {comments}
+\end{{minipage}}
+\hspace{{0.5cm}}
+\\begin{{minipage}}[t]{{0.45\linewidth}}
+ \centering
+    {commentsX}
+    \end{{minipage}}
     }}
+
 
 
     \\frame{{
@@ -1059,7 +1071,9 @@ Hot pixel & can't be re-trimmed and has to be masked \\\\ \\bottomrule
       'XRayHighRate_SCurve_Noise_Threshold_B' : XRayHighRate_SCurve_Noise_Threshold_B,
       'XRayHighRate_SCurve_Noise_Threshold_C' : XRayHighRate_SCurve_Noise_Threshold_C,
       'XRayHighRateEfficiency_max_allowed_loweff_A_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_A_Rate1,
-      'XRayHighRateEfficiency_max_allowed_loweff_B_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_B_Rate1
+      'XRayHighRateEfficiency_max_allowed_loweff_B_Rate1' : XRayHighRateEfficiency_max_allowed_loweff_B_Rate1,
+      'comments' : comments,
+      'commentsX' : commentsX
 
     } 
 

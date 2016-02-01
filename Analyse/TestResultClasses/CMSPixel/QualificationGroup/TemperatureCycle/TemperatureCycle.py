@@ -55,9 +55,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'RelativeModuleFinalResultsPath':os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath, self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder':os.path.relpath(self.FinalResultsStoragePath, self.TestResultEnvironmentObject.FinalModuleResultsPath),
             'Comments': '',
-            'nCycles': self.ResultData['KeyValueDictPairs']['nCycles']['Value'],
-            'CycleTempLow': self.ResultData['KeyValueDictPairs']['CycleTempLow']['Value'],
-            'CycleTempHigh':self.ResultData['KeyValueDictPairs']['CycleTempHigh']['Value'],
+            'nCycles': self.ResultData['KeyValueDictPairs']['nCycles']['Value'] if 'nCycles' in self.ResultData['KeyValueDictPairs'] else '0',
+            'CycleTempLow': self.ResultData['KeyValueDictPairs']['CycleTempLow']['Value'] if 'CycleTempLow' in self.ResultData['KeyValueDictPairs'] else '0',
+            'CycleTempHigh':self.ResultData['KeyValueDictPairs']['CycleTempHigh']['Value'] if 'CycleTempHigh' in self.ResultData['KeyValueDictPairs'] else '0',
         }
         
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:

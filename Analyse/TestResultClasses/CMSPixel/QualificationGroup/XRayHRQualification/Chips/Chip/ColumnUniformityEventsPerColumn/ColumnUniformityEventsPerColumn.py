@@ -2,7 +2,7 @@
 import ROOT
 import AbstractClasses
 import AbstractClasses.Helper.HistoGetter as HistoGetter
-
+import array, math
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -18,6 +18,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'sigma':{
                 'Value':'{0:1.2f}'.format(-1),
                 'Label':'fit error of μ'
+            },
+            'NumberOfNonUniformColumnEvents':{
+                'Value':'{0:1.2f}'.format(-1),
+                'Label':'Non uniform 10.000 event bins'
             }
         }
 
@@ -47,6 +51,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].SetContour(100)
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRange(
@@ -73,6 +78,31 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['sigma']['Value'] = '{0:1.2f}'.format(RMS)
 
             self.ResultData['KeyList'] += ['mu','sigma']
+
+            NumberOfNonUniformColumnEvents = 0
+            for Column in range(0, 52):
+                ColumnReadoutUniformityHistogram = self.ResultData['Plot']['ROOTObject'].ProjectionX(self.GetUniqueID(), Column + 1, Column + 1)
+                NEvents = ColumnReadoutUniformityHistogram.GetNbinsX()
+                FirstBin = ColumnReadoutUniformityHistogram.GetXaxis().GetFirst()
+                LastBin = ColumnReadoutUniformityHistogram.FindLastBinAbove(0)
+                ColumnReadoutUniformityHistogram.GetXaxis().SetRange(1, LastBin - 1)
+
+                MeanHitsPerBin = ColumnReadoutUniformityHistogram.Integral(FirstBin, LastBin) / (LastBin - FirstBin + 1)
+                ReadoutUniformityOverTimeSigma = math.sqrt(MeanHitsPerBin) # poisson
+
+                #exclude last bin
+                for Event in range(0, LastBin - 1):
+                    BinHits = ColumnReadoutUniformityHistogram.GetBinContent(Event + 1)
+
+                    if( abs(BinHits-MeanHitsPerBin) > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']
+                        *ReadoutUniformityOverTimeSigma
+                    ):
+                        NumberOfNonUniformColumnEvents += 1
+
+                ColumnReadoutUniformityHistogram.Delete()
+
+            self.ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnEvents']['Value'] = str(NumberOfNonUniformColumnEvents)
+            self.ResultData['KeyList'] += ['NumberOfNonUniformColumnEvents']
 
             ROOT.gPad.Update()
 

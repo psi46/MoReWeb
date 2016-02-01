@@ -17,7 +17,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            MissingHits = ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfHotPixels_{Rate}'.format(Rate=self.Attributes['Rate'])]['Value']
+            try:
+                MissingHits = float(ChipTestResultObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NumberOfHotPixels_{Rate}'.format(Rate=self.Attributes['Rate'])]['Value'])
+            except:
+                MissingHits = 0
             ChipNo = ChipTestResultObject.Attributes['ChipNo']
             RocNumbers.append(ChipNo)
             HotPixels.append(MissingHits)

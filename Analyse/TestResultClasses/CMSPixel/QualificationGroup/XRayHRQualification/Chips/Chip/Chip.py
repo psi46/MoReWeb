@@ -185,12 +185,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     
                 },
                 {
-                    'Key':'EfficiencyInterpolation',
+                    'Key':'PixelEfficiency',
                     'InitialAttributes':{
                     },
                     'DisplayOptions':{
-                        'Order':2
+                        'Show': False,
                     },
+
+                },
+                {
+                    'Key':'DoubleColumnGrading',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Show': False,
+                    },
+
                 },
                 {
                     'Key':'DoubleColumnEfficiencyDistribution',
@@ -200,6 +210,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':200
                     },
                     
+                },
+                {
+                    'Key':'EfficiencyInterpolation',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Order':2
+                    },
                 },
                 {
                     'Key':'CalDelScan',

@@ -67,7 +67,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Value':'',
             'Label':'Efficiency Grade '+RateData['InterpolatedEfficiencyRates']['RatesString']
         }
-
+        self.ResultData['KeyValueDictPairs']['BadDoubleColumns'] = {
+            'Value':'',
+            'Label':'# Bad Double Columns',
+        }
+        self.ResultData['KeyValueDictPairs']['BadDoubleColumnsGrade'] = {
+            'Value':'',
+            'Label':'Bad DC Grade',
+        }
         self.ResultData['KeyValueDictPairs']['NumberOfHotPixels'] = {
             'Value':'',
             'Label':'# Hot Pixels '+RateData['HRData']['RatesString']
@@ -99,7 +106,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['ReadoutUniformityOverTimeGrade'] = {
             'Value':'',
             'Label':'ROC Read. Unif. Grade '+RateData['HRData']['RatesString']
-        }        
+        }
         self.ResultData['KeyValueDictPairs']['ColumnReadoutUniformityOverTimeGrade'] = {
             'Value':'',
             'Label':'Column Read. Unif. Grade '+RateData['HRData']['RatesString']
@@ -111,7 +118,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['NoiseGrade'] = {
             'Value':'',
             'Label':'Noise Grade'
-        }        
+        }
         self.ResultData['KeyValueDictPairs']['PixelDefects'] = {
             'Value':'',
             'Label':'Total Number of Pixel Defects',
@@ -123,10 +130,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'NumberOfNonUniformColumns',
                 'NumberOfNonUniformEvents',
                 'NumberOfNonUniformColumnEvents',
+                'BadDoubleColumns',
                 'BumpBondingDefects',
                 'Efficiency',
                 'EfficiencyFit',
                 'EfficiencyGrade',
+                'BadDoubleColumnsGrade',
                 'HotPixelsGrade',
                 'HitMapGrade',
                 'ReadoutUniformityOverTimeGrade',
@@ -161,8 +170,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             self.ResultData['HiddenData']['NumberOfNonUniformColumns'] = {'Value': '-1'}
             self.ResultData['HiddenData']['ColumnUniformityGrade'] = {'Value': 'None'}
-            
-	
+        self.ResultData['HiddenData']['MissingTests'] = 0
+
     def PopulateResultData(self):
         GradeMapping = {
             -1:'N/A',
@@ -189,12 +198,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             MeanEfficiency = float(self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)]['Value'])
             Grades['EfficiencyGrade'] = 1
-            if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
-                Grades['EfficiencyGrade'] = 2
-            if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
-                Grades['EfficiencyGrade'] = 3
 
-            if not 'EfficiencyGrade' in OmitGradesInFinalGrading and not 'EfficiencyGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
+            if MeanEfficiency < 0:
+                Grades['EfficiencyGrade'] = -1
+            else:
+                if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
+                    Grades['EfficiencyGrade'] = 2
+                if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
+                    Grades['EfficiencyGrade'] = 3
+
+            if 'EfficiencyGrade' not in OmitGradesInFinalGrading and 'EfficiencyGrade_{Rate}'.format(Rate=Rate) not in OmitGradesInFinalGrading:
                 ROCGrades.append(Grades['EfficiencyGrade'])
 
             RateIndex += 1
@@ -212,7 +225,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         try:
             EfficiencyFit = "chi2/ndf: {chi2}, # points: {n}".format(chi2=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['Chi2NDF']['Value'], n=self.ParentObject.ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['KeyValueDictPairs']['NumberFitPoints']['Value'])
         except:
-            EfficiencyFit = "fit failed"
+            EfficiencyFit = "failed!"
+            self.ResultData['KeyValueDictPairs']['EfficiencyFit']['Style'] = "font-weight:bold;color:red;"
+
         self.ResultData['KeyValueDictPairs']['EfficiencyFit']['Value'] = EfficiencyFit
 
         AliveMapROOTObject = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
@@ -220,6 +235,32 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         BumpBondingDefectsList = []
         NoiseDefectsList = []
         HotPixelDefectsList = []
+
+        # bad double column grading
+        NBadDoubleColumns = -1
+        BadDoubleColumnGrade = -1
+        try:
+
+            # double columns with many defects
+            BadDoubleColumns = self.ParentObject.ResultData['SubTestResults']['DoubleColumnGrading'].ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value']
+
+            # double columns with bad efficiency
+            BadDoubleColumnsEfficiency = self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']
+            for DoubleColumnDefect in BadDoubleColumnsEfficiency:
+                BadDoubleColumns.add(DoubleColumnDefect['Chip'], DoubleColumnDefect['DoubleColumn'])
+
+
+            NBadDoubleColumns = len(BadDoubleColumns)
+            self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'] = NBadDoubleColumns
+            if NBadDoubleColumns > 0:
+                BadDoubleColumnGrade = 3
+            else:
+                BadDoubleColumnGrade = 1
+            ROCGrades.append(BadDoubleColumnGrade)
+        except:
+            print "\x1b[31mCan't get list of defective double columns for chip %d\x1b[0m"%ChipNo
+
+        self.ResultData['KeyValueDictPairs']['BadDoubleColumnsGrade']['Value'] = GradeMapping[BadDoubleColumnGrade]
 
         # hitmap and uniformity grading
         ColumnReadoutUniformityROOTObject = None
@@ -292,29 +333,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             ### Column Readout Uniformity Over Time Grade ###
             Grades['ColumnReadoutUniformityOverTimeGrade'] = 1
-            NumberValues['NumberOfNonUniformColumnEvents'] = 0
-            for Column in range(0, 52):
-                ColumnReadoutUniformityHistogram = ColumnReadoutUniformityOverTimeROOTObject.ProjectionX(self.GetUniqueID(), Column + 1, Column + 1)
-                NEvents = ColumnReadoutUniformityHistogram.GetNbinsX()
-                FirstBin = ColumnReadoutUniformityHistogram.GetXaxis().GetFirst()
-                LastBin = ColumnReadoutUniformityHistogram.FindLastBinAbove(0)
-                ColumnReadoutUniformityHistogram.GetXaxis().SetRange(1, LastBin - 1)
-
-                MeanHitsPerBin = ColumnReadoutUniformityHistogram.Integral(FirstBin, LastBin) / (LastBin - FirstBin + 1)
-                ReadoutUniformityOverTimeSigma = math.sqrt(MeanHitsPerBin) # poisson
-
-                #exclude last bin
-                for Event in range(0, LastBin - 1):
-                    BinHits = ColumnReadoutUniformityHistogram.GetBinContent(Event + 1)
-
-                    if( abs(BinHits-MeanHitsPerBin) > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']
-                        *ReadoutUniformityOverTimeSigma
-                    ):
-                        NumberValues['NumberOfNonUniformColumnEvents'] += 1
-                        Grades['ColumnReadoutUniformityOverTimeGrade'] = 3
-                        ReadoutProblemsDetected = True
-
-                ColumnReadoutUniformityHistogram.Delete()
+            NumberValues['NumberOfNonUniformColumnEvents'] = -1
+            try:
+                NumberValues['NumberOfNonUniformColumnEvents'] = int(self.ParentObject.ResultData['SubTestResults']['ColumnUniformityEventsPerColumn_{Rate}'.format(Rate=Rate)].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumnEvents']['Value'])
+            except:
+                pass
+            if NumberValues['NumberOfNonUniformColumnEvents']>0:
+                Grades['ColumnReadoutUniformityOverTimeGrade'] = 3
+                ReadoutProblemsDetected = True
 
             if not 'ColumnReadoutUniformityOverTimeGrade' in OmitGradesInFinalGrading and not 'ColumnReadoutUniformityOverTimeGrade_{Rate}'.format(Rate=Rate) in OmitGradesInFinalGrading:
                 ROCGrades.append(Grades['ColumnReadoutUniformityOverTimeGrade'])
@@ -357,6 +383,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             sys.stdout.write("\x1b[0m")
             sys.stdout.flush()
             self.ResultData['HiddenData']['MissingTests'] = 1
+            NumberValues['NumberOfNonUniformColumns'] = -1
 
         if not 'ColumnUniformityGrade' in OmitGradesInFinalGrading:
             ROCGrades.append(Grades['ColumnUniformityGrade'])
@@ -400,17 +427,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ### Total Pixel Defects Grading ###
         try:
-            NoiseRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves'])
-            BumpBondingRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData'])
-            HotPixelRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData'])
+            if len(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves']) > 0:
+                NoiseRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves'])
+                NoisePixelsList = self.ParentObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=NoiseRateGrading)].ResultData['HiddenData']['ListOfNoisyPixels']['Value']
+            else:
+                raise Exception("NO NOISE TEST FOUND!")
 
-            NoisePixelsList = self.ParentObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=NoiseRateGrading)].ResultData['HiddenData']['ListOfNoisyPixels']['Value']
-            BumpBondingDefectPixelsList = self.ParentObject.ResultData['SubTestResults']['BumpBondingDefects_{Rate}'.format(Rate=BumpBondingRateGrading)].ResultData['HiddenData']['ListOfDefectivePixels']['Value']
-            HotPixelsList = self.ParentObject.ResultData['SubTestResults']['HotPixelMap_{Rate}'.format(Rate=HotPixelRateGrading)].ResultData['HiddenData']['ListOfHotPixels']['Value']
+            if len(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']) > 0:
+                BumpBondingRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData'])
+                BumpBondingDefectPixelsList = self.ParentObject.ResultData['SubTestResults']['BumpBondingDefects_{Rate}'.format(Rate=BumpBondingRateGrading)].ResultData['HiddenData']['ListOfDefectivePixels']['Value']
+                HotPixelRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData'])
+                HotPixelsList = self.ParentObject.ResultData['SubTestResults']['HotPixelMap_{Rate}'.format(Rate=HotPixelRateGrading)].ResultData['HiddenData']['ListOfHotPixels']['Value']
+            else:
+                raise Exception("NO HR DATA TEST (HITMAP) FOUND!")
+
+            InefficientPixelList = self.ParentObject.ResultData['SubTestResults']['PixelEfficiency'].ResultData['KeyValueDictPairs']['InefficientPixels']['Value']
+
         except:
             NoisePixelsList = set()
             BumpBondingDefectPixelsList = set()
             HotPixelsList = set()
+            InefficientPixelList = set()
             self.ResultData['HiddenData']['MissingTests'] = 1
 
             # Start red color
@@ -425,8 +462,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             sys.stdout.flush()
 
 
-        TotalPixelDefectsList = BumpBondingDefectPixelsList | NoisePixelsList | HotPixelsList
-        TotalPixelDefects = len(TotalPixelDefectsList)
+        TotalPixelDefectsList = BumpBondingDefectPixelsList | NoisePixelsList | HotPixelsList | InefficientPixelList
+
+        if self.ResultData['HiddenData']['MissingTests'] < 1:
+            TotalPixelDefects = len(TotalPixelDefectsList)
+        else:
+            TotalPixelDefects = -1
 
         self.ResultData['HiddenData']['BumpBondingDefectsList'] = {
             'Label': 'Bump Bonding Defects list',
@@ -484,6 +525,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         print ' ROC {ROC:2.0f}: Grade {Grade}'.format(ROC=self.ParentObject.Attributes['ChipNo'], Grade=GradeFormatted)
         print '         Pixel Defects:              {Defects}'.format(Defects=TotalPixelDefects)
+        if NBadDoubleColumns > 0:
+            print '         \x1b[31mDouble Column Defects:      {Defects}\x1b[0m'.format(Defects=NBadDoubleColumns)  
         print '         BumpBonding Defects:        {Defects}'.format(Defects=len(BumpBondingDefectPixelsList))
         print '         Efficiency at 120 MHz/cm2:  {Eff} +/- {EffErr}'.format(Eff=InterpolatedEfficiency120, EffErr=EfficiencyError120)
         try:
@@ -492,12 +535,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print '         \x1b[31mEfficiency fit chi2/ndf is high! chi2/ndf = %f\x1b[0m fit probably failed!'%FitChi2
         except:
             pass
-        if int(NumberValues['NumberOfNonUniformColumns']) > 0:
-            print '         \x1b[31mNumber of non uniform coulmns: %d'%int(NumberValues['NumberOfNonUniformColumns'])
-        if int(NumberValues['NumberOfNonUniformColumnEvents']) > 0:
-            print '         \x1b[31mNumber of non uniform events in a column: %d'%int(NumberValues['NumberOfNonUniformColumnEvents'])
-        if ReadoutProblemsDetected:
-            print '         \x1b[31mProblems in readout uniformity detected!\x1b[0m check for hot pixels!'
+
+        try:
+            if int(NumberValues['NumberOfNonUniformColumns']) > 0:
+                print '         \x1b[31mNumber of non uniform coulmns: %d\x1b[0m'%int(NumberValues['NumberOfNonUniformColumns'])
+            if int(NumberValues['NumberOfNonUniformColumnEvents']) > 0:
+                print '         \x1b[31mNumber of non uniform events in a column: %d\x1b[0m'%int(NumberValues['NumberOfNonUniformColumnEvents'])
+            if ReadoutProblemsDetected:
+                print '         \x1b[31mProblems in readout uniformity detected!\x1b[0m check for hot pixels!'
+        except:
+            print '         \x1b[31mTEST DATA INCOMPLETE!\x1b[0m'
 
 
         print '-'*78

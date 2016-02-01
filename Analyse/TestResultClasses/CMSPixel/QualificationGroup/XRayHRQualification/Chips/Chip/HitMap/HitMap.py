@@ -30,8 +30,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         ChipNo = self.ParentObject.Attributes['ChipNo']
 
-        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])]
-        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'HitMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        try:
+            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])]
+        except:
+            rootFileHandle = self.ParentObject.ParentObject.FileHandle
+
+        self.HistoDict = None
+        try:
+            self.HistoDict = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict
+        except:
+            pass
+
+        if not self.HistoDict:
+            try:
+                self.HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
+            except:
+                pass
+
+        histogramName = self.HistoDict.get('HighRate', 'HitMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
 
         NumberOfDefectivePixels = 0
@@ -50,7 +66,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             NTriggersROOTObject = (
             HistoGetter.get_histo(
-                    self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HRData_{Rate}'.format(Rate=self.Attributes['Rate'])],
+                    rootFileHandle,
                     "Xray.ntrig_Ag_V0" 
                 )
             )
@@ -68,6 +84,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
+            self.ResultData['Plot']['ROOTObject'].SetContour(100)
             self.ResultData['Plot']['ROOTObject'].Draw('colz')
 
         if self.Canvas:
@@ -78,6 +95,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['RealHitrate']['Value'] = '{RealHitrate:1.2f}'.format(RealHitrate=RealHitrate)
         self.ResultData['KeyValueDictPairs']['RealHitrate']['NumericValue'] = RealHitrate
 
-        self.Title = 'Hit Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'],Rate=self.Attributes['Rate'])
+        try:
+            Rate = self.Attributes['Rate']
+        except:
+            Rate = ''
+        self.Title = 'Hit Map {Rate}: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'], Rate=Rate)
 
 

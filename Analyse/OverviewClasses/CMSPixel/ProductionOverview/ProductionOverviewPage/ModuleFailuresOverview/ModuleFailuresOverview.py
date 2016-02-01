@@ -17,7 +17,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def CustomInit(self):
         self.NameSingle='ModuleFailuresOverview'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = 'Module Failures Overview'
         self.DisplayOptions = {
             'Width': 5.4,
@@ -27,12 +27,14 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.SubPages = []
         self.SavePlotFile = True
         self.Canvas.SetCanvasSize(1600, 500)
+        self.Canvas.SetFrameLineStyle(0)
+        self.Canvas.SetFrameLineWidth(1)
+        self.Canvas.SetFrameBorderMode(0)
+        self.Canvas.SetFrameBorderSize(1)
         self.Canvas.Update()
 
     def GenerateOverview(self):
         ROOT.gStyle.SetOptStat(0)
-
-        TableData = []
 
         NumModules = int(self.Attributes['NumModules']) if 'NumModules' in self.Attributes else 9999
         Offset = int(self.Attributes['Offset']) if 'Offset' in self.Attributes else 0
@@ -44,11 +46,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         except:
             pass
 
-        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'BB_X-ray', 'lowHREfficiency', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
+        YLabels = ['LCStartup', 'IVSlope', 'IV150', 'IVRatio150', 'GradeFT', 'ManualGradeFT', 'DeadROC', 'PedestalSpread', 'RelativeGainWidth', 'VcalThrWidth', 'Noise', 'TotalDefects', 'AddressDefects', 'trimbitDefects', 'BB_Fulltest', 'maskDefects', 'deadPixels', 'GradeHR', 'ManualGradeHR', 'BB_X-ray', 'lowHREfficiency', 'DoubleColumn', 'ReadoutProblems', 'UniformityProblems', 'Noise_X-ray', 'TotalDefects_X-ray'][::-1]
         nGradings = 3*len(YLabels)
         Summary = ROOT.TH2D(self.GetUniqueID(), "", len(ModuleIDsList), 0, len(ModuleIDsList), nGradings, 0, nGradings)
         Summary.GetYaxis().SetTickLength(0)
-        BinNumber = 1
 
         YBinNumber = 1
         for YLabel in YLabels:
@@ -61,6 +62,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         TestTypeLeakageCurrentPON = ['LeakageCurrentPON']
         TestTypeXrayHR = 'XRayHRQualification'
 
+        ColorA = 0.5
         ColorB = 0.84
         ColorC = 1.00
 
@@ -70,7 +72,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         GradeMaskDefectsAB = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsB'])
         GradeMaskDefectsBC = float(self.TestResultEnvironmentObject.GradingParameters['maskDefectsC'])
 
-        #time_start = time.time()
         DefectsDict = {}
 
         for ModuleID in ModuleIDsList:
@@ -80,7 +81,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 DefectsDict[ModuleID][DefectCategory] = {}
 
         ModulesCount = 0
-        ModulesProgressPercent = 0
         ModulesProgressPercentOld = 0
         nRows = len(Rows)
         for RowTuple in Rows:
@@ -161,6 +161,41 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 DefectsDict[ModuleID]['GradeFT'][RowTuple['TestType']] = 'B'
                         except:
                             self.ProblematicModulesList.append(ModuleID)
+
+        ### ManualGradeFT
+                    Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ManualGrade', 'Value'])
+                    if Value is not None:
+                        try:
+                            GradeNames = ['A', 'B', 'C']
+                            if Value in GradeNames:
+                                Value = 1 + GradeNames.index(Value)
+                            else:
+                                Value = int(Value)
+                            if Value == 3:
+                                DefectsDict[ModuleID]['ManualGradeFT'][RowTuple['TestType']] = 'C'
+                            elif Value == 2:
+                                DefectsDict[ModuleID]['ManualGradeFT'][RowTuple['TestType']] = 'B'
+                            elif Value == 1:
+                                # also list grade A here because it can negate effect of other defects!
+                                DefectsDict[ModuleID]['ManualGradeFT'][RowTuple['TestType']] = 'A'
+                        except:
+                            self.ProblematicModulesList.append(ModuleID)
+
+        ### DeadROC
+                    DeadROCs = 0
+                    for Chip in range(0,16):
+                        NDefects = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Summary', 'KeyValueDictPairs.json', 'Total', 'Value'])
+                        if NDefects:
+                            try:
+                                NDefects = int(NDefects)
+                                if NDefects > 3999:
+                                    DeadROCs +=1
+                            except:
+                                self.ProblematicModulesList.append(ModuleID)
+
+                    if DeadROCs > 0:
+                        DefectsDict[ModuleID]['DeadROC'][RowTuple['TestType']] = 'C'
+
 
         ### Pedestal Spread
                     ValueB = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'PedestalSpreadGradeBROCs', 'Value'])
@@ -324,6 +359,24 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 DefectsDict[ModuleID]['GradeHR'] = 'B'
                         except:
                             self.ProblematicModulesList.append(ModuleID)
+        ### ManualGradeHR
+                    Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ManualGrade', 'Value'])
+                    if Value is not None:
+                        try:
+                            GradeNames = ['A', 'B', 'C']
+                            if Value in GradeNames:
+                                Value = 1 + GradeNames.index(Value)
+                            else:
+                                Value = int(Value)
+                            if Value == 3:
+                                DefectsDict[ModuleID]['ManualGradeHR'] = 'C'
+                            elif Value == 2:
+                                DefectsDict[ModuleID]['ManualGradeHR'] = 'B'
+                            elif Value == 1:
+                                # also list grade A here because it can negate effect of other defects!
+                                DefectsDict[ModuleID]['ManualGradeHR'] = 'A'
+                        except:
+                            self.ProblematicModulesList.append(ModuleID)
 
         ### defectiveBumps X-ray
                     BBGrades = []
@@ -345,7 +398,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     for Chip in range(0,16):
                         Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'EfficiencyGrade', 'Value'])
                         if Value is not None:
-                            Grades = [grade for grade in Value.split('/') if grade.strip()[0] != '(']
+                            Grades = [grade for grade in Value.split('/') if grade and grade.strip()[0] != '(']
                             EfficiencyGrades += Grades
                         else:
                             self.ProblematicModulesList.append(ModuleID)
@@ -353,6 +406,20 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         DefectsDict[ModuleID]['lowHREfficiency'] = 'C'
                     elif 'B' in EfficiencyGrades:
                         DefectsDict[ModuleID]['lowHREfficiency'] = 'B'
+
+        ### double column ###
+                    DoubleColumnGrades = []
+                    for Chip in range(0,16):
+                        Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'Grading', 'KeyValueDictPairs.json', 'BadDoubleColumnsGrade', 'Value'])
+                        if Value is not None:
+                            Grades = [grade for grade in Value.split('/') if grade and grade.strip()[0] != '(']
+                            DoubleColumnGrades += Grades
+                        else:
+                            self.ProblematicModulesList.append(ModuleID)
+                    if 'C' in DoubleColumnGrades:
+                        DefectsDict[ModuleID]['DoubleColumn'] = 'C'
+                    elif 'B' in DoubleColumnGrades:
+                        DefectsDict[ModuleID]['DoubleColumn'] = 'B'
 
         ### r/o problems
                     Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ROCsWithReadoutProblems', 'Value'])
@@ -409,6 +476,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     elif 'B' in RocGrades:
                         DefectsDict[ModuleID]['TotalDefects_X-ray'] = 'B'
 
+        self.HiddenData['DefectsDict'] = DefectsDict
         # save defects dictionary as json file
         JsonFileName = ''
         try:
@@ -435,6 +503,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorC)
                         elif Grade == 'B':
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorB)
+                        elif Grade == 'A':
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorA)
                         else:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ROOT.kBlue)
                 else:
@@ -444,17 +514,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorC)
                         elif Grade == 'B':
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorB)
+                        elif Grade == 'A':
+                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorA)
                         else:
                             Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ROOT.kBlue)
  
 
         ROOT.gPad.SetLeftMargin(0.16)
         ROOT.gPad.SetRightMargin(0.03)
-
         Summary.Draw("col")
         Summary.GetZaxis().SetRangeUser(0, 1.0)
-        Summary.GetYaxis().SetLabelSize(0.055)
-
+        Summary.GetYaxis().SetLabelSize(0.045)
 
         Summary.GetXaxis().LabelsOption("v")
         if len(ModuleIDsList) > 200:
@@ -468,6 +538,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         line1 = ROOT.TLine()
         line1.SetLineStyle(2)
+        line1.SetLineWidth(1)
+        line1.SetLineColorAlpha(ROOT.kBlack, 0.35)
         linePositions = [3*i for i in range(1, len(YLabels))]
 
         for linePosition in linePositions:
@@ -485,7 +557,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         title2.SetTextAlign(12)
         title2.SetTextColor(self.GetGradeColor('C'))
         title2.DrawText(0.23,0.965,"Grade C")
-
 
         self.SaveCanvas()
         HTML = self.Image(self.Attributes['ImageFile'], {'height': '350px'})

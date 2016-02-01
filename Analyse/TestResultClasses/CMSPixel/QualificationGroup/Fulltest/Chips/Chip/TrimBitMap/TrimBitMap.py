@@ -10,7 +10,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
     def PopulateResultData(self):
-
+        ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0)
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols,
                                                           self.nRows, 0., self.nRows)  # htm

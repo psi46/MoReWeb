@@ -14,16 +14,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # order!
         self.ResultData['SubTestResultDictList'] = []
 
-        if self.Attributes['ModuleVersion'] == 1:
-            self.ResultData['SubTestResultDictList'] += [
-                {
-                    'Key':'PHCalibrationTan',
-                    'DisplayOptions':{
-                        'Show':False,
-                    }
-                }
-            ]
-
         self.ResultData['SubTestResultDictList'] += [
                 {'Key':'OpParameters',
                     'DisplayOptions':{
@@ -51,6 +41,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':4,
                     }
                 },# depends on
+                {'Key':'VcalThresholdTrimmedMap',
+                'InitialAttributes' :{'StorageKey': 'VcalThresholdTrimmedMap'},
+                    'DisplayOptions':{
+                        'Order':4,
+                    }
+                },# depends on SCurveWidths'''
                 {'Key':'BumpBonding',
                     'DisplayOptions':{
                         'Order':6,
@@ -90,6 +86,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             }
         ]
+
+        if self.Attributes['ModuleVersion'] == 1:
+            self.ResultData['SubTestResultDictList'] += [
+                {
+                    'Key':'PHCalibrationTan',
+                    'DisplayOptions':{
+                        'Show':False,
+                    }
+                }
+            ]
 
         self.ResultData['SubTestResultDictList'] += [
                 {'Key':'TrimBitTest',
@@ -165,16 +171,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                     }
                 },
-                {'Key':'ReadbackCal',
+                {'Key':'ReadbackCalIana',
                     'DisplayOptions':{
-                        
                     }
                 },
+                
                 {'Key':'ReadbackCalVdig',
                     'DisplayOptions':{
                     }
                 },
-                {'Key':'ReadbackCalIana',
+                {'Key':'ReadbackCalVana',
+                    'DisplayOptions':{
+                    }
+                },
+                {'Key':'ReadbackVbg',
+                    'DisplayOptions':{
+                    }
+                },
+                {'Key':'ReadbackCal',
+                    'DisplayOptions':{
+                        
+                    }
                 }
 
             ]

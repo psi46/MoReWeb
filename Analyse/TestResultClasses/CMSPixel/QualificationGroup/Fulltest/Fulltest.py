@@ -2,7 +2,7 @@ import os
 import sys
 import ROOT
 import traceback
-
+from AbstractClasses.Helper.SetEncoder import SetEncoder
 import AbstractClasses
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 
@@ -17,6 +17,9 @@ class TestResult(GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
         self.Attributes['NumberOfChips'] = self.nTotalChips
         self.AddCommentsToKeyValueDictPairs = True
+
+        self.CreateJSONIndex = True
+
         self.MergePyxarData()
 
         if self.Attributes['ModuleVersion'] == 1:
@@ -176,8 +179,19 @@ class TestResult(GeneralTestResult):
                 {'Key': 'Parameter1', 'DisplayOptions': {'Order': 13, }}
             ]
 
+
+
         self.ResultData['SubTestResultDictList'] += [
-        	     {
+            {'Key': 'CalDel', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'PHScale', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'PHOffset', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'VthrComp', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'Vtrim', 'DisplayOptions': {'Order': 14, }},
+            {'Key': 'Vana', 'DisplayOptions': {'Order': 14, }},
+        ]
+
+        self.ResultData['SubTestResultDictList'] += [
+            {
                 'Key': 'Grading',
                 'DisplayOptions': {
                     'Show': False,
@@ -188,6 +202,14 @@ class TestResult(GeneralTestResult):
                 'DisplayOptions': {
                     'Order': 100,
                     'Width': 1,
+                }
+            },
+            {
+                'Key': 'Logfile',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 120,
+                    'Show': True,
                 }
             },
             {
@@ -219,14 +241,6 @@ class TestResult(GeneralTestResult):
                 'Key': 'SummaryROCs',
                 'DisplayOptions': {
                     'Width': 5,
-                }
-            },
-            {
-                'Key': 'Logfile',
-                'DisplayOptions': {
-                    'Width': 1,
-                    'Order': 120,
-                    'Show': True,
                 }
             },
         ]
@@ -307,7 +321,6 @@ class TestResult(GeneralTestResult):
         # find pxar logfile of fulltest
         logfilePath = ("%s.log"%fileHandlePath[:-5]) if len(fileHandlePath) > 4 else ''
         self.trimVcal = None
-        self.pxarVersion = None
         if os.path.isfile(logfilePath):
             self.logfilePath = logfilePath
             try:
@@ -324,10 +337,6 @@ class TestResult(GeneralTestResult):
                                         print "-> Trimmed to Vcal %d"%self.trimVcal
                                     except:
                                         pass
-                        if 'Instanciating API for pxar' in line:
-                            posPxar = line.find('pxar')
-                            if posPxar >=0:
-                                self.pxarVersion = line[posPxar + 5:] if len(line) > posPxar + 5 else '?'
             except:
                 pass
 
@@ -682,6 +691,7 @@ class TestResult(GeneralTestResult):
             })
 
         print 'fill row end'
+
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
             from PixelDB import *
             # modified by Tommaso

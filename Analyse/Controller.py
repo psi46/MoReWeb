@@ -45,19 +45,27 @@ parser.add_argument('-c', '--comment', dest = 'comment', action = 'store_true', 
 parser.add_argument('-d', '--delete-row', dest = 'deleterow', action = 'store_true', default = False,
                     help = 'Let you select a row in the local database to delete.')
 parser.add_argument('-r', '--refit', dest = 'refit', action = 'store_true', default = False,
-                    help = 'Forces refitting even if files exist')
+                    help = 'Forces refitting even if fit result files exist')
 parser.add_argument('-p', '--production-overview', dest = 'production_overview', action = 'store_true', default = False,
-                    help = 'Creates production overview page in the end')
+                    help = 'Creates production overview page')
 parser.add_argument('-new', '--new-folders-only', dest = 'no_re_analysis', action = 'store_true', default = False,
                     help = 'Do not analyze folder if it already exists in DB, even if MoReWeb version has changed')
+parser.add_argument('-m', '--modules', dest = 'modules_list', default = '',
+                    help = 'Comma separated list of modules which shall be analyzed')
 parser.add_argument('-pres', '--make-presentation', dest = 'make_presentation', action = 'store_true', default = False,
-                    help = 'Creates tex file for presentation in the end')
+                    help = 'Creates tex file and pdf with presentation, needs -p')
 parser.add_argument('-tc', '--show-test-center', dest = 'show_test_center', action = 'store_true', default = False,
                     help = 'Show test-center in qualification list')
 parser.add_argument('-i', '--include-path', dest = 'additional_include_path', metavar='PATH', default = '',
                     help = argparse.SUPPRESS)
 parser.add_argument('-g', '--use-global-db', dest = 'use_global_db', action = 'store_true', default = False,
                     help = argparse.SUPPRESS)
+
+parser.add_argument('-C', '--csv', dest = 'output_csv', action = 'store_true', default = False,
+                    help = argparse.SUPPRESS)
+parser.add_argument('-ps', '--production-overview-single', dest = 'production_overview_single', default = '',
+                    help = argparse.SUPPRESS)
+
 
 parser.set_defaults(DBUpload=True)
 args = parser.parse_args()
@@ -128,6 +136,7 @@ if verbose:
     print 'RevisionString "%s"'%RevisionString
 GlobalDataDirectory = Configuration.get('Paths', 'GlobalDataDirectory')
 GlobalOverviewPath = Configuration.get('Paths', 'GlobalOverviewPath')
+
 if Configuration.has_option('Paths','GlobalFinalResultsPath'):
     if args.norev:
         GlobalFinalResultsPath = Configuration.get('Paths','GlobalFinalResultsPath')
@@ -135,15 +144,16 @@ if Configuration.has_option('Paths','GlobalFinalResultsPath'):
         GlobalFinalResultsPath = Configuration.get('Paths','GlobalFinalResultsPath')+'/REV%03d'%revisionNumber
 else:
     GlobalFinalResultsPath = ''
+
 print 'GlobalFinalResultsPath: "%s"'%GlobalFinalResultsPath
 if GlobalFinalResultsPath!= '' and not os.path.exists(GlobalFinalResultsPath):
-    try :
-	    os.makedirs(GlobalFinalResultsPath)
+    try:
+        os.makedirs(GlobalFinalResultsPath)
     except: #it could be created by another instance running in parallel
-	    if not os.path.exists(GlobalFinalResultsPath) :
-			raise
-	    else :
-		print "Kind of magic, they made the dir for me while I was checking" 
+        if not os.path.exists(GlobalFinalResultsPath):
+            raise
+        else:
+            print "Kind of magic, they made the dir for me while I was checking"
 
 SQLiteDBPath = GlobalOverviewPath + '/ModuleResultDB.sqlite'
 ModuleVersion = int(Configuration.get('ModuleInformation', 'ModuleVersion'))
@@ -243,6 +253,16 @@ def NeedsToBeAnalyzed(FinalModuleResultsPath,ModuleInformation):
         return True
     md5FileName= FinalModuleResultsPath+'/'+ 'checksum.md5'
     retVal = True
+
+    if len(args.modules_list) > 0:
+        ModulesList = [x.strip().upper() for x in args.modules_list.replace(';',',').split(',')]
+        if ModuleInformation['ModuleID'].upper() in ModulesList:
+            print 'analyse folder '+ FinalModuleResultsPath +'\n'
+            return True
+        else:
+            print 'do not analyse folder '+ FinalModuleResultsPath +'\n'
+            return False
+
     if os.path.exists(md5FileName):
         if verbose: print 'md5 sum exists %s'%md5FileName
         bSameFiles = hasher.compare_two_files('checksum.md5',md5FileName)
@@ -352,7 +372,7 @@ def AnalyseSingleQualification(Folder):
                         'ErrorCode': -999,
                         'FinalResultsStoragePath':'unkown'
                         }
-       )
+        )
         print TestResultEnvironmentInstance
         print 'ERROR'
         return
@@ -609,7 +629,13 @@ ModuleResultOverviewObject.GenerateOverviewHTMLFile()
 
 if args.production_overview:
     print "production overview:"
-    ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentInstance)
+    if len(args.production_overview_single) > 0:
+        SingleSubtest = [x.strip() for x in args.production_overview_single.replace(';',',').split(',')]
+        print "produce plots only for following subtests:"
+        print "-%s"%SingleSubtest
+    else:
+        SingleSubtest = None
+    ProductionOverviewObject = ProductionOverview.ProductionOverview(TestResultEnvironmentObject=TestResultEnvironmentInstance, SingleSubtest=SingleSubtest, Verbose=args.verbose)
     ProductionOverviewObject.GenerateOverview()
 
     if args.make_presentation:
@@ -635,13 +661,100 @@ if args.production_overview:
             sys.stdout.flush()
 
 
+# CSV output
+if args.output_csv:
+    print "CSV output"
+    print "-"*80
+    if TestResultEnvironmentInstance.Configuration['Database']['UseGlobal']:
+        print "\x1b[31merror: CSV export is not supported for global database!\x1b[0m"
+    else:
+        TestResultEnvironmentInstance.LocalDBConnectionCursor.execute(
+            'SELECT * FROM ModuleTestResults ORDER BY ModuleID ASC,TestType ASC,TestDate ASC'
+        )
+        Rows = TestResultEnvironmentInstance.LocalDBConnectionCursor.fetchall()
 
+        ModuleData = {}
+        GradeOrdering = {'M': 0, 'A':1, 'B':2, 'C':3, 'X':9999}
+
+        for Row in Rows:
+            ModuleID = Row['ModuleID']
+
+            # add new modules
+            if ModuleID not in ModuleData:
+                ModuleData[ModuleID] = {'Grade': 'M', 'LeakageCurrent': -1, 'PixelDefects': -1}
+
+            # add FullQualification data
+            if Row['QualificationType'] == 'FullQualification':
+                Grade = Row['Grade']
+                PixelDefects = int(Row['PixelDefects']) if Row['PixelDefects'] else -1
+
+                # grade, if worse
+                if Grade in GradeOrdering:
+                    if GradeOrdering[Grade] > GradeOrdering[ModuleData[ModuleID]['Grade']]:
+                        ModuleData[ModuleID]['Grade'] = Grade
+
+                # number of defects, if higher
+                if PixelDefects > ModuleData[ModuleID]['PixelDefects']:
+                    ModuleData[ModuleID]['PixelDefects'] = PixelDefects
+
+                # leakage current for 17 degrees
+                if Row['Temperature'] and int(float(Row['Temperature'])) == 17:
+                    try:
+                        LeakageCurrent = float(Row['CurrentAtVoltage150V'])
+                        if LeakageCurrent > ModuleData[ModuleID]['LeakageCurrent']:
+                            ModuleData[ModuleID]['LeakageCurrent'] = LeakageCurrent
+                    except:
+                        pass
+
+            # add X-ray data
+            if Row['TestType'] == 'XRayHRQualification':
+                Grade = Row['Grade']
+
+                # grade, if worse
+                if Grade and Grade in GradeOrdering:
+                    if GradeOrdering[Grade] > GradeOrdering[ModuleData[ModuleID]['Grade']]:
+                        ModuleData[ModuleID]['Grade'] = Grade
+
+        CSVPath = GlobalOverviewPath + '/ModuleResultDB.csv'
+        with open(CSVPath, 'w') as csvfile:
+            for ModuleID, Data in ModuleData.iteritems():
+                CSVLine = "%s, %s, %d, %e\n"%(ModuleID, Data['Grade'], Data['PixelDefects'], Data['LeakageCurrent'])
+                csvfile.write(CSVLine)
+                print CSVLine,
+
+        print "-"*80
+
+'''
+            self.TestResultEnvironmentObject.ErrorList.append(
+                {'ModuleID': self.Attributes['TestedObjectID'] if 'TestedObjectID' in self.Attributes else '',
+                 'ModulePath': self.ModulePath,
+                 'ErrorCode': inst,
+                 'File': exc_tb.tb_frame.f_code.co_filename,
+                 'Line': exc_tb.tb_lineno,
+                 'FinalResultsStoragePath': self.FinalResultsStoragePath}
+                # 'FinalResultsStoragePath':i['TestResultObject'].FinalResultsStoragePath}
+'''
 
 # display error list
 print '\nErrorList:'
+ModulePath = ''
+ModuleID = ''
 for i in TestResultEnvironmentInstance.ErrorList:
-    print i
-    print '\t - %s: %s'%(i['ModulePath'],i['ErrorCode'])
+    if i['ModuleID'] != ModuleID:
+        print (i['ModuleID'] if len(i['ModuleID']) > 0 else 'MODULE') + ':'
+        ModulePath = ''
+        ModuleID = i['ModuleID']
+    if i['ModulePath'] != ModulePath:
+        print "  %s"%i['ModulePath']
+        ModulePath = i['ModulePath']
+    ColumnWidth = 10
+    if 'Message' in i:
+        print "    %s%s"%('ERROR: '.ljust(ColumnWidth), i['Message'])
+    else:
+        print "    %s%s"%('ERROR: '.ljust(ColumnWidth), i['ErrorCode'] if 'ErrorCode' in i else '')
+
+    print "    %s%s"%('in ', i['File'] if 'File' in i else '')
+    print "    %s%s"%('PATH: '.ljust(ColumnWidth), i['FinalResultsStoragePath'] if 'FinalResultsStoragePath' in i else '')
 
 
 ExitCode = -2

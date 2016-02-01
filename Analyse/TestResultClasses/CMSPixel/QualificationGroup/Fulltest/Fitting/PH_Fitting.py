@@ -139,16 +139,19 @@ class PH_Fitting():
 
         else:
             # use old way for compatibility
-            threads = []
-            result = Queue()
-            for chip in range (0,nRocs):
-                self.FitPHCurve(dir, chip, result)
-                p = chip
-                threads.append(p)
+            #threads = []
+            #result = Queue()
+            #for chip in range (0,nRocs):
+            #    self.FitPHCurve(dir, chip, result)
+            #    p = chip
+            #    threads.append(p)
+            #
+            #results = [result.get() for p in threads]
 
-            results = [result.get() for p in threads]
+            # serial processing
+            results = [self.FitPHCurve(dir, chip) for chip in range (0, nRocs)]
 
-        for chi2,histos in results :
+        for chi2,histos in results:
             if chi2[0] ==-1:
                 print 'Failed to fit in chip %s'%chi2[1]
             elif chi2[2] == -2:
@@ -164,7 +167,7 @@ class PH_Fitting():
         self.SaveResultHistos()
 
 
-    def FitPHCurve(self,dirName,chip,result):
+    def FitPHCurve(self, dirName, chip, result = None):
         print "Fitting pulse height curves for chip %i"%chip
 
         inputFileName = '%s/'%dirName
@@ -193,7 +196,7 @@ class PH_Fitting():
         else:
             outputFileName = "%s/phCalibrationFit_C%i.dat"%( dirName, chip)
         if os.path.isfile(outputFileName) and not self.refit:
-            print 'file "%s" already exists --> no fiting'%outputFileName
+            print 'file "%s" already exists --> no fiting'%outputFileName.split('/')[-1]
             retVal =[-2]*4
             retVal[1]=chip
             retVal = [retVal,[]]
@@ -244,8 +247,14 @@ class PH_Fitting():
         inputFile.close()
         outputFile.close()
         retVal = [maxChi2,[self.histoChi,self.histoFits]]
-        print "\tMax Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
-        if result: result.put(retVal)
+        if maxChi2[0]>2:
+            print "\t\x1b[31mMax Chi^2 for chip %s: %s chi^2/NDF at %s/%s => high Chi^2, check fits!\x1b[0m"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
+        else:
+            print "\tMax Chi^2 for chip %s: %s chi^2/NDF at %s/%s"%(maxChi2[1],maxChi2[0],maxChi2[2],maxChi2[3])
+        if result:
+            result.put(retVal)
+        else:
+            return retVal
         return
 
     def FillOutputFile(self,outputFile,fitResult,column,row):

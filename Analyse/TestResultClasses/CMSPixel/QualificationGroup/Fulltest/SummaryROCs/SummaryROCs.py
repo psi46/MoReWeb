@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import ROOT
 import AbstractClasses
 import os
 
@@ -30,14 +29,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             return value
 
     def GradeColoredDefectsValue(self, value):
-      limitB = self.TestResultEnvironmentObject.GradingParameters['defectsB']
-      limitC = self.TestResultEnvironmentObject.GradingParameters['defectsC']
-      if int(value) >= limitC:
-        return self.GradeColoredValue(value, 3)
-      elif int(value) >= limitB:
-        return self.GradeColoredValue(value, 2)
-      else:
-        return self.GradeColoredValue(value, 1)
+        if value == '#':
+            return self.GradeColoredValue(value, 3)
+        try:
+            limitB = self.TestResultEnvironmentObject.GradingParameters['defectsB']
+            limitC = self.TestResultEnvironmentObject.GradingParameters['defectsC']
+            if int(value) >= limitC:
+                return self.GradeColoredValue(value, 3)
+            elif int(value) >= limitB:
+                return self.GradeColoredValue(value, 2)
+            else:
+                return self.GradeColoredValue(value, 1)
+        except:
+            return self.GradeColoredValue(value, 3)
 
     def PopulateResultData(self):
         self.ResultData['Table'] = {
@@ -77,20 +81,64 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             ChipNo = i['TestResultObject'].Attributes['ChipNo']
             PixelDefectsGrade = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsGrade']['Value'])
-            VcalThresholdWidthGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_VcalThresholdWidth_Mean_C%d'%ChipNo]['Value'])
-            RelativeGainWidthGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_RelativeGainWidth_Mean_C%d'%ChipNo]['Value'])
-            PedestalSpreadGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_PedestalSpread_Mean_C%d'%ChipNo]['Value'])
-            Parameter1Grade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_Parameter1_Mean_C%d'%ChipNo]['Value'])
-            NoiseGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_Noise_Mean_C%d'%ChipNo]['Value'])
 
-            PixelDefectsTotal = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Total']['Value'], PixelDefectsGrade)
-            Threshold = i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['Threshold']['Value']
-            ThresholdWidth = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['ThresholdWidth']['Value'], VcalThresholdWidthGrade)
-            RelativeGainWidth = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['RelativeGainWidth']['Value'], RelativeGainWidthGrade)
-            PedestalSpread = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['PedestalSpread']['Value'], PedestalSpreadGrade)
-            Noise = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['Noise']['Value'], NoiseGrade)
+            try:
+                VcalThresholdWidthGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_VcalThresholdWidth_Mean_C%d'%ChipNo]['Value'])
+            except:
+                VcalThresholdWidthGrade = 3
 
-            RocGrade = max([PixelDefectsGrade, VcalThresholdWidthGrade, RelativeGainWidthGrade, PedestalSpreadGrade, Parameter1Grade, NoiseGrade])
+            try:
+                RelativeGainWidthGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_RelativeGainWidth_Mean_C%d'%ChipNo]['Value'])
+            except:
+                RelativeGainWidthGrade = 3
+
+            try:
+                PedestalSpreadGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_PedestalSpread_Mean_C%d'%ChipNo]['Value'])
+            except:
+                PedestalSpreadGrade = 3
+
+            try:
+                Parameter1Grade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_Parameter1_Mean_C%d'%ChipNo]['Value'])
+            except:
+                Parameter1Grade = 3
+
+            try:
+                NoiseGrade = int(self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SubGrading_Noise_Mean_C%d'%ChipNo]['Value'])
+            except:
+                NoiseGrade = 3
+
+            try:
+                PixelDefectsTotal = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['Summary'].ResultData['KeyValueDictPairs']['Total']['Value'], PixelDefectsGrade)
+            except:
+                PixelDefectsTotal = '#'
+
+            try:
+                Threshold = i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['Threshold']['Value']
+                ThresholdWidth = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['ThresholdWidth']['Value'], VcalThresholdWidthGrade)
+            except:
+                Threshold = '#'
+                ThresholdWidth = self.GradeColoredValue('#', 3)
+
+            try:
+                RelativeGainWidth = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['RelativeGainWidth']['Value'], RelativeGainWidthGrade)
+            except:
+                RelativeGainWidth = self.GradeColoredValue('#', 3)
+
+            try:
+                PedestalSpread = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['PedestalSpread']['Value'], PedestalSpreadGrade)
+            except:
+                PedestalSpread = self.GradeColoredValue('#', 3)
+
+            try:
+                Noise = self.GradeColoredValue(i['TestResultObject'].ResultData['SubTestResults']['PerformanceParameters'].ResultData['KeyValueDictPairs']['Noise']['Value'], NoiseGrade)
+            except:
+                Noise = self.GradeColoredValue('#', 3)
+
+            try:
+                RocGrade = max([PixelDefectsGrade, VcalThresholdWidthGrade, RelativeGainWidthGrade, PedestalSpreadGrade, Parameter1Grade, NoiseGrade])
+            except:
+                RocGrade = 3
+
             RocGradeFormatted = self.GradeColoredValue(GradeMapping[RocGrade] if RocGrade in GradeMapping else 'None', RocGrade, True)
 
             self.ResultData['Table']['BODY'].append(

@@ -1,13 +1,10 @@
-import ROOT
 import AbstractClasses
-import glob
-import json
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
         self.NameSingle='Section'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = ''
         self.DisplayOptions = {
             'Width': 1,
@@ -23,6 +20,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         if self.Attributes.has_key('Anchor'):
             HTML += "<a class='anchor' name='{Anchor}'></a>".format(Anchor=self.Attributes['Anchor'])
         HTML += "<div style='clear:both;'></div>"
+
+        if 'Caption' in self.Attributes:
+            HTML += "<div style='font-size:12px;margin-bottom:10px;'>%s</div><div style='clear:both;'></div>"%self.Attributes['Caption']
 
         return HTML
 

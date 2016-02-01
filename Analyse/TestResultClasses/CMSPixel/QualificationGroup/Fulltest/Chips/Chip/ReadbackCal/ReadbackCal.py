@@ -5,6 +5,7 @@ import os
 import re
 from operator import itemgetter
 import warnings
+import AbstractClasses.Helper.HistoGetter as HistoGetter
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
@@ -53,6 +54,35 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     ReadbackCalFile.close()
         else:
             warnings.warn('No readback calibration file found!')
+
+
+
+        #Adding Vbg    
+        HistoName= 'Readback.Vbg_readback_VdCal_V0'
+        ChipNo = self.ParentObject.Attributes['ChipNo']
+        ROOTFile = self.ParentObject.ParentObject.FileHandle
+
+        try:
+            self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(ROOTFile, HistoName).Clone(self.GetUniqueID())
+        except:
+            pass
+
+        try:
+            Vbg = round(self.ResultData['Plot']['ROOTObject'].GetBinContent(ChipNo+1),3)
+            self.ResultData['KeyValueDictPairs']['Vbg'] = {'Label': 'Vbg', 'Value': Vbg}
+            self.ResultData['KeyList'].append('Vbg')
+        except:
+            ReadbackCalibrated = False
+
+        try:
+            par0ia = self.ParentObject.ResultData['SubTestResults']['ReadbackCalIana'].ResultData['KeyValueDictPairs']['par0ia']['Value']
+            par1ia = self.ParentObject.ResultData['SubTestResults']['ReadbackCalIana'].ResultData['KeyValueDictPairs']['par1ia']['Value']
+            self.ResultData['KeyValueDictPairs']['par0ia'] = {'Label': 'par0ia', 'Value': par0ia}
+            self.ResultData['KeyList'].append('par0ia')
+            self.ResultData['KeyValueDictPairs']['par1ia'] = {'Label': 'par1ia', 'Value': par1ia}
+            self.ResultData['KeyList'].append('par1ia')
+        except:
+            ReadbackCalibrated = False
 
         self.ResultData['KeyValueDictPairs']['ReadbackCalibrated'] = {'Label': 'Calibrated', 'Value': 'True' if ReadbackCalibrated else 'False'}
         self.ResultData['KeyList'].append('ReadbackCalibrated')

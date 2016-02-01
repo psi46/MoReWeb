@@ -72,11 +72,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     refitPHlin = True
                     refitPHtan = True
             except:
-                print "warning: could not read fit revision file!"
+                print "warning: could not read fit revision file! => needs re-fitting"
+                refitScurves = True
+                refitPHlin = True
+                refitPHtan = True
 
         else:
             FitRevDict.add_section('FitRevisions')
             FitRevDict.add_section('Fit')
+            print "info: this folder has never been analyzed with a recent version of MoReWeb => needs re-fitting"
+            refitScurves = True
+            refitPHlin = True
+            refitPHtan = True
 
         # unset complete flag in file
         FitRevDict.set('Fit','Complete', 'false')

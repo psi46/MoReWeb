@@ -12,7 +12,6 @@ def getDefectsListLength(defectsList):
     else:
         return -1
 
-
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Fulltest_Chips_Chip_PerformanceParameters_TestResult'

@@ -317,6 +317,13 @@ class ModuleResultOverview:
 
         for ModuleID in ModuleIDList:
             RowDict = FinalModuleRowsDict[ModuleID]
+
+            # if comment for all 3 fulltests is the same, show it only once
+            if RowDict['Comments']:
+                CommentItems = [x.strip() for x in RowDict['Comments'].split('/')]
+                if len(CommentItems) == 3 and CommentItems[0]==CommentItems[1] and CommentItems[1]==CommentItems[2]:
+                    RowDict['Comments'] = CommentItems[0]
+
             Row = []
             for Key in TableColumnList:
                 Row.append(RowDict[Key])

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import glob
-
 import ROOT
 
 import AbstractClasses.Helper.HistoGetter as HistoGetter
-from AbstractClasses.GeneralTestResult import GeneralTestResult
+import AbstractClasses
 
 
-class TestResult(GeneralTestResult):
+class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_TrimBits_TestResult'
         self.NameSingle = 'TrimBits'

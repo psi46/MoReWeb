@@ -10,6 +10,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle = 'BB4'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.DeadBumpList = set()
+        self.ResultData['KeyValueDictPairs']['DeadBumps'] = {'Value': None, 'Label': 'Dead Bumps'}
 
     def PopulateResultData(self):
         # initialize ROOT

@@ -8,22 +8,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Logfile_LogfileView_TestResult'
         self.NameSingle = 'LogfileView'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        self.sizeLimit = 5*1024*1024
 
     def PopulateResultData(self):
         LogfileName = self.ParentObject.ParentObject.logfilePath
         if LogfileName:
-            if '/' in LogfileName or '\\' in LogfileName:
-                LogfileNameShort = LogfileName.replace('\\', '/').split('/')[-1]
-            else:
-                LogfileNameShort = 'logfile'
-
             if os.path.isfile(LogfileName):
-                try:
-                    with open(LogfileName) as Logfile:
-                        Lines = Logfile.readlines()
-                except:
-                    raise
-                    Lines = ["could not open '%s'"%LogfileName]
+                if os.path.getsize(LogfileName) < self.sizeLimit:
+                    try:
+                        with open(LogfileName) as Logfile:
+                            Lines = Logfile.readlines()
+                    except:
+                        Lines = ["ERROR: could not open '%s'"%LogfileName]
+                else:
+                    Lines = ["ERROR: log file too large '%s'. Max allowed: %s Bytes"%(LogfileName, self.sizeLimit)]
+
                 LinesFormatted = []
                 for Line in Lines:
                     escapedLine = cgi.escape(Line)

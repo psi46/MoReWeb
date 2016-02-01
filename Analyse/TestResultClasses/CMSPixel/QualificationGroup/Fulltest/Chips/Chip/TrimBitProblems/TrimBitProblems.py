@@ -11,9 +11,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle = 'TrimBitProblems'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.chipNo = self.ParentObject.Attributes['ChipNo']
+        self.ResultData['KeyValueDictPairs']['DeadTrimbits'] = {'Value': None, 'Label':'Dead Trimbits'}
 
     def PopulateResultData(self):
-
+        ROOT.gPad.SetLogy(0)
         ROOT.gStyle.SetOptStat(0);
         self.ResultData['Plot']['ROOTObject'] =  ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows ) # htm
         # TH2D
@@ -21,7 +22,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         self.DeadTrimbitsList = set()
-        self.PixelNotAliveList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NotAlivePixels']['Value']
+        try:
+            self.PixelNotAliveList = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NotAlivePixels']['Value']
+        except:
+            self.PixelNotAliveList = set()
+
         for k in range(5):
             histname = HistoDict.get(self.NameSingle, 'TrimBitMap%d' % k)
             tmpHistogram = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo = ChipNo)

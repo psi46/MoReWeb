@@ -18,6 +18,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.PixelMapMaxValue = self.TestResultEnvironmentObject.GradingParameters['PixelMapMaxValue']
         self.PixelMapMinValue = self.TestResultEnvironmentObject.GradingParameters['PixelMapMinValue']
 
+        self.ResultData['KeyValueDictPairs']['DeadPixels'] = {'Value': None, 'Label':'Dead Pixels'}
+        self.ResultData['KeyValueDictPairs']['InefficentPixels'] = {'Value': None, 'Label':'Ineff Pixels'}
+        self.ResultData['KeyValueDictPairs']['MaskDefects'] = {'Value': None, 'Label':'Mask Defect Pixels'}
+        self.ResultData['KeyValueDictPairs']['NoisyPixels'] = {'Value': None, 'Label':'Mask Defect Pixels'}
+
     def PopulateResultData(self):
         try:
             if self.ParentObject.ParentObject.ParentObject.nTrigPixelAlive:

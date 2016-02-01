@@ -82,7 +82,9 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         'nSinglePixDefect' : 0,
         'nDC' : 0,
         'nLowHREf' : 0,
-        'nOthers' : 0
+        'nOthers' : 0,
+        'commentsgradechange' : '',
+        'commentsgradechangeX' : ''
 }
 
 
@@ -113,6 +115,9 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
         modDC = []
         modlc = []
         modNorate = []
+        comments = ''
+        commentsX = ''
+
 
         for ModuleID in ModuleIDsList:
 
@@ -175,6 +180,7 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
             finalX = 0
             initial = 0
             final = 0
+            co = ""
 
             for RowTuple in Rows:
                 if RowTuple['ModuleID'] == ModuleID:
@@ -233,7 +239,12 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
 
                         #Number of manual regradings
                         reg = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'GradeComment', 'Value']))
-                        
+                        if (co=='' or co=='None'):
+                            c = str(self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], 'QualificationGroup', 'KeyValueDictPairs.json', 'Comment', 'Value']))
+                            c = c[13:-2]
+                            if (c is not 'None' and c is not ''):
+                                co = RowTuple['ModuleID'] + " : " + c
+
                         try: 
                             if (reg!=''):
                                 if (TestType == "XRayHRQualification"):
@@ -290,33 +301,51 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
 
 
 
-                    
+            modg = 0
+            modgX = 0
             if (initialX=='A' and finalX=='B'):
                 Numbers['nAtoBX'] += 1
+                modgX = 1
             elif (initialX=='A' and finalX=='C'):
                 Numbers['nAtoCX'] += 1
+                modgX = 1
             elif (initialX=='B' and finalX=='A'):
                 Numbers['nBtoAX'] += 1
+                modgX = 1
             elif (initialX=='B' and finalX=='C'):
                 Numbers['nBtoCX'] += 1
+                modgX = 1
             elif (initialX=='C' and finalX=='A'):
                 Numbers['nCtoAX'] += 1
+                modgX = 1
             elif (initialX=='C' and finalX=='B'):
                 Numbers['nCtoBX'] += 1
+                modgX = 1
 
             if (initial=='A' and final=='B'):
                 Numbers['nAtoB'] += 1
+                modg = 1
             elif (initial=='A' and final=='C'):
                 Numbers['nAtoC'] += 1
+                modg = 1
             elif (initial=='B' and final=='A'):
                 Numbers['nBtoA'] += 1
+                modg = 1
             elif (initial=='B' and final=='C'):
                 Numbers['nBtoC'] += 1
+                modg = 1
             elif (initial=='C' and final=='A'):
                 Numbers['nCtoA'] += 1
+                modg = 1
             elif (initial=='C' and final=='B'):
                 Numbers['nCtoB'] += 1
+                modg = 1
 
+
+            if modg == 1:
+                comments = comments + co + "\\\\"
+            if modgX == 1:
+                commentsX = commentsX + co + "\\\\"
 
 
 
@@ -654,6 +683,8 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
                     done = 1
 
 
+        Numbers['commentsgradechange'] = comments
+        Numbers['commentsgradechangeX'] = commentsX
 
        
         return Numbers

@@ -1,14 +1,12 @@
 import ROOT
 import AbstractClasses
-import glob
-import json
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
 
         self.NameSingle='GainPerPixel'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = 'Gain per pixel {Test}'.format(Test=self.Attributes['Test'])
         self.DisplayOptions = {
             'Width': 1,
@@ -21,11 +19,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         ROOT.gStyle.SetOptStat(111210)
         ROOT.gPad.SetLogy(1)
 
-        TableData = []
-
         Rows = self.FetchData()
         ModuleIDsList = self.GetModuleIDsList(Rows)
-        HTML = ""
 
         # define for which grades to plot histogram
         HistogramDict = {
@@ -62,8 +57,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         # set histogram options
         HistogramOptions = {
             'RootFileHistogramName': 'PHCalibrationGain',
-            'GradeJsonPath': ['Chips','Chip{Chip}', 'Grading','KeyValueDictPairs.json','PixelDefectsGrade','Value'],
-            'RootFilePath': ['Chips' ,'Chip{Chip}', 'PHCalibrationGain', '*.root'],
+            'GradeJsonPath': ['Chips', 'Chip{Chip}', 'Grading', 'KeyValueDictPairs.json', 'PixelDefectsGrade', 'Value'],
+            'RootFilePath': ['Chips', 'Chip{Chip}', 'PHCalibrationGain', 'PHCalibrationGain.root'],
             'StatsPosition': [0.20,0.88,0.80,0.88],
             'LegendPosition': [0.2, 0.88],
             'XTitle': "Gain [Vcal/ADC]",
