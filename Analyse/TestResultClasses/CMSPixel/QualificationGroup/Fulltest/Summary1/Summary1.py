@@ -13,7 +13,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle='Summary1'
         self.Title = 'Summary 1'
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
-        
+        self.ResultData['KeyValueDictPairs']['SpecialDefects'] = {'Label': 'Defects', 'Value': ''}
+
     def PopulateResultData(self):
         GradeMapping = {
             1:'A',
@@ -184,3 +185,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                 # the following line would enable these subgradings in the summary table
                 #self.ResultData['KeyList'].append(key)
+
+        SpecialDefects = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SpecialDefects']
+        if len(SpecialDefects) > 0:
+            self.ResultData['KeyValueDictPairs']['SpecialDefects'] = {'Label': 'Defects', 'Value': SpecialDefects, 'Style': 'color:red; font-weight:bold;'}
+            self.ResultData['KeyList'].append('SpecialDefects')
+

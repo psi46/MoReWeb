@@ -10,13 +10,13 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.Name = 'CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = 'Primary failure Reason'
         self.DisplayOptions = {
-            'Width': 2,
+            'Width': 3,
         }
         if self.Attributes.has_key('Width'):
             self.DisplayOptions['Width'] = self.Attributes['Width']
         self.SubPages = []
         self.SavePlotFile = True
-        self.Canvas.SetCanvasSize(500, 500)
+        self.Canvas.SetCanvasSize(800, 500)
         self.Canvas.SetFrameLineStyle(0)
         self.Canvas.SetFrameLineWidth(1)
         self.Canvas.SetFrameBorderMode(0)
@@ -73,7 +73,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             'Other']
         GradeCPrimaryReasons = {}
         for Reason in GradeCPrimaryReasonsList:
-            GradeCPrimaryReasons[Reason] = 0
+            GradeCPrimaryReasons[Reason] = []
 
         print "Grade C modules:",GradeCModules
 
@@ -83,35 +83,55 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             if ModuleID in DefectsDict:
 
                 ModuleDefectGrades = DefectsDict[ModuleID]
-                # check for primary reasons in given order, manual grading first!
+                # check for primary reasons in given order
 
-                if self.TestFailed(ModuleDefectGrades['ManualGradeFT']) or self.TestFailed(ModuleDefectGrades['ManualGradeHR']):
-                    GradeCPrimaryReasons['ManualGrading'] += 1
+                HasUserSpecifiedDefects = False
+                UserSpecifiedDefect = ''
+                for k,v in ModuleDefectGrades.iteritems():
+                    if k.upper().startswith('DEFECT_'):
+                        HasUserSpecifiedDefects = True
+                        UserSpecifiedDefect = '_'.join(k.split('_')[1:])
+                        print "---->",UserSpecifiedDefect
+                if type(UserSpecifiedDefect) == unicode:
+                    UserSpecifiedDefect = UserSpecifiedDefect.encode('utf8')
+
+                # user specified defects first!
+                if HasUserSpecifiedDefects:
+                    if UserSpecifiedDefect in GradeCPrimaryReasons:
+                        GradeCPrimaryReasons[UserSpecifiedDefect].append(ModuleID)
+                    else:
+                        GradeCPrimaryReasons[UserSpecifiedDefect] = [ModuleID]
+                # then manual grading
+                elif self.TestFailed(ModuleDefectGrades['ManualGradeFT']) or self.TestFailed(ModuleDefectGrades['ManualGradeHR']):
+                    GradeCPrimaryReasons['ManualGrading'].append(ModuleID)
+                #leakage current
                 elif self.TestFailed(ModuleDefectGrades['LCStartup']):
-                    GradeCPrimaryReasons['LeakageCurrentPON'] += 1
+                    GradeCPrimaryReasons['LeakageCurrentPON'].append(ModuleID)
                 elif self.TestFailed(ModuleDefectGrades['IV150']):
-                    GradeCPrimaryReasons['LeakageCurrentFQ'] += 1
+                    GradeCPrimaryReasons['LeakageCurrentFQ'].append(ModuleID)
+                # dead ROCs
                 elif self.TestFailed(ModuleDefectGrades['DeadROC']):
-                    GradeCPrimaryReasons['DeadROC'] += 1
+                    GradeCPrimaryReasons['DeadROC'].append(ModuleID)
+                # Pixel Defects
                 elif self.TestFailed(ModuleDefectGrades['TotalDefects']):
-                    GradeCPrimaryReasons['FulltestPixelDefects'] += 1
+                    GradeCPrimaryReasons['FulltestPixelDefects'].append(ModuleID)
                 elif self.TestFailed(ModuleDefectGrades['GradeFT']):
-                    GradeCPrimaryReasons['FulltestPerformance'] += 1
+                    GradeCPrimaryReasons['FulltestPerformance'].append(ModuleID)
                 elif self.TestFailed(ModuleDefectGrades['DoubleColumn']) or self.TestFailed(ModuleDefectGrades['UniformityProblems']):
-                    GradeCPrimaryReasons['XrayDoubleColumnDefects'] += 1
+                    GradeCPrimaryReasons['XrayDoubleColumnDefects'].append(ModuleID)
                 elif self.TestFailed(ModuleDefectGrades['TotalDefects_X-ray']):
-                    GradeCPrimaryReasons['XrayPixelDefects'] += 1
+                    GradeCPrimaryReasons['XrayPixelDefects'].append(ModuleID)
                 elif self.TestFailed(ModuleDefectGrades['lowHREfficiency']):
-                    GradeCPrimaryReasons['XrayEfficiency'] += 1
+                    GradeCPrimaryReasons['XrayEfficiency'].append(ModuleID)
                 elif self.TestFailed(ModuleDefectGrades['GradeHR']):
-                    GradeCPrimaryReasons['XrayPerformance'] += 1
+                    GradeCPrimaryReasons['XrayPerformance'].append(ModuleID)
                 else:
                     # otherwise add it to 'Other' category
-                    GradeCPrimaryReasons['Other'] += 1
+                    GradeCPrimaryReasons['Other'].append(ModuleID)
 
             else:
                 # otherwise add it to 'Other' category
-                GradeCPrimaryReasons['Other'] += 1
+                GradeCPrimaryReasons['Other'].append(ModuleID)
 
         print GradeCPrimaryReasons
 
@@ -119,25 +139,39 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         PieChartLabelsList = []
         PieChartColorsList = []
 
-        for Reason in GradeCPrimaryReasonsList:
-            if GradeCPrimaryReasons[Reason] > 0:
-                PieChartValsList.append(GradeCPrimaryReasons[Reason])
+        for Reason,v in GradeCPrimaryReasons.iteritems():
+            if len(GradeCPrimaryReasons[Reason]) > 0:
+                PieChartValsList.append(len(GradeCPrimaryReasons[Reason]))
                 PieChartLabelsList.append(Reason)
 
         PieChartValsArray = array.array('d', PieChartValsList)
-        ColorsArray = array.array('i',[2,3,4,5,6,7,8,9,10,11,12,13,14,15])
+        ColorsArray = array.array('i',[2,3,4,5,6,7,9,40,41,42,38,28,49,36,29,12,21,46,16,17,18,19])
         PieChartLabelsArray = [ array.array( 'c', '%s\0'%x ) for x in PieChartLabelsList ]
         LabelsInTheUglyWayPyRootNeedsThem = array.array( 'l', map( lambda x: x.buffer_info()[0], PieChartLabelsArray ) )
 
-        PieChart = ROOT.TPie(self.GetUniqueID(), "TEST! still work in progress!", len(PieChartValsList), PieChartValsArray, ColorsArray, LabelsInTheUglyWayPyRootNeedsThem)
+        PieChart = ROOT.TPie(self.GetUniqueID(), "Primary failure reason", len(PieChartValsList), PieChartValsArray, ColorsArray, LabelsInTheUglyWayPyRootNeedsThem)
         PieChart.SetLabelFormat("%val")
-        PieChart.Draw("3d nol")
+        PieChart.Draw("3d nol <")
 
         Legend = PieChart.MakeLegend(0.8,0.65,1.0,0.95)
         self.SaveCanvas()
-        HTML = self.Image(self.Attributes['ImageFile'])
+        ImageHTML = self.Boxed(self.Image(self.Attributes['ImageFile']))
+
+        TextHTML = "<div style='height:20px;'></div>"
+        # user specified defect (via defects.txt)
+        for k,v in GradeCPrimaryReasons.iteritems():
+            # check if it is a user specified defect which has priority!
+            if k not in GradeCPrimaryReasonsList:
+                TextHTML += "<b>%s (%d)</b>:<br>%s<br><br>"%(k, len(v), ', '.join(v))
+        # all other defects
+        for k in GradeCPrimaryReasonsList:
+            if k in GradeCPrimaryReasons and len(GradeCPrimaryReasons[k]) > 0:
+                v = GradeCPrimaryReasons[k]
+                TextHTML += "<b>%s (%d)</b>:<br>%s<br><br>"%(k, len(v), ', '.join(v))
+
+        HTML = "<div>%s<div><div style='float:left;width:400px;'>%s</div>"%(ImageHTML, TextHTML)
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
         self.DisplayErrorsList()
-        return self.Boxed(HTML)
+        return HTML

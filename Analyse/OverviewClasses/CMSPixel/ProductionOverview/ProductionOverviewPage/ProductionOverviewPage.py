@@ -187,6 +187,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     NumModulesToShow -= NumModulesMaxPerList
                     Offset += NumModulesMaxPerList
                 self.SumJSONFilesModules.append('ModuleFailuresOverview')
+
+                self.SubPages.append(
+                    {
+                        "Key": "PrimaryFailureReason",
+                        "Module": "PrimaryFailureReason",
+                        "InitialAttributes" : {
+                            "DateBegin": self.Attributes['DateBegin'],
+                            "DateEnd": self.Attributes['DateEnd'],
+                        },
+                    }
+                )
         else:     
             self.SubPages.append(
                 {
@@ -211,19 +222,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     },
                 }
             )
-
-
-
-        self.SubPages.append(
-            {
-                "Key": "PrimaryFailureReason",
-                "Module": "PrimaryFailureReason",
-                "InitialAttributes" : {
-                    "DateBegin": self.Attributes['DateBegin'],
-                    "DateEnd": self.Attributes['DateEnd'],
-                },
-            }
-        )
 
         ### bump bonding ###
         if not self.singleSubtest or 'BumpBonding' in self.singleSubtest:

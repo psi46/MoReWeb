@@ -161,6 +161,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                 DefectsDict[ModuleID]['GradeFT'][RowTuple['TestType']] = 'B'
                         except:
                             self.ProblematicModulesList.append(ModuleID)
+        ### DEFECTS for defects.txt
+                    Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary1', 'KeyValueDictPairs.json', 'SpecialDefects', 'Value'])
+                    if Value is not None:
+                        try:
+                            DefectsList = [x.strip() for x in Value.split(',')]
+                            for Defect in DefectsList:
+                                if 'DEFECT_%s'%Defect not in DefectsDict[ModuleID]:
+                                    DefectsDict[ModuleID]['DEFECT_%s'%Defect] = {}
+                                DefectsDict[ModuleID]['DEFECT_%s'%Defect][RowTuple['TestType']] = 'C'
+                        except:
+                            raise
+                            self.ProblematicModulesList.append(ModuleID)
 
         ### ManualGradeFT
                     Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Grading', 'KeyValueDictPairs.json', 'ManualGrade', 'Value'])
@@ -499,25 +511,29 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     for Test, Grade in Grades.iteritems():
                         #print "  Test:", Test, " -> Grade ", Grade
                         TestIndex = FullTests.index(Test)
-                        if Grade == 'C':
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorC)
-                        elif Grade == 'B':
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorB)
-                        elif Grade == 'A':
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorA)
-                        else:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ROOT.kBlue)
+                        if Defect in YLabels:
+                            YPosition = 1 + 3*YLabels.index(Defect)
+                            if Grade == 'C':
+                                Summary.SetBinContent(BinNumber, YPosition + TestIndex, ColorC)
+                            elif Grade == 'B':
+                                Summary.SetBinContent(BinNumber, YPosition + TestIndex, ColorB)
+                            elif Grade == 'A':
+                                Summary.SetBinContent(BinNumber, YPosition + TestIndex, ColorA)
+                            else:
+                                Summary.SetBinContent(BinNumber, YPosition + TestIndex, ROOT.kBlue)
                 else:
                     Grade = Grades.strip()
                     for TestIndex in range(0,3):
-                        if Grade == 'C':
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorC)
-                        elif Grade == 'B':
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorB)
-                        elif Grade == 'A':
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ColorA)
-                        else:
-                            Summary.SetBinContent(BinNumber, 1 + 3*YLabels.index(Defect) + TestIndex, ROOT.kBlue)
+                        if Defect in YLabels:
+                            YPosition = 1 + 3*YLabels.index(Defect)
+                            if Grade == 'C':
+                                Summary.SetBinContent(BinNumber, YPosition + TestIndex, ColorC)
+                            elif Grade == 'B':
+                                Summary.SetBinContent(BinNumber, YPosition + TestIndex, ColorB)
+                            elif Grade == 'A':
+                                Summary.SetBinContent(BinNumber, YPosition + TestIndex, ColorA)
+                            else:
+                                Summary.SetBinContent(BinNumber, YPosition + TestIndex, ROOT.kBlue)
  
 
         ROOT.gPad.SetLeftMargin(0.16)

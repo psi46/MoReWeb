@@ -111,7 +111,3 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['KeyList'].append('ModuleIa')
         except:
             pass
-
-
-
-
