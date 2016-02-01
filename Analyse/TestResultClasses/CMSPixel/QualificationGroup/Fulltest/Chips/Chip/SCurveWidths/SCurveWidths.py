@@ -84,6 +84,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         NoiseMin = self.TestResultEnvironmentObject.GradingParameters['pixelNoiseMin']
         NoiseMax = self.TestResultEnvironmentObject.GradingParameters['pixelNoiseMax']
 
+        FitResultDataIncomplete = False
         if not SCurveFile:
             raise Exception('Cannot find SCurveFile "%s"'%SCurveFileName)
         else:
@@ -122,6 +123,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         self.ResultData['Plot']['ROOTObject_hn'].SetBinContent(1+column, 1+row, Width)
 
                     else:
+                        if not FitResultDataIncomplete:
+                            print "\x1b[31mWARNING: fit data looks incomplete, try re-fitting with -r option!!!!\x1b[0m"
+                        FitResultDataIncomplete = True
                         if self.verbose: print column, row, 'NAN'
             if self.verbose:
                 print 'Entries: ', self.ResultData['Plot']['ROOTObject'].GetEntries(), self.ResultData['Plot']['ROOTObject'].GetMean(), self.ResultData['Plot']['ROOTObject'].GetRMS()
