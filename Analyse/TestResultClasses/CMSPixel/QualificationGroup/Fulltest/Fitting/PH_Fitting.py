@@ -278,6 +278,8 @@ class PH_Fitting():
             self.nFitParams = 6
         if 3 == self.fitMode:
             self.phFit = ROOT.TF1("phFit", "[3] + [2] * TMath::TanH([0]*x - [1])", 0, 1500.)
+        elif 0 == self.fitMode:
+            self.phFit = ROOT.TF1("phFit", "[1]*x + [0]", -400., 1000.)
         else:
             self.phFit = ROOT.TF1("phFit", "TMath::Tan([0]*x - [4]) + [1]*x**3+ [5]*x[0]**2 + [2]*x[0] + [3]", -400., 1000.)
         self.phFit.SetNpx(1000)
@@ -420,23 +422,19 @@ class PH_Fitting():
             else:
                 slope = 0.5
 
-            phFitClone.SetParameter(2, slope)
-            phFitClone.SetParameter(3, vcals[upperPoint] - slope * phs[upperPoint])
+            phFitClone.SetParameter(1, slope)
+            phFitClone.SetParameter(0, vcals[upperPoint] - slope * phs[upperPoint])
         except:
             #data is missing, or N/A
             return [0] * (self.nFitParams + 1)
 
-        phFitClone.FixParameter(0, 0.)
-        phFitClone.FixParameter(1, 0.)
-        phFitClone.FixParameter(4, 0.)
-        phFitClone.FixParameter(5, 0.)
-
         if self.verbose:
-            graph.Fit("phFit", "R", "")
+            graph.Fit(phFitClone, "R", "")
         else:
-            graph.Fit("phFit", "RQ", "")
+            graph.Fit(phFitClone, "RQ", "")
 
-        retVal = [phFitClone.GetParameter(i) for i in range(0,self.nFitParams)]
+        #                   slope                       offset
+        retVal = [0.0, 0.0, phFitClone.GetParameter(1), phFitClone.GetParameter(0), 0.0, 0.0]
         retVal.append(phFitClone.GetChisquare() / phFitClone.GetNDF() if phFitClone.GetNDF() > 0 else 0)
         return retVal
 
