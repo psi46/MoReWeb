@@ -247,8 +247,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # double columns with bad efficiency
             BadDoubleColumnsEfficiency = self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']
             for DoubleColumnDefect in BadDoubleColumnsEfficiency:
-                BadDoubleColumns.add(DoubleColumnDefect['Chip'], DoubleColumnDefect['DoubleColumn'])
-
+                BadDoubleColumns.add((DoubleColumnDefect['Chip'], DoubleColumnDefect['DoubleColumn']))
 
             NBadDoubleColumns = len(BadDoubleColumns)
             self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'] = NBadDoubleColumns
