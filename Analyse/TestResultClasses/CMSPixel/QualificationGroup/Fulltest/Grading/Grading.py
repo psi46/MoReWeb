@@ -144,8 +144,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # missing subtest results
         MissingSubtests = False
         nChips = len(self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList'])
-        if nChips < 16:
-            print "nChips: ", nChips
+        try:
+            nChipsExpected = self.ParentObject.Attributes['NumberOfChips']
+        except:
+            nChipsExpected = 16
+
+        if nChips != nChipsExpected:
+            print "nChips: %d != %d (expected)"%(nChips, nChipsExpected)
             MissingSubtests = True
             ModuleGrade = 3
 

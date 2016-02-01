@@ -14,7 +14,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = '_'
 
         self.FitRevisionScurves = 0
-        self.FitRevisionPHlin = 0
+        self.FitRevisionPHlin = 1
         self.FitRevisionPHtan = 0
 
     def PopulateResultData(self):

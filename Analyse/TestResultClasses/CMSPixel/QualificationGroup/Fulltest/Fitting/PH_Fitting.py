@@ -402,7 +402,7 @@ class PH_Fitting():
         return retVal
 
     def FitLin(self,calibration):
-        n,phs,vcals,eph,evcal = self.getArrayOfCalibrationPoints(calibration, False, True)
+        n,phs,vcals,eph,evcal = self.getArrayOfCalibrationPoints(calibration, excludeLast=True, excludeSaturated=True)
         graph = self.GetGraph([n,phs,vcals,eph,evcal])
 
         phFitClone = self.phFit
