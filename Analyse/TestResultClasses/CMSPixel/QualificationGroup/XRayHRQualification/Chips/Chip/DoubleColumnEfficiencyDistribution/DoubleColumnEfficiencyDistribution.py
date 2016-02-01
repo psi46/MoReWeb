@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import ROOT
 import AbstractClasses
-import AbstractClasses.Helper.HistoGetter as HistoGetter
 import array
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
@@ -22,13 +21,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
         Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']
         PixelArea = 150 * 100 * 1.e-8
-        RealHitrateList = array.array('d', [0])
-        EfficiencyList = array.array('d', [100])
         ScalingFactor = 1e-6
 
         BAD_DOUBLECOLUMN_DATA = 1
         BAD_DOUBLECOLUMN_FIT = 2
-        BAD_DOUBLECOLUMN_BADPIX = 3
         BAD_DOUBLECOLUMN_EFF = 4
         
         MinDCEfficiencyFiducial = self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_min_fiducial_dc_eff']
@@ -40,6 +36,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         NonEmptyDoubleColumnFound = False
         for InterpolationRate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             DoubleColumnEfficienciesRate = []
+            FiducialDoubleColumnEfficienciesRate = []
 
             # and all double columns
             for DoubleColumn in range(0, 26):
@@ -53,12 +50,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                     PixelRateList = array.array('d')
                     PixelEfficiencyList = array.array('d')
-                    BadPixelsList = []
-
-                    PixelEfficiencyMean = EfficiencyMapROOTObject.GetMean()
-                    PixelEfficiencyRMS = EfficiencyMapROOTObject.GetRMS()
-                    PixelEfficiencyThreshold = min(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_bad_pixels_cut_max'], max(self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_bad_pixels_cut_min'], PixelEfficiencyMean - self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_bad_pixels_cut_sigma'] * PixelEfficiencyRMS))
-                    MaximumNumberAllowedBadPixels = self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_bad_pixels_per_double_column']
 
                     for PixNo in range(0, 160):
                         col = DoubleColumn * 2 + (1 if PixNo > 79 else 0)
@@ -71,18 +62,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             PixelEfficiency = PixelNHits/Ntrig
                             AreaFactor = 1 * (2 if col==0 or col==51 else 1) * (2 if row==0 or row==79 else 1)
 
-                            if PixelEfficiency < PixelEfficiencyThreshold:
-                                BadPixelsList.append([PixNo])
-
                             # in MHz/cm2
                             PixelRate = BackgroundMapNHits / (25 * 1e-9 * Ntrig * 4160 * PixelArea * AreaFactor) * ScalingFactor
 
                             PixelRateList.append(PixelRate)
                             PixelEfficiencyList.append(PixelEfficiency)
-
-                    # if more than X pixel with very(!) bad efficiency in double column, declare DC as bad
-                    if len(BadPixelsList) > MaximumNumberAllowedBadPixels:
-                        BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_BADPIX})
 
                     try:
                         DoubleColumnMeanEfficiency = ROOT.TMath.Mean(len(PixelEfficiencyList), PixelEfficiencyList)
@@ -127,16 +111,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                     BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_EFF})
 
                         DoubleColumnEfficienciesRate.append(InterpolatedEfficiency)
+                        if DoubleColumn not in [0, 25]:
+                            FiducialDoubleColumnEfficienciesRate.append(InterpolatedEfficiency)
                         cubicFit.Delete()
                         EfficiencyGraph.Delete()
                         NonEmptyDoubleColumnFound = True
-                    else:
-                        pass
 
                 except:
                     BadDoubleColumns.append({'Chip': ChipNo, 'DoubleColumn': DoubleColumn, 'Error': BAD_DOUBLECOLUMN_FIT})
 
             DoubleColumnEfficiencies.append(DoubleColumnEfficienciesRate)
+
+            self.ResultData['KeyValueDictPairs']['MeanEfficiency_%d'%InterpolationRate] = {'Value': '-1', 'Label': 'Mean Efficiency %d MHz/cm2'%InterpolationRate}
+            try:
+                MeanEfficiency = sum(FiducialDoubleColumnEfficienciesRate)/len(FiducialDoubleColumnEfficienciesRate) if len(FiducialDoubleColumnEfficienciesRate) > 0 else 0
+                self.ResultData['KeyValueDictPairs']['MeanEfficiency_%d'%InterpolationRate]['Value'] = '{MeanEfficiency:1.2f}'.format(MeanEfficiency=MeanEfficiency)
+                self.ResultData['KeyList'].append('MeanEfficiency_%d'%InterpolationRate)
+            except:
+                pass
+
 
         # get minimum efficiency
         AllDoubleColumnEfficiencies = [item for sublist in DoubleColumnEfficiencies for item in sublist]

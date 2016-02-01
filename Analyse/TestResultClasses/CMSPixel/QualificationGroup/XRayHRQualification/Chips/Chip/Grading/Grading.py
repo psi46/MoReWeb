@@ -240,7 +240,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         NBadDoubleColumns = -1
         BadDoubleColumnGrade = -1
         try:
-            NBadDoubleColumns = int(self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['KeyValueDictPairs']['NBadDoubleColumns']['Value'])
+
+            # double columns with many defects
+            BadDoubleColumns = self.ParentObject.ResultData['SubTestResults']['DoubleColumnGrading'].ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value']
+
+            # double columns with bad efficiency
+            BadDoubleColumnsEfficiency = self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']
+            for DoubleColumnDefect in BadDoubleColumnsEfficiency:
+                BadDoubleColumns.add(DoubleColumnDefect['Chip'], DoubleColumnDefect['DoubleColumn'])
+
+
+            NBadDoubleColumns = len(BadDoubleColumns)
             self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'] = NBadDoubleColumns
             if NBadDoubleColumns > 0:
                 BadDoubleColumnGrade = 3
@@ -248,7 +258,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 BadDoubleColumnGrade = 1
             ROCGrades.append(BadDoubleColumnGrade)
         except:
-            pass
+            print "\x1b[31mCan't get list of defective double columns for chip %d\x1b[0m"%ChipNo
 
         self.ResultData['KeyValueDictPairs']['BadDoubleColumnsGrade']['Value'] = GradeMapping[BadDoubleColumnGrade]
 
@@ -431,10 +441,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             else:
                 raise Exception("NO HR DATA TEST (HITMAP) FOUND!")
 
+            InefficientPixelList = self.ParentObject.ResultData['SubTestResults']['PixelEfficiency'].ResultData['KeyValueDictPairs']['InefficientPixels']['Value']
+
         except:
             NoisePixelsList = set()
             BumpBondingDefectPixelsList = set()
             HotPixelsList = set()
+            InefficientPixelList = set()
             self.ResultData['HiddenData']['MissingTests'] = 1
 
             # Start red color
@@ -449,7 +462,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             sys.stdout.flush()
 
 
-        TotalPixelDefectsList = BumpBondingDefectPixelsList | NoisePixelsList | HotPixelsList
+        TotalPixelDefectsList = BumpBondingDefectPixelsList | NoisePixelsList | HotPixelsList | InefficientPixelList
 
         if self.ResultData['HiddenData']['MissingTests'] < 1:
             TotalPixelDefects = len(TotalPixelDefectsList)

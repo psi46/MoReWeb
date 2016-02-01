@@ -36,6 +36,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             print 'testdate',self.Attributes['TestDate']
             raise e
 
+        TestDuration = '-'
         try:
             logFileSearchString = self.RawTestSessionDataPath + "/logfiles/elComandante.log"
             logFiles = glob.glob(logFileSearchString)
@@ -60,10 +61,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             else:
                 print "no 'elComandante.log' file found!"
-                raise
         except:
-            raise
-            TestDuration = '-'
+            pass
 
         self.ResultData['KeyValueDictPairs'] = {
             'TestCenter': {

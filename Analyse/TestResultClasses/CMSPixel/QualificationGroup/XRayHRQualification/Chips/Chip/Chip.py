@@ -185,6 +185,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     
                 },
                 {
+                    'Key':'PixelEfficiency',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Show': False,
+                    },
+
+                },
+                {
+                    'Key':'DoubleColumnGrading',
+                    'InitialAttributes':{
+                    },
+                    'DisplayOptions':{
+                        'Show': False,
+                    },
+
+                },
+                {
                     'Key':'DoubleColumnEfficiencyDistribution',
                     'InitialAttributes':{
                     },
