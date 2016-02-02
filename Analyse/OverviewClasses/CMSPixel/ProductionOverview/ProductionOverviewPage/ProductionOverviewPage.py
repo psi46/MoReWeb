@@ -527,13 +527,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for Test in TestsList:
                 self.SubPages.append(
                     {
-                        "Key": "CalDelPerModule_{Test}".format(Test = Test),
-                        "Module": "CalDelPerModule",
+                        "Key": "DACSpreadPerModule_CalDel_{Test}".format(Test = Test),
+                        "Module": "DACSpreadPerModule",
                         "InitialAttributes" : {
                             "Test": "{Test}".format(Test = Test),
                             "StorageKey" : "CalDelPerModule_{Test}".format(Test = Test),
                             "DateBegin": self.Attributes['DateBegin'],
                             "DateEnd": self.Attributes['DateEnd'],
+                            "JSONPath": ['CalDel', 'KeyValueDictPairs.json', 'caldelspread', 'Value'],
+                            "HistogramMin": 0,
+                            "HistogramMax": 100,
+                            "NBins": 50,
+                            "Title": "CalDel difference %s"%Test,
                         }
                     }
                 )
@@ -542,28 +547,39 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for Test in TestsList:
                 self.SubPages.append(
                     {
-                        "Key": "PHScalePerModule_{Test}".format(Test = Test),
-                        "Module": "PHScalePerModule",
+                        "Key": "DACSpreadPerModule_PHScale_{Test}".format(Test = Test),
+                        "Module": "DACSpreadPerModule",
                         "InitialAttributes" : {
                             "Test": "{Test}".format(Test = Test),
                             "StorageKey" : "PHScalePerModule_{Test}".format(Test = Test),
                             "DateBegin": self.Attributes['DateBegin'],
                             "DateEnd": self.Attributes['DateEnd'],
+                            "JSONPath": ['PHScale', 'KeyValueDictPairs.json', 'phscalespread', 'Value'],
+                            "HistogramMin": 0,
+                            "HistogramMax": 100,
+                            "NBins": 50,
+                            "Title": "PHScale difference %s"%Test,
                         }
                     }
                 )
+
 
         if not self.singleSubtest or 'PHOffsetSpread' in self.singleSubtest:
             for Test in TestsList:
                 self.SubPages.append(
                     {
-                        "Key": "PHOffsetPerModule_{Test}".format(Test = Test),
-                        "Module": "PHOffsetPerModule",
+                        "Key": "DACSpreadPerModule_PHOffset_{Test}".format(Test = Test),
+                        "Module": "DACSpreadPerModule",
                         "InitialAttributes" : {
                             "Test": "{Test}".format(Test = Test),
                             "StorageKey" : "PHOffsetPerModule_{Test}".format(Test = Test),
                             "DateBegin": self.Attributes['DateBegin'],
                             "DateEnd": self.Attributes['DateEnd'],
+                            "JSONPath": ['PHOffset', 'KeyValueDictPairs.json', 'phoffsetspread', 'Value'],
+                            "HistogramMin": 0,
+                            "HistogramMax": 100,
+                            "NBins": 50,
+                            "Title": "PHOffset difference %s"%Test,
                         }
                     }
                 )
@@ -572,13 +588,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for Test in TestsList:
                 self.SubPages.append(
                     {
-                        "Key": "VthrCompPerModule_{Test}".format(Test = Test),
-                        "Module": "VthrCompPerModule",
+                        "Key": "DACSpreadPerModule_VthrComp_{Test}".format(Test = Test),
+                        "Module": "DACSpreadPerModule",
                         "InitialAttributes" : {
                             "Test": "{Test}".format(Test = Test),
                             "StorageKey" : "VthrCompPerModule_{Test}".format(Test = Test),
                             "DateBegin": self.Attributes['DateBegin'],
                             "DateEnd": self.Attributes['DateEnd'],
+                            "JSONPath": ['VthrComp', 'KeyValueDictPairs.json', 'vthrcompspread', 'Value'],
+                            "HistogramMin": 0,
+                            "HistogramMax": 100,
+                            "NBins": 50,
+                            "Title": "VthrComp difference %s"%Test,
                         }
                     }
                 )
@@ -587,13 +608,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for Test in TestsList:
                 self.SubPages.append(
                     {
-                        "Key": "VtrimPerModule_{Test}".format(Test = Test),
-                        "Module": "VtrimPerModule",
+                        "Key": "DACSpreadPerModule_Vtrim_{Test}".format(Test = Test),
+                        "Module": "DACSpreadPerModule",
                         "InitialAttributes" : {
                             "Test": "{Test}".format(Test = Test),
                             "StorageKey" : "VtrimPerModule_{Test}".format(Test = Test),
                             "DateBegin": self.Attributes['DateBegin'],
                             "DateEnd": self.Attributes['DateEnd'],
+                            "JSONPath": ['Vtrim', 'KeyValueDictPairs.json', 'vtrimspread', 'Value'],
+                            "HistogramMin": 0,
+                            "HistogramMax": 100,
+                            "NBins": 50,
+                            "Title": "Vtrim difference %s"%Test,
                         }
                     }
                 )
@@ -602,13 +628,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             for Test in TestsList:
                 self.SubPages.append(
                     {
-                        "Key": "VanaPerModule_{Test}".format(Test = Test),
-                        "Module": "VanaPerModule",
+                        "Key": "DACSpreadPerModule_Vana_{Test}".format(Test = Test),
+                        "Module": "DACSpreadPerModule",
                         "InitialAttributes" : {
                             "Test": "{Test}".format(Test = Test),
                             "StorageKey" : "VanaPerModule_{Test}".format(Test = Test),
                             "DateBegin": self.Attributes['DateBegin'],
                             "DateEnd": self.Attributes['DateEnd'],
+                            "JSONPath": ['Vana', 'KeyValueDictPairs.json', 'vanaspread', 'Value'],
+                            "HistogramMin": 0,
+                            "HistogramMax": 100,
+                            "NBins": 50,
+                            "Title": "Vana difference %s"%Test,
                         }
                     }
                 )

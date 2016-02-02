@@ -22,6 +22,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def GenerateOverview(self):
         ROOT.gStyle.SetOptStat(0)
+        ROOT.gPad.SetLogy(1)
         ROOT.gPad.SetLeftMargin(0.04)
         ROOT.gPad.SetRightMargin(0.03)
 
@@ -95,7 +96,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         # fill histograms
         if HistogramsCreated:
-            print "fill..."
             for DTB_FW, Histogram in Histograms.iteritems():
                 if Histograms[DTB_FW]:
                     binX = 1
@@ -118,7 +118,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             if max(data[DTB_FW]) > MaxY:
                 MaxY = max(data[DTB_FW])
         for DTB_FW in data:
-            Histograms[DTB_FW].GetYaxis().SetRangeUser(0, MaxY * 1.1)
+            Histograms[DTB_FW].GetYaxis().SetRangeUser(0.5, MaxY * 1.5)
             Histograms[DTB_FW].GetXaxis().LabelsOption("v")
 
         # draw histograms
@@ -156,5 +156,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         HTML = self.Image(self.Attributes['ImageFile'], {'height': '300px'})
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
+        ROOT.gPad.SetLogy(0)
         return self.Boxed(HTML)
 

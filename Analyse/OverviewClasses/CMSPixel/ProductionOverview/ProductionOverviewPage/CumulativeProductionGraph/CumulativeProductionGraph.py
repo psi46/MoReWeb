@@ -127,14 +127,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             hA.GetXaxis().SetTimeFormat("#splitline{%m-%d}{ %Y}")
             hA.GetYaxis().SetTitle("# modules")
             hA.GetYaxis().SetTitleOffset(0.7)
-            hA.GetYaxis().SetRangeUser(0, 1.05*max([hA.GetMaximum(),hB.GetMaximum(),hC.GetMaximum(),hN.GetMaximum()]))
 
             ROOT.gStyle.SetOptStat(0)
 
             if 'AddAB' in self.Attributes and self.Attributes['AddAB']:
                 hA.Add(hB)
+                hA.GetYaxis().SetRangeUser(0, 1.05*max([hA.GetMaximum(),hC.GetMaximum(),hN.GetMaximum()]))
                 hA.Draw()
             else:
+                hA.GetYaxis().SetRangeUser(0, 1.05*max([hA.GetMaximum(),hB.GetMaximum(),hC.GetMaximum(),hN.GetMaximum()]))
                 hA.Draw()
                 hB.Draw("same")
 
