@@ -37,6 +37,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '-',
                 'Label':'Readback calibration'
             },
+            'Defects': {
+                'Value': '',
+                'Label':'Total Pixel defects'
+            },
         }
 
         self.ResultData['KeyList'] = ['Module', 'Grade', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback']
@@ -46,6 +50,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         chipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
         NumBumpBondingProblems = []
         NumDeadPixels = []
+        NumDefects = []
         PixelDefectsGrades = []
         Incomplete = False
         for i in chipResults:
@@ -53,6 +58,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 PixelDefectsGrade = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsGrade']['Value'])
                 NumBumpBondingProblems.append(int(i['TestResultObject'].ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['nBumpBondingProblems']['Value']))
                 NumDeadPixels.append(int(i['TestResultObject'].ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NDeadPixels']['Value']))
+                NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']['Value']))
             except:
                 Incomplete = True
                 PixelDefectsGrade = 3
@@ -76,6 +82,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['DeadPixels']['Value'] = sum(NumDeadPixels)
         self.ResultData['KeyValueDictPairs']['DeadPixelsMax']['Value'] = max(NumDeadPixels)
         self.ResultData['KeyValueDictPairs']['Readback']['Value'] = ReadbackStatus
+        self.ResultData['KeyValueDictPairs']['Defects']['Value'] = sum(NumDefects)
 
         self.ResultData['HiddenData']['ROCsLessThanOnePercent'] = len([x for x in PixelDefectsGrades if x == 1])
         self.ResultData['HiddenData']['ROCsMoreThanOnePercent'] = len([x for x in PixelDefectsGrades if x == 2])

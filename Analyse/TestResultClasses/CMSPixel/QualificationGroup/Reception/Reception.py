@@ -114,6 +114,16 @@ class TestResult(GeneralTestResult):
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                 },
             },
+            {
+                'Key': 'Database',
+                'DisplayOptions': {
+                    'Width': 5,
+                    'Order': 200,
+                },
+                'InitialAttributes': {
+                    'StorageKey': 'Database'
+                }
+            },
         ]
 
 

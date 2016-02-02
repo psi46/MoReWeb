@@ -106,6 +106,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         PixelDefectsGradeALimit = self.TestResultEnvironmentObject.GradingParameters['defectsB']
         PixelDefectsGradeBLimit = self.TestResultEnvironmentObject.GradingParameters['defectsC']
         totalDefects = len(self.ResultData['HiddenData']['TotalList'])
+        self.ResultData['HiddenData']['NDefects'] = totalDefects
+        self.ResultData['HiddenData']['NDefectiveBumps'] = len(self.ResultData['HiddenData']['DeadBumpList']) if self.ResultData['HiddenData']['DeadBumpList'] is not None else 0
+        self.ResultData['HiddenData']['NDeadPixels'] = len(self.ResultData['HiddenData']['DeadPixelList']) if self.ResultData['HiddenData']['DeadPixelList'] is not None else 0
         if totalDefects < PixelDefectsGradeALimit:
             pixelDefectsGrade = 1
         elif totalDefects < PixelDefectsGradeBLimit:
