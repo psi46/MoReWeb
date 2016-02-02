@@ -9,6 +9,8 @@ except NameError:
 def getDefectsListLength(defectsList):
     if type(defectsList) == list:
         return len(defectsList)
+    elif type(defectsList) == set:
+        return len(defectsList)
     else:
         return -1
 
