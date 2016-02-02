@@ -124,6 +124,14 @@ class TestResult(GeneralTestResult):
                     'StorageKey': 'Database'
                 }
             },
+            {
+                'Key': 'Logfile',
+                'DisplayOptions': {
+                    'Width': 1,
+                    'Order': 120,
+                    'Show': True,
+                }
+            },
         ]
 
 
