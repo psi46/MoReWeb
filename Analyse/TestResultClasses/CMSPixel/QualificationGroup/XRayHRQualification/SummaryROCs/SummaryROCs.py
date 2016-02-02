@@ -13,7 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         
     def PopulateResultData(self):
-        TableHeader = ['ROC','Grade','Def', 'DC']
+        TableHeader = ['ROC', 'Grade', 'Def', 'DC']
         for Rate in self.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             TableHeader.append('Eff {Rate}'.format(Rate=Rate))
 
@@ -23,10 +23,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             TableHeader.append('Rate "{Rate}"'.format(Rate=Rate))
             # display bb defects only for highest rate = best statistics
             if Rate == max(self.ParentObject.Attributes['Rates']['HRData']):
-              TableHeader.append('BB def'.format(Rate=Rate))
-        TableHeader.append('R/O'.format(Rate=Rate))
+                TableHeader.append('BB def')
 
-        TableHeader.append('Unif.'.format(Rate=Rate))
+        TableHeader.append('R/O')
+        TableHeader.append('Unif.')
 
         for Rate in self.ParentObject.Attributes['Rates']['HRSCurves']:
             TableHeader.append('Thr [e-] "{Rate}"'.format(Rate=Rate))
@@ -35,8 +35,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Table'] = {
             'HEADER': [TableHeader],
-            'BODY':[],
-            'FOOTER':[],
+            'BODY': [],
+            'FOOTER': [],
         }
         LinkHTMLTemplate = self.TestResultEnvironmentObject.HtmlParser.getSubpart(
             self.TestResultEnvironmentObject.OverviewHTMLTemplate,
@@ -61,7 +61,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                  '<div style="text-align:center;">%s</div>'%ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value'],             
             ]
         
-            # pixe defects
+            # pixel defects
             try:
                 PixelDefects = int(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefects']['Value'])
             except:

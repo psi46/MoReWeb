@@ -273,12 +273,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 Grades[GradeKey] = -1
 
             HotPixelMapROOTObject = self.ParentObject.ResultData['SubTestResults']['HotPixelMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
-            HitMapROOTObject = self.ParentObject.ResultData['SubTestResults']['HitMap_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
             ColumnReadoutUniformityROOTObject = self.ParentObject.ResultData['SubTestResults']['ColumnUniformityPerColumn'].ResultData['Plot']['ROOTObject']
-            ColumnReadoutUniformityOverTimeROOTObject = self.ParentObject.ResultData['SubTestResults']['ColumnUniformityEventsPerColumn_{Rate}'.format(Rate=Rate)].ResultData['Plot']['ROOTObject']
             ReadoutUniformityOverTimeTestResultObject = self.ParentObject.ResultData['SubTestResults']['ReadoutUniformityOverTime_{Rate}'.format(Rate=Rate)]
 
-            HotPixelThreshold =self.TestResultEnvironmentObject.GradingParameters['XRayHighRateHotPixels_Threshold']
             for Row in range(self.nRows):
                 for Column in range(self.nCols):
                     PixelIsHotPixel = HotPixelMapROOTObject.GetBinContent(Column+1, Row+1) if HotPixelMapROOTObject else False
@@ -319,7 +316,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             NumberValues['NumberOfNonUniformEvents'] = 0
             for Event in range(1, LastBin-1):
                 EventHits = ReadoutUniformityOverTimeTestResultObject.ResultData['Plot']['ROOTObject'].GetBinContent(Event+1)
-                if( abs(EventHits-ReadoutUniformityOverTimeMean) > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']
+                if(abs(EventHits-ReadoutUniformityOverTimeMean) > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_readout_uniformity']
                     *ReadoutUniformityOverTimeSigma
                 ):
                     NumberValues['NumberOfNonUniformEvents'] += 1
@@ -510,6 +507,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Grades['PixelDefectsGrade'] = 3
         if not 'PixelDefectsGrade' in OmitGradesInFinalGrading:   
             ROCGrades.append(Grades['PixelDefectsGrade'])
+
+        # check if PixelDefects grading is incomplete
+        if TotalPixelDefects < 0:
+            ROCGrades.append(3)
 
         ### Final ROC Grade ###
         self.ResultData['KeyValueDictPairs']['ROCGrade']['Value'] = GradeMapping[max(ROCGrades)]

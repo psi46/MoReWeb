@@ -53,9 +53,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         TotalDefectPixelsList = set()
 
         TestIncomplete = False
+        TestIncompleteWarningShown = False
 
-        try:
-            for i in chipResults:
+        for i in chipResults:
+            try:
                 ROCGrade = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value']
                 GradeHistogram[ROCGrade] += 1
                 if ROCGrade == GradeMapping[2] and ModuleGrade < 2:
@@ -130,18 +131,22 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     MeanNoise = sum(NoiseList) / float(len(NoiseList))
                 else:
                     MeanNoise = -1
-        except:
-            TestIncomplete = True
-            # Start red color
-            sys.stdout.write("\x1b[31m")
-            sys.stdout.flush()
-            print "X-ray test incomplete!!!"
-            # Print traceback
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            traceback.print_exception(exc_type, exc_obj, exc_tb)
-            # Reset color
-            sys.stdout.write("\x1b[0m")
-            sys.stdout.flush()
+            except:
+                TestIncomplete = True
+
+                # show warning only for the first ROC
+                if not TestIncompleteWarningShown:
+                    TestIncompleteWarningShown = True
+                    # Start red color
+                    sys.stdout.write("\x1b[31m")
+                    sys.stdout.flush()
+                    print "X-ray test incomplete!!!"
+                    # Print traceback
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    traceback.print_exception(exc_type, exc_obj, exc_tb)
+                    # Reset color
+                    sys.stdout.write("\x1b[0m")
+                    sys.stdout.flush()
 
         # check for test completenes
         if TestIncomplete:
@@ -174,7 +179,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             MeanEfficiency120 = '{0:1.2f}'.format(sum(MeanEfficiency120List)/float(len(MeanEfficiency120List)))
         except:
             MeanEfficiency120 = '-1'
-            
+
+        if PixelDefects < 0:
+            PixelDefects = -1
+        if BumpBondingDefects < 0:
+            BumpBondingDefects = -1
+        if NoiseDefects < 0:
+            NoiseDefects = -1
+        if HotPixelDefects < 0:
+            HotPixelDefects = -1
+
         SubGradings['PixelDefects'] = SubGrading
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
