@@ -282,7 +282,7 @@ class ModuleResultOverview:
                 FinalModuleRowsDict[Identificator]['TestType'] += ' & %s'%RowTuple['TestType']
                 if (FinalModuleRowsDict[Identificator]['Grade'] < RowTuple['Grade']):
                     FinalModuleRowsDict[Identificator]['Grade'] = RowTuple['Grade']
-                MaxCompareList = ['PixelDefects','ROCsMoreThanOnePercent','Noise','Trimming','PHCalibration']
+                MaxCompareList = ['PixelDefects','Noise','Trimming','PHCalibration']
                 for item in MaxCompareList:
                     RowValue = RowTuple[item]
                     FinalValue = FinalModuleRowsDict[Identificator][item]
@@ -295,6 +295,17 @@ class ModuleResultOverview:
                     except:
                         pass
                     FinalModuleRowsDict[Identificator][item] = max(FinalValue, RowValue)
+
+                # ROCsMoreThanFourPercent
+
+                if ((RowTuple['ROCsMoreThanFourPercent'] > FinalModuleRowsDict[Identificator]['ROCsMoreThanFourPercent']) or
+                    (RowTuple['ROCsMoreThanFourPercent'] == FinalModuleRowsDict[Identificator]['ROCsMoreThanFourPercent'] and
+                        RowTuple['ROCsMoreThanOnePercent'] > FinalModuleRowsDict[Identificator]['ROCsMoreThanOnePercent'])):
+                    FinalModuleRowsDict[Identificator]['ROCsMoreThanFourPercent'] = RowTuple['ROCsMoreThanFourPercent']
+                    FinalModuleRowsDict[Identificator]['ROCsMoreThanOnePercent'] = RowTuple['ROCsMoreThanOnePercent']
+                    FinalModuleRowsDict[Identificator]['ROCsLessThanOnePercent'] = RowTuple['ROCsLessThanOnePercent']
+
+
                 if RowTuple['Temperature'] and FinalModuleRowsDict[Identificator].has_key('Temperature'):
                    if FinalModuleRowsDict[Identificator]['Temperature']:
                        FinalModuleRowsDict[Identificator]['Temperature'] += " / %s"%RowTuple['Temperature']

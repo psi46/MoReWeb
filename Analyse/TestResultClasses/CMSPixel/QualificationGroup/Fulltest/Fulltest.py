@@ -687,7 +687,10 @@ class TestResult(GeneralTestResult):
         if 'SpecialDefects' in self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']:
             SpecialDefects = self.ResultData['SubTestResults']['Summary1'].ResultData['KeyValueDictPairs']['SpecialDefects']['Value'].strip()
             if len(SpecialDefects) > 0:
-                Comment += SpecialDefects
+                if len(Comment.strip()) > 0:
+                    Comment += ", " + SpecialDefects
+                else:
+                    Comment = SpecialDefects
 
         # fill final grade and comments
         Comment = Comment.strip().strip('/')

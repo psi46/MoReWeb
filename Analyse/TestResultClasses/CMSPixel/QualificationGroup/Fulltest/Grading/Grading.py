@@ -155,6 +155,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             MissingSubtests = True
             ModuleGrade = 3
 
+        if nChips < 1:
+            print "Found nChips < 1 => Grade C"
+            MissingSubtests = True
+            ModuleGrade = 3
+
+
         ChipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
         for j in ChipResults:
             ChipGradingTestResultObject = j['TestResultObject'].ResultData['SubTestResults']['Grading']
