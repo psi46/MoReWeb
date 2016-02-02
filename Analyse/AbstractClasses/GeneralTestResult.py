@@ -723,11 +723,13 @@ class GeneralTestResult(object):
         for ch in range(4):
             KeyValueDictPairs['channel_%d_count'%ch] = {'Label': 'Channel %d'%ch, 'Value': '%d'%len([True for ErrorObject in ErrorObjects if ErrorObject['channel'] == ch])}
 
-        for errorSubtype, keywords in DetectMessages.iteritems():
-            KeyValueDictPairs['message_%s_count'%errorSubtype] = {'Label': ErrorNames[errorSubtype] if errorSubtype in ErrorNames else errorSubtype, 'Value': '%d'%len([True for ErrorObject in ErrorObjects if ErrorObject['subtype'] == errorSubtype])}
+        KeyList = (['nCriticals', 'nErrors', 'nWarnings', 'channel_0_count', 'channel_1_count', 'channel_2_count', 'channel_3_count'])
 
-        KeyList = (['nCriticals', 'nErrors', 'nWarnings', 'channel_0_count', 'channel_1_count', 'channel_2_count', 'channel_3_count', 'message_tokenchain_count', 
-            'message_eventid_count', 'message_readback_count', 'message_notokenpass_count', 'message_datasize_count', 'message_missingevents_count', 'message_usbtimeout_count', 'message_deser400_count', 'message_daqerror_count'])
+        for errorSubtype, keywords in DetectMessages.iteritems():
+            NErrors = len([True for ErrorObject in ErrorObjects if ErrorObject['subtype'] == errorSubtype])
+            KeyValueDictPairs['message_%s_count'%errorSubtype] = {'Label': ErrorNames[errorSubtype] if errorSubtype in ErrorNames else errorSubtype, 'Value': '%d'%NErrors}
+            if NErrors > 0:
+                KeyList.append('message_%s_count'%errorSubtype)
 
         return {'KeyValueDictPairs': KeyValueDictPairs, 'KeyList': KeyList}
 

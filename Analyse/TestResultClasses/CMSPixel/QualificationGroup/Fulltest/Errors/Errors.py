@@ -25,6 +25,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'usbtimeout': ['Timeout reading from USB buffer after'],
             'deser400': ['header reports DESER400 failure'],
             'daqerror': ['Error in DAQ. Aborting test.'],
+            'deser400_no_data': ['Detected DESER400 trailer error bits: "NO DATA"'],
+            'deser400_idle_data': ['Detected DESER400 trailer error bits: "IDLE DATA"'],
+            'deser400_code_error': ['Detected DESER400 trailer error bits: "CODE ERROR"'],
+            'deser400_frame_error': ['Detected DESER400 trailer error bits: "FRAME ERROR"'],
+            'pkam': ['detected a PKAM reset, event cleared'],
         }
 
         # optional: name dictionary of the errors displayed in the summary
@@ -38,6 +43,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'usbtimeout': 'USB criticals',
             'deser400': 'DESER400 failure',
             'daqerror': 'DAQ error',
+            'deser400_no_data': 'DESER400 NO DATA',
+            'deser400_idle_data': 'DESER400 IDLE DATA',
+            'deser400_code_error': 'DESER400 CODE ERROR',
+            'deser400_frame_error': 'DESER400 FRAME ERROR',
+            'pkam': 'PKAM reset',
         }
 
         LogfileErrors = self.AnalyzeLogfiles(self.ParentObject.logfilePath, DetectMessages, ErrorNames)
