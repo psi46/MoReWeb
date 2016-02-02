@@ -95,9 +95,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['Table']['BODY'].append(ROCRow)
 
-
-
-
         ### fill row for reception test
         ReceptionDataRow = ['Reception']
 
@@ -119,5 +116,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ReceptionDataRow += NDeadPixelsList
         ReceptionDataRow += NDefectiveBumpsList
 
-        # fill row for DB result
         self.ResultData['Table']['BODY'].append(ReceptionDataRow)
+
+        # todo: fill row for Pisa DB result
+
+        # todo: fill row for local DB

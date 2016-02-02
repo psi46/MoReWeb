@@ -58,7 +58,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 PixelDefectsGrade = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsGrade']['Value'])
                 NumBumpBondingProblems.append(int(i['TestResultObject'].ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['nBumpBondingProblems']['Value']))
                 NumDeadPixels.append(int(i['TestResultObject'].ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NDeadPixels']['Value']))
-                NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']['Value']))
+                NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']))
             except:
                 Incomplete = True
                 PixelDefectsGrade = 3
