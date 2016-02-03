@@ -95,4 +95,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.ResultData['KeyList'] = ['Module', 'Grade', 'ManualGrade', 'ROCGrades','PixelDefects','BumpBondingDefects','NoisyPixels', 'HotPixelDefects', 'ROCsWithReadoutProblems', 'ROCsWithUniformityProblems', 'Efficiency','Noise']
 
+        SpecialDefects = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['SpecialDefects']
+        if len(SpecialDefects) > 0:
+            self.ResultData['KeyValueDictPairs']['SpecialDefects'] = {'Label': 'Defects', 'Value': SpecialDefects, 'Style': 'color:red; font-weight:bold;'}
+            self.ResultData['KeyList'].append('SpecialDefects')
 

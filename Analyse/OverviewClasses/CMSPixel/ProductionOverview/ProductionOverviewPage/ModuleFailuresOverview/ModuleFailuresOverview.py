@@ -171,7 +171,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                     DefectsDict[ModuleID]['DEFECT_%s'%Defect] = {}
                                 DefectsDict[ModuleID]['DEFECT_%s'%Defect][RowTuple['TestType']] = 'C'
                         except:
-                            raise
                             self.ProblematicModulesList.append(ModuleID)
 
         ### ManualGradeFT
@@ -351,6 +350,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     elif 'B' in BBGrades:
                         DefectsDict[ModuleID]['BB_Fulltest'][RowTuple['TestType']] = 'B'
 
+### HIGH RATE TESTS
+
                 if RowTuple['TestType'] == TestTypeXrayHR:
 
         ### GradeHR
@@ -387,6 +388,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             elif Value == 1:
                                 # also list grade A here because it can negate effect of other defects!
                                 DefectsDict[ModuleID]['ManualGradeHR'] = 'A'
+                        except:
+                            self.ProblematicModulesList.append(ModuleID)
+
+        ### DEFECTS for defects.txt
+                    Value = self.GetJSONValue([ RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'XRayHRQualification', 'KeyValueDictPairs.json', 'SpecialDefects', 'Value'])
+                    if Value is not None:
+                        try:
+                            DefectsList = [x.strip() for x in Value.split(',')]
+                            for Defect in DefectsList:
+                                if 'DEFECT_%s'%Defect not in DefectsDict[ModuleID]:
+                                    DefectsDict[ModuleID]['DEFECT_%s'%Defect] = {}
+                                DefectsDict[ModuleID]['DEFECT_%s'%Defect] = 'C'
                         except:
                             self.ProblematicModulesList.append(ModuleID)
 
