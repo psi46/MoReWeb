@@ -55,9 +55,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # check for number of defects per double column
         for DoubleColumn in range(0, 26):
-            NDefectsPerDoubleColumn = len([x for x in self.ResultData['HiddenData']['TotalList'] if x[0] == ChipNo and int(x[1]/2) == DoubleColumn])
 
-            if NDefectsPerDoubleColumn > MaximumNumberAllowedBadPixels:
+            # inefficienct pixels: >1% per double column => C
+            NEfficiencyDefectsPerDoubleColumn = len([x for x in self.ResultData['HiddenData']['InefficientPixelList'] if x[0] == ChipNo and int(x[1]/2) == DoubleColumn])
+            if NEfficiencyDefectsPerDoubleColumn > MaximumNumberAllowedBadPixels:
                 self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'].add((ChipNo, DoubleColumn))
 
         self.ResultData['KeyValueDictPairs']['NBadDoubleColumns']['Value'] = len(self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'])
