@@ -47,12 +47,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         DeadPixels = 0
         DeadBumps = 0
+        DeadBumpsBB2 = 0
         MissingBumps = 0
         totalMissingBumps = 0
+        totalMissingBumpsBB2 = 0
         totalDeadBumps = 0
         totalDeadPixels = 0
         listDefectBumps = []
         listDefectAlive = []
+
+
 
         # obtain the values to get dispayed
 
@@ -111,6 +115,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         globalRH = ""
         globalBBcut = ""
         globalBMname = ""
+        globaluseBB2Map = ""
+        #useBB2Map = "yes"
+
         
         if os.path.isfile(bareModulefilename):        
             BareModuleInfoFile = open(bareModulefilename, "r")
@@ -135,8 +142,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             globalBBcut = ParameterValue
                         if (Key=="BMname:"):
                             globalBMname = ParameterValue
+                        if (Key=="useBB2Map:"):
+                            globaluseBB2Map = ParameterValue
 
                         print 'globalNameLab: ',globalNameLab
+                        print 'globaluseBB2Map: ',globaluseBB2Map
 
             BareModuleInfoFile.close()
 
@@ -155,6 +165,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 
         allrocslist = []
         allrocs2 = {}
+        allrocslistBB2 = []
+        allrocs2BB2 = {}
 
         digCurrentList = {}
         listPlWidthCut = {}
@@ -176,6 +188,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 totalMissingBumps = totalMissingBumps + DeadBumps;
                 #print 'Inside Chips-loop:',i,totalDeadBumps
                 listDefectBumps = i['TestResultObject'].ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['DeadBumps']['Value'];
+
+                #Check if BB2 Histogram exist:
+                if (globaluseBB2Map=='yes'):
+                    listDefectBumpsBB2 = i['TestResultObject'].ResultData['SubTestResults']['BareBBMap'].ResultData['KeyValueDictPairs']['MissingBumps']['Value'];
+                    DeadBumpsBB2 = int(i['TestResultObject'].ResultData['SubTestResults']['BareBBMap'].ResultData['KeyValueDictPairs']['NMissingBumps']['Value']);
+                    totalMissingBumpsBB2 = totalMissingBumpsBB2 + DeadBumpsBB2;
+
             else:
                 chipNum = i['TestResultObject'].Attributes['ChipNo'];
                 MissingBumps = int(i['TestResultObject'].ResultData['SubTestResults']['BareBBMap'].ResultData['KeyValueDictPairs']['NMissingBumps']['Value']);
@@ -204,6 +223,25 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 allrocslist.append(roccombs)
                 allrocs2[finalword] = combs
 
+
+            if (globaluseBB2Map=='yes'):
+                if not listDefectBumpsBB2:
+                    print 'No BB2 Method is used'
+                else:
+                    combsBB2 = []
+                    roccombsBB2 = {}
+                    for key in listDefectBumpsBB2:
+                        dataChipBB2 = key[0];
+                        val1BB2 = key[1];
+                        val2BB2 = key[2];
+                    #print 'again ',dataChip, val1, val2
+                        combsBB2.append((val1BB2,val2BB2))
+                        finalwordBB2 = "ROC" + str(dataChipBB2)
+                    roccombsBB2[finalwordBB2] = combsBB2
+                    allrocslistBB2.append(roccombsBB2)
+                    allrocs2BB2[finalwordBB2] = combsBB2
+
+
         print 'allroclist ',json.dumps(allrocslist, separators=(',', ':'))
         print 'totalMissingBumps: ',totalMissingBumps,totalDeadBumps
 
@@ -222,22 +260,47 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         fbbmapforDB.write('BB_cut_criteria: ' + str(listPlWidthCut) + '\n')
         fbbmapforDB.close()
         
+        if (globaluseBB2Map=='yes'):
+            fdefectBB2 = open(self.FinalResultsStoragePath +'/' + bareModuleBBDBName +'/' + 'defectsBB2.json', 'w')        
+            fdefectBB2.write(json.dumps(allrocs2BB2, separators=(',', ': ')))
+            fdefectBB2.close()
+            
+            fbbmap2forDB = open(self.FinalResultsStoragePath +'/' + bareModuleBBDBName +'/' + 'Bare_module_QA_BumpBB2.csv', 'w')
+            fbbmap2forDB.write('Bare_module_ID: ' +  bareModuleIDName + '\n')
+            fbbmap2forDB.write('Laboratory_ID: ' +  ' ' +  globalNameLab + '\n')
+            fbbmap2forDB.write('Operator_NickName: ' +  ' ' + globalOperatorName + '\n')
+            fbbmap2forDB.write('Temperature: ' + globalTemp +'\n')
+            fbbmap2forDB.write('RH: ' + globalRH + '\n' )
+            fbbmap2forDB.write('Dead_Missing_Channels: ' + str(totalMissingBumpsBB2) + '\n' )
+        #fbbmapforDB.write('BB_cut_criteria: ' + globalBBcut + '\n')
+            fbbmap2forDB.write('BB_cut_criteria: ' + str(listPlWidthCut) + '\n')
+            fbbmap2forDB.close()
+
         # copy png images to this DB subdirectory
         
         if self.ParentObject.testSoftware == 'pxar':
             srcBumpBondingFigDir = str(self.FinalResultsStoragePath).split('Summary1')[-2]+'BumpBondingMap/BumpBondingMap.png'
             srcPixelAliveFigDir = str(self.FinalResultsStoragePath).split('Summary1')[-2]+'BarePixelMap/BarePixelMap.png'
+            if (globaluseBB2Map=='yes'):
+                srcBumpBondingBB2FigDir = str(self.FinalResultsStoragePath).split('Summary1')[-2]+'bareBBMap/bareBBMap.png'
+
         else:
             srcBumpBondingFigDir = str(self.FinalResultsStoragePath).split('Summary1')[-2]+'bareBBMap/bareBBMap.png'
             srcPixelAliveFigDir = str(self.FinalResultsStoragePath).split('Summary1')[-2]+'BarePixelMap/BarePixelMap.png'
 
         shutil.copyfile(srcBumpBondingFigDir,self.FinalResultsStoragePath +'/' + bareModuleBBDBName +'/bareModuleQA.png' )
         shutil.copyfile(srcPixelAliveFigDir,self.FinalResultsStoragePath +'/' + bareModulePADBName +'/bareModuleQA.png' )
+        if (globaluseBB2Map=='yes'):
+            shutil.copyfile(srcBumpBondingBB2FigDir,self.FinalResultsStoragePath +'/' + bareModuleBBDBName +'/bareModuleBB2QA.png' )
 
         self.ResultData['KeyValueDictPairs'] = {
             'NMissingBumps': {
                 'Value':totalMissingBumps,
                 'Label':'Total MissingBumps'
+            },
+            'NMissingBumpsBB2': {
+                'Value':totalMissingBumpsBB2,
+                'Label':'Total MissingBumpsBB2'
             },
             'NDeadBumps': {
                 'Value':totalDeadPixels,
@@ -245,9 +308,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
         }
 
+        #self.ResultData['KeyList'] = ['NMissingBumps','NDeadBumps']
+        if (globaluseBB2Map=="yes"):
+            self.ResultData['KeyList'] = ['NMissingBumps','NMissingBumpsBB2','NDeadBumps']
+        else:
+            self.ResultData['KeyList'] = ['NMissingBumps','NDeadBumps']
 
-        self.ResultData['KeyList'] = ['NMissingBumps','NDeadBumps']
-        
         # prepare also DAC files for DB upload
         DirectoryDac = self.RawTestSessionDataPath
         DirectoryDacToSave = self.FinalResultsStoragePath +'/' + bareModuleBBDBName
