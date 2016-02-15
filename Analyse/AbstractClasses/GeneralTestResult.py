@@ -191,6 +191,7 @@ class GeneralTestResult(object):
             'YLimitC': None,  # limit for grading
         }
 
+        self.ROOTObjects = []
         self.CustomInit()
 
         if not self.Title:
@@ -1381,6 +1382,35 @@ class GeneralTestResult(object):
             JSONDictionary[jsonFileName] = JSONData
         f.write(json.dumps(JSONDictionary, sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
         f.close()
+
+    def CleanUp(self, Level = 0):
+        if self.verbose and Level < 1:
+            print "\x1b[44m\x1b[97mCalling 'CleanUp' for %s\x1b[0m"%self.Name
+
+        # clean up subtests
+        for i in self.ResultData['SubTestResults']:
+            SubTestResult = self.ResultData['SubTestResults'][i]
+            try:
+                SubTestResult.CleanUp(Level + 1)
+            except:
+                raise
+
+        # clean up own plots
+        if self.ResultData['Plot']['ROOTObject']:
+            if self.verbose:
+                print "\x1b[45m\x1b[97mgarbage collected: %s.%r\x1b[0m"%(self.Name, self.ResultData['Plot']['ROOTObject'])
+            self.ResultData['Plot']['ROOTObject'].IsA().Destructor(self.ResultData['Plot']['ROOTObject'])
+
+        if self.ROOTObjects:
+            for i in self.ROOTObjects:
+                if i:
+                    try:
+                        if self.verbose:
+                            print "\x1b[45m\x1b[97mgarbage collected: %r\x1b[0m"%(i)
+                        i.IsA().Destructor(i)
+                    except:
+                        pass
+        self.CloseSubTestResultFileHandles()
 
     def __del__(self):
         self.CloseSubTestResultFileHandles()

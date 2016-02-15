@@ -359,6 +359,12 @@ def AnalyseTestData(ModuleInformationRaw,ModuleFolder):
     ModuleTestResult.GenerateFinalOutput()
     ModuleTestResults.append(ModuleTestResult)
     CopyMD5File(TestResultEnvironmentInstance.FinalModuleResultsPath)
+    print '    Clean up'
+    try:
+        ModuleTestResult.CleanUp()
+    except:
+        pass
+
     print 'DONE'
     pass
 
