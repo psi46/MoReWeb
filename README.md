@@ -1,17 +1,15 @@
-News
-=======
-
-Dec 15, 2015:
-
-- new improved BB2 cuts merged into master branch, thanks @andreavargas
-- development branch v0.7 which contains: new checks for bad double columns, FQ analysis speed up, more Readback test analysis, support for single test analysis and some improved plots -> will be merged into master branch in January 2016
-
-
 Info
 =======
 
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
+
+
+##### version 0.7.2
+
+New grading for double column defects (>1% inefficienct pixels per double column => C). Bugfixes for handling incomplete data and "fake test structures" to insert them into the DB.
+Improvements for Reception tests analysis, overview page and presentation.
+
 
 ##### version 0.6.7
 
