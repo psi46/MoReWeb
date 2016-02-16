@@ -877,6 +877,7 @@ class TestResult(GeneralTestResult):
         except:
             pass
 
+        selfVerboseBefore = self.verbose
         self.verbose=True
         if self.verbose:
             print 'Write to DB: ',ParentID
@@ -1327,9 +1328,8 @@ class TestResult(GeneralTestResult):
                                              ,HighRateDataAggrRoc
                                              ,HighRateDataAllNoiseRoc
                                              ,HighRateDataInterpRoc)
+            self.verbose = selfVerboseBefore
 
-            pass
-            
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
@@ -1369,6 +1369,7 @@ class TestResult(GeneralTestResult):
                         :Comments
                     )
                     ''', Row)
+                self.verbose = selfVerboseBefore
                 return self.TestResultEnvironmentObject.LocalDBConnectionCursor.lastrowid
 
 
