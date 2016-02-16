@@ -2,7 +2,6 @@
 import ROOT
 import AbstractClasses
 import array
-import numpy as np
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -164,8 +163,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency%d'%int(InterpolationRate)]['Value'] = '{InterpolatedEfficiency:1.2f}'.format(InterpolatedEfficiency=InterpolationFunction.Eval(InterpolationRate * 1e6 * ScalingFactor))
                     self.ResultData['KeyList'] += ['InterpolatedEfficiency%d'%int(InterpolationRate)]
 
-                    xpos = np.array([float(InterpolationRate * 1.0e6 * ScalingFactor)])
-                    err = np.array([0.]*len(xpos))
+                    xpos = array.array('d', [float(InterpolationRate * 1.0e6 * ScalingFactor)])
+                    err = array.array('d', [0.]*len(xpos))
                     try:
                         FitResults.GetConfidenceIntervals(len(xpos), 1, 1, xpos, err, 0.683)
                         InterpolatedEfficiencyError = err[0]

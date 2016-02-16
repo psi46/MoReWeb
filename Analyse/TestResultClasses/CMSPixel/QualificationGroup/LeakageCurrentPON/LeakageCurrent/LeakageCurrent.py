@@ -1,8 +1,6 @@
 import ROOT
 import array
 import AbstractClasses
-import AbstractClasses.Helper.HistoGetter as HistoGetter
-import numpy
 import ROOT
 import time
 import datetime
@@ -63,8 +61,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Timestamp = 0
 
 
-        numPoints = len(numpy.array(timestamps))
-        tgraph = ROOT.TGraph(numPoints, numpy.array(timestamps), numpy.array(currents))
+        numPoints = len(array.array('d', timestamps))
+        tgraph = ROOT.TGraph(numPoints, array.array('d', timestamps), array.array('d', currents))
 
         self.ResultData['Plot']['ROOTObject'] = tgraph.Clone()
         self.ResultData['Plot']['Caption'] = self.ParentObject.Attributes['ModuleID']
