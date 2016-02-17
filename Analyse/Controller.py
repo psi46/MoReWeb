@@ -114,6 +114,9 @@ Configuration.read([
     'Configuration/ProductionOverview.cfg'
     ])
 
+if os.path.isfile('Configuration/UserConfiguration.cfg'):
+    Configuration.read(['Configuration/UserConfiguration.cfg'])
+
 if args.use_global_db:
     Configuration.set('SystemConfiguration', 'UseGlobalDatabase', '1')
 
