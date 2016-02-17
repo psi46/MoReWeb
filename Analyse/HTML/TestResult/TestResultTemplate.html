@@ -11,7 +11,64 @@
 		<!-- ###HEAD_STYLESHEET_TEMPLATE### -->
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 	</head>
-	<body>
+	<body onload="documentOnload()">
+<script>
+	document.onkeydown = checkKey;
+function documentOnload() {
+	var hash = window.location.hash.substring(1);
+	if (hash != undefined && hash.length > 0 && parseInt(hash) > 0) {
+		window.scrollTo(0, parseInt(hash));
+	}
+}
+function checkKey(e) {
+    e = e || window.event;
+	var newURL = '';
+    if (e.keyCode == '37') {
+        var pathArray = window.location.pathname.split( '/' );
+		console.log(pathArray)
+		if (pathArray[pathArray.length-3] == 'Chips') {
+			var ChipNo = parseInt(pathArray[pathArray.length-2].replace('Chip', '')) - 1;
+			if (ChipNo < 0) {
+				ChipNo = 15;
+			}
+			pathArray[pathArray.length-2] = 'Chip' + ChipNo;
+			if (window.location.host.length > 0) {
+				newURL = window.location.protocol + "//" + window.location.host + "/" + pathArray.join('/');
+			} else {
+				newURL = window.location.protocol + "//" + pathArray.join('/');
+			}
+		}
+    }
+    else if (e.keyCode == '39') {
+        var pathArray = window.location.pathname.split( '/' );
+		console.log(pathArray)
+		if (pathArray[pathArray.length-3] == 'Chips') {
+			var ChipNo = parseInt(pathArray[pathArray.length - 2].replace('Chip', '')) + 1;
+			if (ChipNo > 15) {
+				ChipNo = 0;
+			}
+			pathArray[pathArray.length - 2] = 'Chip' + ChipNo;
+			var newURL = '';
+			if (window.location.host.length > 0) {
+				newURL = window.location.protocol + "//" + window.location.host + "/" + pathArray.join('/');
+			} else {
+				newURL = window.location.protocol + "//" + pathArray.join('/');
+			}
+		}
+    }
+	if (newURL.length > 0) {
+		var hash = window.location.hash.substring(1);
+		if (parseInt(hash) > 0 || hash == '0' || hash == 'd' || hash.length == 0) {
+			if (window.pageYOffset != undefined) {
+				newURL = newURL + '#' + window.pageYOffset;
+			}
+		} else {
+			newURL = newURL + '#' + hash;
+		}
+		window.location.assign(newURL);
+	}
+}
+	</script>
 		<!-- ###TEMPLATE### -->
 			<div id="Page">
 				<div id="HeaderWrap">
