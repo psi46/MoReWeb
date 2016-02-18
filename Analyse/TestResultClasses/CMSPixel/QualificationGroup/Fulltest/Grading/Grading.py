@@ -200,8 +200,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         GradeComment = ''
         ManualGrade = self.check_for_manualGrade()
         if ManualGrade != '':
-            GradeComment = "Grade manually changed from "+str(GradeMapping[ModuleGrade])+" to "+str(GradeMapping[int(ManualGrade)])
-            print GradeComment
+            if GradeMapping[ModuleGrade] != GradeMapping[int(ManualGrade)]:
+                GradeComment = "Grade manually changed from "+str(GradeMapping[ModuleGrade])+" to "+str(GradeMapping[int(ManualGrade)])
+                print GradeComment
             ModuleGrade =int(ManualGrade)
 
         print 'Fulltest Summary:'

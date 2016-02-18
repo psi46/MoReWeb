@@ -211,6 +211,16 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     },
                 }
             )
+            self.SubPages.append(
+                {
+                    "Key": "PrimaryFailureReason",
+                    "Module": "PrimaryFailureReason",
+                    "InitialAttributes" : {
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    },
+                }
+            )
 
             self.SubPages.append(
                 {

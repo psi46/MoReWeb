@@ -52,7 +52,8 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 if DTB_FW not in DTB_FWs:
                     DTB_FWs.append(DTB_FW)
                 NTests +=1
-                BinNames.append(RowTuple['ModuleID'])
+                if len(RowTuple['ModuleID'].strip()) > 0:
+                    BinNames.append(RowTuple['ModuleID'])
 
         # initialize histograms
         Histograms = {}

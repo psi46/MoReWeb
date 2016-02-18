@@ -334,6 +334,8 @@ class ModuleResultOverview:
                 CommentItems = [x.strip() for x in RowDict['Comments'].split('/')]
                 if len(CommentItems) == 3 and CommentItems[0]==CommentItems[1] and CommentItems[1]==CommentItems[2]:
                     RowDict['Comments'] = CommentItems[0]
+                elif len(CommentItems) == 2 and CommentItems[0]==CommentItems[1]:
+                    RowDict['Comments'] = CommentItems[0]
 
             Row = []
             for Key in TableColumnList:

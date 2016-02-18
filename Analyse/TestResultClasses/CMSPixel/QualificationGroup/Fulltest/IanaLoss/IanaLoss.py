@@ -79,9 +79,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # draw plot if data exists
         if IanaLossPerRoc:
 
-            if IanaLossProblems:
+            LowIanaLossRocs = [x for x in IanaLossPerRoc if x < 15.0]
+
+            if len(LowIanaLossRocs) > 1:
                 self.ResultData['KeyValueDictPairs']['IanaLossProblems']['Value'] = 'Yes'
                 self.ResultData['HiddenData']['IanaLossProblems'] = True
+            elif len(LowIanaLossRocs) > 0:
+                self.ResultData['KeyValueDictPairs']['IanaLossProblems']['Value'] = 'Only single ROC below'
             else:
                 self.ResultData['KeyValueDictPairs']['IanaLossProblems']['Value'] = 'No'
 
