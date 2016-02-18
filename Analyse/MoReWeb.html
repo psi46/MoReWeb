@@ -7,8 +7,8 @@
 
 	<body>
 
-	<h1>MoReWeb v0.7.0</h1>
-	last updated: February 1, 2016
+	<h1>MoReWeb v0.7.2</h1>
+	last updated: February 18, 2016
 	<h2>Changelog</h2>
 	<a href='Changelog/MoReWeb_changes.html'>see Changelog</a>
 
@@ -27,8 +27,12 @@
 
 	<h2>How to run</h2>
 	<ul>
-	<li>run './Controller.py' in Analyse subdirectory</li>
-	<li>run './Controller.py -p' to create production overview page if needed</li>
+	<li>run './Controller.py' in Analyse subdirectory, to analyze all modules, which have not been analyzed with the latest version</li>
+	<li>run './Controller.py -p' to create production overview page</li>
+	<li>run './Controller.py -new' to analyze only modules, which have not been analyzed yet. (don't re-analyze) </li>
+	<li>run './Controller.py -f' to analyze only modules, even if already analyzed with latest version</li>
+	<li>run './Controller.py -FQ /path/to/M1234_...._123456789/' to analyze only a specific Qualification</li>
+	<li>run './Controller.py -m M1234,M5678,M7890' to analyze all Qualifications for listed modules</li>
 	</ul>
 
 	<h2>Documentation</h2>
@@ -36,7 +40,14 @@
 	<li>see Documentation.pdf in Analyse folder</li>
 	</ul>
 
-	<h2>FAQ</h2>
+	<h2>FAQ and use cases</h2>
+
+	<h3>How can modules uploaded to database if test was not possible at all?</h3>
+	<ul>
+	<li>See the examples in <b>examples/</b> subfolder.</li>
+	<li>If a module was not qualified because the leakage current at startup was too high, a LeakageCurrentPON test (see LeakageCurrentPON_IfLeakageCurrentTooHigh.tar example) can be uploaded instead of the Fullqualification. </li>
+	</ul>
+
 	<h3>How is it decided if a folder placed in <i>GlobalDataDirectory</i> is re-analyzed when running MoReWeb?</h3>
 	<ul>
 	<li>MoReWeb places a checksum of the current code in the FinalResults folder. If the code is changed, either by git pull or manuel changes, all folders will be re-analyzed. To force re-analysis, <strong>use the --force</strong> (or -f) parameter.</li>
@@ -49,7 +60,8 @@
 
 	<h3>How can the order of the qualification list be changed?</h3>
 	<ul>
-	<li>In <strong>SystemConfiguration.cfg</strong> change the option <i>QualificationOverviewSort</i>, eg. to sort descending by module number: <strong>ModuleID DESC,TestType ASC,TestDate ASC</strong></li>
+	<li>Add a <b>UserConfiguration.cfg</b> in Configuration folder, add section <b>[SystemConfiguration]</b> with entry <b>QualificationOverviewSort = ModuleID DESC,TestType ASC,TestDate ASC</b></li>
+	<li>The list will be recreated after the next test analysis.</li>
 	</ul>
 
 	<h3>How can one delete modules/qualifications from the list?</h3>
@@ -61,6 +73,8 @@
 	<ul>
 	<li>Use './Controller.py -new'</li>
 	</ul>
+
+
 
 	<a href='http://cmspixel.phys.ethz.ch/'>back to ETH CMS Pixel group page</a>
 

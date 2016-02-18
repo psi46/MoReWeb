@@ -7,7 +7,33 @@
 
 	<body>
 	<h1>MoReWeb changelog</h1>
-	last updated: Feb 1, 2016
+	last updated: Feb 18, 2016
+
+	<h2>v0.7.2 - DB reprocessing</h2>
+    <ul>
+		<li><b>fix:</b> defective pixel counts in performance parameters dictionary were -1</li>
+		<li><b>fix:</b> remove dependence on <b>numpy</b> module</li>
+		<li>navigation on chip result pages between different chips with left/right arrow keys</li>
+		<li>BB2 test for baremodules</li>
+		<li>additional <b>experimental cut for Fulltest BumpBonding test, not used for grading!</b> and only displayed on the chip pages as dash-dotted green line.</li>
+		<li><b>defects.txt</b> can be placed in test directories to manually grade a module C and additionally specify a machine readable defect type. Modules are then listed together with modules, for which the defect has been found in automatic test analysis. This <b>can</b> be used to replace grade.txt. Possible values are:
+		<ul>
+			<li>LeakageCurrentPON</li>
+			<li>LeakageCurrentFQ</li>
+			<li>NotProgrammable</li>
+			<li>DeadROC</li>
+			<li>FulltestPixelDefects</li>
+			<li>FulltestPerformance</li>
+			<li>XrayPixelDefects</li>
+			<li>XrayDoubleColumnDefects</li>
+			<li>XrayEfficiency</li>
+			<li>XrayPerformance</li>
+			<li>... or any other defect which will then create a new category</li>
+		</ul>
+		<li>add logfile view to reception test</li>
+		<li>speed-up linear PH fitting and Scurve fitting</li>
+		</li>
+	</ul>
 
 	<h2>v0.7.0</h2>
 	<h3>Grading</h3>
@@ -29,7 +55,6 @@
 		<li>Readback parameters plot shown on Fulltest/ROC pages</li>
 		<li>Reception tests can be analyzed</li>
 		<li>Speed-up of analysis of FQ (without fit) takes 45 % less time now</li>
-		<li>Speed-up of scurve fit and linear PH fits</li>
 		<li>Analysis of single tests:</li>
 		<ul>
 			<li><strong>PixelAlive</strong>: PixelAlive map per module and per chip</li>
@@ -37,7 +62,7 @@
 		</ul>
 	</ul>	
 
-	<h2>v0.6.8</h2>
+	<h2>v0.6.8 - DB reprocessing</h2>
 	<ul>
 		<li>Incomplete/broken/fake test data for not testable modules can now be uploaded to the Pisa DB. HTML pages show more explicitly which tests were missing in the full Qualification</li>
 		<li>LeakageCurrentPON tests can now be uploaded.</li>
