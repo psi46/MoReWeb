@@ -17,6 +17,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0)
+        self.Canvas.Clear()
 
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         HistoName = HistoDict.get(self.NameSingle, 'VanaCalibration')
