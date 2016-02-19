@@ -125,6 +125,18 @@ class TestResult(GeneralTestResult):
                 }
             },
             {
+                'Key': 'DatabasePixelDefects',
+                'Module': 'Database',
+                'DisplayOptions': {
+                    'Width': 5,
+                    'Order': 201,
+                },
+                'InitialAttributes': {
+                    'StorageKey': 'DatabasePixelDefects',
+                    'Type': 'PixelDefects',
+                }
+            },
+            {
                 'Key': 'Logfile',
                 'DisplayOptions': {
                     'Width': 1,

@@ -49,10 +49,48 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             return self.GradeColoredValue(value, 3)
 
 
-
-
     def PopulateResultData(self):
+        if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
+            return
 
+        if 'Type' in self.Attributes and self.Attributes['Type'] == 'PixelDefects':
+            self.PopulateResultDataPixelDefects()
+            self.Title += " - Pixel Defects"
+        else:
+            self.PopulateResultDataFullQualifications()
+
+    def PopulateResultDataFullQualifications(self):
+
+        try:
+            ModuleID = self.ParentObject.Attributes['ModuleID']
+            DB = GlobalDatabaseQuery()
+            rows = DB.GetFullQualificationResult(ModuleID=ModuleID)
+
+            HeaderRow = ['FULLMODULE_ID', 'GRADE', 'BAREMODULE_ID', 'HDI_ID', 'TBM_ID', 'BUILTON', 'BUILTBY', 'STATUS', 'tempnominal', 'I150', 'IVSLOPE', 'PIXELDEFECTS']
+            if len(rows) >0:
+                for k,v in rows[0].items():
+                    if k not in HeaderRow:
+                        HeaderRow.append(k)
+            self.ResultData['Table'] = {
+               'HEADER': [HeaderRow],
+               'BODY': [],
+               'FOOTER': [],
+            }
+
+            for row in rows:
+                FulltestRow = []
+                for k in HeaderRow:
+                    FulltestRow.append(row[k] if k in row else '-')
+                self.ResultData['Table']['BODY'].append(FulltestRow)
+        except:
+            self.ResultData['Table'] = {
+               'HEADER': ['Error'],
+               'BODY': ["Can't compare with DB, either not connection or module not in database!"],
+               'FOOTER': [],
+            }
+
+
+    def PopulateResultDataPixelDefects(self):
         chipResults = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']
         nChips = len(chipResults)
         gradingResult = self.ParentObject.ResultData['SubTestResults']['Grading']
@@ -164,6 +202,3 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # Stop red color
             sys.stdout.write("\x1b[0m")
             sys.stdout.flush()
-
-
-        # todo: fill row for local DB
