@@ -7,3 +7,4 @@ import TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.PixelMa
 class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.PixelMap.PixelMap.TestResult):
     def CustomInit(self):
         super(TestResult, self).CustomInit()
+        self.verbose = False
