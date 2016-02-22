@@ -274,6 +274,23 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
+
+        ### dead pixel clusters###
+        if 'DeadPixelClusters' in self.singleSubtest:
+            self.SubPages.append({"InitialAttributes" : {"Anchor": "DefectClusters", "Title": "Defect Clusters"}, "Key": "Section","Module": "Section"})
+            self.SubPages.append(
+                {
+                    "Key": "DeadPixelClusters",
+                    "Module": "DeadPixelClusters",
+                    "InitialAttributes" : {
+                        "Test": "m20_2",
+                        "StorageKey" : "DeadPixelClusters",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
         ### dead pixels ###
         if not self.singleSubtest or 'DeadPixels' in self.singleSubtest:
             self.SubPages.append({"InitialAttributes" : {"Anchor": "DeadPixel", "Title": "Dead Pixels"}, "Key": "Section","Module": "Section"})
