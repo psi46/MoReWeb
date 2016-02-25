@@ -787,6 +787,11 @@ else:
 try:
     if len(ModulesNotInsertedIntoDB) > 0:
         print 'Modules not inserted into DB: %s'%','.join(ModulesNotInsertedIntoDB)
+
+        # if there was no error with processing
+        if ExitCode == 0:
+            # indicate there was an error with insertion
+            ExitCode = 999
 except:
     pass
 

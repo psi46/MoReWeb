@@ -1324,9 +1324,30 @@ class GeneralTestResult(object):
     def WriteToDatabase(self, ParentID=0):
         ColumnMapping = {}
         ID = 0
-        ID = self.CustomWriteToDatabase(ParentID)
-
         WriteToDBSuccess = True
+
+        try:
+            ID = self.CustomWriteToDatabase(ParentID)
+        except Exception as inst:
+            if ParentID > 0:
+                raise
+            else:
+                # Start red color
+                sys.stdout.write("\x1b[31m")
+                sys.stdout.flush()
+                print 'Error in test (write to database)'
+                print inst
+                print inst.args
+                print sys.exc_info()[0]
+                print "\n\n------\n"
+                # Print traceback
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                traceback.print_exception(exc_type, exc_obj, exc_tb)
+                # Reset color
+                sys.stdout.write("\x1b[0m")
+                sys.stdout.flush()
+                WriteToDBSuccess = False
+
         for i in self.ResultData['SubTestResults']:
             try:
                 SubtestWriteToDBSuccess = self.ResultData['SubTestResults'][i].WriteToDatabase(ID)

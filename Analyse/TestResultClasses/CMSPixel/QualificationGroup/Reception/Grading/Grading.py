@@ -56,8 +56,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for i in chipResults:
             try:
                 PixelDefectsGrade = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsGrade']['Value'])
-                NumBumpBondingProblems.append(int(i['TestResultObject'].ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['nBumpBondingProblems']['Value']))
-                NumDeadPixels.append(int(i['TestResultObject'].ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NDeadPixels']['Value']))
+                NumBumpBondingProblems.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefectiveBumps']))
+                NumDeadPixels.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDeadPixels']))
                 NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']))
             except:
                 Incomplete = True
