@@ -290,7 +290,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
-
+            self.SubPages.append(
+                {
+                    "Key": "DeadPixelClustersP17",
+                    "Module": "DeadPixelClusters",
+                    "InitialAttributes" : {
+                        "Test": "p17_1",
+                        "StorageKey" : "DeadPixelClustersP17",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
         ### dead pixels ###
         if not self.singleSubtest or 'DeadPixels' in self.singleSubtest:
             self.SubPages.append({"InitialAttributes" : {"Anchor": "DeadPixel", "Title": "Dead Pixels"}, "Key": "Section","Module": "Section"})

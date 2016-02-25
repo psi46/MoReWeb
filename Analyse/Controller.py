@@ -690,11 +690,12 @@ if args.output_csv:
 
             # add new modules
             if ModuleID not in ModuleData:
-                ModuleData[ModuleID] = {'Grade': 'M', 'LeakageCurrent': -1, 'PixelDefects': -1}
+                ModuleData[ModuleID] = {'Grade': 'M', 'FullQualificationGrade':'', 'XrayGrade':'',  'LeakageCurrent': -1, 'PixelDefects': -1}
 
             # add FullQualification data
             if Row['QualificationType'] == 'FullQualification':
                 Grade = Row['Grade']
+                ModuleData[ModuleID]['FullQualificationGrade'] = Grade
                 PixelDefects = int(Row['PixelDefects']) if Row['PixelDefects'] else -1
 
                 # grade, if worse
@@ -718,7 +719,7 @@ if args.output_csv:
             # add X-ray data
             if Row['TestType'] == 'XRayHRQualification':
                 Grade = Row['Grade']
-
+                ModuleData[ModuleID]['XrayGrade'] = Grade
                 # grade, if worse
                 if Grade and Grade in GradeOrdering:
                     if GradeOrdering[Grade] > GradeOrdering[ModuleData[ModuleID]['Grade']]:
@@ -727,7 +728,7 @@ if args.output_csv:
         CSVPath = GlobalOverviewPath + '/ModuleResultDB.csv'
         with open(CSVPath, 'w') as csvfile:
             for ModuleID, Data in ModuleData.iteritems():
-                CSVLine = "%s, %s, %d, %e\n"%(ModuleID, Data['Grade'], Data['PixelDefects'], Data['LeakageCurrent'])
+                CSVLine = "%s, %s, %s, %s, %d, %e\n"%(ModuleID, Data['Grade'], Data['FullQualificationGrade'], Data['XrayGrade'], Data['PixelDefects'], Data['LeakageCurrent'])
                 csvfile.write(CSVLine)
                 print CSVLine,
 
