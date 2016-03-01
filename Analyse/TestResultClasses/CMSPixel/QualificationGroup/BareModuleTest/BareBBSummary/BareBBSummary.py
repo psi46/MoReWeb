@@ -17,48 +17,32 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH2D(self.GetUniqueID(), "", 8*self.nCols, 0., 8*self.nCols, 2*self.nRows, 0., 2*self.nRows); # mThreshold
 
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
-            ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
-            histo = ChipTestResultObject.ResultData['SubTestResults']['BareBBMap'].ResultData['Plot']['ROOTObject']
-            print 'histo name inside BareBBSumary: ', histo.GetName()
-            if not histo:
-                print 'cannot get BareBBMap histo for chip ',ChipTestResultObject.Attributes['ChipNo']
-                continue
-            print '---------------------',ChipTestResultObject.Attributes['ChipNo']
-            for col in range(self.nCols): # Columns
-                for row in range(self.nRows): # Rows
-                    #roc = ChipTestResultObject.Attributes['ChipNo'];
-                    #mcol = 52*(roc%8) + col;
-                    #mrow = row;
-                    #
-                    #if ChipTestResultObject.Attributes['ChipNo'] > 7:
-                    #    mcol = 415 - mcol;
-                    #    mrow = 159 - row;
-                    #
-                    #self.ResultData['Plot']['ROOTObject'].SetBinContent(mcol+1, mrow+1, histo.GetBinContent(col + 1, row + 1))
-                    if ChipTestResultObject.Attributes['ChipNo'] < 8:
-                        tmpCol = 8*self.nCols-(ChipTestResultObject.Attributes['ChipNo']*self.nCols+col)
-                        tmpRow = 2*self.nRows-row
-                    else:
-                        tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*self.nCols+col)+1
-                        tmpRow = row+1
-                    if ChipTestResultObject.Attributes['ChipNo'] < 8:
+            try:
+                ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
+                histo = ChipTestResultObject.ResultData['SubTestResults']['BareBBMap'].ResultData['Plot']['ROOTObject']
+                print 'histo name inside BareBBSumary: ', histo.GetName()
+                if not histo:
+                    print 'cannot get BareBBMap histo for chip ',ChipTestResultObject.Attributes['ChipNo']
+                    continue
+                print '---------------------',ChipTestResultObject.Attributes['ChipNo']
+                for col in range(self.nCols): # Columns
+                    for row in range(self.nRows): # Rows
+                        if ChipTestResultObject.Attributes['ChipNo'] < 8:
+                            tmpCol = 8*self.nCols-(ChipTestResultObject.Attributes['ChipNo']*self.nCols+col)
+                            tmpRow = 2*self.nRows-row
+                        else:
+                            tmpCol = (ChipTestResultObject.Attributes['ChipNo']%8*self.nCols+col)+1
+                            tmpRow = row+1
+                        if ChipTestResultObject.Attributes['ChipNo'] < 8:
                         #tmpRow += self.nRows
-                        pass
-                    self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, histo.GetBinContent(col + 1, row + 1))
+                            pass
+                        self.ResultData['Plot']['ROOTObject'].SetBinContent(tmpCol, tmpRow, histo.GetBinContent(col + 1, row + 1))
                     
+            except:
+                'No histogram for chip i',i
+
 
         if self.ResultData['Plot']['ROOTObject']:
-            mThresholdMin = 0.
-            mThresholdMax = 255.
-
-            #self.Canvas.SetLinx();
-            #self.Canvas.SetLinY;
-
-            if  self.ResultData['Plot']['ROOTObject'].GetMaximum() < mThresholdMax:
-                mThresholdMax = self.ResultData['Plot']['ROOTObject'].GetMaximum();
-
-            if self.ResultData['Plot']['ROOTObject'].GetMinimum() > mThresholdMin:
-                mThresholdMin = self.ResultData['Plot']['ROOTObject'].GetMinimum();
 
             #self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(mThresholdMin,mThresholdMax);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");

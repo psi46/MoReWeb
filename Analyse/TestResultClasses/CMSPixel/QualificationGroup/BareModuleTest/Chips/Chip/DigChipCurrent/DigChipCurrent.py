@@ -24,7 +24,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo=self.ParentObject.Attributes['ChipNo']
         self.HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
         histname = self.HistoDict.get(self.NameSingle,'DigitalCurrent')
-        print 'inside DigChipCurrent ',histname, self.HistoDict
+        #print 'inside DigChipCurrent ',histname, self.HistoDict
 
         #if self.HistoDict.has_option(self.NameSingle,'DigChipCurrent'):
         #    histname = self.HistoDict.get(self.NameSingle,'DigitalCurrent')
