@@ -31,6 +31,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['TotalList'] = set()
         self.ResultData['HiddenData']['DefectsGradingComplete'] = False
         self.isDigitalROC = self.ParentObject.ParentObject.ParentObject.Attributes['isDigital']
+        try:
+            if 'isBareModule' in self.ParentObject.ParentObject.ParentObject.Attributes:
+                self.isBareModule = self.ParentObject.ParentObject.ParentObject.Attributes['isBareModule']
+            else:
+                self.isBareModule = False
+        except:
+            self.isBareModule = False
 
     def GetSingleChipSubtestGrade(self, SpecialPopulateDataParameters, CurrentGrade, IncludeDefects = True):
         Value = float(self.ParentObject.ResultData['SubTestResults'][SpecialPopulateDataParameters['DataKey']].ResultData['KeyValueDictPairs'][SpecialPopulateDataParameters['DataParameterKey']]['Value'])
@@ -70,10 +77,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         
         # Bump Bonding Defects
         # priority: BB4 > BB2 > BB  (BB4 > BB2 is arbitrary, they should not be present at the same time)
-        if self.ParentObject.ResultData['SubTestResults']['BB4'].ResultData['Plot']['ROOTObject']:
+        if 'BB4' in self.ParentObject.ResultData['SubTestResults'] and self.ParentObject.ResultData['SubTestResults']['BB4'].ResultData['Plot']['ROOTObject']:
             self.ResultData['HiddenData']['DeadBumpList'] = self.ParentObject.ResultData['SubTestResults']['BB4'].ResultData['KeyValueDictPairs']['DeadBumps']['Value']
             self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = 'BB4'
-        elif self.ParentObject.ResultData['SubTestResults']['BB2Map'].ResultData['Plot']['ROOTObject']:
+        elif 'BB2Map' in self.ParentObject.ResultData['SubTestResults'] and self.ParentObject.ResultData['SubTestResults']['BB2Map'].ResultData['Plot']['ROOTObject']:
             self.ResultData['HiddenData']['DeadBumpList'] = self.ParentObject.ResultData['SubTestResults']['BB2Map'].ResultData['KeyValueDictPairs']['MissingBumps']['Value']
             self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = 'BB2'
         else:
@@ -81,18 +88,51 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = ''
 
         # other pixel defects
-        self.ResultData['HiddenData']['DeadPixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
-        self.ResultData['HiddenData']['DeadTrimbitsList'] = self.ParentObject.ResultData['SubTestResults']['TrimBitProblems'].ResultData['KeyValueDictPairs']['DeadTrimbits']['Value']
-        self.ResultData['HiddenData']['GainDefectList'] = self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['GainDefects']['Value']
-        self.ResultData['HiddenData']['IneffPixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['InefficentPixels']['Value']
-        self.ResultData['HiddenData']['MaskDefectList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['MaskDefects']['Value']
-        self.ResultData['HiddenData']['Noisy1PixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'] # pixels with too many hitys in pixel alive...
-        self.ResultData['HiddenData']['NoiseDefectList'] = self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['KeyValueDictPairs']['NoiseDefects']['Value'] # pixels with too wide S-curve...
-        self.ResultData['HiddenData']['Par1DefectList'] = self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData['KeyValueDictPairs']['Par1Defects']['Value']
-        self.ResultData['HiddenData']['ThrDefectList'] = self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['TrimProblems']['Value']
+        self.ResultData['HiddenData']['DefectsGradingComplete'] = True
+
+        if 'PixelMap' in self.ParentObject.ResultData['SubTestResults']:
+            self.ResultData['HiddenData']['DeadPixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
+            self.ResultData['HiddenData']['IneffPixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['InefficentPixels']['Value']
+            self.ResultData['HiddenData']['MaskDefectList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['MaskDefects']['Value']
+            self.ResultData['HiddenData']['Noisy1PixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['NoisyPixels']['Value'] # pixels with too many hitys in pixel alive...
+        else:
+            self.ResultData['HiddenData']['DeadPixelList'] = set()
+            self.ResultData['HiddenData']['IneffPixelList'] = set()
+            self.ResultData['HiddenData']['MaskDefectList'] = set()
+            self.ResultData['HiddenData']['Noisy1PixelList'] = set()
+            self.ResultData['HiddenData']['DefectsGradingComplete'] = False
+
+        if 'TrimBitProblems' in self.ParentObject.ResultData['SubTestResults']:
+            self.ResultData['HiddenData']['DeadTrimbitsList'] = self.ParentObject.ResultData['SubTestResults']['TrimBitProblems'].ResultData['KeyValueDictPairs']['DeadTrimbits']['Value']
+        else:
+            self.ResultData['HiddenData']['DeadTrimbitsList'] = set()
+            self.ResultData['HiddenData']['DefectsGradingComplete'] = False
+
+        if 'PHCalibrationGain' in self.ParentObject.ResultData['SubTestResults']:
+            self.ResultData['HiddenData']['GainDefectList'] = self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['KeyValueDictPairs']['GainDefects']['Value']
+        else:
+            self.ResultData['HiddenData']['GainDefectList'] = set()
+            self.ResultData['HiddenData']['DefectsGradingComplete'] = False
+
+        if 'SCurveWidths' in self.ParentObject.ResultData['SubTestResults']:
+            self.ResultData['HiddenData']['NoiseDefectList'] = self.ParentObject.ResultData['SubTestResults']['SCurveWidths'].ResultData['KeyValueDictPairs']['NoiseDefects']['Value'] # pixels with too wide S-curve...
+        else:
+            self.ResultData['HiddenData']['NoiseDefectList'] = set()
+            self.ResultData['HiddenData']['DefectsGradingComplete'] = False
+
+        if 'PHCalibrationTan' in self.ParentObject.ResultData['SubTestResults']:
+            self.ResultData['HiddenData']['Par1DefectList'] = self.ParentObject.ResultData['SubTestResults']['PHCalibrationTan'].ResultData['KeyValueDictPairs']['Par1Defects']['Value']
+        else:
+            self.ResultData['HiddenData']['Par1DefectList'] = set()
+            self.ResultData['HiddenData']['DefectsGradingComplete'] = False
+
+        if 'VcalThresholdTrimmed' in self.ParentObject.ResultData['SubTestResults']:
+            self.ResultData['HiddenData']['ThrDefectList'] = self.ParentObject.ResultData['SubTestResults']['VcalThresholdTrimmed'].ResultData['KeyValueDictPairs']['TrimProblems']['Value']
+        else:
+            self.ResultData['HiddenData']['ThrDefectList'] = set()
+            self.ResultData['HiddenData']['DefectsGradingComplete'] = False
 
         # check if some data is missing and make unique list of total pixel defects
-        self.ResultData['HiddenData']['DefectsGradingComplete'] = True
         self.ResultData['HiddenData']['TotalList'] = set([])
         for IndividualDefectsList in [
             self.ResultData['HiddenData']['DeadPixelList'],
@@ -113,7 +153,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['HiddenData']['DefectsGradingComplete'] = False
 
         # subtract dead pixels explicitly from individual defects which do not exclude them implicitly
-        if  self.ResultData['HiddenData']['DeadPixelList'] is not None:
+        if self.ResultData['HiddenData']['DeadPixelList'] is not None:
             self.ResultData['HiddenData']['AddressProblemList'] = self.ResultData['HiddenData']['AddressProblemList'] - self.ResultData['HiddenData']['DeadPixelList'] if self.ResultData['HiddenData']['AddressProblemList'] is not None else None
             self.ResultData['HiddenData']['DeadBumpList'] = self.ResultData['HiddenData']['DeadBumpList'] - self.ResultData['HiddenData']['DeadPixelList'] if self.ResultData['HiddenData']['DeadBumpList'] is not None else None
             self.ResultData['HiddenData']['DeadTrimbitsList'] = self.ResultData['HiddenData']['DeadTrimbitsList'] - self.ResultData['HiddenData']['DeadPixelList'] if self.ResultData['HiddenData']['DeadTrimbitsList'] is not None else None
@@ -146,8 +186,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         except:
             pass
 
-        if not self.ResultData['HiddenData']['DefectsGradingComplete']:
+        if not self.ResultData['HiddenData']['DefectsGradingComplete'] and not self.isBareModule:
             Grade = GradeMapping[3]
+        elif self.isBareModule:
+            if self.ResultData['HiddenData']['DeadPixelList'] is None or self.ResultData['HiddenData']['DeadBumpList'] is None:
+                Grade = GradeMapping[3]
 
         print '\nChip %d Pixel Defects Grade %s'%(self.chipNo, Grade)
 

@@ -34,6 +34,7 @@ class TestResult(GeneralTestResult):
         if halfModule:
             self.Attributes['StartChip'] = 8
         self.Attributes['isDigital'] = (ROCtype.find('dig') != -1)
+        self.Attributes['isBareModule'] = True
         if self.verbose:
             print 'Analysing BareModuletest with the following Attributes:'
             for name, value in self.Attributes.items():
