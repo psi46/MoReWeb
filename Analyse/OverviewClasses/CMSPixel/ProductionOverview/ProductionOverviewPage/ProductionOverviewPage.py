@@ -276,7 +276,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             )
 
         ### dead pixel clusters###
-        if 'DeadPixelClusters' in self.singleSubtest:
+        if self.singleSubtest and 'DeadPixelClusters' in self.singleSubtest:
             self.SubPages.append({"InitialAttributes" : {"Anchor": "DefectClusters", "Title": "Defect Clusters"}, "Key": "Section","Module": "Section"})
             self.SubPages.append(
                 {
