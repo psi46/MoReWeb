@@ -111,7 +111,7 @@ class TestResult(GeneralTestResult):
         line2.SetLineStyle(2)
 
         self.ResultData['Plot']['Caption'] = 'PH Calibration: Pedestal (Vcal)'
-        self.SaveCanvas()        
+        self.SaveCanvas()
         self.ResultData['KeyValueDictPairs'] = {
             'N': {
                 'Value': '{0:1.0f}'.format(IntegralPedestal),
@@ -144,4 +144,11 @@ class TestResult(GeneralTestResult):
         if over:
             self.ResultData['KeyValueDictPairs']['over'] = {'Value': '{0:1.2f}'.format(over), 'Label': '>='}
             self.ResultData['KeyList'].append('over')
+
+        if self.isPROC:
+            for ChannelNumber in range(4):
+                h = self.ParentObject.ResultData['SubTestResults']['PHCalibrationGain'].ResultData['Plot']['ROOTObject_hPedestal_c%d'%ChannelNumber]
+                self.ResultData['KeyValueDictPairs']['mu_RMS_c%d'%ChannelNumber]= {'Label': 'μ/RMS ch%d'%ChannelNumber, 'Value': '{mu:1.2f}/{rms:1.2f}'.format(mu=h.GetMean(), rms=h.GetRMS())}
+                self.ResultData['KeyList'].append('mu_RMS_c%d'%ChannelNumber)
+
         ROOT.gPad.SetLogy(0)

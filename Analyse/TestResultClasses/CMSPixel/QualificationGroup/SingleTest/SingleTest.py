@@ -22,7 +22,6 @@ class TestResult(GeneralTestResult):
         self.Attributes['isDigital'] = 1
 
         self.AddCommentsToKeyValueDictPairs = True
-        ROCtype, nRocs, halfModule = self.ReadModuleVersion()
 
         TestNameDictionary = {
             'PixelAlive': {

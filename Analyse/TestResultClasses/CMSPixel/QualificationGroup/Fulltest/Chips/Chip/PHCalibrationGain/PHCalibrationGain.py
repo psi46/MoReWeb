@@ -72,8 +72,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                                                                      row=row))
                             n_warnings += 1
                             continue
+                        if self.isPROC:
+                            ChannelNumber = (col % 2) + 2*(row % 2)
+                            self.ResultData['Plot']['ROOTObject_hPedestal_c%d'%ChannelNumber].Fill(pedestal)
+                            self.ResultData['Plot']['ROOTObject_hGain_c%d'%ChannelNumber].Fill(gain)
+
                         self.ResultData['Plot']['ROOTObject_hPedestal'].Fill(pedestal)
                         self.ResultData['Plot']['ROOTObject_hGain'].Fill(gain)
+
                         self.ResultData['Plot']['ROOTObject_hGainMap'].SetBinContent(col + 1, row + 1, gain)
                         self.ResultData['Plot']['ROOTObject_hPedestalMap'].SetBinContent(col + 1, row + 1, pedestal)
                         if gain > self.TestResultEnvironmentObject.GradingParameters['gainMax'] or gain < self.TestResultEnvironmentObject.GradingParameters['gainMin']:
@@ -92,6 +98,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # hg
         self.ResultData['Plot']['ROOTObject_hGain'] = ROOT.TH1D(self.GetUniqueID(), "", 300, -2.0, 5.5)  # hGain
 
+        if self.isPROC:
+            #  pixel cluster channels todo:check with PSI for numbering
+            #  2 3
+            #  0 1
+            self.ResultData['Plot']['ROOTObject_hGain_c0'] = ROOT.TH1D(self.GetUniqueID(), "", 300, -2.0, 5.5)  # hGain channel 0
+            self.ResultData['Plot']['ROOTObject_hGain_c1'] = ROOT.TH1D(self.GetUniqueID(), "", 300, -2.0, 5.5)  # hGain channel 1
+            self.ResultData['Plot']['ROOTObject_hGain_c2'] = ROOT.TH1D(self.GetUniqueID(), "", 300, -2.0, 5.5)  # hGain channel 2
+            self.ResultData['Plot']['ROOTObject_hGain_c3'] = ROOT.TH1D(self.GetUniqueID(), "", 300, -2.0, 5.5)  # hGain channel 3
+
         # hgm
         self.ResultData['Plot']['ROOTObject_hGainMap'] = ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0, self.nCols,
                                                                    self.nRows, 0, self.nRows)  # hGainMap
@@ -102,9 +117,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                                                        self.nRows)  # hPedestalMap
 
         # hp
-        self.ResultData['Plot']['ROOTObject_hPedestal'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500.,
-                                                                    600.)  # hPedestal
+        self.ResultData['Plot']['ROOTObject_hPedestal'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500., 600.)  # hPedestal
         self.ResultData['Plot']['ROOTObject_hPedestal'].StatOverflows(True)
+
+        if self.isPROC:
+            self.ResultData['Plot']['ROOTObject_hPedestal_c0'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500., 600.)  # hPedestal channel 0
+            self.ResultData['Plot']['ROOTObject_hPedestal_c1'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500., 600.)  # hPedestal channel 1
+            self.ResultData['Plot']['ROOTObject_hPedestal_c2'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500., 600.)  # hPedestal channel 2
+            self.ResultData['Plot']['ROOTObject_hPedestal_c3'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500., 600.)  # hPedestal channel 3
 
         # rp
         self.ResultData['Plot']['ROOTObject_rPedestal'] = ROOT.TH1D(self.GetUniqueID(), "", 2100, -1500.,

@@ -39,7 +39,7 @@ class TestResult(GeneralTestResult):
         self.Attributes['NumberOfChips'] = nRocs
         if halfModule:
             self.Attributes['StartChip'] = 8
-        self.Attributes['isDigital'] = (ROCtype.find('dig') != -1)
+        self.Attributes['isDigital'] = (ROCtype.find('dig') != -1 or self.isPROC)
         if self.verbose:
             print 'Analysing Fulltest with the following Attributes:'
             for name, value in self.Attributes.items():

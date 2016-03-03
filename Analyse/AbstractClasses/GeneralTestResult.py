@@ -54,6 +54,7 @@ class GeneralTestResult(object):
         self.testSoftware = None
         self.HistoDict = None
         self.version = None
+        self.isPROC = False
         self.nRocs = 0
         self.halfModule = 0
         self.CommentFromFile = None
@@ -173,6 +174,7 @@ class GeneralTestResult(object):
         if ParentObject:
             self.ParentObject = ParentObject
             self.RawTestSessionDataPath = self.ParentObject.RawTestSessionDataPath
+            self.isPROC = ParentObject.isPROC
 
         if InitialAttributes:
             self.Attributes.update(InitialAttributes)
@@ -461,10 +463,13 @@ class GeneralTestResult(object):
             except (KeyError,ConfigParser.NoOptionError,ConfigParser.NoSectionError):
                 halfModule = 0
         version = version.rstrip('\n')
+        if version and ('proc' in version or 'psi46digplus' in version or 'psi46digl1' in version):
+            self.isPROC = True
         if self.verbose:
             print 'Version:    ', version
             print 'nRocs:      ', nRocs
             print 'halfModule: ', halfModule
+            print 'isPROC:     ', self.isPROC
         self.version = version
         self.nRocs = nRocs
         self.halfModule = halfModule
