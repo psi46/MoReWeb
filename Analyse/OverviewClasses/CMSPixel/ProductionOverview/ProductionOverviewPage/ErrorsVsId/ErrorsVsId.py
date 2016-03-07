@@ -63,9 +63,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             Histograms[DTB_FW].GetXaxis().SetNdivisions(-NTests)
             Histograms[DTB_FW].GetXaxis().SetTickLength(0.015)
             Histograms[DTB_FW].GetYaxis().SetTickLength(0.012)
-            Histograms[DTB_FW].GetXaxis().SetAxisColor(1, 0.4)
-            Histograms[DTB_FW].GetYaxis().SetAxisColor(1, 0.4)
-
+            try:
+                Histograms[DTB_FW].GetXaxis().SetAxisColor(1, 0.4)
+                Histograms[DTB_FW].GetYaxis().SetAxisColor(1, 0.4)
+            except:
+                pass
             HistogramsCreated = HistogramsCreated and Histograms[DTB_FW]
 
         # extract data
