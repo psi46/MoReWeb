@@ -17,8 +17,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'Label': 'Inefficient Pixels',
             'Value': ''
         }
+        self.ResultData['KeyValueDictPairs']['HighRateInefficientPixels'] = {
+            'Label': 'HR Inefficient Pixels',
+            'Value': ''
+        }
         self.ResultData['KeyList'] = ['InefficientPixels', 'NInefficientPixels']
         self.InefficienctPixelList = set()
+        self.HighRateInefficientPixelsList = set()
 
 
     def PopulateResultData(self):
@@ -26,6 +31,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ChipNo = self.ParentObject.Attributes['ChipNo']
         Rates = self.ParentObject.ParentObject.ParentObject.Attributes['Rates']
+
+        try:
+            histoAlive = self.ParentObject.ResultData['SubTestResults']['AliveMap'].ResultData['Plot']['ROOTObject']
+        except:
+            histoAlive = None
 
         # scan all rates of the efficiency test
         for Rate in Rates['HREfficiency']:
@@ -47,8 +57,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     PixelEfficiency = PixelNHits/Ntrig
 
                     if PixelEfficiency < PixelEfficiencyThreshold:
+                        # inefficient pixels, including dead pixels. Used for pixel-based grading only
                         self.InefficienctPixelList.add((ChipNo, col, row))
 
+                        # inefficient pixels, excluding dead pixels, Used for double column defects detection
+                        if histoAlive is None or histoAlive.GetBinContent(col + 1, row + 1) > 0:
+                            self.HighRateInefficientPixelsList.add((ChipNo, col, row))
+
+
         self.ResultData['KeyValueDictPairs']['InefficientPixels']['Value'] = self.InefficienctPixelList
+        self.ResultData['KeyValueDictPairs']['HighRateInefficientPixels']['Value'] = self.HighRateInefficientPixelsList
         self.ResultData['KeyValueDictPairs']['NInefficientPixels']['Value'] = len(self.InefficienctPixelList)
 
