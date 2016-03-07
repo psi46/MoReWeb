@@ -45,11 +45,12 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                             print "looking in .root files:", RootFiles
                         ROOTObject = self.GetHistFromROOTFile(RootFiles, "VcalThresholdTrimmedMap")
                         if ROOTObject:
-                            for x in range(1, ROOTObject.GetNbinsX()+1):
-                                for y in range(1, ROOTObject.GetNbinsY()+1):
-                                    BinContent = ROOTObject.GetBinContent(x, y)
-                                    if BinContent < pixelThrMin or BinContent > pixelThrMax:
-                                        self.ModuleMap.UpdatePlot(Chip, x, y, 1)
+                            if ROOTObject.GetEntries() > 0:
+                                for x in range(ROOTObject.GetNbinsX()):
+                                    for y in range(ROOTObject.GetNbinsY()):
+                                        BinContent = ROOTObject.GetBinContent(1 + x, 1 + y)
+                                        if BinContent < pixelThrMin or BinContent > pixelThrMax:
+                                            self.ModuleMap.UpdatePlot(Chip, x, y, 1)
                             ROOTObject.Delete()
                         else:
                             self.ProblematicModulesList.append(ModuleID)

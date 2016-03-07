@@ -46,9 +46,9 @@ class ModuleMap:
                 print "cannot copy directly because of different #bins:"
                 print " self: ", self.nBinsX,"x",self.nBinsY
                 print " add: ", ROOTObject.GetXaxis().GetNbins(),"x",ROOTObject.GetYaxis().GetNbins()
-            for x in range(1, self.nBinsX+1):
-                for y in range(1, self.nBinsY+1):
-                    BinContent = ROOTObject.GetBinContent(x,y)
+            for x in range(self.nBinsX):
+                for y in range(self.nBinsY):
+                    BinContent = ROOTObject.GetBinContent(1 + x, 1 + y)
                     if CountMissing:
                         if BinContent < 1:
                             self.Map2D.Fill(x, y, 1)
@@ -56,7 +56,7 @@ class ModuleMap:
                         if BinContent < GoodRange[0] or BinContent > GoodRange[1]:
                             self.Map2D.Fill(x, y, 1)
                     else:
-                        self.Map2D.Fill(x, y, ROOTObject.GetBinContent(x,y))
+                        self.Map2D.Fill(x, y, ROOTObject.GetBinContent(1 + x, 1 + y))
 
         else:
             self.Map2D.Add(ROOTObject)
@@ -64,9 +64,9 @@ class ModuleMap:
     def AddTH2DChip(self, ROOTObject, Chip, FillFunction):
         ROOTObjectNbinsX = ROOTObject.GetXaxis().GetNbins()
         ROOTObjectNbinsY = ROOTObject.GetYaxis().GetNbins()
-        for x in range(1, ROOTObjectNbinsX+1):
-            for y in range(1, ROOTObjectNbinsY+1):
-                self.UpdatePlot(Chip, x, y, FillFunction(ROOTObject.GetBinContent(x, y)))
+        for x in range(ROOTObjectNbinsX):
+            for y in range(ROOTObjectNbinsY):
+                self.UpdatePlot(Chip, x, y, FillFunction(ROOTObject.GetBinContent(1 + x, 1 + y)))
 
     def GetNbinsX(self):
         return self.nBinsX

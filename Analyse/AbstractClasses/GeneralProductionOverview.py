@@ -334,6 +334,11 @@ class GeneralProductionOverview:
                 SubPageContentHTML += '<br>'.join(traceback.format_list(traceback.extract_tb(exc_tb))).replace('\n','')
                 SubPageContentHTML += '</div>'
 
+            try:
+                SubPageObject.CloseFileHandles()
+            except:
+                print "could not close open files!"
+
             ### add to this module html page
             if SubPageContentHTML is not None:
                 ContentHTML += SubPageContentHTML
@@ -536,7 +541,12 @@ class GeneralProductionOverview:
             for i in range(0, PrimitivesList.GetSize()):
                 if PrimitivesList.At(i).GetName().find(HistName) > -1:
                     ClonedROOTObject = PrimitivesList.At(i).Clone(self.GetUniqueID())
+                    try:
+                        ClonedROOTObject.SetDirectory(0)
+                    except:
+                        pass
                     HistogramFound = True
+                    RootFile.Close()
                     break
 
             if HistogramFound:
