@@ -154,11 +154,14 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         PieChartLabelsArray = [ array.array( 'c', '%s\0'%x ) for x in PieChartLabelsList ]
         LabelsInTheUglyWayPyRootNeedsThem = array.array('l', map(lambda x: x.buffer_info()[0], PieChartLabelsArray))
 
-        PieChart = ROOT.TPie(self.GetUniqueID(), "Primary failure reason", len(PieChartValsList), PieChartValsArray, ColorsArray, LabelsInTheUglyWayPyRootNeedsThem)
-        PieChart.SetLabelFormat("%val")
-        PieChart.Draw("3d nol <")
-
-        PieChart.MakeLegend(0.8, 0.65, 1.0, 0.95)
+        self.Canvas.Clear()
+        try:
+            PieChart = ROOT.TPie(self.GetUniqueID(), "Primary failure reason", len(PieChartValsList), PieChartValsArray, ColorsArray, LabelsInTheUglyWayPyRootNeedsThem)
+            PieChart.SetLabelFormat("%val")
+            PieChart.Draw("3d nol <")
+            PieChart.MakeLegend(0.8, 0.65, 1.0, 0.95)
+        except:
+            pass
         self.SaveCanvas()
         ImageHTML = self.Boxed(self.Image(self.Attributes['ImageFile']))
 

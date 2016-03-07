@@ -92,7 +92,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             Histograms[DTB_FW].SetBinContent(HistogramBins, Histograms[DTB_FW].GetBinContent(HistogramBins) + OverflowBinContent)
 
             Histograms[DTB_FW].SetLineColor(HistogramColors[HistogramColorIndex])
-            Histograms[DTB_FW].SetFillColorAlpha(HistogramColors[HistogramColorIndex], 0.25)
+            try:
+                Histograms[DTB_FW].SetFillColorAlpha(HistogramColors[HistogramColorIndex], 0.25)
+            except:
+                pass
             HistogramColorIndex += 1
             if HistogramColorIndex >= len(HistogramColors):
                 HistogramColorIndex = 0
