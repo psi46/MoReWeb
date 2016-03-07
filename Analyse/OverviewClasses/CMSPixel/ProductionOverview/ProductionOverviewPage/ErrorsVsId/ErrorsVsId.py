@@ -130,7 +130,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         for DTB_FW, Histogram in Histograms.iteritems():
             Histograms[DTB_FW].SetLineColor(HistogramColors[HistogramColorIndex])
             Histograms[DTB_FW].SetLineWidth(1)
-            Histograms[DTB_FW].SetFillColorAlpha(HistogramColors[HistogramColorIndex], 0.25)
+            try:
+                Histograms[DTB_FW].SetFillColorAlpha(HistogramColors[HistogramColorIndex], 0.25)
+            except:
+                pass
             HistogramColorIndex += 1
             if HistogramColorIndex >= len(HistogramColors):
                 HistogramColorIndex = 0
