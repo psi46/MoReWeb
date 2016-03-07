@@ -5,11 +5,11 @@ import time
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='CMSPixel_ProductionOverview_GradingOverview'
-    	self.NameSingle='GradingOverview'
+        self.Name='CMSPixel_ProductionOverview_GradingOverview'
+        self.NameSingle='GradingOverview'
         self.Title = 'Grading overview'
         self.DisplayOptions = {
-            'Width': 1,
+            'Width': 2,
         }
         self.SubPages = []
 

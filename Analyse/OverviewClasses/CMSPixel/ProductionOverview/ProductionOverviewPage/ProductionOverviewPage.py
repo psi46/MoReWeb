@@ -96,7 +96,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         self.SubPages.append({
             "InitialAttributes" : {
-                "Sections": ["BumpBonding", "DeadPixel", "PerformanceParameters", "DACs", "IVCurves", "Readback", "HighRate", "VcalCalibration"],
+                "Sections": ["BumpBonding", "DeadPixel", "PerformanceParameters", "DACs", "IVCurves", "Readback", "HighRate", "VcalCalibration", "ReadoutErrors"],
                 "DateBegin": self.Attributes['DateBegin'],
                 "DateEnd": self.Attributes['DateEnd'],
             }, 
@@ -104,19 +104,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             "Module": "SectionNavigation"
         })
 
-        self.SubPages.append(
-            {
-                "Key": "GradingOverview",
-                "Module": "GradingOverview",
-                "InitialAttributes" : {
-                    "StorageKey" : "GradingOverview",
-                    "DateBegin": self.Attributes['DateBegin'],
-                    "DateEnd": self.Attributes['DateEnd'],
-                },
-            }
-        )
-
         if self.Attributes['ShowWeeklyPlots']:
+            self.SubPages.append(
+                {
+                    "Key": "GradingOverview",
+                    "Module": "GradingOverview",
+                    "InitialAttributes" : {
+                        "StorageKey" : "GradingOverview",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    },
+                }
+            )
             if not self.singleSubtest or 'Statistics' in self.singleSubtest:
                 self.SubPages.append(
                     {
@@ -198,7 +197,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         },
                     }
                 )
-        else:     
+        else:
+            self.SubPages.append(
+                {
+                    "Key": "GradingOverview",
+                    "Module": "GradingOverview",
+                    "InitialAttributes" : {
+                        "StorageKey" : "GradingOverview",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    },
+                }
+            )
             self.SubPages.append(
                 {
                     "Key": "ModuleFailuresOverview",
@@ -834,7 +844,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
 
         ### Errors ###
-        self.SubPages.append({"InitialAttributes" : {"Anchor": "VcalCalibration", "Title": "Readout Errors", "Caption": "<i>First bin means <strong>no errors</strong> and last bin includes overflow.</i>"}, "Key": "Section", "Module": "Section"})
+        self.SubPages.append({"InitialAttributes" : {"Anchor": "ReadoutErrors", "Title": "Readout Errors", "Caption": "<i>First bin means <strong>no errors</strong> and last bin includes overflow.</i>"}, "Key": "Section", "Module": "Section"})
         if not self.singleSubtest or 'Errors' in self.singleSubtest:
             for ErrorType in ['nErrors', 'nWarnings', 'nCriticals', 'message_daqerror_count',
                               'message_datasize_count','message_deser400_count', 'message_eventid_count',

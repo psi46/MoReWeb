@@ -568,7 +568,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         line1 = ROOT.TLine()
         line1.SetLineStyle(2)
         line1.SetLineWidth(1)
-        line1.SetLineColorAlpha(ROOT.kBlack, 0.35)
+        try:
+            line1.SetLineColorAlpha(ROOT.kBlack, 0.35)
+        except:
+            line1.SetLineColor(ROOT.kBlack) # for old root versions
+
         linePositions = [3*i for i in range(1, len(YLabels))]
 
         for linePosition in linePositions:

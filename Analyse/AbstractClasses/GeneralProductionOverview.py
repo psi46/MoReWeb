@@ -876,7 +876,7 @@ class GeneralProductionOverview:
                         if CloneHistogram2.GetBinLowEdge(i) > GradeAB:
                             CloneHistogram2.SetBinContent(i, PlotMaximum)
 
-                    CloneHistogram2.SetFillColorAlpha(ROOT.kRed, 0.15)
+                    CloneHistogram2.SetFillColorAlpha(ROOT.kGreen+2, 0.15)
                     CloneHistogram2.SetFillStyle(1001)
                     CloneHistogram2.Draw("same;b")
 
@@ -885,7 +885,7 @@ class GeneralProductionOverview:
                         if CloneHistogram3.GetBinLowEdge(i) <= GradeBC:
                             CloneHistogram3.SetBinContent(i, PlotMaximum)
 
-                    CloneHistogram3.SetFillColorAlpha(ROOT.kGreen+2, 0.1)
+                    CloneHistogram3.SetFillColorAlpha(ROOT.kRed, 0.1)
                     CloneHistogram3.SetFillStyle(1001)
                     CloneHistogram3.Draw("same;b")
 
