@@ -6,11 +6,11 @@ import datetime
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='CMSPixel_ProductionOverview_WeeklyProduction'
-    	self.NameSingle='WeeklyProduction'
+        self.Name='CMSPixel_ProductionOverview_WeeklyProduction'
+        self.NameSingle='WeeklyProduction'
         self.Title = 'Weekly Production A/B/C'
         self.DisplayOptions = {
-            'Width': 2,
+            'Width': 2.5,
         }
         self.SavePlotFile = True
         self.SubPages = []
@@ -59,7 +59,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
     def CreatePlot(self):
 
-    	ModuleData = self.FetchData()
+        ModuleData = self.FetchData()
         
         if len(ModuleData) > 0:	
             SecondsPerWeek = 7 * 24 * 60 * 60

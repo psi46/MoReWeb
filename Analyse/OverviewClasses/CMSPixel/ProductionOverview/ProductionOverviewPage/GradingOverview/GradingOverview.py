@@ -9,7 +9,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.NameSingle='GradingOverview'
         self.Title = 'Grading overview'
         self.DisplayOptions = {
-            'Width': 2,
+            'Width': 2.5,
         }
         self.SubPages = []
 

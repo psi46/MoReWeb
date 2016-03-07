@@ -6,6 +6,7 @@ import glob
 import json
 import copy
 import sys
+import traceback
 
 class GeneralProductionOverview:
     LastUniqueIDCounter = 1
@@ -230,8 +231,9 @@ class GeneralProductionOverview:
     def GetFinalGrade(self, ModuleID, Rows = None):
         if not Rows:
             Rows = self.GetModuleQualificationRows(ModuleID)
+
+        ModuleGrades = []
         if self.ModuleQualificationIsComplete(ModuleID, Rows):
-            ModuleGrades = []
             GradedTestTypes = ['m20_1', 'm20_2', 'p17_1', 'XrayCalibration_Spectrum', 'XRayHRQualification']
             for RowTuple in Rows:
                 if RowTuple['ModuleID']==ModuleID:
@@ -309,13 +311,28 @@ class GeneralProductionOverview:
             SubPageObject = SubPage['ProductionOverview'].ProductionOverview(TestResultEnvironmentObject=self.TestResultEnvironmentObject, InitialAttributes = InitialAttributes, ParentObject = self, Verbose=self.Verbose)
 
             ### generate html overview of submodule
-            #try:
-            SubPageContentHTML = SubPageObject.GenerateOverview()
+            try:
+                SubPageContentHTML = SubPageObject.GenerateOverview()
 
-            self.SubtestResults[SubPage['Key']] = {}
-            self.SubtestResults[SubPage['Key']]['HiddenData'] = SubPageObject.HiddenData
-            #except:
-            #    SubPageContentHTML = "sub page module not found or 'SubPage['ProductionOverview'].GenerateOverview()' failed"
+                self.SubtestResults[SubPage['Key']] = {}
+                self.SubtestResults[SubPage['Key']]['HiddenData'] = SubPageObject.HiddenData
+            except Exception as inst:
+                # Start red color
+                sys.stdout.write("\x1b[31m")
+                sys.stdout.flush()
+                print "Sub page module not found or GenerateOverview() failed:"
+                print inst
+                print "------"
+                # Print traceback
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                traceback.print_exception(exc_type, exc_obj, exc_tb)
+                # Reset color
+                sys.stdout.write("\x1b[0m")
+                sys.stdout.flush()
+
+                SubPageContentHTML = "<div style='background-color:#ecc;color:#700;float:left;'><b>sub page module not found or GenerateOverview() failed:</b><br>"
+                SubPageContentHTML += '<br>'.join(traceback.format_list(traceback.extract_tb(exc_tb))).replace('\n','')
+                SubPageContentHTML += '</div>'
 
             ### add to this module html page
             if SubPageContentHTML is not None:

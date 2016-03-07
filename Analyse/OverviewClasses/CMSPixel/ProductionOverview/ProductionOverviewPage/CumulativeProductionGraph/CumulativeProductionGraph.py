@@ -10,7 +10,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = 'Cumulative Production Graph'
         self.DisplayOptions = {
-            'Width': 2,
+            'Width': 2.5,
         }
         self.SavePlotFile = True
         self.SubPages = []
