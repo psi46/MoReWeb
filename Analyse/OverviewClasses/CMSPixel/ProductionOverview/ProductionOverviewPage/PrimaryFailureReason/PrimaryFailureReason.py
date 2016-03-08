@@ -2,6 +2,17 @@
 import ROOT
 import AbstractClasses
 import array
+import glob
+import sys
+import time
+from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
+import json
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
@@ -132,6 +143,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             else:
                 # otherwise add it to 'Other' category
                 GradeCPrimaryReasons['Other'].append(ModuleID)
+
+        # save defects dictionary as json file
+        JsonFileName = ''
+        try:
+            JsonFileName = self.GlobalOverviewPath+'/'+self.Attributes['BasePath'] + '/KeyValueDictPairs.json'
+            f = open(JsonFileName, 'w')
+            f.write(json.dumps(GradeCPrimaryReasons, sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
+            f.close()
+            print "    -> written to %s"%JsonFileName
+        except:
+            print "could not write json file: '%s'!"%JsonFileName
+
 
         print GradeCPrimaryReasons
 
