@@ -285,6 +285,22 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             )
 
+        SingleMinus20TestName = "m20_2"
+        try:
+            RequiredQualificationTypes = self.TestResultEnvironmentObject.Configuration['RequiredTestTypesForComplete'].strip().split(',')
+            if "m20_2" not in RequiredQualificationTypes:
+                print "No -20C test after cycling (m20_2) found!"
+                if "m20_1" in RequiredQualificationTypes:
+                    SingleMinus20TestName = "m20_1"
+                    print "=> using m20_1 instead!"
+                elif "p17_1" in RequiredQualificationTypes:
+                    SingleMinus20TestName = "p17_1"
+                    print "=> using p17_1 instead!"
+                else:
+                    print "\x1b[31mno equivalent test found!\x1b[0m"
+        except:
+            print "\x1b[31Could not decide which m20 test to use, check 'RequiredTestTypesForComplete' field in configuration!\x1b[0m"
+
         ### dead pixel clusters###
         if self.singleSubtest and 'DeadPixelClusters' in self.singleSubtest:
             self.SubPages.append({"InitialAttributes" : {"Anchor": "DefectClusters", "Title": "Defect Clusters"}, "Key": "Section","Module": "Section"})
@@ -293,7 +309,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "Key": "DeadPixelClusters",
                     "Module": "DeadPixelClusters",
                     "InitialAttributes" : {
-                        "Test": "m20_2",
+                        "Test": SingleMinus20TestName,
                         "StorageKey" : "DeadPixelClusters",
                         "DateBegin": self.Attributes['DateBegin'],
                         "DateEnd": self.Attributes['DateEnd'],
@@ -321,7 +337,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         "Key": "DeadPixelOverlay_{Grade}".format(Grade = Grade),
                         "Module": "DeadPixelOverlay",
                         "InitialAttributes" : {
-                            "Test": "m20_2",
+                            "Test": SingleMinus20TestName,
                             "Grade": "{Grade}".format(Grade = Grade),
                             "StorageKey" : "DeadPixelOverlay_{Grade}".format(Grade = Grade),
                             "DateBegin": self.Attributes['DateBegin'],
@@ -338,7 +354,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         "Key": "ThresholdDefectsOverlay_{Grade}".format(Grade = Grade),
                         "Module": "ThresholdDefectsOverlay",
                         "InitialAttributes" : {
-                            "Test": "m20_2",
+                            "Test": SingleMinus20TestName,
                             "Grade": "{Grade}".format(Grade = Grade),
                             "StorageKey" : "ThresholdDefectsOverlay_{Grade}".format(Grade = Grade),
                             "DateBegin": self.Attributes['DateBegin'],
@@ -355,7 +371,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         "Key": "GainOverlay_{Grade}".format(Grade = Grade),
                         "Module": "GainOverlay",
                         "InitialAttributes" : {
-                            "Test": "m20_2",
+                            "Test": SingleMinus20TestName,
                             "Grade": "{Grade}".format(Grade = Grade),
                             "StorageKey" : "GainOverlay_{Grade}".format(Grade = Grade),
                             "DateBegin": self.Attributes['DateBegin'],
