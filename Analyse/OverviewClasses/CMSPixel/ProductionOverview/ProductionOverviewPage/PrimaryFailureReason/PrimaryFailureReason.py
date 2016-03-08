@@ -91,8 +91,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 for k,v in ModuleDefectGrades.iteritems():
                     if k.upper().startswith('DEFECT_'):
                         HasUserSpecifiedDefects = True
-                        UserSpecifiedDefect = '_'.join(k.split('_')[1:])
+                        # treat HDI defect with lower priority than other user specified defects
+                        if UserSpecifiedDefect == '' or UserSpecifiedDefect.upper() == 'HDI':
+                            UserSpecifiedDefect = '_'.join(k.split('_')[1:])
                         print "---->",UserSpecifiedDefect
+
                 if type(UserSpecifiedDefect) == unicode:
                     UserSpecifiedDefect = UserSpecifiedDefect.encode('utf8')
 
