@@ -31,6 +31,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         rms = -9999
         nBumpBondingProblems = 0
         nSigma = self.TestResultEnvironmentObject.GradingParameters['BumpBondingProblemsNSigma']
+        minDistanceFromPeak = self.TestResultEnvironmentObject.GradingParameters['BumpBondingProblemsMinDistanceFromPeak']
+
         thr = 0
 
         # TH1D
@@ -90,10 +92,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             GaussFitFunction.SetLineColor(ROOT.kGreen+3)
             self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "QBR+")
 
-            thr2 = GaussFitFunction.GetParameter(1) + 4 * GaussFitFunction.GetParameter(2)
+            thr2 = GaussFitFunction.GetParameter(1) + nSigma * GaussFitFunction.GetParameter(2)
 
             try:
-                thrLowLimit = 5 + GaussFitFunction.GetParameter(1) + math.sqrt(2)*GaussFitFunction.GetParameter(2) * math.sqrt(math.log(2) - math.log(1.0/GaussFitFunction.GetParameter(0)))
+                thrLowLimit = minDistanceFromPeak + GaussFitFunction.GetParameter(1) + math.sqrt(2)*GaussFitFunction.GetParameter(2) * math.sqrt(math.log(2) - math.log(1.0/GaussFitFunction.GetParameter(0)))
                 if thr2 < thrLowLimit:
                     thr2 = thrLowLimit
             except:
