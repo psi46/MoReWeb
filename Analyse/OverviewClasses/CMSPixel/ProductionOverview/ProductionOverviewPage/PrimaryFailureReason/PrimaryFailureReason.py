@@ -145,6 +145,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 # otherwise add it to 'Other' category
                 GradeCPrimaryReasons['Other'].append(ModuleID)
 
+        # save defects dictionary as json file
+        JsonFileName = ''
+        try:
+            JsonFileName = self.GlobalOverviewPath+'/'+self.Attributes['BasePath'] + '/KeyValueDictPairs.json'
+            f = open(JsonFileName, 'w')
+            f.write(json.dumps(GradeCPrimaryReasons, sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
+            f.close()
+            print "    -> written to %s"%JsonFileName
+        except:
+            print "could not write json file: '%s'!"%JsonFileName
+
         print GradeCPrimaryReasons
 
         PieChartValsList = []
@@ -156,7 +167,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 PieChartLabelsList.append(Reason)
 
         PieChartValsArray = array.array('d', PieChartValsList)
-        ColorsArray = array.array('i', [2,3,4,5,6,7,9,40,41,42,38,28,49,36,29,12,21,46,16,17,18,19])
+        ColorsArray = array.array('i', [2,3,4,5,6,7,9,40,41,42,38,28,49,36,29,12,21,46,16,17,18,19,11,10,13,14,15,20,21,22,23,24])
         PieChartLabelsArray = [ array.array( 'c', '%s\0'%x ) for x in PieChartLabelsList ]
         LabelsInTheUglyWayPyRootNeedsThem = array.array('l', map(lambda x: x.buffer_info()[0], PieChartLabelsArray))
 
@@ -188,17 +199,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 TextHTML += "<b>%s (%d)</b>:<br>%s<br><br>"%(k, len(v), ', '.join(v))
 
         HTML = "<div>%s<div><div style='float:left;width:400px;'>%s</div>"%(ImageHTML, TextHTML)
-
-
-        JsonFileName = ''
-        try:
-            JsonFileName = self.GlobalOverviewPath+'/'+self.Attributes['BasePath'] + '/KeyValueDictPairs.json'
-            f = open(JsonFileName, 'w')
-            f.write(json.dumps(GradeCPrimaryReasons, sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
-            f.close()
-            print "    -> written to %s"%JsonFileName
-        except:
-            print "could not write json file: '%s'!"%JsonFileName
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 
