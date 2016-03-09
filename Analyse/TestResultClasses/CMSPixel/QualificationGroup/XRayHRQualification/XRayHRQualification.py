@@ -991,6 +991,9 @@ class TestResult(GeneralTestResult):
                 # N_HOT_PIXEL
                 HighRateDataModule ['NHotPixel'] = len(GradingTestResultObject.ResultData['HiddenData']['HotPixelsList']['Value'])
 
+                # N_BAD_DOUBLECOLUMNS
+                HighRateDataModule ['NBadDoubleColumns'] = GradingTestResultObject.ResultData['KeyValueDictPairs']['NBadDoubleColumns']['Value']
+
                 #
                 # tommaso
                 #
@@ -1013,6 +1016,7 @@ class TestResult(GeneralTestResult):
                 HotPixelsLists = []
                 RocGrades = []
                 NColNonUniform = []
+                NBadDoubleColumnsList = []
                 ChipsSubTestResult = self.ResultData['SubTestResults']['Chips']
                 for i in ChipsSubTestResult.ResultData['SubTestResultDictList']:
                     ChipNo = i['TestResultObject'].Attributes['ChipNo']
@@ -1026,6 +1030,7 @@ class TestResult(GeneralTestResult):
                     HotPixelsLists.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefectsList']['Value'])
                     RocGrades.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ROCGrade']['Value'])
                     NColNonUniform.append(NColNonUniformROC)
+                    NBadDoubleColumnsList.append(ChipsSubTestResult.ResultData['SubTestResults']['Chip%d'%ChipNo].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'])
           
                 # ROC rows
                 HighRateDataRoc = {}
@@ -1044,6 +1049,9 @@ class TestResult(GeneralTestResult):
 
                     # N_HOT_PIXEL
                     HighRateDataRoc[i]['NHotPixel'] = len(HotPixelsLists[i])
+
+                    # N_BAD_DOUBLECOLUMNS
+                    HighRateDataRoc[i]['NBadDoubleColumns'] = NBadDoubleColumnsList[i]
 
                     # GRADE
                     HighRateDataRoc[i]['Grade'] = RocGrades[i]

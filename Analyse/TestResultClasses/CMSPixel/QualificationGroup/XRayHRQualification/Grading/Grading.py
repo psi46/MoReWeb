@@ -36,6 +36,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         SubGrading = []
 
         PixelDefects = 0
+        DoubleColumnDefects = 0
         BumpBondingDefects = 0
         NoiseDefects = 0
         HotPixelDefects = 0
@@ -88,6 +89,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 BumpBondingDefects += BumpBondingDefectsROC
                 NoiseDefects += NoiseDefectsROC
                 HotPixelDefects += HotPixelDefectsROC
+
+                try:
+                    DoubleColumnDefectsROC = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'])
+                except:
+                    DoubleColumnDefectsROC = 0
+
+                if DoubleColumnDefectsROC > 0:
+                    DoubleColumnDefects += DoubleColumnDefectsROC
 
                 # get ROC pixel defect lists
                 HotPixelsListROC = i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['HotPixelDefectsList']['Value']
@@ -149,7 +158,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     sys.stdout.write("\x1b[0m")
                     sys.stdout.flush()
 
-        # check for test completenes
+        # check for test completeness
         if TestIncomplete:
             print "\x1b[31mX-ray test incomplete/bad format => GRADE C\x1b[0m"
             ModuleGrade = 3
@@ -205,6 +214,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if HotPixelDefects < 0:
             HotPixelDefects = -1
 
+        if DoubleColumnDefects < 0:
+            DoubleColumnDefects = -1
+
         SubGradings['PixelDefects'] = SubGrading
         self.ResultData['KeyValueDictPairs'] = {
             'Module': {
@@ -230,6 +242,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'PixelDefects': {
                 'Value': PixelDefects,
                 'Label': 'Total Pixel Defects'
+            },
+            'NBadDoubleColumns': {
+                'Value': DoubleColumnDefects,
+                'Label': 'Double Column Defects'
             },
             'Efficiency_50': {
                 'Value': MeanEfficiency50,
