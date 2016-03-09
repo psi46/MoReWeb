@@ -7,11 +7,7 @@ import time
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
 import json
 
-class SetEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, set):
-            return list(obj)
-        return json.JSONEncoder.default(self, obj)
+from AbstractClasses.Helper.SetEncoder import SetEncoder
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 

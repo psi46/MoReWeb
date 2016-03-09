@@ -2,11 +2,7 @@ import ROOT
 import AbstractClasses
 import os, json
 
-class SetEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, set):
-            return list(obj)
-        return json.JSONEncoder.default(self, obj)
+from AbstractClasses.Helper.SetEncoder import SetEncoder
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
@@ -192,6 +188,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         "Key": "PrimaryFailureReason",
                         "Module": "PrimaryFailureReason",
                         "InitialAttributes" : {
+                            "StorageKey" : "PrimaryFailureReason",
                             "DateBegin": self.Attributes['DateBegin'],
                             "DateEnd": self.Attributes['DateEnd'],
                         },
@@ -226,6 +223,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "Key": "PrimaryFailureReason",
                     "Module": "PrimaryFailureReason",
                     "InitialAttributes" : {
+                        "StorageKey" : "PrimaryFailureReason",
                         "DateBegin": self.Attributes['DateBegin'],
                         "DateEnd": self.Attributes['DateEnd'],
                     },
@@ -715,6 +713,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     "Key": "Duration",
                     "Module": "Duration",
                     "InitialAttributes" : {
+                        "StorageKey" : "Duration",
                         "DateBegin": self.Attributes['DateBegin'],
                         "DateEnd": self.Attributes['DateEnd'],
                     }

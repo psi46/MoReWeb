@@ -2,6 +2,9 @@
 import ROOT
 import AbstractClasses
 import array
+import json
+
+from AbstractClasses.Helper.SetEncoder import SetEncoder
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
@@ -185,6 +188,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 TextHTML += "<b>%s (%d)</b>:<br>%s<br><br>"%(k, len(v), ', '.join(v))
 
         HTML = "<div>%s<div><div style='float:left;width:400px;'>%s</div>"%(ImageHTML, TextHTML)
+
+
+        JsonFileName = ''
+        try:
+            JsonFileName = self.GlobalOverviewPath+'/'+self.Attributes['BasePath'] + '/KeyValueDictPairs.json'
+            f = open(JsonFileName, 'w')
+            f.write(json.dumps(GradeCPrimaryReasons, sort_keys=True, indent=4, separators=(',', ': '), cls=SetEncoder))
+            f.close()
+            print "    -> written to %s"%JsonFileName
+        except:
+            print "could not write json file: '%s'!"%JsonFileName
 
         AbstractClasses.GeneralProductionOverview.GeneralProductionOverview.GenerateOverview(self)
 

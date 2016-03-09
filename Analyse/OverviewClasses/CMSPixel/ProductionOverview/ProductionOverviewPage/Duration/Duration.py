@@ -1,15 +1,12 @@
 import ROOT
 import AbstractClasses
-import time
-import datetime
-import glob
-import json
+
 
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-        self.NameSingle='Duration'
-    	self.Name='CMSPixel_ProductionOverview_%s'%self.NameSingle
+        self.NameSingle = 'Duration'
+        self.Name = 'CMSPixel_ProductionOverview_%s'%self.NameSingle
         self.Title = 'Fulltest Duration'
         self.DisplayOptions = {
             'Width': 2,
