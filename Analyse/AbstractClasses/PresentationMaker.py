@@ -70,8 +70,9 @@ class MakeProductionSummary:
     datenow = time.strftime("%d %m %Y")
     d = time.strptime(datenow, "%d %m %Y")
     week = strftime("%U", d)
+    year = strftime("%Y", d)
 
-    filename = OutputDirectoryPath + "/ModuleProductionOverview_Week{0}.tex".format(week)
+    filename = OutputDirectoryPath + "/ModuleProductionOverview_{year}_Week{week}.tex".format(year=year, week=week)
     
     #Fetch data
 
