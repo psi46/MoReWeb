@@ -69,6 +69,7 @@ class TestResultEnvironment:
         'PixelMapMinValue':0,
         'PixelMapMaskDefectUpperThreshold': 0,
         'BumpBondingProblemsNSigma': 5,
+        'BumpBondingProblemsMinDistanceFromPeak': 5,
         'XRayHighRateEfficiency_NInterpolationRates': 2,
         'XRayHighRateEfficiency_InterpolationRate1': 50,
         'XRayHighRateEfficiency_InterpolationRate2': 120,
