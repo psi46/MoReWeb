@@ -192,16 +192,19 @@ class MakeProductionSummary:
 
     # Template for latex presentation
     template = ''
-    with open('LaTeX/presentation.tex', 'r') as presentationTemplate:
-        template = presentationTemplate.read()
-
+    try:
+        with open('LaTeX/presentation.tex', 'r') as presentationTemplate:
+            template = presentationTemplate.read()
+    except:
+        print "\x1b[31mCould not read template: LaTeX/presentation.tex\x1b[0m"
 
     # build module failure overview plots .tex code
-    ModuleFailureOverviewFigureTemplate = """
-    \\begin{{figure}} \centering \\advance\leftskip-0.9cm
-    \includegraphics[width=1.14\\textwidth, angle=0] {{{GlobalOverviewPath}/ProductionOverview/ProductionOverviewPage_Total/{ModuleFailuresOverviewFolder}/ModuleFailuresOverview.pdf}}
-    \end{{figure}}
-    """
+    ModuleFailureOverviewFigureTemplate = ''
+    try:
+        with open('LaTeX/ModuleFailureOverviewFigure.tex', 'r') as presentationTemplate:
+            ModuleFailureOverviewFigureTemplate = presentationTemplate.read()
+    except:
+        print "\x1b[31mCould not read template: LaTeX/ModuleFailureOverviewFigure.tex\x1b[0m"
 
     GlobalOverviewPath = Configuration.get('Paths', 'GlobalOverviewPath')
     ModuleFailuresOverviewPath = GlobalOverviewPath + "/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview_*"
@@ -362,8 +365,20 @@ class MakeProductionSummary:
 
 
     oldWorkingDirectory = os.getcwd()
-    with  open(filename,'w') as myfile:
-        myfile.write(template.format(**context))
+    with open(filename,'w') as myfile:
+        try:
+            TeXCodeFormatted = template.format(**context)
+        except:
+            print "\x1b[31mcould not print formatted tex code for:\x1b[31m"
+            print context
+            TeXCodeFormatted = None
+
+        if TeXCodeFormatted:
+            try:
+                myfile.write(TeXCodeFormatted)
+            except:
+                print "\x1b[31mcould not write to file: %s\x1b[31m"%filename
+
 
     print "compile tex file..."
 
@@ -377,11 +392,11 @@ class MakeProductionSummary:
         print "LaTeX compiler returned: %d"%proc.returncode
         for extension in ['aux', 'nav', 'snm', 'toc', 'out']:
             auxFile = filename[0:-4]+"."+extension
-        if os.path.isfile(auxFile):
-            try:
-                os.remove(auxFile)
-            except:
-                print "could not remove auxiliary file: %s"%auxFile
+            if os.path.isfile(auxFile):
+                try:
+                    os.remove(auxFile)
+                except:
+                    print "could not remove auxiliary file: %s"%auxFile
     except:
         print "could not compile tex file, pdflatex installed?"
         raise
