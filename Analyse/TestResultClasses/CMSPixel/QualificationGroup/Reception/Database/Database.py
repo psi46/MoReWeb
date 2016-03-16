@@ -84,8 +84,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Table']['BODY'].append(FulltestRow)
         except:
             self.ResultData['Table'] = {
-               'HEADER': ['Error'],
-               'BODY': ["Can't compare with DB, either not connection or module not in database!"],
+               'HEADER': [['Error']],
+               'BODY': [["Can't compare with DB, either no connection or module not in database!"]],
                'FOOTER': [],
             }
 
@@ -171,7 +171,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             rows = DB.GetFulltestPixelDefects(ModuleID=ModuleID)
 
             if rows is None:
-                raise Exception("Could not connect to DB or module not found in DB!")
+                raise Exception("Could not connect to DB or module not found in DB! Use Configuration/GlobalDatabase.cfg to specify connection parameters to MySQL database!")
 
             DBDataRow = ['Database']
             DBDataRow.append(sum([x['Total'] for x in rows]))

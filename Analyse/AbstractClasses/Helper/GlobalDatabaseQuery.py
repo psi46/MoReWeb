@@ -28,7 +28,7 @@ class GlobalDatabaseQuery():
             print 'Configuration/GlobalDatabase.cfg does not contain all information needed: User, Host, Database, MacroVersion'
 
     def Connect(self):
-        if self.db is None:
+        if self.db is None and self.Host is not None:
 
             try:
                 Password = self.Configuration.get('GlobalDatabase', 'Password').strip()
