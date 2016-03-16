@@ -201,6 +201,7 @@ class TestResult(GeneralTestResult):
         # find pxar logfile of fulltest
         logfilePath = ("%s.log"%fileHandlePath[:-5]) if len(fileHandlePath) > 4 else ''
         self.pxarVersion = None
+        self.logfilePath = None
         if os.path.isfile(logfilePath):
             self.logfilePath = logfilePath
             try:

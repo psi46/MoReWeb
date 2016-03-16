@@ -57,5 +57,5 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # save canvas
         self.ResultData['Plot']['Format'] = 'png'
-        self.Title = 'Bump Bonding Defects Map'
+        self.Title = 'Bump Bonding Defects Map %s'%("(" + self.ResultData['HiddenData']['SpecialBumpBondingTestName'] + ")" if len(self.ResultData['HiddenData']['SpecialBumpBondingTestName']) > 0 else "")
         self.SaveCanvas()

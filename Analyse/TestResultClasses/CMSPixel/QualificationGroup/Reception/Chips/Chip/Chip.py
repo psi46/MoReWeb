@@ -43,11 +43,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         
                     }
                 },
-                {'Key':'Grading',
-                    'DisplayOptions':{
-                        'Show': False
-                    }
-                },
                 {'Key':'DacDac',
                     'DisplayOptions':{
                     }
@@ -71,7 +66,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                  'DisplayOptions':{
                     'Order':34,
                     }
-                 }
+                 },
+                {'Key':'Grading',
+                    'DisplayOptions':{
+                        'Show': False
+                    }
+                },
             ]
 
     def PopulateResultData(self):

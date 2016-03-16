@@ -8,7 +8,10 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Ch
         super(TestResult, self).CustomInit()
 
     def PopulateResultData(self):
-        super(TestResult, self).PopulateResultData()
-        for pix in self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']:
-            self.ResultData['Plot']['ROOTObject'].SetBinContent(1+pix[1], 1+pix[2], 0)
-        self.SaveCanvas()
+        try:
+            super(TestResult, self).PopulateResultData()
+            for pix in self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']:
+                self.ResultData['Plot']['ROOTObject'].SetBinContent(1+pix[1], 1+pix[2], 0)
+            self.SaveCanvas()
+        except:
+            print "No standard BumpBonding test found!"

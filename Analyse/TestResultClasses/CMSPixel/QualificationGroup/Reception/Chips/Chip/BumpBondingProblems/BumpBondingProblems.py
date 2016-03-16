@@ -7,3 +7,9 @@ import TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.BumpBon
 class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.BumpBondingProblems.BumpBondingProblems.TestResult):
     def CustomInit(self):
         super(TestResult, self).CustomInit()
+
+    def PopulateResultData(self):
+        try:
+            super(TestResult, self).PopulateResultData()
+        except:
+            print "No standard BumpBonding test found!"
