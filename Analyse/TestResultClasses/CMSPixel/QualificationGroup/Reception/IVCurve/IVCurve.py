@@ -7,6 +7,7 @@ import TestResultClasses.CMSPixel.QualificationGroup.Fulltest.IVCurve.IVCurve
 class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.IVCurve.IVCurve.TestResult):
     def CustomInit(self):
         super(TestResult, self).CustomInit()
+        self.Attributes['Reception'] = True
 
     def PopulateResultData(self):
         super(TestResult, self).PopulateResultData()

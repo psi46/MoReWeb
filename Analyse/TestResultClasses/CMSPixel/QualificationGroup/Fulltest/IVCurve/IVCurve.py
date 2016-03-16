@@ -281,7 +281,8 @@ class TestResult(GeneralTestResult):
                     print "no %s IV for current ratio found :-("%HighTemperatureEnvironment
         else:
             # if IV curve at low T is missing, ignore grading on ratio, bu print warning
-            print "#"*80,"\nWARNING: IV curve at low temperature is missing, no grading on ratio is done!\n","#"*80
+            if 'Reception' not in self.Attributes or ('Reception' in self.Attributes and not self.Attributes['Reception']):
+                print "#"*80,"\nWARNING: IV curve at low temperature is missing, no grading on ratio is done!\n","#"*80
 
         # plot
         if len(Voltage_List) == 0:
