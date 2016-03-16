@@ -52,6 +52,26 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'DisplayOptions':{
                     }
                 },
+                {'Key':'BB2Scan',
+                    'DisplayOptions':{
+                        'Order':31,
+                    }
+                },
+                {'Key':'BareBBWidth',
+                 'DisplayOptions':{
+                    'Order':32,
+                    }
+                 },
+                {'Key':'BB2Map',
+                 'DisplayOptions':{
+                    'Order':33,
+                    }
+                 },
+                {'Key':'BB4',
+                 'DisplayOptions':{
+                    'Order':34,
+                    }
+                 }
             ]
 
     def PopulateResultData(self):

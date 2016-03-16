@@ -96,7 +96,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             title.SetTextAlign(11)
             title.SetTextAlign(12)
             title.SetTextColor(ROOT.kBlack)
-            Subtitle = "total number of BB defects, modules: %s to %s (%d)"%(ModuleIDsList[0], ModuleIDsList[-1], NModules)
+            if len(ModuleIDsList) > 0:
+                Subtitle = "total number of BB defects, modules: %s to %s (%d)"%(ModuleIDsList[0], ModuleIDsList[-1], NModules)
+            else:
+                Subtitle = "no modules available"
             title.DrawText(0.05, 0.965, Subtitle)
 
             title2 = ROOT.TText()

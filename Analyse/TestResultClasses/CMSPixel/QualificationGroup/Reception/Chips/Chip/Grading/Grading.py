@@ -74,6 +74,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['HiddenData']['DeadBumpList'] = self.ParentObject.ResultData['SubTestResults']['BumpBondingProblems'].ResultData['KeyValueDictPairs']['DeadBumps']['Value']
             self.ResultData['HiddenData']['SpecialBumpBondingTestName'] = ''
 
+        if len(self.ResultData['HiddenData']['SpecialBumpBondingTestName']) > 0:
+            print "using special bump bonding test: %s"%self.ResultData['HiddenData']['SpecialBumpBondingTestName']
+
         # other pixel defects
         self.ResultData['HiddenData']['DeadPixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
         self.ResultData['HiddenData']['IneffPixelList'] = self.ParentObject.ResultData['SubTestResults']['PixelMap'].ResultData['KeyValueDictPairs']['InefficentPixels']['Value']
