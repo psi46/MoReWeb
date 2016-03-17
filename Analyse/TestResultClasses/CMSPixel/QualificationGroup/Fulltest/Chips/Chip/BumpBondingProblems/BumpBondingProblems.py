@@ -85,17 +85,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
     def CheckBumpBondingProblems(self):
-        BumpBondingProblems_Mean = \
-        self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Mean']['Value']
-        BumpBondingProblems_RMS = \
-        self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['RMS']['Value']
-        BumpBondingProblems_nSigma = 0
-        if self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs'].has_key(
-                'nSigma'):
-            BumpBondingProblems_nSigma = \
-            self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['nSigma'][
-                'Value']
-        threshold = BumpBondingProblems_Mean + BumpBondingProblems_nSigma * BumpBondingProblems_RMS
+
+        # use threshold already calculated in BumpBonding subtest
+        threshold = self.ParentObject.ResultData['SubTestResults']['BumpBonding'].ResultData['KeyValueDictPairs']['Threshold']['Value']
         for column in range(self.nCols):
             for row in range(self.nRows):
                 self.HasBumpBondingProblems(column, row, threshold)

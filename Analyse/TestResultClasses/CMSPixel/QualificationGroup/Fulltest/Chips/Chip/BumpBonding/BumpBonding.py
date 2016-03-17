@@ -19,8 +19,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['nBumpBondingProblems'] = {'Value': round(-1, 0),
                                                                             'Label': 'N BumpProblems'}
 
-            self.ResultData['KeyValueDictPairs']['nBumpBondingProblems2'] = {'Value': round(-1, 0),
-                                                                            'Label': 'N (experimental cut)',
+            self.ResultData['KeyValueDictPairs']['nBumpBondingProblemsOld'] = {'Value': round(-1, 0),
+                                                                            'Label': 'N (old cut)',
                                                                             'Style': 'color:#666;'}
 
     def PopulateResultData(self):
@@ -30,6 +30,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         mean = -9999
         rms = -9999
         nBumpBondingProblems = 0
+        nBumpBondingProblemsOld = 0
         nSigma = self.TestResultEnvironmentObject.GradingParameters['BumpBondingProblemsNSigma']
         minDistanceFromPeak = self.TestResultEnvironmentObject.GradingParameters['BumpBondingProblemsMinDistanceFromPeak']
 
@@ -61,13 +62,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].Draw()
 
-            # cut 1
+            # old bump bonding cut based on mean and RMS of whole distribution
             mean = self.ResultData['Plot']['ROOTObject'].GetMean()
             rms = self.ResultData['Plot']['ROOTObject'].GetRMS()
             thr = mean + nSigma * rms
             startbin = self.ResultData['Plot']['ROOTObject'].FindBin(thr)
             for bin in range(startbin, self.ResultData['Plot']['ROOTObject'].GetNbinsX()):
-                nBumpBondingProblems += self.ResultData['Plot']['ROOTObject'].GetBinContent(bin)
+                nBumpBondingProblemsOld += self.ResultData['Plot']['ROOTObject'].GetBinContent(bin)
             self.Cut = ROOT.TCutG('bumpBondingThreshold', 2)
             self.Cut.SetPoint(0, thr, -1e9)
             self.Cut.SetPoint(1, thr, +1e9)
@@ -76,14 +77,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.Cut.SetLineColor(ROOT.kRed)
             self.Cut.Draw('PL')
 
-            # cut 2 (experimental)
+            # new bump bonding cut
+
+            # use coarse histogram to detect peak
             CoarseHistogram = self.ResultData['Plot']['ROOTObject'].Clone(self.GetUniqueID())
             RebinX = 4
             CoarseHistogram.Rebin(RebinX)
             CoarseHistogram.GetXaxis().SetRangeUser(20, 250)
             PeakPositionGuess = CoarseHistogram.GetXaxis().GetBinLowEdge(CoarseHistogram.GetMaximumBin())
 
-            # 1st iteration
+            # fit right half of peak with a Gaussian
             GaussFitFunction = ROOT.TF1("BBPeakFitFunction","gaus(0)", max(0, PeakPositionGuess), min(PeakPositionGuess+40, 255))
             GaussFitFunction.SetParameter(0, CoarseHistogram.GetBinContent(CoarseHistogram.GetMaximumBin()) / RebinX)
             GaussFitFunction.SetParameter(1, PeakPositionGuess)
@@ -94,6 +97,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             thr2 = GaussFitFunction.GetParameter(1) + nSigma * GaussFitFunction.GetParameter(2)
 
+            # ensure threshold is at least minDistanceFromPeak units away from point where fit == 1/2
             try:
                 thrLowLimit = minDistanceFromPeak + GaussFitFunction.GetParameter(1) + math.sqrt(2)*GaussFitFunction.GetParameter(2) * math.sqrt(math.log(2) - math.log(1.0/GaussFitFunction.GetParameter(0)))
                 if thr2 < thrLowLimit:
@@ -101,10 +105,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             except:
                 pass
 
-            startbin = self.ResultData['Plot']['ROOTObject'].FindBin(thr2)
-            nBumpBondingProblems2 = 0
-            for bin in range(startbin, self.ResultData['Plot']['ROOTObject'].GetNbinsX()):
-                nBumpBondingProblems2 += self.ResultData['Plot']['ROOTObject'].GetBinContent(bin)
+            # align threshold to bin boundaries
+            startbin = self.ResultData['Plot']['ROOTObject'].FindBin(thr2)+1
+            thr2 = self.ResultData['Plot']['ROOTObject'].GetXaxis().GetBinLowEdge(startbin)
+
+            # count missing bumps
+            for bin in range(startbin, self.ResultData['Plot']['ROOTObject'].GetNbinsX()+1):
+                nBumpBondingProblems += self.ResultData['Plot']['ROOTObject'].GetBinContent(bin)
 
             self.Cut2 = ROOT.TCutG('bumpBondingThreshold2', 2)
             self.Cut2.SetPoint(0, thr2, -1e9)
@@ -117,19 +124,19 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         self.Title = 'Bump Bonding: C{ChipNo}'.format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         self.SaveCanvas()
-        self.ResultData['KeyValueDictPairs']['Mean']['Value'] = round(mean, 2)
+        self.ResultData['KeyValueDictPairs']['Mean']['Value'] = round(GaussFitFunction.GetParameter(1), 2)
         self.ResultData['KeyList'].append('Mean')
-        self.ResultData['KeyValueDictPairs']['RMS']['Value'] = round(rms, 2)
+        self.ResultData['KeyValueDictPairs']['RMS']['Value'] = round(GaussFitFunction.GetParameter(2), 2)
         self.ResultData['KeyList'].append('RMS')
-        self.ResultData['KeyValueDictPairs']['Threshold']['Value'] = round(thr, 2)
+        self.ResultData['KeyValueDictPairs']['Threshold']['Value'] = round(thr2, 2)
         self.ResultData['KeyList'].append('Threshold')
 
         if self.Attributes['isDigitalROC']:
             self.ResultData['KeyValueDictPairs']['nSigma']['Value'] = nSigma
             self.ResultData['KeyValueDictPairs']['nBumpBondingProblems']['Value'] = round(nBumpBondingProblems, 0)
-            self.ResultData['KeyValueDictPairs']['nBumpBondingProblems2']['Value'] = "{N:1.0f}".format(N=nBumpBondingProblems2)
+            self.ResultData['KeyValueDictPairs']['nBumpBondingProblemsOld']['Value'] = "{N:1.0f}".format(N=nBumpBondingProblemsOld)
             self.ResultData['KeyList'].append('nSigma')
             self.ResultData['KeyList'].append('nBumpBondingProblems')
-            self.ResultData['KeyList'].append('nBumpBondingProblems2')
+            self.ResultData['KeyList'].append('nBumpBondingProblemsOld')
 
 
