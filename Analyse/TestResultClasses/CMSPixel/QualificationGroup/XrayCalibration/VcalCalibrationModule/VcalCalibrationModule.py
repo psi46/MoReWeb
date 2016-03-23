@@ -89,8 +89,14 @@ class TestResult(GeneralTestResult):
 
 
         for roc in range(self.nRocs):
-            table_line = [roc, "%.1f e- / Vcal" % (slopes[roc]), "%.1f e- / Vcal" % (error_slopes[roc]),
-                          "%.1f e-" % (offsets[roc]), "%.1f e-" % (error_offsets[roc])]
+            print "slope roc ", slopes[roc]
+            if slopes[roc] < 0:
+                table_line = ["<span style='color:red'>%d</span>"%roc, "<span style='color:red'>%.1f e- / Vcal</span>" % (slopes[roc]), "<span style='color:red'>%.1f e- / Vcal" % (error_slopes[roc]),
+                              "<span style='color:red'>%.1f e-" % (offsets[roc]), "<span style='color:red'>%.1f e-" % (error_offsets[roc])]
+            else:
+                table_line = [roc, "%.1f e- / Vcal" % (slopes[roc]), "%.1f e- / Vcal" % (error_slopes[roc]),
+                              "%.1f e-" % (offsets[roc]), "%.1f e-" % (error_offsets[roc])]
+
             self.ResultData['Table']['BODY'].append(table_line)
 
         if self.verbose:

@@ -317,11 +317,22 @@ class TestResult(GeneralTestResult):
             target = 'unknown'
         chi2_per_ndf = myfit.GetChisquare() / max(myfit.GetNDF(), 1)
 
-        if histo.GetEntries() > 99:
+        NMinEntries = 99
+        histoEntries = histo.GetEntries()
+        try:
+            binX1 = histo.GetXaxis().FindBin(10)
+            binX2 = histo.GetXaxis().FindBin(250)
+            histoIntegral = histo.Integral(binX1, binX2)
+        except:
+            histoIntegral = -1
+
+        if histoEntries > NMinEntries and histoIntegral > NMinEntries:
             PeakCenter = round(myfit.GetParameter(3), 2)
             PeakSigma = round(myfit.GetParError(3), 2)
         else:
             print "\x1b[31mwarning: histogram with x-ray spectrum has less than 100 entries, no Vcal calibration possible. Dead ROC?\x1b[0m"
+            print " -> #entries:", histoEntries
+            print " -> integral(10-250):", histoIntegral
             PeakCenter = -1
             PeakSigma = -1
 
@@ -624,7 +635,15 @@ class TestResult(GeneralTestResult):
                     entries = histo.GetEntries()
                     ratio = float(maximum) / float(entries) if entries > 0 else 1
                     if ratio < .025:
+                        BinsBefore = histo.GetXaxis().GetNbins()
                         histo.Rebin()
+                        BinsAfter = histo.GetXaxis().GetNbins()
+                        if BinsAfter < 20:
+                            print "\x1b[31mStop rebinning of histogram at #bins = %d. This might be a due to a broken ROC or missing PH calibration data.\x1b[0m"%BinsAfter
+                            break
+                        elif BinsBefore == BinsAfter:
+                            print "\x1b[31mRebinning of histogram failed\x1b[0m"
+                            break
                     else:
                         break
 

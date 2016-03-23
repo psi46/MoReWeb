@@ -2,7 +2,7 @@ import AbstractClasses
 import ROOT
 import os
 from AbstractClasses.Helper.BetterConfigParser import BetterConfigParser
-
+import sys
 
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
@@ -63,5 +63,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.SaveCanvas()
         
         self.ResultData['KeyList'] = ['Slope', 'Offset']
+        if slope['Value'] < 0:
+            sys.stdout.write("\x1b[31m")
         print ("ROC %d"%self.chipNo).ljust(6) + " Slope = " + ("%.2f"%slope['Value']).ljust(5) + " +/- " + ("%.1f"%slope['Sigma']).ljust(4) + " Offset = " + ("%.1f"%offset['Value']).ljust(8)
+        if slope['Value'] < 0:
+            sys.stdout.write("\x1b[0m")
         self.ResultData['KeyValueDictPairs'] = {'Slope': slope,'Offset': offset,'chi2': chi2}
