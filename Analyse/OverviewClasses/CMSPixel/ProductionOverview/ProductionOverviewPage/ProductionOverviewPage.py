@@ -283,6 +283,56 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 }
             )
 
+        if self.singleSubtest and 'XrayMap' in self.singleSubtest:
+            self.SubPages.append(
+                {
+                    "Key": "XrayMap",
+                    "Module": "XrayMap",
+                    "InitialAttributes" : {
+                        "Target": "Zn",
+                        "StorageKey" : "XrayMap_Zn",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+            self.SubPages.append(
+                {
+                    "Key": "XrayMap",
+                    "Module": "XrayMap",
+                    "InitialAttributes" : {
+                        "Target": "Mo",
+                        "StorageKey" : "XrayMap_Mo",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+            self.SubPages.append(
+                {
+                    "Key": "XrayMap",
+                    "Module": "XrayMap",
+                    "InitialAttributes" : {
+                        "Target": "Ag",
+                        "StorageKey" : "XrayMap_Ag",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+            self.SubPages.append(
+                {
+                    "Key": "XrayMap",
+                    "Module": "XrayMap",
+                    "InitialAttributes" : {
+                        "Target": "Sn",
+                        "StorageKey" : "XrayMap_Sn",
+                        "DateBegin": self.Attributes['DateBegin'],
+                        "DateEnd": self.Attributes['DateEnd'],
+                    }
+                }
+            )
+
         SingleMinus20TestName = "m20_2"
         try:
             RequiredQualificationTypes = self.TestResultEnvironmentObject.Configuration['RequiredTestTypesForComplete'].strip().split(',')
