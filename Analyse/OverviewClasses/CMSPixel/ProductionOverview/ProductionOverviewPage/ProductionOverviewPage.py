@@ -954,8 +954,9 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         for SumJSONFilesModule in self.SumJSONFilesModules:
             print("merge JSON files for '%s'..."%SumJSONFilesModule)
             TotalJSONDict = {}
-            for Page in [x for x in self.SubPages if x['Key'] == SumJSONFilesModule]:
+            for Page in [x for x in self.SubPages if x['Module'] == SumJSONFilesModule]:
                 Path = self.GlobalOverviewPath + '/' + self.Attributes['BasePath'] + '/' + Page['InitialAttributes']['StorageKey'] + "/KeyValueDictPairs.json"
+
                 with open(Path) as data_file:
                     JSONData = json.load(data_file)
                     TotalJSONDict.update(JSONData)

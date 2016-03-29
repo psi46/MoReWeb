@@ -243,192 +243,191 @@ class ModuleSummaryValues(AbstractClasses.GeneralProductionOverview.GeneralProdu
 
 
         # Get number of modules for each defect from module defects table
-        for modulerange in range (0,len(ModuleIDsList)/50+1):
-            filename = "{Path}/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview_{Modulerange}/KeyValueDictPairs.json".format(Path=Path,Modulerange=modulerange)
-            data = open(filename, 'r')
-            moduledefects = json.load(data)
-           
+        filename = "{Path}/ProductionOverview/ProductionOverviewPage_Total/ModuleFailuresOverview/KeyValueDictPairs.json".format(Path=Path)
+        data = open(filename, 'r')
+        moduledefects = json.load(data)
+       
 
-            for mod, defects in moduledefects.iteritems():
-
-
-                for d, grade in defects.iteritems():
-
-                    if (d == 'TotalDefects' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['ntotDefectsB'] += 1
-                        elif tag == "C":
-                            Numbers['ntotDefectsC'] += 1
-
-                    if (d == 'TotalDefects_X-ray' and grade!=""):
-                        if grade == "B" :
-                            Numbers['ntotDefectsXrayB'] += 1
-                        elif grade == "C":
-                            Numbers['ntotDefectsXrayC'] += 1
-                            
-
-            for mod, defects in moduledefects.iteritems():
+        for mod, defects in moduledefects.iteritems():
 
 
-                for d, grade in defects.iteritems():
+            for d, grade in defects.iteritems():
+
+                if (d == 'TotalDefects' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['ntotDefectsB'] += 1
+                    elif tag == "C":
+                        Numbers['ntotDefectsC'] += 1
+
+                if (d == 'TotalDefects_X-ray' and grade!=""):
+                    if grade == "B" :
+                        Numbers['ntotDefectsXrayB'] += 1
+                    elif grade == "C":
+                        Numbers['ntotDefectsXrayC'] += 1
+                        
+
+        for mod, defects in moduledefects.iteritems():
 
 
-                    if (d == 'AddressDefects' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B":
-                            Numbers['nAddressdefB'] += 1
-                        elif tag == "C":
-                            Numbers['nAddressdefC'] += 1
-
-                    if (d == 'BB_Fulltest' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['nBBFullB'] += 1
-                        elif tag == "C":
-                            Numbers['nBBFullC'] += 1
-
-                    if (d == 'BB_X-ray' and grade!=""):
-                        if grade == "B" :
-                            Numbers['nBBXrayB'] += 1
-                        elif grade == "C":
-                            Numbers['nBBXrayC'] += 1           
-
-                    if (d == 'IVRatio150' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['nCurrentRatioB'] += 1
-                        elif tag == "C":
-                            Numbers['nCurrentRatioC'] += 1
-
-                    if (d == 'IVSlope' and grade!=""):
-                        if grade == "B" :
-                            Numbers['nIVSlopeB'] += 1
-                        elif grade == "C":
-                            Numbers['nIVSlopeC'] += 1
-
-                    if (d == 'LCStartup' and grade!=""):
-                        if grade == "B" :
-                            Numbers['nlcstartupB'] += 1
-                        elif grade == "C":
-                            Numbers['nlcstartupC'] += 1
-
-                    if (d == 'Noise' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['nNoiseB'] += 1
-                        elif tag == "C":
-                            Numbers['nNoiseC'] += 1
-
-                    if (d == 'Noise_X-ray' and grade!=""):
-                        if grade == "B" :
-                            Numbers['nNoiseXrayB'] += 1
-                        elif grade == "C":
-                            Numbers['nNoiseXrayC'] += 1
-
-                    if (d == 'PedestalSpread' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['nPedSpreadB'] += 1
-                        elif tag == "C":
-                            Numbers['nPedSpreadC'] += 1
-
-                    if (d == 'RelativeGainWidth' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['nRelGainWB'] += 1
-                        elif tag == "C":
-                            Numbers['nRelGainWC'] += 1
+            for d, grade in defects.iteritems():
 
 
-                    if (d == 'VcalThrWidth' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['nVcalThrWB'] += 1
-                        elif tag == "C":
-                            Numbers['nVcalThrWC'] += 1
+                if (d == 'AddressDefects' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B":
+                        Numbers['nAddressdefB'] += 1
+                    elif tag == "C":
+                        Numbers['nAddressdefC'] += 1
 
-                    if (d == 'deadPixels' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['ndeadpixB'] += 1
-                        elif tag == "C":
-                            Numbers['ndeadpixC'] += 1
+                if (d == 'BB_Fulltest' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['nBBFullB'] += 1
+                    elif tag == "C":
+                        Numbers['nBBFullC'] += 1
 
-                    if (d == 'lowHREfficiency' and grade!=""):
-                        if grade == "B" :
-                            Numbers['nLowHREfB'] += 1
-                        elif grade == "C":
-                            Numbers['nLowHREfC'] += 1
+                if (d == 'BB_X-ray' and grade!=""):
+                    if grade == "B" :
+                        Numbers['nBBXrayB'] += 1
+                    elif grade == "C":
+                        Numbers['nBBXrayC'] += 1           
 
-                    if (d == 'maskDefects' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['nMaskdefB'] += 1
-                        elif tag == "C":
-                            Numbers['nMaskdefC'] += 1
+                if (d == 'IVRatio150' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['nCurrentRatioB'] += 1
+                    elif tag == "C":
+                        Numbers['nCurrentRatioC'] += 1
 
-                    if (d == 'trimbitDefects' and grade!=""):
-                        tag = "A"
-                        for test, g in grade.iteritems():
-                            if g == "C":
-                                tag = "C"
-                            elif (tag!="C" and g == "B"):
-                                tag = "B"
-                        if tag == "B" :
-                            Numbers['nTrimbitdefB'] += 1
-                        elif tag == "C":
-                            Numbers['nTrimbitdefC'] += 1
+                if (d == 'IVSlope' and grade!=""):
+                    if grade == "B" :
+                        Numbers['nIVSlopeB'] += 1
+                    elif grade == "C":
+                        Numbers['nIVSlopeC'] += 1
+
+                if (d == 'LCStartup' and grade!=""):
+                    if grade == "B" :
+                        Numbers['nlcstartupB'] += 1
+                    elif grade == "C":
+                        Numbers['nlcstartupC'] += 1
+
+                if (d == 'Noise' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['nNoiseB'] += 1
+                    elif tag == "C":
+                        Numbers['nNoiseC'] += 1
+
+                if (d == 'Noise_X-ray' and grade!=""):
+                    if grade == "B" :
+                        Numbers['nNoiseXrayB'] += 1
+                    elif grade == "C":
+                        Numbers['nNoiseXrayC'] += 1
+
+                if (d == 'PedestalSpread' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['nPedSpreadB'] += 1
+                    elif tag == "C":
+                        Numbers['nPedSpreadC'] += 1
+
+                if (d == 'RelativeGainWidth' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['nRelGainWB'] += 1
+                    elif tag == "C":
+                        Numbers['nRelGainWC'] += 1
+
+
+                if (d == 'VcalThrWidth' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['nVcalThrWB'] += 1
+                    elif tag == "C":
+                        Numbers['nVcalThrWC'] += 1
+
+                if (d == 'deadPixels' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['ndeadpixB'] += 1
+                    elif tag == "C":
+                        Numbers['ndeadpixC'] += 1
+
+                if (d == 'lowHREfficiency' and grade!=""):
+                    if grade == "B" :
+                        Numbers['nLowHREfB'] += 1
+                    elif grade == "C":
+                        Numbers['nLowHREfC'] += 1
+
+                if (d == 'maskDefects' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['nMaskdefB'] += 1
+                    elif tag == "C":
+                        Numbers['nMaskdefC'] += 1
+
+                if (d == 'trimbitDefects' and grade!=""):
+                    tag = "A"
+                    for test, g in grade.iteritems():
+                        if g == "C":
+                            tag = "C"
+                        elif (tag!="C" and g == "B"):
+                            tag = "B"
+                    if tag == "B" :
+                        Numbers['nTrimbitdefB'] += 1
+                    elif tag == "C":
+                        Numbers['nTrimbitdefC'] += 1
 
 
         #Categorize modules with leakage current problems
