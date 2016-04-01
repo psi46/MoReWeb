@@ -690,18 +690,22 @@ if args.output_csv:
 
             # add new modules
             if ModuleID not in ModuleData:
-                ModuleData[ModuleID] = {'Grade': 'M', 'FullQualificationGrade':'', 'XrayGrade':'',  'LeakageCurrent': -1, 'PixelDefects': -1}
+                ModuleData[ModuleID] = {'Grade': 'M', 'FullQualificationGrade': None, 'XrayGrade': None,  'LeakageCurrent': -1, 'PixelDefects': -1}
 
             # add FullQualification data
             if Row['QualificationType'] == 'FullQualification':
                 Grade = Row['Grade']
-                ModuleData[ModuleID]['FullQualificationGrade'] = Grade
+                if ModuleData[ModuleID]['FullQualificationGrade'] is None:
+                    ModuleData[ModuleID]['FullQualificationGrade'] = Grade
                 PixelDefects = int(Row['PixelDefects']) if Row['PixelDefects'] else -1
 
                 # grade, if worse
                 if Grade in GradeOrdering:
                     if GradeOrdering[Grade] > GradeOrdering[ModuleData[ModuleID]['Grade']]:
                         ModuleData[ModuleID]['Grade'] = Grade
+                    print "worst:",ModuleData[ModuleID]['FullQualificationGrade']
+                    if GradeOrdering[Grade] > GradeOrdering[ModuleData[ModuleID]['FullQualificationGrade']]:
+                        ModuleData[ModuleID]['FullQualificationGrade'] = Grade
 
                 # number of defects, if higher
                 if PixelDefects > ModuleData[ModuleID]['PixelDefects']:
