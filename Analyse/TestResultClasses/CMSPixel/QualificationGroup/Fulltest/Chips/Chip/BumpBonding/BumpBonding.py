@@ -14,6 +14,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['Mean'] = {'Value': -999, 'Label': 'Mean', }
         self.ResultData['KeyValueDictPairs']['RMS'] = {'Value': -1, 'Label': 'RMS', }
         self.ResultData['KeyValueDictPairs']['Threshold'] = {'Value': round(-999, 2), 'Label': 'Threshold', }
+        self.ResultData['KeyValueDictPairs']['Chi2Ndf'] = {'Value': 0, 'Label': 'Chi2/ndf', }
         if self.Attributes['isDigitalROC']:
             self.ResultData['KeyValueDictPairs']['nSigma'] = {'Value': -1, 'Label': 'σ'}
             self.ResultData['KeyValueDictPairs']['nBumpBondingProblems'] = {'Value': round(-1, 0),
@@ -55,7 +56,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
                 'ROOTObject'].GetMaximum())
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold difference")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold")
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
@@ -88,12 +89,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             # fit right half of peak with a Gaussian
             GaussFitFunction = ROOT.TF1("BBPeakFitFunction","gaus(0)", max(0, PeakPositionGuess), min(PeakPositionGuess+40, 255))
-            GaussFitFunction.SetParameter(0, CoarseHistogram.GetBinContent(CoarseHistogram.GetMaximumBin()) / RebinX)
+            PeakHeightGuess = CoarseHistogram.GetBinContent(CoarseHistogram.GetMaximumBin()) / RebinX
+            GaussFitFunction.SetParameter(0, PeakHeightGuess)
+            GaussFitFunction.SetParLimits(0, PeakHeightGuess / 4, 4160)
             GaussFitFunction.SetParameter(1, PeakPositionGuess)
-            GaussFitFunction.SetParameter(2, 10)
-            GaussFitFunction.SetParLimits(2, 1, 30)
+            GaussFitFunction.SetParameter(2, 5)
+            GaussFitFunction.SetParLimits(2, 1.5, 30)
             GaussFitFunction.SetLineColor(ROOT.kGreen+3)
-            self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "QBR+")
+            FitStatus = self.ResultData['Plot']['ROOTObject'].Fit(GaussFitFunction, "QSBR+")
 
             thr2 = GaussFitFunction.GetParameter(1) + nSigma * GaussFitFunction.GetParameter(2)
 
@@ -104,6 +107,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     thr2 = thrLowLimit
             except:
                 pass
+
+            # check convergence of fit and use non-fit method if chi2 is bad
+            FitChi2Ndf = FitStatus.Chi2() / FitStatus.Ndf() if FitStatus.Ndf() > 0 else -1
+            self.ResultData['KeyValueDictPairs']['Chi2Ndf']['Value'] = FitChi2Ndf
+
+            if FitChi2Ndf < 0 or FitChi2Ndf > 100:
+                thr2 = thr
+                print "\x1b[31mBumpBonding: peak fit for cut has bad chi2, using old BB cut!\x1b[0m"
 
             # align threshold to bin boundaries
             startbin = self.ResultData['Plot']['ROOTObject'].FindBin(thr2)+1
