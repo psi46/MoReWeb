@@ -658,11 +658,13 @@ class TestResult(GeneralTestResult):
             sys.stdout.write("\x1b[0m")
             sys.stdout.flush()
 
-            grade = 'C'
+            if 'ManualGrade' not in self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']:
+                grade = 'C'
+
             Comment += 'Test incomplete!'
 
         #adding comment (if any) from manual grading
-        if self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
+        if 'GradeComment' in self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']:
             Comment += self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['GradeComment']['Value']
 
         try:
