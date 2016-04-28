@@ -3,9 +3,15 @@ import ConfigParser
 
 try:
     import getpass
+except:
+    print "\x1b[31merror: can't load Python module 'getpass' \x1b[0m"
+
+try:
     import MySQLdb
 except:
-    pass
+    print "\x1b[31merror: can't load Python module 'MySQLdb' \x1b[0m"
+    print "\x1b[31m -> run: pip install MySQL-python\x1b[0m"
+
 
 class GlobalDatabaseQuery():
 
