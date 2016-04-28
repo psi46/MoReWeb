@@ -196,6 +196,10 @@ class TestResult(GeneralTestResult):
         # self.durationPrepare = 0
         #         self.durationCleanup = 0
 
+        ROOT.gStyle.SetOptStat(0)
+        ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogx(0)
+
         self.analyseTempPrepare()
         self.analyseTempExecute()
         self.analyseTempCleanup()
