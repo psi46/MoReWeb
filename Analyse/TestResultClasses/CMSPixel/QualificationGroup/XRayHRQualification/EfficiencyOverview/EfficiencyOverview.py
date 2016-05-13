@@ -29,6 +29,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # draw module map
         if self.ModuleMap:
             self.ResultData['Plot']['ROOTObject'] = self.ModuleMap.GetHistogram()
+            Ntrig = self.ParentObject.Attributes['Ntrig']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]
+            self.ModuleMap.SetRangeUser(0, Ntrig)
             self.ModuleMap.Draw(self.Canvas)
 
         # save canvas

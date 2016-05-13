@@ -43,6 +43,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if self.ModuleMap:
             self.ModuleMap.SetContour(100)
             self.ResultData['Plot']['ROOTObject'] = self.ModuleMap.GetHistogram()
+            self.ModuleMap.SetRangeUser(1200, 2800)
             self.ModuleMap.Draw(Canvas=self.Canvas, TitleZ="electrons")
 
         # save canvas
