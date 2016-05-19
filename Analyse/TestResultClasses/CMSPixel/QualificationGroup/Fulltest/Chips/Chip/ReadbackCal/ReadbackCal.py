@@ -17,6 +17,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['ReadbackCal'] = {}
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
+        self.ResultData['KeyValueDictPairs']['Vbg'] = {'Label': 'Vbg', 'Value': '-1'}
+        self.ResultData['KeyValueDictPairs']['par0ia'] = {'Label': 'par0ia', 'Value': '-1'}
+        self.ResultData['KeyValueDictPairs']['par1ia'] = {'Label': 'par1ia', 'Value': '-1'}
+        self.ResultData['KeyValueDictPairs']['par2ia'] = {'Label': 'par2ia', 'Value': '-1'}
 
     def PopulateResultData(self):
         Directory = self.RawTestSessionDataPath
@@ -57,7 +61,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
 
-        #Adding Vbg    
+        # Adding Vbg
         HistoName= 'Readback.Vbg_readback_VdCal_V0'
         ChipNo = self.ParentObject.Attributes['ChipNo']
         ROOTFile = self.ParentObject.ParentObject.FileHandle

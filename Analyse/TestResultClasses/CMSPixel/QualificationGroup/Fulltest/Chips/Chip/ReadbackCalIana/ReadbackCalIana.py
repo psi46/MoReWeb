@@ -14,6 +14,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
         self.FitFunction = "[0]+[1]*x+[2]*x**2"
 
+        self.ResultData['KeyList'] = []
+        self.ResultData['KeyValueDictPairs'] = {}
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0)
@@ -40,19 +42,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pointListADC = []
             pointListCurrent = []
 
-            if NBinsX==NBinsX2:
+            if NBinsX == NBinsX2:
                 for i in range(NBinsX):
-                    if HistogramAdcVsDac.GetBinContent(i+1)!=0 or HistogramCurrentVsDac.GetBinContent(i+1)!=0:
+                    if HistogramAdcVsDac.GetBinContent(i+1) != 0 or HistogramCurrentVsDac.GetBinContent(i+1) != 0:
                         pointListCurrent.append(HistogramCurrentVsDac.GetBinContent(i+1))
                         pointListADC.append(HistogramAdcVsDac.GetBinContent(i+1))
-
 
             pointsADC = array.array('d', pointListADC)
             pointsCurrent = array.array('d', pointListCurrent)
             numPoints = len(pointsADC)
 
             self.ResultData['Plot']['ROOTObject'] = ROOT.TGraph(numPoints, pointsCurrent, pointsADC)
-
 
             if self.ResultData['Plot']['ROOTObject']:
                 self.ResultData['Plot']['ROOTObject'].SetMarkerColor(4)
@@ -63,22 +63,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle('Iana [ADC]')
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.4)
 
-                #Make linear fit with pol1 and get fit parameters
+                # Make linear fit with pol1 and get fit parameters
                 FitFunctionTF1 = ROOT.TF1('f1', self.FitFunction)
                 self.ResultData['Plot']['ROOTObject'].Fit(FitFunctionTF1, "QS")
                 chi2 = FitFunctionTF1.GetChisquare() / FitFunctionTF1.GetNDF() if FitFunctionTF1.GetNDF() > 0 else -1
 
-                #Draw the plot
+                # Draw the plot
                 self.ResultData['Plot']['ROOTObject'].Draw('AP')                
-
 
             self.Title = 'Iana [ADC]/Iana [mA]'
             if self.Canvas:
                 self.Canvas.SetCanvasSize(500, 500)
                 self.SaveCanvas()
-
-                self.ResultData['KeyList'] = []
-                self.ResultData['KeyValueDictPairs'] = {}
 
                 # Write down the fit function + results
                 self.ResultData['KeyValueDictPairs']['FitFunction'] = {
