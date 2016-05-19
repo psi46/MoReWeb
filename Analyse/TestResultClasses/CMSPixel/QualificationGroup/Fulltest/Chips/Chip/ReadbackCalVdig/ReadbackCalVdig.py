@@ -13,6 +13,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.NameSingle = 'ReadbackCalVdig'
         self.Name = 'CMSPixel_QualificationGroup_Fulltest_Chips_Chip_%s_TestResult'%self.NameSingle
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
+        self.FitFunction = "[0]+[1]*x"
 
 
     def PopulateResultData(self):
@@ -55,39 +56,44 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if g1:
                 g1.SetMarkerColor(4)
                 g1.SetMarkerStyle(21)
-                g1.SetTitle();
-                g1.GetXaxis().SetTitle('Vdig [V]');
-                g1.GetXaxis().SetTitleOffset(1.3);
-                g1.GetYaxis().SetTitle('Vdig [ADC]');
-                g1.GetYaxis().SetTitleOffset(1.4);
+                g1.SetTitle()
+                g1.GetXaxis().SetTitle('Vdig [V]')
+                g1.GetXaxis().SetTitleOffset(1.3)
+                g1.GetYaxis().SetTitle('Vdig [ADC]')
+                g1.GetYaxis().SetTitleOffset(1.4)
 
                 #Make linear fit with pol1 and get fit parameters
-                f1=ROOT.TF1('f1','1 ++ x')
-                g1.Fit("f1","Q");
-                p0 = f1.GetParameter(0)
-                p1 = f1.GetParameter(1)
-                chi2 = f1.GetChisquare()
+                FitFunctionTF1 = ROOT.TF1('f1', self.FitFunction)
+                g1.Fit(FitFunctionTF1, "QS")
+                chi2 = FitFunctionTF1.GetChisquare() / FitFunctionTF1.GetNDF() if FitFunctionTF1.GetNDF() > 0 else -1
 
                 #Draw the plot
                 g1.Draw('AP')
 
-            #Write down the fit results
-            self.ResultData['KeyValueDictPairs'] = {
-                'par0vd': {
-                'Value': round(p0,2),
-                'Label':'par0vd'
-                },
-                'par1vd': {
-                    'Value':round(p1,2),
-                    'Label':'par1vd'
-                },
-                'chi2vd': {
-                    'Value':round(chi2,2),
-                    'Label':'chi2'
-                },
+                self.ResultData['KeyList'] = []
+                self.ResultData['KeyValueDictPairs'] = {}
 
-                                                    }
-            self.ResultData['KeyList'] = ['par0vd', 'par1vd', 'chi2vd']
+                # Write down the fit function + results
+                self.ResultData['KeyValueDictPairs']['FitFunction'] = {
+                        'Value': self.FitFunction,
+                        'Label': 'fit'
+                }
+                self.ResultData['KeyList'].append('FitFunction')
+
+                # parameters
+                for i in range(FitFunctionTF1.GetNpar()):
+                    self.ResultData['KeyValueDictPairs']['par%dvd'%i] = {
+                            'Value': '{0:1.3e}'.format(FitFunctionTF1.GetParameter(i)),
+                            'Label': 'par%dvd'%i
+                    }
+                    self.ResultData['KeyList'].append('par%dvd'%i)
+
+                # chi2/ndf
+                self.ResultData['KeyValueDictPairs']['chi2vd'] = {
+                        'Value': round(chi2, 2),
+                        'Label': 'chi2/ndf'
+                }
+                self.ResultData['KeyList'].append('chi2vd')
 
         self.Title = 'Vdig [ADC]/Vdig [V]'
         if self.Canvas:

@@ -111,6 +111,7 @@ class GeneralTestResult(object):
             'Order': 0,
             'Width': 1,
             'GroupWithNext': False,
+            'Floating': False,
         }
 
         # Result array
@@ -1181,17 +1182,19 @@ class GeneralTestResult(object):
                 if i['TestResultObject'].DisplayOptions['Show']:
 
                     GroupCSSClass = ''
-                    if i2 % 5 == 0:
-                        GroupCSSClass += ' WidthNthChild5n'
-                    if i2 % 4 == 0:
-                        GroupCSSClass += ' WidthNthChild4n'
-                    if i2 % 3 == 0:
-                        GroupCSSClass += ' WidthNthChild3n'
-                    if i2 % 2 == 0:
-                        GroupCSSClass += ' WidthNthChild2n'
 
-                    if i['TestResultObject'].DisplayOptions['Width'] > 1:
-                        GroupCSSClass += ' Width' + str(i['TestResultObject'].DisplayOptions['Width'])
+                    if not i['TestResultObject'].DisplayOptions['Floating']:
+                        if i2 % 5 == 0:
+                            GroupCSSClass += ' WidthNthChild5n'
+                        if i2 % 4 == 0:
+                            GroupCSSClass += ' WidthNthChild4n'
+                        if i2 % 3 == 0:
+                            GroupCSSClass += ' WidthNthChild3n'
+                        if i2 % 2 == 0:
+                            GroupCSSClass += ' WidthNthChild2n'
+
+                        if i['TestResultObject'].DisplayOptions['Width'] > 1:
+                            GroupCSSClass += ' Width' + str(i['TestResultObject'].DisplayOptions['Width'])
 
                     if not GroupWithNext:
                         SubTestResultListHTML += HtmlParser.substituteMarker(

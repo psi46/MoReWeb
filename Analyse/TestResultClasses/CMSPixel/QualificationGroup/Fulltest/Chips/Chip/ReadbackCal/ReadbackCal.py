@@ -17,6 +17,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['HiddenData']['ReadbackCal'] = {}
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_Fulltest_ROC'
 
+        self.ResultData['KeyValueDictPairs']['Vbg'] = {'Label': 'Vbg', 'Value': '-1'}
+        self.ResultData['KeyValueDictPairs']['par0ia'] = {'Label': 'par0ia', 'Value': '-1'}
+        self.ResultData['KeyValueDictPairs']['par1ia'] = {'Label': 'par1ia', 'Value': '-1'}
+        self.ResultData['KeyValueDictPairs']['par2ia'] = {'Label': 'par2ia', 'Value': '-1'}
 
     def PopulateResultData(self):
         Directory = self.RawTestSessionDataPath
@@ -57,7 +61,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
 
 
-        #Adding Vbg    
+        # Adding Vbg
         HistoName= 'Readback.Vbg_readback_VdCal_V0'
         ChipNo = self.ParentObject.Attributes['ChipNo']
         ROOTFile = self.ParentObject.ParentObject.FileHandle
@@ -77,10 +81,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         try:
             par0ia = self.ParentObject.ResultData['SubTestResults']['ReadbackCalIana'].ResultData['KeyValueDictPairs']['par0ia']['Value']
             par1ia = self.ParentObject.ResultData['SubTestResults']['ReadbackCalIana'].ResultData['KeyValueDictPairs']['par1ia']['Value']
+            par2ia = self.ParentObject.ResultData['SubTestResults']['ReadbackCalIana'].ResultData['KeyValueDictPairs']['par2ia']['Value']
             self.ResultData['KeyValueDictPairs']['par0ia'] = {'Label': 'par0ia', 'Value': par0ia}
             self.ResultData['KeyList'].append('par0ia')
             self.ResultData['KeyValueDictPairs']['par1ia'] = {'Label': 'par1ia', 'Value': par1ia}
             self.ResultData['KeyList'].append('par1ia')
+            self.ResultData['KeyValueDictPairs']['par2ia'] = {'Label': 'par2ia', 'Value': par2ia}
+            self.ResultData['KeyList'].append('par2ia')
         except:
             ReadbackCalibrated = False
 

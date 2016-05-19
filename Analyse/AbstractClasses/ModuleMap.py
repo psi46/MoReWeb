@@ -40,6 +40,10 @@ class ModuleMap:
         if self.Map2D:
             self.Map2D.SetContour(NContours)
 
+    def SetRangeUser(self, rangeMin, rangeMax):
+        if self.Map2D:
+            self.Map2D.GetZaxis().SetRangeUser(rangeMin, rangeMax)
+
     def AddTH2D(self, ROOTObject, CountMissing=False, GoodRange=None):
         if ROOTObject.GetXaxis().GetNbins() != self.nBinsX or ROOTObject.GetYaxis().GetNbins() != self.nBinsY:
             if self.verbose:

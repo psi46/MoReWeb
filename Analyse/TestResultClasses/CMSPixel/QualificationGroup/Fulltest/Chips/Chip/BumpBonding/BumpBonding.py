@@ -56,7 +56,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(-50., 50.)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(0.5, 5.0 * self.ResultData['Plot'][
                 'ROOTObject'].GetMaximum())
-            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Threshold")
+            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Vthrcomp threshold")
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("No. of Entries")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
@@ -109,7 +109,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 pass
 
             # check convergence of fit and use non-fit method if chi2 is bad
-            FitChi2Ndf = FitStatus.Chi2() / FitStatus.Ndf() if FitStatus.Ndf() > 0 else -1
+            try:
+                FitChi2Ndf = FitStatus.Chi2() / FitStatus.Ndf() if FitStatus.Ndf() > 0 else -1
+            except:
+                print "\x1b[31mBumpBonding: can't check status and chi2/ndf of bump bonding fit!\x1b[0m"
+                FitChi2Ndf = -1
+
             self.ResultData['KeyValueDictPairs']['Chi2Ndf']['Value'] = FitChi2Ndf
 
             if FitChi2Ndf < 0 or FitChi2Ndf > 100:
