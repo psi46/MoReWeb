@@ -4,6 +4,11 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
+##### version 1.0.0 (DB re-processing with final grading)
+
+Same grading as in 0.7.3 version, but some small bugs fixed and some changes for global DB
+
+
 ##### version 0.7.3
 
 New bump bonding cut for standard pxar bump bonding test (BB) which can more reliably detect missing bumps if there are >90 per ROC.
