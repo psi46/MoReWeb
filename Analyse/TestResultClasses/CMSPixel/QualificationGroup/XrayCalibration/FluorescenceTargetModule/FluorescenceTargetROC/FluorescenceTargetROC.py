@@ -568,6 +568,8 @@ class TestResult(GeneralTestResult):
         pass
 
     def PopulateResultData(self):
+        ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogx(0)
         if self.verbose:
             tag = 'PopulateResultData', self.NameSingle, self.Attributes['Target'] + ": Custom Init"
             print "".ljust(len(tag), '=')
