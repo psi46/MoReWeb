@@ -68,7 +68,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
 
-            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("Threshold [DAC]")
+            self.ResultData['Plot']['ROOTObject'].GetZaxis().SetTitle("Vthrcomp threshold [DAC]")
             self.ResultData['Plot']['ROOTObject'].GetZaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].Draw("colz")
 

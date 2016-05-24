@@ -39,15 +39,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0)
-        # self.ResultData['Plot']['ROOTObject'] =  ROOT.TH2D(self.GetUniqueID(), "", self.nCols, 0., self.nCols, self.nRows, 0., self.nRows ) # htm
-        # TH2D
 
         ChipNo = self.ParentObject.Attributes['ChipNo']
         HistoDict = self.ParentObject.ParentObject.ParentObject.HistoDict
+
+        # load trimbit distribution from .root file or create from trim bit map
         if HistoDict.has_option(self.NameSingle, 'TrimBits'):
             histname = HistoDict.get(self.NameSingle, 'TrimBits')
             root_object = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo=ChipNo)
-            # self.ResultData['Plot']['ROOTObject'] = root_object.Clone(self.GetUniqueID())
         else:
             histname = HistoDict.get(self.NameSingle, 'TrimBitMap')
             root_object2 = HistoGetter.get_histo(self.ParentObject.ParentObject.FileHandle, histname, rocNo=ChipNo)
@@ -66,26 +65,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         rms = 0
 
         if self.ResultData['Plot']['ROOTObject']:
-            # for i in range(self.nCols): # Columns
-            # for j in range(self.nRows): # Rows
-            #        self.ResultData['Plot']['ROOTObject'].SetBinContent(i+1, j+1, self.ResultData['Plot']['ROOTObject_TrimMap'].GetBinContent(i+1, j+1))
-
             self.ResultData['Plot']['ROOTObject'].SetTitle("")
             self.ResultData['Plot']['ROOTObject'].SetFillStyle(3002)
             self.ResultData['Plot']['ROOTObject'].SetLineColor(ROOT.kBlack)
-            #self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0., self.nTotalChips);
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Trim bits")
             self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, 15)
 
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("entries")
-            #            self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Column No.");
-            #            self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Row No.");
             self.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
             self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitleOffset(1.5)
             self.ResultData['Plot']['ROOTObject'].GetYaxis().CenterTitle()
-            self.ResultData['Plot']['ROOTObject'].Draw('')
+            self.ResultData['Plot']['ROOTObject'].Draw('hist')
+
             mean = self.ResultData['Plot']['ROOTObject'].GetMean()
             rms = self.ResultData['Plot']['ROOTObject'].GetRMS()
+
         self.ResultData['KeyValueDictPairs'] = {
             'mu': {
                 'Value': '{0:1.2f}'.format(mean),
@@ -99,4 +93,4 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyList'] = ['mu', 'sigma']
 
         self.Title = 'Trim Bits'
-        self.SaveCanvas()        
+        self.SaveCanvas()

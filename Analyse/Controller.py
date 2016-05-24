@@ -754,11 +754,11 @@ print '\nErrorList:'
 ModulePath = ''
 ModuleID = ''
 for i in TestResultEnvironmentInstance.ErrorList:
-    if i['ModuleID'] != ModuleID:
+    if 'ModuleID' in i and i['ModuleID'] != ModuleID:
         print (i['ModuleID'] if len(i['ModuleID']) > 0 else 'MODULE') + ':'
         ModulePath = ''
         ModuleID = i['ModuleID']
-    if i['ModulePath'] != ModulePath:
+    if 'ModulePath' in i and i['ModulePath'] != ModulePath:
         print "  %s"%i['ModulePath']
         ModulePath = i['ModulePath']
     ColumnWidth = 10
@@ -798,6 +798,10 @@ try:
             ExitCode = 999
 except:
     pass
+
+if len(ModulesNotInsertedIntoDB) < 1 and len(TestResultEnvironmentInstance.ModulesInsertedIntoDB) < 1:
+    print "Nothing to be inserted!"
+    ExitCode = 404
 
 print 'inserted: ', TestResultEnvironmentInstance.ModulesInsertedIntoDB
 print 'failed: ', ModulesNotInsertedIntoDB

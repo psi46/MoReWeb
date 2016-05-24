@@ -38,6 +38,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
 
+        ROOT.gStyle.SetOptStat(0)
+        ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogx(0)
+
         NChips = self.ParentObject.Attributes['NumberOfChips']
         StartChip = self.ParentObject.Attributes['StartChip']
         self.ResultData['Plot']['ROOTObject'] = ROOT.TH1D(self.GetUniqueID(), '', NChips, StartChip, StartChip + NChips)

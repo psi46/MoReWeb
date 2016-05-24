@@ -110,7 +110,7 @@ class TestResultEnvironment:
     LocalDBConnectionCursor = None
 
     # Path to the test results
-    ModuleDataDirectory = '';
+    ModuleDataDirectory = ''
 
     # path to folder with all test results
     GlobalDataDirectory = ''
@@ -128,9 +128,9 @@ class TestResultEnvironment:
     # Path to the Overview
     GlobalOverviewPath = ''
 
-    LastUniqueIDCounter = 0;
+    LastUniqueIDCounter = 0
 
-    MoReWebVersion = 'unknown MoReWeb version'
+    MoReWebVersion = 'MoReWeb v1.0.0'
     MoReWebBranch = 'unknown branch'
 
     IVCurveFiles = {}

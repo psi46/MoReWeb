@@ -200,7 +200,7 @@ class TestResult(GeneralTestResult):
             {
                 'Key': 'TBM',
                 'DisplayOptions': {
-                    'Order': 100,
+                    'Order': 150,
                     'Width': 1,
                 }
             },
@@ -208,14 +208,14 @@ class TestResult(GeneralTestResult):
                 'Key': 'Logfile',
                 'DisplayOptions': {
                     'Width': 1,
-                    'Order': 120,
+                    'Order': 170,
                     'Show': True,
                 }
             },
             {
                 'Key': 'Errors',
                 'DisplayOptions': {
-                    'Order': 101,
+                    'Order': 191,
                     'Width': 1,
                 }
             },
@@ -245,7 +245,8 @@ class TestResult(GeneralTestResult):
             },
         ]
 
-        for ReadbackParameter in ['par0vd', 'par1vd','par0va','par1va','par0rbia','par1rbia','par0tbia','par1tbia','par2tbia']:
+        SubOrderIndex = 0
+        for ReadbackParameter in ['par0vd', 'par1vd','par0va','par1va','par0rbia','par1rbia','par0tbia','par1tbia','par2tbia','par0ia','par1ia','par2ia']:
             self.ResultData['SubTestResultDictList'].append({
                 'Key': 'ReadbackParameter_%s'%ReadbackParameter,
                 'Module': 'ReadbackParameter',
@@ -254,10 +255,12 @@ class TestResult(GeneralTestResult):
                     'StorageKey': 'ReadbackParameter_%s'%ReadbackParameter,
                 },
                 'DisplayOptions': {
-                    'Order': 90,
+                    'Order': 90 + SubOrderIndex,
                     'Width': 1,
+                    'Floating': True,
                 }
             })
+            SubOrderIndex += 1
 
     def MergePyxarData(self):
         self.check_Test_Software()
@@ -658,11 +661,13 @@ class TestResult(GeneralTestResult):
             sys.stdout.write("\x1b[0m")
             sys.stdout.flush()
 
-            grade = 'C'
+            if 'ManualGrade' not in self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']:
+                grade = 'C'
+
             Comment += 'Test incomplete!'
 
         #adding comment (if any) from manual grading
-        if self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'].has_key('GradeComment'):
+        if 'GradeComment' in self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']:
             Comment += self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['GradeComment']['Value']
 
         try:
