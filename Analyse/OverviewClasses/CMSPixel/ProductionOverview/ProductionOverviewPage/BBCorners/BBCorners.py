@@ -17,6 +17,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.nRows = 80
         self.marginX = 10
         self.marginY = 10
+        self.IncludeSorttable = True
 
     # taken from M. Donega. pickmodule.py
     def isBorder(self, x,y):
@@ -174,8 +175,11 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     ])
             nMod +=1 
 
-        RowLimit = 5
-        HTML = self.Table(TableData, RowLimit)
+        RowLimit = 500
+        HTMLInfo = "<b>definitions:</b> corners are pixels with col less or equal than " + "%d"%self.marginX + " pix and row less or equal than " + "%d"%self.marginY + " pix away from edge. Borders include pixels with col less or equal than " + "%d"%self.marginX + " pix or row less or equal than " + "%d"%self.marginY + " pix away from edge, thus include corners.<br>"
+        HTMLInfo += "<b>test:</b> " + self.Attributes['Test'] + "<br>"
+        HTMLInfo += "<b>features:</b> click on table header to sort table<br>"
+        HTML = HTMLInfo + self.Table(TableData, RowLimit, TableClass='sortable', TableStyle='text-align:center;')
 
         return self.Boxed(HTML)
 

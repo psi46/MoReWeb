@@ -187,6 +187,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         },
                     }
                 )
+                self.IncludeSorttable = True
 
             if not self.singleSubtest or 'ModuleFailureOverview' in self.singleSubtest:
                 Offset = 0
