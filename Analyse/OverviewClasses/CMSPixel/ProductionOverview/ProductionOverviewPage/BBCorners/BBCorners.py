@@ -3,12 +3,14 @@ import AbstractClasses
 import glob
 import os
 
+from AbstractClasses.ModuleMap import ModuleMap
+
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
     	self.Name='CMSPixel_ProductionOverview_BBCorners'
     	self.NameSingle='BBCorners'
-        self.Title = 'Bump Bonding quality'
+        self.Title = 'Pixel Defects (Bump+Dead)'
         self.DisplayOptions = {
             'Width': 5,
         }
@@ -20,6 +22,10 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
         self.marginY = 10
         self.IncludeSorttable = True
         self.IncludeGrades = ['A', 'B']
+        self.SavePlotFile = True
+        self.Canvas.SetCanvasSize(1784, 412)
+        self.Canvas.Update()
+
 
     # taken from M. Donega. pickmodule.py
     def isBorder(self, x,y):
@@ -81,21 +87,27 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 {'Class' : 'Header', 'Value' : 'Module'}, 
                 {'Class' : 'Header', 'Value' : 'Grade'}, 
                 {'Class' : 'Header', 'Value' : 'Total'}, 
-                {'Class' : 'Header', 'Value' : 'Worst ROC'}, 
-                {'Class' : 'Header', 'Value' : 'Borders'}, 
-                {'Class' : 'Header', 'Value' : 'Corners'}, 
-                {'Class' : 'Header', 'Value' : 'Center'}, 
+                {'Class' : 'Header', 'Value' : 'Bump'}, 
+                {'Class' : 'Header', 'Value' : 'Dead'}, 
+                {'Class' : 'Header', 'Value' : 'WorstROC'}, 
                 {'Class' : 'Header', 'Value' : 'Map'}, 
             ]
         )
+
+        try:
+            IgnoreModules = [x.strip() for x in self.TestResultEnvironmentObject.Configuration['IgnoreInSelectionList'].split(',')]
+            print "ignore modules:",IgnoreModules
+        except:
+            IgnoreModules = []
+
+        # n defects -> category = floor(n/10)
+        defectCategories = []
+        nCategories = 20
+        for i in range(nCategories):
+            defectCategories.append([])
+
         nMod = 0
         for ModuleID in ModuleIDsList:
-
-            countTotBB = 0
-            countROCBB = [0]*self.nROCs
-            countBorderBB = [0]*self.nROCs
-            countCenterBB = [0]*self.nROCs
-            countCornerBB = [0]*self.nROCs
 
             matchRows = [x for x in Rows if x['ModuleID'] == ModuleID and x['TestType'] == self.Attributes['Test']]
 
@@ -109,82 +121,134 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             else:
                 FinalGradeFormatted = FinalGrade
 
-            if FinalGrade in self.IncludeGrades:
+
+            if FinalGrade in self.IncludeGrades and ModuleID not in IgnoreModules:
                 if len(matchRows) == 1:
                     RowTuple = matchRows[0]
 
-                    countTotBB = 0
-                    # get ROOT histogram corresponding to BB defects map
-                    Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], "BumpBondingMap", '*.root'])
-                    RootFiles = glob.glob(Path)
-                    ROOTObject = self.GetHistFromROOTFile(RootFiles, "BumpBonding")
+                    countBBTotal = 0
+                    countDeadTotal = 0
+                    countBBROC = [0]*self.nROCs
+                    countDeadROC = [0]*self.nROCs
 
-                    for r in range(0,2): # 2 rows per modules
-                        for c in range(0,8): # 8 columns per modules                                
-                            nROC = c
-                            if r > 0: 
-                                nROC += 8
+                    # initialize module map
+                    self.DefectsMap = ModuleMap(Name=self.GetUniqueID(), nChips=self.nROCs, StartChip=0)
 
-                            localX = -1
-                            for ic in range(0+c*self.nCols+1,self.nCols+c*self.nCols+1):
-                                localX += 1
-                                localY = -1
-                                for ir in range(0+r*self.nRows+1,self.nRows+r*self.nRows+1):        
-                                    localY += 1
-                                    bb = ROOTObject.GetBinContent(ic,ir) 
+                    # add dead pixels
+                    for iRoc in range(self.nROCs):
+                        Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],"Chips", "Chip%d"%iRoc, "PixelMap", 'PixelMap.root'])
+                        RootFiles = glob.glob(Path)
+                        PixelMapROOTObject = self.GetHistFromROOTFile(RootFiles, "PixelMap")
 
-                                    #ntotPXL+=1
+                        for x in range(PixelMapROOTObject.GetNbinsX()):
+                            for y in range(PixelMapROOTObject.GetNbinsY()):
+                                BinContent = PixelMapROOTObject.GetBinContent(1 + x, 1 + y)
+                                if BinContent < 1:
+                                    self.DefectsMap.UpdatePlot(iRoc, x, y, 0.123)
+                                    countDeadTotal += 1
+                                    countDeadROC[iRoc] += 1
 
-                                    if bb > 0.5:
-                                        # print nROC, localX, localY, bb                                                            
-                                        countTotBB += 1
-                                        countROCBB[nROC] += 1 # to plot all BB per ROC
+                    # add bump defects pixels
+                    for iRoc in range(self.nROCs):
+                        Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],"Chips", "Chip%d"%iRoc, "BumpBondingMap", 'BumpBondingMap.root'])
+                        RootFiles = glob.glob(Path)
+                        PixelMapROOTObject = self.GetHistFromROOTFile(RootFiles, "BumpBondingMap")
 
-                                        # definition of border includes corners!
-                                        if self.isBorder(localX,localY):
-                                            countBorderBB[nROC]+=1 # to plot all border BB per ROC
-                                        else:
-                                            countCenterBB[nROC]+=1 
+                        for x in range(PixelMapROOTObject.GetNbinsX()):
+                            for y in range(PixelMapROOTObject.GetNbinsY()):
+                                BinContent = PixelMapROOTObject.GetBinContent(1 + x, 1 + y)
+                                if BinContent > 0:
+                                    self.DefectsMap.UpdatePlot(iRoc, x, y, 1)
+                                    countBBTotal += 1
+                                    countBBROC[iRoc] += 1
 
-                                        if self.isCorner(localX,localY):
-                                            countCornerBB[nROC]+=1 # to plot all corners BB per ROC
+                    # combine maps, 0.12 means blue
+                    self.DefectsMap.Map2D.GetZaxis().SetRangeUser(0.0, 1.0)
+                    self.DefectsMap.Map2D.SetStats(ROOT.kFALSE)
 
-                    imgFile = '/'.join(['..','..',RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], "BumpBondingMap", 'BumpBondingMap.png'])
+                    self.Canvas.Clear()
+                    self.DefectsMap.Draw(self.Canvas)
+                    saveAsFileName = self.GlobalOverviewPath+'/'+self.Attributes['BasePath'] + 'defects_map_%s.png'%ModuleID
+                    self.Canvas.SaveAs(saveAsFileName)
+
+                    imgFile = self.GetStorageKey() + '/defects_map_%s.png'%ModuleID # '/'.join(['..','..',RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], "BumpBondingMap", 'BumpBondingMap.png'])
                     imgHTMLData = ("<a href='%s'><img src='%s' alt='Bump Bonding defects map' width=600></a>"%(imgFile,imgFile))
 
-                    if max(countROCBB) < 42:
-                        MaxROC = "%d"%max(countROCBB)
-                    elif max(countROCBB) < 167:
-                        MaxROC = "<span style='color:#f70;font-weight:bold;'>%d</span>"%max(countROCBB)
+                    maxRocDefects = [countDeadROC[i] + countBBROC[i] for i in range(self.nROCs)]
+                    if max(maxRocDefects) < 42:
+                        MaxROC = "%d"%max(maxRocDefects)
+                    elif max(maxRocDefects) < 167:
+                        MaxROC = "<span style='color:#f70;font-weight:bold;'>%d</span>"%max(maxRocDefects)
                     else:
-                        MaxROC = "<span style='color:red;font-weight:bold;'>%d</span>"%max(countROCBB)
+                        MaxROC = "<span style='color:red;font-weight:bold;'>%d</span>"%max(maxRocDefects)
+
+                    totalDefects = countBBTotal + countDeadTotal
+
+                    defectCategory = int(totalDefects/10)
+                    if defectCategory > len(defectCategories) -1:
+                        defectCategory = len(defectCategories) -1
+                    defectCategories[defectCategory].append(ModuleID)
 
                     TableData.append(
                         [
-                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, "%d"%countTotBB, MaxROC, "%d"%sum(countBorderBB), "%d"%sum(countCornerBB), "%d"%sum(countCenterBB), imgHTMLData
+                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, "%d"%totalDefects, "%d"%countBBTotal, "%d"%countDeadTotal, MaxROC, imgHTMLData
                         ]
                     )
                 elif len(matchRows) < 1:
                     TableData.append(
                         [
-                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, 'N/A', '', '', '', '', '-'
+                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, 'N/A', '', '', '',  '-'
                         ])
                 else:
                     TableData.append(
                         [
-                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, '?', '', '', '', '', '-'
+                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, '?', '', '', '', '-'
 
                         ])
                     print "multiple rows found!:", matchRows
                 nMod +=1 
 
         RowLimit = 500
-        HTMLInfo = "<b>definitions:</b> corners are pixels with col less or equal than " + "%d"%self.marginX + " pix and row less or equal than " + "%d"%self.marginY + " pix away from edge. Borders include pixels with col less or equal than " + "%d"%self.marginX + " pix or row less or equal than " + "%d"%self.marginY + " pix away from edge, thus include corners.<br>"
+        HTMLInfo = ""
+        HTMLInfo += "<b>colors:</b> red = missing bump, blue = dead pixel<br>"
+        #HTMLInfo += "<b>definitions:</b> corners are pixels with col less or equal than " + "%d"%self.marginX + " pix and row less or equal than " + "%d"%self.marginY + " pix away from edge. Borders include pixels with col less or equal than " + "%d"%self.marginX + " pix or row less or equal than " + "%d"%self.marginY + " pix away from edge, thus include corners.<br>"
         HTMLInfo += "<b>test:</b> " + self.Attributes['Test'] + "<br>"
         HTMLInfo += "<b>grades:</b> %s<br>"%(', '.join(self.IncludeGrades))
+        HTMLInfo += "<b>ignored modules:</b> %s<br>"%(', '.join(IgnoreModules))
         HTMLInfo += "<b>features:</b> click on table header to sort table<br>"
 
         HTML = HTMLInfo + self.Table(TableData, RowLimit, TableClass='sortable', TableStyle='text-align:center;')
+
+        TableData = []
+        # second table
+        TableData.append(    
+            [
+                {'Class' : 'Header', 'Value' : '# defects'}, 
+                {'Class' : 'Header', 'Value' : '# cumulative'}, 
+                {'Class' : 'Header', 'Value' : '# modules'}, 
+                {'Class' : 'Header', 'Value' : 'ModuleIDs'}, 
+            ]
+        )
+
+        catDefects = 0
+        nModulesCumulative = 0
+        for moduleIDs in defectCategories:
+            catDefects += 10
+            nModulesInCategory = len(moduleIDs)
+            nModulesCumulative += nModulesInCategory
+            categoryName = "<%d"%catDefects if catDefects < nCategories*10 else ">=%d"%(catDefects-10)
+
+            TableData.append(    
+                [
+                    categoryName,
+                    "%d"%nModulesCumulative,
+                    "%d"%nModulesInCategory,
+                    ", ".join(moduleIDs)
+                ]
+            )
+        HTML += "<br><h4>List of modules less than n defects</h4>" 
+        HTML += "<b>ignored modules:</b> %s<br>"%(', '.join(IgnoreModules))
+        HTML += "<br>"  + self.Table(TableData, RowLimit, TableClass='', TableStyle='')
 
         return self.Boxed(HTML)
 

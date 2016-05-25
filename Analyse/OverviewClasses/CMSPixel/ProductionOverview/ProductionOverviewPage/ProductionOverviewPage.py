@@ -181,6 +181,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         "Key": "BBCorners",
                         "Module": "BBCorners",
                         "InitialAttributes" : {
+                            "StorageKey" : "BBCorners",
                             "DateBegin": self.Attributes['DateBegin'],
                             "DateEnd": self.Attributes['DateEnd'],
                             "Test": SingleMinus20TestName,

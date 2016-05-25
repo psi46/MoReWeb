@@ -263,13 +263,68 @@ class GeneralProductionOverview:
 
         # Stylesheet
         StylesheetHTMLTemplate = HtmlParser.getSubpart(HTMLTemplate, '###HEAD_STYLESHEET_TEMPLATE###')
+        AdditionalStylesheetHTML = ""
+        if self.IncludeSorttable:
+            AdditionalStylesheetHTML += '''
+table.sortable {
+    border-spacing: 0;
+    border: 1px solid #000;
+    border-collapse: collapse;
+}
+table.sortable th, table.sortable td {
+    text-align: left;
+    padding: 2px 4px 2px 4px;
+    width: 100px;
+    border-style: solid;
+    border-color: #444;
+}
+table.sortable th {
+    border-width: 0px 0px 0px 0px;
+    background-color: #ccc;
+    font-family      : Arial, helvetica, Verdana, sans-serif
+}
+table.sortable td {
+    border-width: 0px 0px 0px 0px;
+    font-family      : Arial, helvetica, Verdana, sans-serif
+}
+table.sortable tr.odd td {
+    background-color: #ddd;
+}
+table.sortable tr.even td {
+    background-color: #fff;
+}
+table.sortable tr.sortbottom td {
+    border-top: 1px solid #444;
+    background-color: #ccc;
+    font-weight: bold;
+}
+table.sortable tbody {
+    counter-reset: sortabletablescope;
+}
+table.sortable thead tr::before {
+    content: '';
+    display: table-cell;
+    background-color: #ccc;
+}
+table.sortable tbody tr::before {
+    content: counter(sortabletablescope);
+    counter-increment: sortabletablescope;
+    display: table-cell;
+    background-color: #ccc;
+    border: 1px solid #000;
+    border-color: #444;
+    padding: 2px 4px 2px 4px;
+    width: 30px;
+}
+            '''
         StylesheetHTML = HtmlParser.substituteMarkerArray(
             StylesheetHTMLTemplate,
             {
                 '###STYLESHEET###':self.TestResultEnvironmentObject.MainStylesheet+
-                    self.TestResultEnvironmentObject.ProductionOverviewStylesheet,
+                    self.TestResultEnvironmentObject.ProductionOverviewStylesheet+ AdditionalStylesheetHTML,
             }
         )
+
         FinalHTML = HtmlParser.substituteSubpart(
             FinalHTML,
             '###HEAD_STYLESHEETS###',
@@ -435,6 +490,7 @@ class GeneralProductionOverview:
         if Style:
             for StyleElement in Style:
                 StyleCSS += "%s:%s;"%(StyleElement, Style[StyleElement])
+
         HTML = HtmlParser.substituteMarkerArray(
                     PlotTemplate,
                     {

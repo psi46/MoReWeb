@@ -3,3 +3,4 @@ GenerateTotalOverview = 1
 GenerateWeeklyOverviews = 0
 ModuleQualificationFinalDate = first
 RequiredTestTypesForComplete = m20_1,m20_2,p17_1
+IgnoreInSelectionList =

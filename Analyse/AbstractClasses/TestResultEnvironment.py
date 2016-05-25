@@ -159,6 +159,11 @@ class TestResultEnvironment:
             self.Configuration['GzipSVG'] = int(Configuration.get('SystemConfiguration', 'GzipSVG'))
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
             self.Configuration['RequiredTestTypesForComplete'] = Configuration.get('ProductionOverview', 'RequiredTestTypesForComplete')
+            try:
+                self.Configuration['IgnoreInSelectionList'] = Configuration.get('ProductionOverview', 'IgnoreInSelectionList')
+            except:
+                self.Configuration['IgnoreInSelectionList'] = ''
+
             self.Configuration['QualificationOverviewSort'] = Configuration.get('SystemConfiguration', 'QualificationOverviewSort')
 
             for i in self.GradingParameters:
