@@ -38,11 +38,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order':30,
                     }
                 },
-                {'Key':'ReadbackCal',
-                    'DisplayOptions':{
-                        
-                    }
-                },
                 {'Key':'DacDac',
                     'DisplayOptions':{
                     }
@@ -67,16 +62,47 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Order':34,
                     }
                  },
+                {'Key':'ReadbackCalIana',
+                 'Module':'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.ReadbackCalIana',
+                 'StorageKey':'ReadbackCalIana',
+                    'DisplayOptions':{
+                        'Show': True,
+                        'Order': 50,
+                    }
+                },
+                {'Key':'ReadbackCalVdig',
+                 'Module':'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.ReadbackCalVdig',
+                 'StorageKey':'ReadbackCalVdig',
+                    'DisplayOptions':{
+                        'Show': True,
+                        'Order': 52,
+                    }
+                },
+                {'Key':'ReadbackCalVana',
+                 'Module':'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.ReadbackCalVana',
+                 'StorageKey':'ReadbackCalVana',
+                    'DisplayOptions':{
+                        'Show': True,
+                        'Order': 54,
+                    }
+                },
+                {'Key':'ReadbackCal',
+                 'Module':'TestResultClasses.CMSPixel.QualificationGroup.Fulltest.Chips.Chip.ReadbackCal',
+                 'StorageKey':'ReadbackCal',
+                    'DisplayOptions':{
+                        'Show': True,
+                        'Order': 60,
+                    }
+                },
                 {'Key':'Grading',
                     'DisplayOptions':{
                         'Show': False
                     }
                 },
+
             ]
+#'PixelMap'
 
     def PopulateResultData(self):
         self.CloseSubTestResultFileHandles()
 
-
-
-       

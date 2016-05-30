@@ -72,6 +72,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'ModuleCalibrationGood': {
                 'Value': 'ok' if ModuleCalibrationGood else 'bad/unfinished',
                 'Label':'Readback Calibration'
+            },
+            'ReadbackExplanation': {
+                'Value': 'Red means not calibrated or parameter value outside of bulk distribution',
+                'Label': 'Colors'
             }
         }
-        self.ResultData['KeyList'] = ['ModuleCalibrationGood']
+        self.ResultData['KeyList'] = ['ModuleCalibrationGood', 'ReadbackExplanation']
