@@ -7,6 +7,7 @@ import json
 import copy
 import sys
 import traceback
+import shutil
 
 class GeneralProductionOverview:
     LastUniqueIDCounter = 1
@@ -61,6 +62,7 @@ class GeneralProductionOverview:
         self.FullQualificationFullTests = ['m20_1', 'm20_2', 'p17_1']
         self.HiddenData = {}
         self.SubtestResults = {}
+        self.IncludeSorttable = False
         ### custom init
         self.CustomInit()
 
@@ -273,6 +275,25 @@ class GeneralProductionOverview:
             '###HEAD_STYLESHEETS###',
             StylesheetHTML
         )
+
+        # Javsscripts
+        ScriptHTML = ''
+        if self.IncludeSorttable:
+            ScriptHTML += "\n<script src='sorttable.js'></script>\n"
+            sorttableSource = 'HTML/ProductionOverview/sorttable.js'
+            sorttableDest = self.GlobalOverviewPath+'/'+self.Attributes['BasePath'] + 'sorttable.js'
+            try:
+                shutil.copy(sorttableSource, sorttableDest)
+            except:
+                print "can't copy sorttable.js from:"
+                print " <- ", sorttableSource
+                print " -> ", sorttableDest
+
+        FinalHTML = HtmlParser.substituteMarkerArray(
+            FinalHTML,
+            {'###ADDITIONALSCRIPTS###': ScriptHTML}
+        )
+
         FinalHTML = HtmlParser.substituteSubpart(
             FinalHTML,
             '###HEAD_STYLESHEET_TEMPLATE###',
@@ -433,7 +454,7 @@ class GeneralProductionOverview:
                 )
         return HTML
 
-    def Table(self, TableData, RowLimit = 999):
+    def Table(self, TableData, RowLimit = 999, TableClass = '', TableStyle = ''):
 
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
         TableHTMLTemplate = self.TestResultEnvironmentObject.ProductionOverviewTableHTMLTemplate
@@ -487,6 +508,8 @@ class GeneralProductionOverview:
             HtmlParser.substituteSubpart(TableHTMLTemplate, '###TABLE_ROW###', TableRows),
                 {
                         '###TABLEID###': TableID,
+                        '###TABLECLASS###': TableClass,
+                        '###TABLESTYLE###': TableStyle
                 })
 
         # button to show hidden rows

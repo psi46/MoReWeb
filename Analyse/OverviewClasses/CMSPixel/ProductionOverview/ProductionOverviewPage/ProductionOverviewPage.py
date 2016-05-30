@@ -31,6 +31,22 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         self.SumJSONFilesModules = []
 
+        SingleMinus20TestName = "m20_2"
+        try:
+            RequiredQualificationTypes = self.TestResultEnvironmentObject.Configuration['RequiredTestTypesForComplete'].strip().split(',')
+            if "m20_2" not in RequiredQualificationTypes:
+                print "No -20C test after cycling (m20_2) found!"
+                if "m20_1" in RequiredQualificationTypes:
+                    SingleMinus20TestName = "m20_1"
+                    print "=> using m20_1 instead!"
+                elif "p17_1" in RequiredQualificationTypes:
+                    SingleMinus20TestName = "p17_1"
+                    print "=> using p17_1 instead!"
+                else:
+                    print "\x1b[31mno equivalent test found!\x1b[0m"
+        except:
+            print "\x1b[31Could not decide which m20 test to use, check 'RequiredTestTypesForComplete' field in configuration!\x1b[0m"
+
         TestsList = ['m20_1', 'm20_2', 'p17_1']
         ReadbackParameters = [
             {
@@ -160,6 +176,18 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         },
                     }
                 )
+                self.SubPages.append(
+                    {
+                        "Key": "BBCorners",
+                        "Module": "BBCorners",
+                        "InitialAttributes" : {
+                            "DateBegin": self.Attributes['DateBegin'],
+                            "DateEnd": self.Attributes['DateEnd'],
+                            "Test": SingleMinus20TestName,
+                        },
+                    }
+                )
+                self.IncludeSorttable = True
 
             if not self.singleSubtest or 'ModuleFailureOverview' in self.singleSubtest:
                 Offset = 0
@@ -332,22 +360,6 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     }
                 }
             )
-
-        SingleMinus20TestName = "m20_2"
-        try:
-            RequiredQualificationTypes = self.TestResultEnvironmentObject.Configuration['RequiredTestTypesForComplete'].strip().split(',')
-            if "m20_2" not in RequiredQualificationTypes:
-                print "No -20C test after cycling (m20_2) found!"
-                if "m20_1" in RequiredQualificationTypes:
-                    SingleMinus20TestName = "m20_1"
-                    print "=> using m20_1 instead!"
-                elif "p17_1" in RequiredQualificationTypes:
-                    SingleMinus20TestName = "p17_1"
-                    print "=> using p17_1 instead!"
-                else:
-                    print "\x1b[31mno equivalent test found!\x1b[0m"
-        except:
-            print "\x1b[31Could not decide which m20 test to use, check 'RequiredTestTypesForComplete' field in configuration!\x1b[0m"
 
         ### dead pixel clusters###
         if self.singleSubtest and 'DeadPixelClusters' in self.singleSubtest:
