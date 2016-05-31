@@ -279,6 +279,32 @@ class TestResult(GeneralTestResult):
                 IVCurveData['IVSlope'] = float(
                     IVCurveTestResultData['KeyValueDictPairs']['Variation']['Value'])
 
+        NPixelDefects = self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Defects']['Value']
+        PixelDefectsString = "%d"%NPixelDefects
+        try:
+            NPixelDefectsDB = self.ResultData['SubTestResults']['DatabasePixelDefects'].ResultData['HiddenData']['NPixelDefectsDB']
+            PixelDefectsString = PixelDefectsString + " (%d)"%NPixelDefectsDB
+            if NPixelDefects > 41:
+                if NPixelDefects >= 2 * NPixelDefectsDB:
+                    PixelDefectsString = "<span style='color:red;font-weight:bold;'>%s</span>" % PixelDefectsString
+                elif NPixelDefects >= 1.5 * NPixelDefectsDB:
+                    PixelDefectsString = "<span style='color:#f70;font-weight:bold;'>%s</span>" % PixelDefectsString
+        except:
+            pass
+
+        LeakageCurrentString = "-"
+        try:
+            LeakageCurrent = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
+            LeakageCurrentDB = 1e6*float(self.ResultData['SubTestResults']['Database'].ResultData['HiddenData']['LeakageCurrent150p17'])
+            LeakageCurrentString = "I = %1.1f"%(LeakageCurrent)
+            LeakageCurrentString = LeakageCurrentString + " (%1.1f)"%LeakageCurrentDB
+            if LeakageCurrent >= 2 * LeakageCurrentDB:
+                LeakageCurrentString = "<span style='color:red;font-weight:bold;'>%s</span>"%LeakageCurrentString
+            elif LeakageCurrent >= 1.5 * LeakageCurrentDB:
+                LeakageCurrentString = "<span style='color:#f70;font-weight:bold;'>%s</span>" % LeakageCurrentString
+        except:
+            pass
+
         # fill DB row
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
@@ -319,7 +345,7 @@ class TestResult(GeneralTestResult):
 
         try:
             Row.update({
-                'PixelDefects': None,
+                'PixelDefects': PixelDefectsString,
                 'CurrentAtVoltage150V': IVCurveData['CurrentAtVoltage150V'],
                 'CurrentAtVoltage100V':IVCurveData['CurrentAtVoltage100V'],
                 'IVSlope': IVCurveData['IVSlope'],
@@ -329,7 +355,7 @@ class TestResult(GeneralTestResult):
                 'ROCsLessThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'],
                 'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanOnePercent'],
                 'ROCsMoreThanFourPercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanFourPercent'],
-                'Comments': '',
+                'Comments': LeakageCurrentString,
             })
         except:
             raise
