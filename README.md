@@ -4,7 +4,11 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
-##### version 1.0.0 (DB re-processing with final grading)
+##### version 1.0.1 (DB re-processing with final grading)
+
+few changes for reception tests
+
+##### version 1.0.0
 
 Same grading as in 0.7.3 version, but some small bugs fixed and some changes for global DB
 
