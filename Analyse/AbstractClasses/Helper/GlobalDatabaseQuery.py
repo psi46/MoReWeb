@@ -29,7 +29,7 @@ class GlobalDatabaseQuery():
             self.User = self.Configuration.get('GlobalDatabase', 'User')
             self.Host = self.Configuration.get('GlobalDatabase', 'Host')
             self.dbName = self.Configuration.get('GlobalDatabase', 'Database').strip()
-            self.DBMacroVersion = self.Configuration.get('GlobalDatabase', 'MacroVersion').strip()
+
         except:
             print 'Configuration/GlobalDatabase.cfg does not contain all information needed: User, Host, Database, MacroVersion'
 
@@ -87,23 +87,25 @@ class GlobalDatabaseQuery():
     def GetFulltestPixelDefects(self, ModuleID, tempnominal = 'p17_1'):
 
         SQLQuery = '''
-SELECT inventory_fullmodule.FULLMODULE_ID, tempnominal, ROC_POS, Total, nDeadPixel, nDeadBumps
-FROM inventory_fullmodule
-INNER JOIN test_fullmodule ON inventory_fullmodule.LASTTEST_FULLMODULE=test_fullmodule.SUMMARY_ID
-INNER JOIN test_fullmoduleanalysis ON test_fullmodule.TEST_ID=test_fullmoduleanalysis.FULLMODULETEST_ID
-INNER JOIN test_performanceparameters ON test_performanceparameters.FULLMODULEANALYSISTEST_ID=test_fullmoduleanalysis.TEST_ID
-WHERE inventory_fullmodule.FULLMODULE_ID = '{ModuleID}' AND tempnominal='{tempnominal}' AND test_fullmoduleanalysis.MACRO_VERSION = '{MacroVersion}' AND TYPE='FullQualification' AND STATUS='INSTOCK'
-ORDER BY ROC_POS'''.format(MacroVersion=self.DBMacroVersion, tempnominal=tempnominal, ModuleID=ModuleID)
+    SELECT inventory_fullmodule.FULLMODULE_ID, tempnominal, ROC_POS, Total, nDeadPixel, nDeadBumps
+    FROM inventory_fullmodule
+    INNER JOIN test_fullmodule ON inventory_fullmodule.LASTTEST_FULLMODULE=test_fullmodule.SUMMARY_ID
+    INNER JOIN test_fullmoduleanalysis ON test_fullmodule.LASTANALYSIS_ID=test_fullmoduleanalysis.TEST_ID
+    INNER JOIN test_performanceparameters ON test_performanceparameters.FULLMODULEANALYSISTEST_ID=test_fullmoduleanalysis.TEST_ID
+    WHERE inventory_fullmodule.FULLMODULE_ID = '{ModuleID}' AND tempnominal='{tempnominal}' AND TYPE='FullQualification' AND STATUS='INSTOCK'
+    ORDER BY ROC_POS'''.format(tempnominal=tempnominal, ModuleID=ModuleID)
+
         return self.QuerySQL(SQLQuery)
 
     def GetFullQualificationResult(self, ModuleID):
 
-        SQLQuery = '''
-SELECT inventory_fullmodule.FULLMODULE_ID, GRADE, BAREMODULE_ID, HDI_ID, TBM_ID, BUILTON, BUILTBY, STATUS, tempnominal, I150, IVSLOPE, PIXELDEFECTS
-FROM inventory_fullmodule
-INNER JOIN test_fullmodule ON inventory_fullmodule.LASTTEST_FULLMODULE=test_fullmodule.SUMMARY_ID
-INNER JOIN test_fullmoduleanalysis ON test_fullmodule.TEST_ID=test_fullmoduleanalysis.FULLMODULETEST_ID
-WHERE inventory_fullmodule.FULLMODULE_ID = '{ModuleID}' AND test_fullmoduleanalysis.MACRO_VERSION = '{MacroVersion}' AND TYPE='FullQualification' AND STATUS='INSTOCK'
-ORDER BY tempnominal ;'''.format(MacroVersion=self.DBMacroVersion, ModuleID=ModuleID)
+        SQLQuery = '''SELECT inventory_fullmodule.FULLMODULE_ID, GRADE, inventory_fullmodule.BAREMODULE_ID, SENSOR_ID, HDI_ID, inventory_fullmodule.BUILTON, inventory_fullmodule.BUILTBY, inventory_fullmodule.STATUS, tempnominal, I150, IVSLOPE, PIXELDEFECTS
+    FROM inventory_fullmodule
+    INNER JOIN test_fullmodule ON inventory_fullmodule.LASTTEST_FULLMODULE=test_fullmodule.SUMMARY_ID
+    INNER JOIN test_fullmoduleanalysis ON test_fullmodule.LASTANALYSIS_ID=test_fullmoduleanalysis.TEST_ID
+    INNER JOIN inventory_baremodule ON inventory_baremodule.BAREMODULE_ID=inventory_fullmodule.BAREMODULE_ID
+    WHERE inventory_fullmodule.FULLMODULE_ID = '{ModuleID}' AND test_fullmodule.TYPE='FullQualification' AND inventory_fullmodule.STATUS='INSTOCK'
+    ORDER BY tempnominal;'''.format(ModuleID=ModuleID)
+
         return self.QuerySQL(SQLQuery)
 

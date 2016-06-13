@@ -67,7 +67,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             DB = GlobalDatabaseQuery()
             rows = DB.GetFullQualificationResult(ModuleID=ModuleID)
 
-            HeaderRow = ['FULLMODULE_ID', 'GRADE', 'BAREMODULE_ID', 'HDI_ID', 'TBM_ID', 'BUILTON', 'BUILTBY', 'STATUS', 'tempnominal', 'I150', 'IVSLOPE', 'PIXELDEFECTS']
+            HeaderRow = ['FULLMODULE_ID', 'GRADE', 'BAREMODULE_ID', 'HDI_ID', 'SENSOR_ID', 'BUILTON', 'BUILTBY', 'STATUS', 'tempnominal', 'I150', 'IVSLOPE', 'PIXELDEFECTS']
             if len(rows) >0:
                 for k,v in rows[0].items():
                     if k not in HeaderRow:

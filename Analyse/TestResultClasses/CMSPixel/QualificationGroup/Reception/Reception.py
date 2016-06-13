@@ -34,17 +34,6 @@ class TestResult(GeneralTestResult):
             }
         ]
 
-        if self.Attributes['IncludeIVCurve']:
-            self.ResultData['SubTestResultDictList'] += [
-                {
-                    'Key': 'IVCurve',
-                    'DisplayOptions': {
-                        'Order': 88,
-                        'Width': 2,
-                    }
-                },
-            ]
-
         self.ResultData['SubTestResultDictList'] += [
             {
                 'Key': 'BumpBondingMap',
@@ -145,6 +134,17 @@ class TestResult(GeneralTestResult):
                 }
             },
         ]
+
+        if self.Attributes['IncludeIVCurve']:
+            self.ResultData['SubTestResultDictList'] += [
+                {
+                    'Key': 'IVCurve',
+                    'DisplayOptions': {
+                        'Order': 88,
+                        'Width': 2,
+                    }
+                },
+            ]
 
 
     def OpenFileHandle(self):
