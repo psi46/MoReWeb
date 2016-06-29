@@ -928,6 +928,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                               'message_datasize_count','message_deser400_count', 'message_eventid_count',
                               'message_missingevents_count', 'message_notokenpass_count', 'message_readback_count',
                               'message_tokenchain_count', 'message_usbtimeout_count']:
+                continue
                 self.SubPages.append(
                     {
                         "Key": "ErrorsVsFW",

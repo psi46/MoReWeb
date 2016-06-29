@@ -46,14 +46,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                 try:
                     DTB_FW = self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Summary2', 'KeyValueDictPairs.json', 'DTB_FW', 'Value'])
                     if DTB_FW is None:
-                        raise
+                        DTB_FW = 'NA'
                 except:
                     DTB_FW = 'NA'
-                if DTB_FW not in DTB_FWs:
-                    DTB_FWs.append(DTB_FW)
-                NTests +=1
-                if len(RowTuple['ModuleID'].strip()) > 0:
-                    BinNames.append(RowTuple['ModuleID'])
+                try:
+                    if DTB_FW not in DTB_FWs:
+                        DTB_FWs.append(DTB_FW)
+                    NTests +=1
+                    BinNames.append(RowTuple['ModuleID'] if len(RowTuple['ModuleID'].strip()) > 0 else '')
+                except:
+                    print "could not add module",RowTuple," to error statistics plot."
+
 
         # initialize histograms
         Histograms = {}

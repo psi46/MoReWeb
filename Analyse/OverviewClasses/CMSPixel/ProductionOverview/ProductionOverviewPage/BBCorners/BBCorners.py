@@ -86,6 +86,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             [
                 {'Class' : 'Header', 'Value' : 'Module'}, 
                 {'Class' : 'Header', 'Value' : 'Grade'}, 
+                {'Class' : 'Header', 'Value' : 'I_leak ratio'}, 
                 {'Class' : 'Header', 'Value' : 'Total'}, 
                 {'Class' : 'Header', 'Value' : 'Bump'}, 
                 {'Class' : 'Header', 'Value' : 'Dead'}, 
@@ -189,20 +190,27 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         defectCategory = len(defectCategories) -1
                     defectCategories[defectCategory].append(ModuleID)
 
+                    # LEAKAGE CURRENT RATIO
+                    try:
+                        lcRationNumber = float(self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'IVCurve', 'KeyValueDictPairs.json', 'CurrentRatio150V', 'Value']))
+                        lcRatio = ("%1.2f"%lcRationNumber) if lcRationNumber > 0 else 'N/A'
+                    except:
+                        lcRatio = 'N/A'
+
                     TableData.append(
                         [
-                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, "%d"%totalDefects, "%d"%countBBTotal, "%d"%countDeadTotal, MaxROC, imgHTMLData
+                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, lcRatio, "%d"%totalDefects, "%d"%countBBTotal, "%d"%countDeadTotal, MaxROC, imgHTMLData
                         ]
                     )
                 elif len(matchRows) < 1:
                     TableData.append(
                         [
-                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, 'N/A', '', '', '',  '-'
+                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, 'N/A', '', '', '', '',  '-'
                         ])
                 else:
                     TableData.append(
                         [
-                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, '?', '', '', '', '-'
+                            "<b>%s</b>"%ModuleID, FinalGradeFormatted, '?', '', '', '', '', '-'
 
                         ])
                     print "multiple rows found!:", matchRows
