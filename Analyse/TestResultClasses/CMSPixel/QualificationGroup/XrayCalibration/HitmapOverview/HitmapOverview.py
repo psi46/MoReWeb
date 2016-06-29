@@ -41,6 +41,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 XProjectionList.sort()
                 Median = XProjectionList[int(len(XProjectionList)/2)]
 
+                if Median < 1:
+                    XProjectionList = []
+                    for col in range(self.nCols):
+                        XProjectionList.append(self.ResultData['Plot']['ROOTObject'].GetBinContent(7*self.nCols + col, int(self.nRows * 1.5)))
+                    XProjectionList.sort()
+                    Median = XProjectionList[int(len(XProjectionList) / 2)]
+
                 if self.ResultData['Plot']['ROOTObject'].GetMaximum() > Median*3:
                     self.ResultData['Plot']['ROOTObject'].GetZaxis().SetRangeUser(0, Median*3)
             except:

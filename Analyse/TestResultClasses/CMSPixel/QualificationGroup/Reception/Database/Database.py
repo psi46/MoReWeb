@@ -61,12 +61,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultDataFullQualifications(self):
 
+        LeakageCurrent150p17 = -1
         try:
             ModuleID = self.ParentObject.Attributes['ModuleID']
             DB = GlobalDatabaseQuery()
             rows = DB.GetFullQualificationResult(ModuleID=ModuleID)
 
-            HeaderRow = ['FULLMODULE_ID', 'GRADE', 'BAREMODULE_ID', 'HDI_ID', 'TBM_ID', 'BUILTON', 'BUILTBY', 'STATUS', 'tempnominal', 'I150', 'IVSLOPE', 'PIXELDEFECTS']
+            HeaderRow = ['FULLMODULE_ID', 'GRADE', 'BAREMODULE_ID', 'HDI_ID', 'SENSOR_ID', 'BUILTON', 'BUILTBY', 'STATUS', 'tempnominal', 'I150', 'IVSLOPE', 'PIXELDEFECTS']
             if len(rows) >0:
                 for k,v in rows[0].items():
                     if k not in HeaderRow:
@@ -81,6 +82,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 FulltestRow = []
                 for k in HeaderRow:
                     FulltestRow.append(row[k] if k in row else '-')
+                    if k == 'I150' and row['tempnominal'] == 'p17_1':
+                        try:
+                            LeakageCurrent150p17 = float(row[k])
+                        except:
+                            LeakageCurrent150p17 = -2
+
                 self.ResultData['Table']['BODY'].append(FulltestRow)
         except:
             self.ResultData['Table'] = {
@@ -88,6 +95,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                'BODY': [["Can't compare with DB, either no connection or module not in database!"]],
                'FOOTER': [],
             }
+        self.ResultData['HiddenData']['LeakageCurrent150p17'] = LeakageCurrent150p17
 
 
     def PopulateResultDataPixelDefects(self):
@@ -176,20 +184,23 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             DBDataRow = ['Database']
             DBDataRow.append(sum([x['Total'] for x in rows]))
 
-            DBDataRow.append(sum([x['nDeadPixel'] for x in rows]))
+            NDeadPixelsDB = sum([x['nDeadPixel'] for x in rows])
+            DBDataRow.append(NDeadPixelsDB)
             for ChipNo in range(len(chipResults)):
                 try:
                     DBDataRow.append([x['nDeadPixel'] for x in rows if int(x['ROC_POS']) == ChipNo][0])
                 except:
                     DBDataRow.append('#')
 
-            DBDataRow.append(sum([x['nDeadBumps'] for x in rows]))
+            NMissingBumpsDB = sum([x['nDeadBumps'] for x in rows])
+            DBDataRow.append(NMissingBumpsDB)
             for ChipNo in range(len(chipResults)):
                 try:
                     DBDataRow.append([x['nDeadBumps'] for x in rows if int(x['ROC_POS']) == ChipNo][0])
                 except:
                     DBDataRow.append('#')
 
+            self.ResultData['HiddenData']['NPixelDefectsDB'] = NDeadPixelsDB + NMissingBumpsDB
             self.ResultData['Table']['BODY'].append(DBDataRow)
         except Exception as inst:
             exc_type, exc_obj, exc_tb = sys.exc_info()

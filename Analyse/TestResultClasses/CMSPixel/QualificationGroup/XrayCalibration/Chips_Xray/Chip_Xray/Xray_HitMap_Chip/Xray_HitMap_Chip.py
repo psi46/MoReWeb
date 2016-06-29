@@ -26,6 +26,8 @@ class TestResult(GeneralTestResult):
             Method=self.Attributes['Method'])
 
     def PopulateResultData(self):
+        ROOT.gPad.SetLogy(0)
+        ROOT.gPad.SetLogx(0)
         if self.verbose:
             tag = self.Name + ": Populate"
             print "".ljust(len(tag), '=')
