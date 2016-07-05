@@ -17,6 +17,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '-',
                 'Label':'Grade'
             },
+            'ManualGrade': {
+                'Value': '-',
+                'Label':'Manual grade'
+            },
             'ElectricalGrade': {
                 'Value': '-',
                 'Label':'Electrical Grade'
@@ -51,7 +55,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
         }
 
-        self.ResultData['KeyList'] = ['Module', 'Grade', 'ElectricalGrade', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback']
+        self.ResultData['KeyList'] = ['Module', 'Grade', 'ManualGrade', 'ElectricalGrade', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback']
 
     def OpenFileHandle(self):
 
@@ -103,14 +107,24 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             pass
 
         # Final Grade
+        # translate grade from number to A/B/C
+        GradeMapping = {1:'A', 2:'B', 3:'C'}
+
         ModuleGrade = max(ElectricalGrade, IVGrade)
 
         # Grade C if incomplete
         if Incomplete:
             ModuleGrade = 3
 
-        # translate grade from number to A/B/C
-        GradeMapping = {1:'A', 2:'B', 3:'C'}
+        # manual Grade
+        ManualGrade = self.check_for_manualGrade()
+        if ManualGrade != '':
+            self.ResultData['KeyValueDictPairs']['ManualGrade']['Value'] = str(GradeMapping[int(ManualGrade)])
+            if GradeMapping[ModuleGrade] != GradeMapping[int(ManualGrade)]:
+                GradeComment = "Grade "+str(GradeMapping[ModuleGrade])+" -> "+str(GradeMapping[int(ManualGrade)])
+                print GradeComment
+            ModuleGrade = int(ManualGrade)
+
         try:
             Grade = GradeMapping[ModuleGrade]
         except:
