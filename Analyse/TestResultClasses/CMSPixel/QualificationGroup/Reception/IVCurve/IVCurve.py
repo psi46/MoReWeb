@@ -26,7 +26,6 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.IVCurve.
             ivGraph.Draw("P* same")
 
         except:
-            raise
             pass
 
         if IVfromDB:

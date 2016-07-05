@@ -293,6 +293,7 @@ class TestResult(GeneralTestResult):
             pass
 
         LeakageCurrentString = "-"
+        LeakageCurrent = -1
         try:
             LeakageCurrent = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
             LeakageCurrentDB = 1e6*float(self.ResultData['SubTestResults']['Database'].ResultData['HiddenData']['LeakageCurrent150p17'])
@@ -325,6 +326,17 @@ class TestResult(GeneralTestResult):
             'IVCurveFilePath': '',
             'TestTemperature': -1,
             'Temperature': -1,
+            'nCycles': 0,
+            'CycleTempLow': -1,
+            'CycleTempHigh': -1,
+            'nMaskDefects': -1,
+            'nDeadPixels': -1,
+            'nBumpDefects': -1,
+            'nTrimDefects': -1,
+            'nNoisyPixels': -1,
+            'nGainDefPixels': -1,
+            'nPedDefPixels': -1,
+            'nPar1DefPixels': -1,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -345,7 +357,10 @@ class TestResult(GeneralTestResult):
 
         try:
             Row.update({
-                'PixelDefects': PixelDefectsString,
+                'PixelDefects': "%d"%NPixelDefects,
+                'initialCurrent': "%1.2f"%LeakageCurrent,
+                'nDeadPixels': "%d"%self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DeadPixels']['Value'],
+                'nBumpDefects': "%d"%self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DefectiveBumps']['Value'],
                 'CurrentAtVoltage150V': IVCurveData['CurrentAtVoltage150V'],
                 'CurrentAtVoltage100V':IVCurveData['CurrentAtVoltage100V'],
                 'IVSlope': IVCurveData['IVSlope'],
@@ -359,8 +374,11 @@ class TestResult(GeneralTestResult):
             })
         except:
             raise
-            pass
-            #test incomplete
+
+        if not self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
+            Row.update({
+                'PixelDefects': PixelDefectsString,
+            })
 
 
         print 'fill row end'

@@ -62,6 +62,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         NumDefects = []
         PixelDefectsGrades = []
         Incomplete = False
+
         for i in chipResults:
             try:
                 PixelDefectsGrade = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsGrade']['Value'])
@@ -70,7 +71,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']))
             except:
                 Incomplete = True
-                PixelDefectsGrade = 3
+
+            if not i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DefectsGradingComplete']:
+                Incomplete = True
+
             PixelDefectsGrades.append(PixelDefectsGrade)
         ElectricalGrade = max(PixelDefectsGrades)
 
@@ -101,6 +105,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # Final Grade
         ModuleGrade = max(ElectricalGrade, IVGrade)
 
+        # Grade C if incomplete
+        if Incomplete:
+            ModuleGrade = 3
 
         # translate grade from number to A/B/C
         GradeMapping = {1:'A', 2:'B', 3:'C'}
@@ -133,7 +140,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if Incomplete:
             self.ResultData['KeyValueDictPairs']['Incomplete'] = {
                     'Value': 'INCOMPLETE',
-                    'Label':'Test'
+                    'Label': 'Test',
+                    'Style': 'color:red;font-weight:bold;'
                 }
             self.ResultData['KeyList'].append('Incomplete')
 
