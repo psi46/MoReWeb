@@ -32,4 +32,25 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.IVCurve.
             self.ResultData['KeyValueDictPairs']['IV150DB'] = {'Label': 'I(150 V) Fulltest', 'Value': "%1.2f"%(float(IVfromDB)*1e6), 'Unit': 'μA'}
             self.ResultData['KeyList'].append('IV150DB')
 
+
+        if 'IVCurveDB' in self.ParentObject.ResultData['SubTestResults']['Database'].ResultData['HiddenData']:
+            IVCurveDB = self.ParentObject.ResultData['SubTestResults']['Database'].ResultData['HiddenData']['IVCurveDB']
+
+            voltages = []
+            currents = []
+            for IVTuple in IVCurveDB:
+                if len(IVTuple) > 1:
+                    try:
+                        voltages.append(-float(IVTuple[0]))
+                        currents.append(-float(IVTuple[1]))
+                    except:
+                        pass
+
+            xp = array.array('d', voltages)
+            yp = array.array('d', currents)
+
+            ivGraph2 = ROOT.TGraph(len(voltages), xp, yp)
+            ivGraph2.SetLineColor(ROOT.kRed + 1)
+            ivGraph2.Draw("L same")
+
         self.SaveCanvas()

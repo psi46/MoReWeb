@@ -12,6 +12,12 @@ except:
     print "\x1b[31merror: can't load Python module 'MySQLdb' \x1b[0m"
     print "\x1b[31m -> run: pip install MySQL-python\x1b[0m"
 
+try:
+    from urllib2 import urlopen
+except:
+    raise
+    print "\x1b[31merror: can't load Python module 'urllib' \x1b[0m"
+    print "\x1b[31m -> needed for getting IV curves from DB\x1b[0m"
 
 class GlobalDatabaseQuery():
 
@@ -108,4 +114,28 @@ class GlobalDatabaseQuery():
     ORDER BY tempnominal;'''.format(ModuleID=ModuleID)
 
         return self.QuerySQL(SQLQuery)
+
+    def GetFulltestIVCurve(self, ModuleID, tempnominal = 'p17_1'):
+
+        SQLQuery = '''SELECT inventory_fullmodule.FULLMODULE_ID, GRADE, inventory_fullmodule.BUILTON, inventory_fullmodule.BUILTBY, inventory_fullmodule.STATUS, tempnominal, I150, IVSLOPE, PFNs
+        FROM inventory_fullmodule
+        INNER JOIN test_fullmodule ON inventory_fullmodule.LASTTEST_FULLMODULE=test_fullmodule.SUMMARY_ID
+        INNER JOIN test_fullmoduleanalysis ON test_fullmodule.LASTANALYSIS_ID=test_fullmoduleanalysis.TEST_ID
+        INNER JOIN test_data ON test_data.DATA_ID = test_fullmoduleanalysis.DATA_ID
+        WHERE inventory_fullmodule.FULLMODULE_ID = '{ModuleID}' AND tempnominal = '{tempnominal}' AND test_fullmodule.TYPE='FullQualification' AND inventory_fullmodule.STATUS='INSTOCK'
+        ORDER BY tempnominal;'''.format(ModuleID=ModuleID, tempnominal=tempnominal)
+        DbResults = self.QuerySQL(SQLQuery)
+        if len(DbResults) > 0:
+            print DbResults[0]
+            RelativePath = DbResults[0]['PFNs'].replace('file:','')
+            IVCurveURL = "http://" + self.Host + RelativePath + "/ivCurve.log"
+            myreq = urlopen(IVCurveURL)
+            IVdata = myreq.read()
+
+            IVdataLines = IVdata.replace('\x0d','').split('\n')
+            IVdataLines = [x.strip().replace('\t', ' ').split(' ') for x in IVdataLines if not x.strip().startswith('#')]
+        else:
+            IVdataLines = []
+
+        return IVdataLines
 

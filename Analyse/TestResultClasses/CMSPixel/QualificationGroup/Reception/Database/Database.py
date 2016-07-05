@@ -89,12 +89,18 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             LeakageCurrent150p17 = -2
 
                 self.ResultData['Table']['BODY'].append(FulltestRow)
+
+            IVdata = DB.GetFulltestIVCurve(ModuleID=ModuleID)
+            self.ResultData['HiddenData']['IVCurveDB'] = IVdata
+
         except:
             self.ResultData['Table'] = {
                'HEADER': [['Error']],
                'BODY': [["Can't compare with DB, either no connection or module not in database!"]],
                'FOOTER': [],
             }
+
+
         self.ResultData['HiddenData']['LeakageCurrent150p17'] = LeakageCurrent150p17
 
 
