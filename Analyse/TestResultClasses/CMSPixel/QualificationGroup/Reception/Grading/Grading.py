@@ -53,6 +53,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '',
                 'Label':'Total Pixel defects'
             },
+            'Comment': {
+                'Value': '',
+                'Label':'Comment'
+            },
         }
 
         self.ResultData['KeyList'] = ['Module', 'Grade', 'ManualGrade', 'ElectricalGrade', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback']
@@ -66,7 +70,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         NumDefects = []
         PixelDefectsGrades = []
         Incomplete = False
+        GradingComments = []
 
+        ChipIndex = 0
         for i in chipResults:
             try:
                 PixelDefectsGrade = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsGrade']['Value'])
@@ -75,11 +81,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']))
             except:
                 Incomplete = True
+                GradingComments.append("Pixel tests missing C%d"%ChipIndex)
 
             if not i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DefectsGradingComplete']:
                 Incomplete = True
+                GradingComments.append("Pixel tests incomplete C%d"%ChipIndex)
 
             PixelDefectsGrades.append(PixelDefectsGrade)
+            ChipIndex += 1
+
         ElectricalGrade = max(PixelDefectsGrades)
 
         # IV Grading
@@ -103,8 +113,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 IVGrade = 2
             if CurrentVariation > self.TestResultEnvironmentObject.GradingParameters['slopeivC']:
                 IVGrade = 3
+
+            if ('IVCurveFilePath' not in IVTestResult.ResultData['HiddenData']) or len(IVTestResult.ResultData['HiddenData']['IVCurveFilePath'].strip()) < 1:
+                IVGrade = 0
+                Incomplete = True
+                GradingComments.append("IV curve logfile missing")
         else:
-            pass
+            Incomplete = True
+            GradingComments.append("IV subtest folder missing")
 
         # Final Grade
         # translate grade from number to A/B/C
@@ -123,6 +139,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if GradeMapping[ModuleGrade] != GradeMapping[int(ManualGrade)]:
                 GradeComment = "Grade "+str(GradeMapping[ModuleGrade])+" -> "+str(GradeMapping[int(ManualGrade)])
                 print GradeComment
+                GradingComments.append(GradeComment)
             ModuleGrade = int(ManualGrade)
 
         try:
@@ -158,6 +175,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                     'Style': 'color:red;font-weight:bold;'
                 }
             self.ResultData['KeyList'].append('Incomplete')
+
+        if len(GradingComments) > 0:
+            self.ResultData['KeyValueDictPairs']['Comment']['Value'] = '; '.join(GradingComments)
+            self.ResultData['KeyList'].append('Comment')
 
     def PopulateResultData(self):
         pass
