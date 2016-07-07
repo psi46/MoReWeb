@@ -4,6 +4,10 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
+##### version 1.0.2
+
+fix for Reception tests for global DB
+
 ##### version 1.0.1 (DB re-processing with final grading)
 
 few changes for reception tests
