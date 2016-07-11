@@ -96,17 +96,6 @@ class TestResult(GeneralTestResult):
 
         self.ResultData['SubTestResultDictList'] += [
             {
-                'Key': 'Grading',
-                'DisplayOptions': {
-                    'Order': 15,
-                    'Width': 1,
-                    'Show': True,
-                },
-                'InitialAttributes': {
-                    'ModuleVersion': self.Attributes['ModuleVersion'],
-                },
-            },
-            {
                 'Key': 'Database',
                 'DisplayOptions': {
                     'Width': 5,
@@ -149,6 +138,19 @@ class TestResult(GeneralTestResult):
                 },
             ]
 
+        self.ResultData['SubTestResultDictList'] += [
+            {
+                'Key': 'Grading',
+                'DisplayOptions': {
+                    'Order': 15,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            }
+            ]
 
     def OpenFileHandle(self):
         self.check_Test_Software()
