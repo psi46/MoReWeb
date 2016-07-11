@@ -160,10 +160,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ReceptionDataRow = ['Reception']
 
         # pixel defects per module
-        NDefects = gradingResult.ResultData['KeyValueDictPairs']['Defects']['Value']
-        NDeadPixels = gradingResult.ResultData['KeyValueDictPairs']['DeadPixels']['Value']
-        NDefectiveBumps = gradingResult.ResultData['KeyValueDictPairs']['DefectiveBumps']['Value']
-        ReceptionDataRow += [NDefects, NDeadPixels]
+        NDefects = 0 #gradingResult.ResultData['KeyValueDictPairs']['Defects']['Value']
+        NDeadPixels = 0 #gradingResult.ResultData['KeyValueDictPairs']['DeadPixels']['Value']
+        NDefectiveBumps = 0 #gradingResult.ResultData['KeyValueDictPairs']['DefectiveBumps']['Value']
+
 
         # pixel defects per ROC
         NDefectiveBumpsList = []
@@ -174,6 +174,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             NDeadPixelsROC = int(chipResult['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDeadPixels'])
             NDefectiveBumpsList.append(NDefectiveBumpsROC)
             NDeadPixelsList.append(NDeadPixelsROC)
+
+            NDeadPixels +=  NDeadPixelsROC
+            NDefectiveBumps += NDefectiveBumpsROC
+            NDefects += NDeadPixelsROC + NDefectiveBumpsROC
+
+        ReceptionDataRow += [NDefects, NDeadPixels]
+
         ReceptionDataRow += NDeadPixelsList
         ReceptionDataRow += [NDefectiveBumps]
         ReceptionDataRow += NDefectiveBumpsList

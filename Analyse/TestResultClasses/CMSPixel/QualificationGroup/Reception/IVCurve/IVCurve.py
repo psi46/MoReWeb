@@ -52,5 +52,7 @@ class TestResult(TestResultClasses.CMSPixel.QualificationGroup.Fulltest.IVCurve.
             ivGraph2 = ROOT.TGraph(len(voltages), xp, yp)
             ivGraph2.SetLineColor(ROOT.kRed + 1)
             ivGraph2.Draw("L same")
+        else:
+            print "no iv curve from DB available"
 
         self.SaveCanvas()
