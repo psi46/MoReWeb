@@ -300,8 +300,8 @@ class TestResult(GeneralTestResult):
         try:
             LeakageCurrent = float(self.ResultData['SubTestResults']['IVCurve'].ResultData['KeyValueDictPairs']['CurrentAtVoltage150V']['Value'])
             LeakageCurrentDB = 1e6*float(self.ResultData['SubTestResults']['Database'].ResultData['HiddenData']['LeakageCurrent150p17'])
-            LeakageCurrentString = "I = %1.1f"%(LeakageCurrent)
-            LeakageCurrentString = LeakageCurrentString + " (%1.1f)"%LeakageCurrentDB
+            LeakageCurrentString = "I=%1.2f"%(LeakageCurrent)
+            LeakageCurrentString = LeakageCurrentString + " (%1.2f)"%LeakageCurrentDB
             if LeakageCurrent >= 2 * LeakageCurrentDB:
                 LeakageCurrentString = "<span style='color:red;font-weight:bold;'>%s</span>"%LeakageCurrentString
             elif LeakageCurrent >= 1.5 * LeakageCurrentDB:

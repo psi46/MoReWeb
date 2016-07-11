@@ -92,6 +92,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             IVdata = DB.GetFulltestIVCurve(ModuleID=ModuleID)
             self.ResultData['HiddenData']['IVCurveDB'] = IVdata
+            if len(IVdata) < 1:
+                print "\x1b[31merror: can't read IV curve from global DB!\x1b[0m"
 
         except:
             self.ResultData['Table'] = {
