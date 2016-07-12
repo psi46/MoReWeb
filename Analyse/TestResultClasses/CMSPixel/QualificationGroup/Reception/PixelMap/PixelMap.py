@@ -33,6 +33,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # draw module map
         if self.ModuleMap:
             self.ResultData['Plot']['ROOTObject'] = self.ModuleMap.GetHistogram()
+            self.ModuleMap.SetRangeUser(0, 10)
             self.ModuleMap.Draw(self.Canvas)
 
         # save canvas
