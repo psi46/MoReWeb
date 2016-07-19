@@ -311,6 +311,26 @@ class TestResult(GeneralTestResult):
         except:
             pass
 
+        Comment = LeakageCurrentString
+        
+        try:
+            if self.ParentObject.CommentFromFile:
+                if len(Comment) < 1:
+                    Comment = self.ParentObject.CommentFromFile
+                else:
+                    Comment += "; " + self.ParentObject.CommentFromFile
+        except:
+            pass
+
+        try:
+            if self.CommentFromFile:
+                if len(Comment) < 1:
+                    Comment = self.CommentFromFile
+                else:
+                    Comment += "; " + self.CommentFromFile
+        except:
+            pass
+
         # fill DB row
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
@@ -375,7 +395,7 @@ class TestResult(GeneralTestResult):
                 'ROCsLessThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'],
                 'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanOnePercent'],
                 'ROCsMoreThanFourPercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanFourPercent'],
-                'Comments': LeakageCurrentString,
+                'Comments': Comment,
             })
         except:
             raise
