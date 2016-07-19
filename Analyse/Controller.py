@@ -395,6 +395,9 @@ def AnalyseSingleQualification(Folder):
 
 def AnalyseAllTestDataInDirectory(GlobalDataDirectory):
     Folders = os.listdir(GlobalDataDirectory)
+    Folders.sort()
+    print "FOLDERS:"
+    print Folders
     FoldersToBeAnalyzed = []
 
     for Folder in Folders:
