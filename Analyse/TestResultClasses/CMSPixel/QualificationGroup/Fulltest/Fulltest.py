@@ -837,7 +837,7 @@ class TestResult(GeneralTestResult):
                             VTRIM = DacParameters['vtrim']['Value'],
                             VTHRCOMP = DacParameters['vthrcomp']['Value'],
                             VHLDDEL = DacParameters['vhlddel']['Value'],
-                            VIBIAS_BUS = DacParameters['vibias_bus']['Value'],
+                            VIBIAS_BUS = DacParameters['vibias_bus']['Value'] if 'vibias_bus' in DacParameters else DacParameters['vcolorbias']['Value'],
                             PHOFFSET = DacParameters['phoffset']['Value'],
                             VCOMP_ADC = DacParameters['vcomp_adc']['Value'],
                             PHSCALE = DacParameters['phscale']['Value'],
