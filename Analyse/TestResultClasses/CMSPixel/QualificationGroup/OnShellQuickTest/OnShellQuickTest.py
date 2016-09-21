@@ -98,6 +98,17 @@ class TestResult(GeneralTestResult):
                 'InitialAttributes': {
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                 },
+            },
+            {
+                'Key': 'Vana',
+                'DisplayOptions': {
+                    'Order': 340,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
             }
         ]
 
