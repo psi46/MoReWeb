@@ -25,6 +25,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '-',
                 'Label':'IV Grade'
             },
+            'ManualGrade': {
+                'Value': '-',
+                'Label':'Manual Grade'
+            },
             'DefectiveBumps': {
                 'Value': '-',
                 'Label':'Bump Defects'
@@ -43,63 +47,28 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
         }
 
-        self.ResultData['KeyList'] = ['Module', 'Grade', 'ElectricalGrade', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'Comment']
+        self.ResultData['KeyList'] = ['Module', 'Grade', 'ElectricalGrade', 'ManualGrade', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'Comment']
 
     def OpenFileHandle(self):
 
-        Incomplete = False
-        ElectricalGrade = 1
-        IVGrade = 1
-        GradingComments = []
-
-        # chip pixel defects grading
-        # Final Grade
-        # translate grade from number to A/B/C
-        GradeMapping = {1:'A', 2:'B', 3:'C'}
-
-        ModuleGrade = max(ElectricalGrade, IVGrade)
-
-        # Grade C if incomplete
-        if Incomplete:
-            ModuleGrade = 3
-
-        # manual Grade
-        ManualGrade = self.check_for_manualGrade()
-        if ManualGrade != '':
-            self.ResultData['KeyValueDictPairs']['ManualGrade']['Value'] = str(GradeMapping[int(ManualGrade)])
-            if GradeMapping[ModuleGrade] != GradeMapping[int(ManualGrade)]:
-                GradeComment = "Grade "+str(GradeMapping[ModuleGrade])+" -> "+str(GradeMapping[int(ManualGrade)])
-                print GradeComment
-                GradingComments.append(GradeComment)
-            ModuleGrade = int(ManualGrade)
-
-        try:
-            Grade = GradeMapping[ModuleGrade]
-        except:
-            Grade = 'None'
-
-        # readback calibration flag
-        try:
-            ReadbackStatus = self.ParentObject.ResultData['SubTestResults']['ReadbackStatus'].ResultData['KeyValueDictPairs']['ModuleCalibrationGood']['Value']
-        except:
-            ReadbackStatus = "unknown"
+        Grade = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Grade']['Value']
+        ElectricalGrade = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ElectricalGrade']['Value']
+        IVGrade = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['IVGrade']['Value']
+        ManualGrade = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ManualGrade']['Value'] if 'ManualGrade' in self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'] else '-'
 
         self.ResultData['KeyValueDictPairs']['Module']['Value'] = self.ParentObject.Attributes['ModuleID']
         self.ResultData['KeyValueDictPairs']['Grade']['Value'] = Grade
-        self.ResultData['KeyValueDictPairs']['ElectricalGrade']['Value'] = GradeMapping[ElectricalGrade] if ElectricalGrade in GradeMapping else 'None'
-        self.ResultData['KeyValueDictPairs']['IVGrade']['Value'] = GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None'
+        self.ResultData['KeyValueDictPairs']['ElectricalGrade']['Value'] = ElectricalGrade
+        self.ResultData['KeyValueDictPairs']['IVGrade']['Value'] = IVGrade
+        self.ResultData['KeyValueDictPairs']['ManualGrade']['Value'] = ManualGrade
 
-        if Incomplete:
-            self.ResultData['KeyValueDictPairs']['Incomplete'] = {
-                    'Value': 'INCOMPLETE',
-                    'Label': 'Test',
-                    'Style': 'color:red;font-weight:bold;'
-                }
+        self.ResultData['KeyValueDictPairs']['DefectiveBumps']['Value'] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DefectiveBumps']['Value']
+        self.ResultData['KeyValueDictPairs']['DeadPixels']['Value'] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
+        self.ResultData['KeyValueDictPairs']['Defects']['Value'] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Defects']['Value']
+
+        if 'Incomplete' in self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']:
+            self.ResultData['KeyValueDictPairs']['Incomplete'] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Incomplete']
             self.ResultData['KeyList'].append('Incomplete')
-
-        if len(GradingComments) > 0:
-            self.ResultData['KeyValueDictPairs']['Comment']['Value'] = '; '.join(GradingComments)
-            self.ResultData['KeyList'].append('Comment')
 
     def PopulateResultData(self):
         pass

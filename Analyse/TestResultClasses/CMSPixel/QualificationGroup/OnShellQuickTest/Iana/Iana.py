@@ -40,6 +40,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['IanaMin']['Value'] = "%1.1f"%min(IanaRoc) if len(IanaRoc) > 0 else -1
             self.ResultData['KeyValueDictPairs']['IanaMax']['Value'] = "%1.1f"%max(IanaRoc) if len(IanaRoc) > 0 else -1
 
+            self.ResultData['HiddenData']['IanaRocs'] = IanaRoc
+
             # style histogram
             if self.ResultData['Plot']['ROOTObject']:
                 self.ResultData['Plot']['ROOTObject'].SetTitle("")

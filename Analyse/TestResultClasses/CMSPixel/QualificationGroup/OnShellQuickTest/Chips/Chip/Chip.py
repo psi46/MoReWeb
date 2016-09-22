@@ -28,6 +28,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order': 120,
                     }
                 },
+                {'Key':'Grading',
+                    'DisplayOptions':{
+                        'Order': 1000,
+                        'Show': False,
+                    }
+                },
 
             ]
 #'PixelMap'

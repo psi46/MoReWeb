@@ -9,7 +9,7 @@ class TestResult(GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_OnShellQuickTest_Chips_Chip_%s_TestResult'%self.NameSingle
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_OnShellQuickTest_ROC'
 
-        self.BumpbondingDefectsList = []
+        self.BumpbondingDefectsList = set([])
         self.ResultData['KeyValueDictPairs']['BumpBondingDefects'] = {'Value': '', 'Label': 'Bump Bonding Defects'}
         self.ResultData['KeyValueDictPairs']['NBumpBondingDefects'] = {'Value': '-', 'Label': 'N Bump Bonding Defects'}
         self.ResultData['KeyList'].append('NBumpBondingDefects')
@@ -33,7 +33,7 @@ class TestResult(GeneralTestResult):
                 for row in range(self.nRows):
                     defectIndicator = self.ResultData['Plot']['ROOTObject'].GetBinContent(column + 1, row + 1)
                     if defectIndicator > 0:
-                        self.BumpbondingDefectsList.append([ChipNo, column, row])
+                        self.BumpbondingDefectsList.add((ChipNo, column, row))
 
             self.ResultData['KeyValueDictPairs']['BumpBondingDefects']['Value'] = self.BumpbondingDefectsList
             self.ResultData['KeyValueDictPairs']['NBumpBondingDefects']['Value'] = len(self.BumpbondingDefectsList)

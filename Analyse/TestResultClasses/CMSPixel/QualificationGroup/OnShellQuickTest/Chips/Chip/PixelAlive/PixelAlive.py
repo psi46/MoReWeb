@@ -44,16 +44,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['Plot']['ROOTObject'] = rootObject.Clone(self.GetUniqueID())
 
         # check dead and inefficient pixels
-        self.IneffPixelList = []
-        self.DeadPixelList = []
+        self.IneffPixelList = set([])
+        self.DeadPixelList = set([])
         ChipNo = self.ParentObject.Attributes['ChipNo']
         for column in range(self.nCols):
             for row in range(self.nRows):
                 nHits = self.ResultData['Plot']['ROOTObject'].GetBinContent(column+1, row+1)
                 if nHits < self.PixelMapMaxValue:
-                    self.IneffPixelList.append([ChipNo, column, row])
+                    self.IneffPixelList.add((ChipNo, column, row))
                 if nHits < 1:
-                    self.DeadPixelList.append([ChipNo, column, row])
+                    self.DeadPixelList.add((ChipNo, column, row))
         nInefficientPixels = len(self.IneffPixelList)
         nDeadPixels = len(self.DeadPixelList)
 

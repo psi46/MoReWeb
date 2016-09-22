@@ -25,12 +25,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # check dead and inefficient pixels
             nChipsProgrammable = 0
             nChips = self.ParentObject.Attributes['NumberOfChips']
+            deltaIanaRocs = []
             for chipNo in range(nChips):
                if self.ResultData['Plot']['ROOTObject'].GetBinContent(1 + chipNo) > 5:
                    nChipsProgrammable += 1
+               deltaIanaRocs.append(self.ResultData['Plot']['ROOTObject'].GetBinContent(1 + chipNo))
 
             # fill dictionaries
             self.ResultData['KeyValueDictPairs']['RocsProgrammable']['Value'] = nChipsProgrammable
+            self.ResultData['HiddenData']['DeltaIanaRocs'] = deltaIanaRocs
 
             # style histogram
             if self.ResultData['Plot']['ROOTObject']:

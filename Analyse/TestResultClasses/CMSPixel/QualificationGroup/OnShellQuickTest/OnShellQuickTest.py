@@ -34,17 +34,6 @@ class TestResult(GeneralTestResult):
                 },
             },
             {
-                'Key': 'Summary',
-                'DisplayOptions': {
-                    'Order': 100,
-                    'Width': 1,
-                    'Show': True,
-                },
-                'InitialAttributes': {
-                    'ModuleVersion': self.Attributes['ModuleVersion'],
-                },
-            },
-            {
                 'Key': 'BumpBonding',
                 'DisplayOptions': {
                     'Order': 210,
@@ -60,6 +49,17 @@ class TestResult(GeneralTestResult):
                 'DisplayOptions': {
                     'Order': 110,
                     'Width': 4,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
+                'Key': 'Logfile',
+                'DisplayOptions': {
+                    'Order': 2010,
+                    'Width': 1,
                     'Show': True,
                 },
                 'InitialAttributes': {
@@ -109,7 +109,51 @@ class TestResult(GeneralTestResult):
                 'InitialAttributes': {
                     'ModuleVersion': self.Attributes['ModuleVersion'],
                 },
-            }
+            },
+            {
+                'Key': 'SummaryROCs',
+                'DisplayOptions': {
+                    'Order': 300,
+                    'Width': 5,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
+                'Key': 'LeakageCurrent',
+                'DisplayOptions': {
+                    'Order': 305,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
+                'Key': 'Grading',
+                'DisplayOptions': {
+                    'Order': 100,
+                    'Width': 1,
+                    'Show': False,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
+                'Key': 'Summary',
+                'DisplayOptions': {
+                    'Order': 100,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
         ]
 
     def OpenFileHandle(self):
@@ -234,6 +278,7 @@ class TestResult(GeneralTestResult):
             'nGainDefPixels': -1,
             'nPedDefPixels': -1,
             'nPar1DefPixels': -1,
+            'RecalculatedVoltage': -1,
             'RelativeModuleFinalResultsPath': os.path.relpath(self.TestResultEnvironmentObject.FinalModuleResultsPath,
                                                               self.TestResultEnvironmentObject.GlobalOverviewPath),
             'FulltestSubfolder': os.path.relpath(self.FinalResultsStoragePath,
@@ -254,19 +299,20 @@ class TestResult(GeneralTestResult):
 
         try:
             Row.update({
-                'PixelDefects': "%d" % -1,
+                'PixelDefects': "%d" % self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Defects']['Value'],
                 'initialCurrent': "%1.2f" % -1,
-                'nDeadPixels': "%d" % -1,
-                'nBumpDefects': "%d" % -1,
-                'CurrentAtVoltage150V': -1,
+                'nDeadPixels': "%d" % self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DeadPixels']['Value'],
+                'nBumpDefects': "%d" % self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DefectiveBumps']['Value'],
+                'CurrentAtVoltage150V': self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150']['Value'],
+                'RecalculatedVoltage': self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Recalculated']['Value'],
                 'CurrentAtVoltage100V': -1,
                 'IVSlope': -1,
                 'IVCurveFilePath': -1,
                 'TestTemperature': -1,
-                'Grade': -1, #self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Grade']['Value']
-                'ROCsLessThanOnePercent': -1, #self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'
-                'ROCsMoreThanOnePercent': -1,
-                'ROCsMoreThanFourPercent': -1,
+                'Grade': self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Grade']['Value'],
+                'ROCsLessThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'], #self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'
+                'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanOnePercent'],
+                'ROCsMoreThanFourPercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanFourPercent'],
                 'Comments': Comment,
             })
         except:
