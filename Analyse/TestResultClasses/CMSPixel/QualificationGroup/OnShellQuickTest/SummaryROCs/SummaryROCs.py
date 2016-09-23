@@ -68,7 +68,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
 
-        HeaderRow = ['ROC', 'Grade', 'Defects', 'Dead', 'Dead (FQ)', 'Bump', 'Bump (FQ)', 'Inefficient', 'ΔaliveHV', 'BB Vthrcomp', 'BB Vana', 'Vana', 'Iana', 'ΔIana', 'ΔIana(load)', 'Vdig', 'Caldel']
+        HeaderRow = ['ROC', 'Grade', 'Defects', 'Dead', 'Read (R)', 'Dead (FQ)', 'Bump', 'Bump (R)', 'Bump (FQ)', 'Inefficient', 'ΔaliveHV', 'BB Vthrcomp', 'BB Vana', 'Vana', 'Iana', 'ΔIana', 'ΔIana(load)', 'Vdig', 'Caldel']
 
         self.ResultData['Table'] = {
            'HEADER': [HeaderRow],
@@ -109,6 +109,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         dbPretestCaldel = self.LoadValuesFromFile('dbPretestCaldel.dat', 'int')
         dbPretestVana = self.LoadValuesFromFile('dbPretestVana.dat', 'int')
 
+        dbReceptionDead = self.LoadValuesFromFile('dbReceptionDead.dat', 'int')
+        dbReceptionBB = self.LoadValuesFromFile('dbReceptionBB.dat', 'int')
+
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResultDictList']:
             ChipNo = int(i['TestResultObject'].Attributes['ChipNo'])
             GradeMapping = {1: 'A', 2: 'B', 3: 'C', -1: 'None'}
@@ -128,8 +131,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 PixelDefectsGrade,
                 '%d'%NDefects,
                 '%d'%NDeadPixels,
+                '%d' % int(dbReceptionDead[ChipNo]) if ChipNo < len(dbReceptionDead) else '-',
                 '%d' % int(databaseDeadPixels[ChipNo]) if ChipNo < len(databaseDeadPixels) else '-',
                 '%d'%NDefectiveBumps,
+                '%d' % int(dbReceptionBB[ChipNo]) if ChipNo < len(dbReceptionBB) else '-',
                 '%d' % int(databaseBumpDefects[ChipNo]) if ChipNo < len(databaseBumpDefects) else '-',
                 i['TestResultObject'].ResultData['SubTestResults']['PixelAlive'].ResultData['KeyValueDictPairs']['NInefficentPixels']['Value'],
                 '%d' % int(DeltaAliveHVRocs[ChipNo]) if ChipNo < len(DeltaAliveHVRocs) else '-',

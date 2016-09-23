@@ -94,6 +94,8 @@ class TestResultEnvironment:
         'XRayHighRate_missing_xray_pixels_C':168,
         'XRayHighRate_pixel_defects_B':42,
         'XRayHighRate_pixel_defects_C':168,
+        'OnShellQuickTest_LeakageCurrent_B': 2.0,
+        'OnShellQuickTest_LeakageCurrent_C': 10.0
     }
     XRayHRQualificationConfiguration = {
         'OmitGradesInFinalGrading':'',

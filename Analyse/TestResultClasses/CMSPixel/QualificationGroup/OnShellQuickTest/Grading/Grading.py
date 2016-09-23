@@ -92,6 +92,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ElectricalGrade = max(PixelDefectsGrades)
 
+        if 'IanaProblem' in self.ParentObject.ResultData['SubTestResults']['Logfile'].ResultData['HiddenData'] and self.ParentObject.ResultData['SubTestResults']['Logfile'].ResultData['HiddenData']['IanaProblem']:
+            ElectricalGrade = 3
+
+        # IV grading
         IVGrade = 1
         try:
             IVRecalculated = float(self.ParentObject.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Recalculated']['Value'])
@@ -99,9 +103,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             IVRecalculated = -1
             Incomplete = True
 
-        if IVRecalculated >= 10.0:
+        if IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_C']):
             IVGrade = 3
-        elif IVRecalculated >= 2.0:
+        elif IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_B']):
             IVGrade = 2
 
         # Final Grade

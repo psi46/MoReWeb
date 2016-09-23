@@ -34,7 +34,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         LeakageCurrentFileName = self.RawTestSessionDataPath + '/../logfiles/IV.log'
 
-        print "lookign for:" , LeakageCurrentFileName
         if os.path.isfile(LeakageCurrentFileName):
             LeakageCurrentLines = []
             with open(LeakageCurrentFileName, 'r') as LeakageCurrentFile:
@@ -45,9 +44,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             except:
                 pass
 
-            print LeakageCurrentLines
-            print LeakageCurrentTuples
-
             InitialLeakageCurrent = abs(float(LeakageCurrentTuples[0][1])) if len(LeakageCurrentTuples) > 0 else -1
             MaxLeakageCurrent = abs(float(max([abs(x[1]) for x in LeakageCurrentTuples]))) if len(LeakageCurrentTuples) > 0 else -1
             RecalculatedLeakageCurrent = self.recalculate_current(MaxLeakageCurrent, 21.0, 17.0) if len(LeakageCurrentTuples) > 0 else -1
@@ -55,3 +51,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             self.ResultData['KeyValueDictPairs']['I150']['Value'] = '%1.2f'%(MaxLeakageCurrent*1.0e6)
             self.ResultData['KeyValueDictPairs']['I150Initial']['Value'] = '%1.2f'%(InitialLeakageCurrent*1.0e6)
             self.ResultData['KeyValueDictPairs']['I150Recalculated']['Value'] = '%1.2f'%(RecalculatedLeakageCurrent*1.0e6)
+
+        dbLeakageCurrentFileName = self.RawTestSessionDataPath + '/dbIvCurve.log'
+        if os.path.isfile(dbLeakageCurrentFileName):
+            with open(dbLeakageCurrentFileName, 'r') as dbLeakageCurrentFile:
+                dbLeakageCurrentLines = [x for x in dbLeakageCurrentFile.readlines() if not x.strip().startswith('#')]
+            dbLeakageCurrentTuples = [[float(y) for y in x.strip().replace('\t', ' ').split(' ') if len(y) > 0] for x in dbLeakageCurrentLines]
+            for dbLeakageCurrentTuple in dbLeakageCurrentTuples:
+                if abs(dbLeakageCurrentTuple[0]) > 147.0:
+                    self.ResultData['KeyValueDictPairs']['I150Database']['Value'] = '%1.2f'%(abs(dbLeakageCurrentTuple[1])*1.0e6)
+                    break
