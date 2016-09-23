@@ -13,6 +13,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Title = 'Chip '+ str(self.Attributes['ChipNo'])
 
         self.ResultData['SubTestResultDictList'] = [
+                {'Key':'DACs',
+                    'DisplayOptions':{
+                        'Order': 50,
+                        'Show': True,
+                    }
+                },
                 {'Key':'PixelAlive',
                     'DisplayOptions':{
                         'Order': 100,
@@ -20,7 +26,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 },
                 {'Key':'CalDelVthrcomp',
                     'DisplayOptions':{
-                        'Order': 00,
+                        'Order': 90,
                     }
                 },
                 {'Key':'BumpBonding',

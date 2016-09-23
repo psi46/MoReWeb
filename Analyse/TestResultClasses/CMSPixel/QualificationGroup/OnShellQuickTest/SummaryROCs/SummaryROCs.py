@@ -68,7 +68,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
 
-        HeaderRow = ['ROC', 'Grade', 'Defects', 'Dead', 'Dead (FQ)', 'Bump', 'Bump (FQ)', 'Inefficient', 'BB Vthrcomp', 'BB Vana', 'Iana', 'ΔIana', 'ΔIana(load)', 'ΔaliveHV']
+        HeaderRow = ['ROC', 'Grade', 'Defects', 'Dead', 'Dead (FQ)', 'Bump', 'Bump (FQ)', 'Inefficient', 'ΔaliveHV', 'BB Vthrcomp', 'BB Vana', 'Vana', 'Iana', 'ΔIana', 'ΔIana(load)', 'Vdig', 'Caldel']
 
         self.ResultData['Table'] = {
            'HEADER': [HeaderRow],
@@ -77,6 +77,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         }
 
         BodyRows = []
+
+        LinkHTMLTemplate = self.TestResultEnvironmentObject.HtmlParser.getSubpart(
+           self.TestResultEnvironmentObject.OverviewHTMLTemplate,
+           '###LINK###'
+        )
 
         try:
             IanaRocs = self.ParentObject.ResultData['SubTestResults']['Iana'].ResultData['HiddenData']['IanaRocs']
@@ -113,20 +118,30 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             NDefectiveBumps = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefectiveBumps'])
 
             BodyRows.append([
-                '%d'%ChipNo,
+                self.TestResultEnvironmentObject.HtmlParser.substituteMarkerArray(
+                       LinkHTMLTemplate,
+                       {
+                           '###LABEL###':'Chip '+str(ChipNo),
+                           '###URL###': os.path.relpath(i['TestResultObject'].FinalResultsStoragePath, self.ParentObject.FinalResultsStoragePath)+'/TestResult.html'
+                       }
+                ),
                 PixelDefectsGrade,
                 '%d'%NDefects,
                 '%d'%NDeadPixels,
                 '%d' % int(databaseDeadPixels[ChipNo]) if ChipNo < len(databaseDeadPixels) else '-',
                 '%d'%NDefectiveBumps,
                 '%d' % int(databaseBumpDefects[ChipNo]) if ChipNo < len(databaseBumpDefects) else '-',
-                i['TestResultObject'].ResultData['SubTestResults']['PixelAlive'].ResultData['KeyValueDictPairs']['InefficientPixels']['Value'],
+                i['TestResultObject'].ResultData['SubTestResults']['PixelAlive'].ResultData['KeyValueDictPairs']['NInefficentPixels']['Value'],
+                '%d' % int(DeltaAliveHVRocs[ChipNo]) if ChipNo < len(DeltaAliveHVRocs) else '-',
                 '%d' % int(bumpBondingVthrcomp[ChipNo]) if ChipNo < len(bumpBondingVthrcomp) else '-',
                 '%d' % int(dbPretestVana[ChipNo]) if ChipNo < len(dbPretestVana) else '-',
+                i['TestResultObject'].ResultData['SubTestResults']['DACs'].ResultData['KeyValueDictPairs']['DAC_vana']['Value'] if 'DAC_vana' in i['TestResultObject'].ResultData['SubTestResults']['DACs'].ResultData['KeyValueDictPairs'] else 'None',
                 '%1.1f'%IanaRocs[ChipNo] if ChipNo < len(IanaRocs) else '-',
                 '%1.1f'%DeltaIanaRocs[ChipNo] if ChipNo < len(DeltaIanaRocs) else '-',
                 '%1.1f'%DeltaIanaRocs2[ChipNo] if ChipNo < len(DeltaIanaRocs2) else '-',
-                '%d' % int(DeltaAliveHVRocs[ChipNo]) if ChipNo < len(DeltaAliveHVRocs) else '-',
+                i['TestResultObject'].ResultData['SubTestResults']['DACs'].ResultData['KeyValueDictPairs']['DAC_vdig']['Value'] if 'DAC_vdig' in i['TestResultObject'].ResultData['SubTestResults']['DACs'].ResultData['KeyValueDictPairs'] else 'None',
+                i['TestResultObject'].ResultData['SubTestResults']['DACs'].ResultData['KeyValueDictPairs']['DAC_caldel']['Value'] if 'DAC_caldel' in i['TestResultObject'].ResultData['SubTestResults']['DACs'].ResultData['KeyValueDictPairs'] else 'None',
+
             ])
 
         self.ResultData['Table']['BODY'] = BodyRows

@@ -6,8 +6,8 @@ import AbstractClasses.Helper.ROOTConfiguration as ROOTConfiguration
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         ROOTConfiguration.initialise_ROOT()
-        self.NameSingle='PixelAlive'
-        self.Name='CMSPixel_QualificationGroup_OnShellQuickTest_Chips_Chip_{NameSingle}_TestResult'.format(NameSingle=self.NameSingle)
+        self.NameSingle = 'PixelAlive'
+        self.Name = 'CMSPixel_QualificationGroup_OnShellQuickTest_Chips_Chip_{NameSingle}_TestResult'.format(NameSingle=self.NameSingle)
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_OnShellQuickTest_ROC'
 
         self.DeadPixelList = set()
