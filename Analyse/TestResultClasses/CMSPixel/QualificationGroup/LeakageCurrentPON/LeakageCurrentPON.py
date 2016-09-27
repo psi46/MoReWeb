@@ -89,6 +89,14 @@ class TestResult(GeneralTestResult):
             if abs(leakageCurrent) > abs(thr_C)*1.e-6:
                 grade = 3
 
+        GradeComment = ''
+        ManualGrade = self.check_for_manualGrade()
+        if ManualGrade:
+            if gradeMapping[grade] != gradeMapping[int(ManualGrade)]:
+                GradeComment = "Grade:" + str(gradeMapping[grade]) + " -> " + str(gradeMapping[int(ManualGrade)])
+                print GradeComment
+            grade = int(ManualGrade)
+
         print 'fill row'
         Row = {
             'ModuleID': self.Attributes['ModuleID'],
@@ -170,7 +178,7 @@ class TestResult(GeneralTestResult):
             'Par1NGradeA': -1,
             'Par1NGradeB': -1,
             'Par1NGradeC': -1,
-            'Comments': '',
+            'Comments': GradeComment,
         }
         print 'fill row end'
 
