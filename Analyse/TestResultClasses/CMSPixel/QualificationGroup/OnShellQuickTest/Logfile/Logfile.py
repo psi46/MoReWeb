@@ -56,13 +56,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                                     pass
 
                         if 'i(loss) [mA/ROC]' in Line:
-                            print "L:", Line
                             pos = Line.rfind(':')
                             currentLossRoc = [float(x.replace('->','').replace('<-','')) for x in Line[pos+1:].split(' ') if len(x.strip()) > 0]
                             if '->' in Line[pos+1:]:
                                 self.ResultData['HiddenData']['IanaProblem'] = True
-
-                            print "LOSS:",currentLossRoc
                             self.ResultData['HiddenData']['IanaLossRoc'] = currentLossRoc
 
                         if FWFound and pXarFound and IanaLossFound:

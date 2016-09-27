@@ -44,9 +44,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             except:
                 pass
 
-            InitialLeakageCurrent = abs(float(LeakageCurrentTuples[0][1])) if len(LeakageCurrentTuples) > 0 else -1
-            MaxLeakageCurrent = abs(float(max([abs(x[1]) for x in LeakageCurrentTuples]))) if len(LeakageCurrentTuples) > 0 else -1
-            RecalculatedLeakageCurrent = self.recalculate_current(MaxLeakageCurrent, 21.0, 17.0) if len(LeakageCurrentTuples) > 0 else -1
+            InitialLeakageCurrent = abs(float(LeakageCurrentTuples[0][1])) if len(LeakageCurrentTuples) > 0 else 0
+            MaxLeakageCurrent = abs(float(max([abs(x[1]) for x in LeakageCurrentTuples]))) if len(LeakageCurrentTuples) > 0 else 0
+            RecalculatedLeakageCurrent = self.recalculate_current(MaxLeakageCurrent, 21.0, 17.0) if len(LeakageCurrentTuples) > 0 else 0
 
             self.ResultData['KeyValueDictPairs']['I150']['Value'] = '%1.2f'%(MaxLeakageCurrent*1.0e6)
             self.ResultData['KeyValueDictPairs']['I150Initial']['Value'] = '%1.2f'%(InitialLeakageCurrent*1.0e6)

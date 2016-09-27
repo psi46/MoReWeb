@@ -133,6 +133,17 @@ class TestResult(GeneralTestResult):
                 },
             },
             {
+                'Key': 'DigitalCurrent',
+                'DisplayOptions': {
+                    'Order': 900,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
                 'Key': 'Grading',
                 'DisplayOptions': {
                     'Order': 100,
@@ -313,6 +324,7 @@ class TestResult(GeneralTestResult):
                 'ROCsLessThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'], #self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'
                 'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanOnePercent'],
                 'ROCsMoreThanFourPercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanFourPercent'],
+                'initialCurrent': self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Initial']['Value'],
                 'Comments': Comment,
             })
         except:
