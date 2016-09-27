@@ -4,6 +4,10 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
+##### version 1.0.4
+
+fix for filling DAC parameters created with recent pxar version into global DB
+
 ##### version 1.0.2
 
 fix for Reception tests for global DB
