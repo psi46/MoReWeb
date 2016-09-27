@@ -68,7 +68,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
 
-        HeaderRow = ['ROC', 'Grade', 'Defects', 'Dead', 'Read (R)', 'Dead (FQ)', 'Bump', 'Bump (R)', 'Bump (FQ)', 'Inefficient', 'ΔaliveHV', 'BB Vthrcomp', 'BB Vana', 'Vana', 'Iana', 'ΔIana', 'ΔIana(load)', 'Vdig', 'Caldel']
+        HeaderRow = ['ROC', 'Grade', 'Defects', 'Dead', 'Dead (R)', 'Dead (FQ)', 'Bump', 'Bump (R)', 'Bump (FQ)', 'Inefficient', 'ΔaliveHV', 'BB Vthrcomp', 'BB Vana', 'Vana', 'Iana', 'ΔIana', 'ΔIana(load)', 'Vdig', 'Caldel']
 
         self.ResultData['Table'] = {
            'HEADER': [HeaderRow],
