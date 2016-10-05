@@ -3,6 +3,7 @@ import re
 import datetime
 import os
 import json
+import glob
 
 class ModuleResultOverview:
     def __init__(self, TestResultEnvironmentObject):
@@ -326,6 +327,47 @@ class ModuleResultOverview:
                    FinalModuleRowsDict[Identificator]['CycleTempLow'] = RowTuple['CycleTempLow']
                    FinalModuleRowsDict[Identificator]['CycleTempHigh'] = RowTuple['CycleTempHigh']
 
+        mapModules = []
+        try:
+            mapFilePattern = self.TestResultEnvironmentObject.GlobalDataDirectory + '/mount*.txt'
+            mapFileNames = glob.glob(mapFilePattern)
+            mapName = ''
+            if len(mapFileNames) == 1:
+                #mapName = mapFileNames[0].split('/').replace('mount_','')[0:-4]
+                mapLines = []
+                with open(mapFileNames[0], 'r') as mapFile:
+                    mapLines = mapFile.readlines()
+                mapModuleIDs = [[y.strip() for y in x.split(';')] for x in mapLines if len(x.strip()) > 1]
+
+                LadderNumber = 1
+                for mapLine in mapModuleIDs:
+                    moduleLinksRow = ['%d'%LadderNumber]
+                    for moduleID in mapLine:
+                        matchingRows = []
+                        for k,v in FinalModuleRowsDict.items():
+                            if k.startswith(moduleID):
+                                matchingRows.append(v)
+                        try:
+                            RowDict = matchingRows[0]
+                            ModuleLink = RowDict['ModuleID']
+                            if 'Grade' in RowDict:
+                                if RowDict['Grade'] == 'A':
+                                    ModuleLink = "<div style='background-color:#aaffaa'>" + ModuleLink + "</div>"
+                                elif RowDict['Grade'] == 'B':
+                                    ModuleLink = "<div style='background-color:#eeff99'>" + ModuleLink + "</div>"
+                                elif RowDict['Grade'] == 'C':
+                                    ModuleLink = "<div style='background-color:#ff8888'>" + ModuleLink + "</div>"
+
+                            moduleLinksRow.append(ModuleLink)
+
+                        except:
+                            moduleLinksRow.append(moduleID)
+                    mapModules.append(moduleLinksRow)
+                    LadderNumber += 1
+
+        except:
+            pass
+
         for ModuleID in ModuleIDList:
             RowDict = FinalModuleRowsDict[ModuleID]
 
@@ -343,7 +385,8 @@ class ModuleResultOverview:
 
             TableData['BODY'].append(Row)
 
-        return TableData
+        TableDataObject = {'List': TableData, 'Map': {'BODY': mapModules, 'HEADER': [['','-4','-3','-2','-1','+1','+2','+3','+4']]}}
+        return TableDataObject
 
     def GenerateOverviewHTML(self):
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
@@ -374,10 +417,19 @@ class ModuleResultOverview:
             ''
         )
 
-        TableData = self.TableData()
         TableHTMLTemplate = HtmlParser.getSubpart(self.TestResultEnvironmentObject.OverviewHTMLTemplate, '###OVERVIEWTABLE###')
+        TableDataObject = self.TableData()
+        TableHTML = ''
+        TableMap = TableDataObject['Map']
+        if TableMap:
+            TableHTML += HtmlParser.GenerateTableHTML(TableHTMLTemplate, TableMap, {
+                '###ADDITIONALCSSCLASS###': '',
+                '###ID###': 'OverviewTableMap',
+            })
+            TableHTML += "<br><br>"
 
-        TableHTML = HtmlParser.GenerateTableHTML(TableHTMLTemplate, TableData, {
+        TableData = TableDataObject['List']
+        TableHTML += HtmlParser.GenerateTableHTML(TableHTMLTemplate, TableData, {
                 '###ADDITIONALCSSCLASS###':'',
                 '###ID###':'OverviewTable',
         })

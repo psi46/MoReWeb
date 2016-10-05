@@ -839,6 +839,6 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ModuleResultOverviewObject.FinalResultsStoragePath = self.FinalResultsStoragePath
         self.ResultData['Table'] = ModuleResultOverviewObject.TableData(self.Attributes['ModuleID'],
                                                                         self.Attributes['TestDate'],
-                                                                        GlobalOverviewList=False)
+                                                                        GlobalOverviewList=False)['List']
     def PostWriteToDatabase(self):
         self.PopulateResultData()

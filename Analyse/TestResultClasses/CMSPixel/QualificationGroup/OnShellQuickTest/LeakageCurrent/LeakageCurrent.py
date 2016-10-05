@@ -11,12 +11,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_OnShellQuickTest_Chips_Chip_{NameSingle}_TestResult'.format(NameSingle=self.NameSingle)
         self.Attributes['TestedObjectType'] = 'CMSPixel_Module'
 
-        self.ResultData['KeyValueDictPairs']['I150'] = {'Value': '-', 'Label': 'I(150 V)', 'Unit': 'uA'}
+        self.ResultData['KeyValueDictPairs']['I150'] = {'Value': '-', 'Label': 'I(150 V) max.', 'Unit': 'uA'}
         self.ResultData['KeyValueDictPairs']['I150Recalculated'] = {'Value': '-', 'Label': 'I(150 V) recalculated', 'Unit': 'uA'}
         self.ResultData['KeyValueDictPairs']['I150Initial'] = {'Value': '-', 'Label': 'I(150 V) initial', 'Unit': 'uA'}
         self.ResultData['KeyValueDictPairs']['I150Database'] = {'Value': '-', 'Label': 'I(150 V) Database', 'Unit': 'uA'}
 
-        self.ResultData['KeyList'] += ['I150', 'I150Recalculated', 'I150Initial', 'I150Database']
+        self.ResultData['KeyList'] += ['I150Recalculated', 'I150Initial', 'I150', 'I150Database']
 
 
     def recalculate_current(self, inputCurrent, inputTemp, outputTemp):
@@ -46,7 +46,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
             InitialLeakageCurrent = abs(float(LeakageCurrentTuples[0][1])) if len(LeakageCurrentTuples) > 0 else 0
             MaxLeakageCurrent = abs(float(max([abs(x[1]) for x in LeakageCurrentTuples]))) if len(LeakageCurrentTuples) > 0 else 0
-            RecalculatedLeakageCurrent = self.recalculate_current(MaxLeakageCurrent, 21.0, 17.0) if len(LeakageCurrentTuples) > 0 else 0
+            RecalculatedLeakageCurrent = self.recalculate_current(InitialLeakageCurrent, 21.0, 17.0) if len(LeakageCurrentTuples) > 0 else 0
 
             self.ResultData['KeyValueDictPairs']['I150']['Value'] = '%1.2f'%(MaxLeakageCurrent*1.0e6)
             self.ResultData['KeyValueDictPairs']['I150Initial']['Value'] = '%1.2f'%(InitialLeakageCurrent*1.0e6)

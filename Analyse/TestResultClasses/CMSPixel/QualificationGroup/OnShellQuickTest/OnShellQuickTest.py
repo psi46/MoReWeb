@@ -67,6 +67,17 @@ class TestResult(GeneralTestResult):
                 },
             },
             {
+                'Key': 'SignalTest',
+                'DisplayOptions': {
+                    'Order': 2500,
+                    'Width': 3,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
                 'Key': 'DeltaAliveHV',
                 'DisplayOptions': {
                     'Order': 310,
@@ -305,7 +316,7 @@ class TestResult(GeneralTestResult):
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
             'Operator': self.Attributes['Operator'],
-            'Comments': '',
+            'Comments': Comment,
         }
 
         try:
@@ -325,10 +336,10 @@ class TestResult(GeneralTestResult):
                 'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanOnePercent'],
                 'ROCsMoreThanFourPercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanFourPercent'],
                 'initialCurrent': self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Initial']['Value'],
-                'Comments': Comment,
             })
         except:
-            raise
+            Row['Grade'] = 'C'
+            Row['Comments'] = 'incomplete test'
 
         print 'fill row end'
 

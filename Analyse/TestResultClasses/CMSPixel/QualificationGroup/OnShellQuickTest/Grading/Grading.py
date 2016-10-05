@@ -81,11 +81,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']))
             except:
                 Incomplete = True
+                print "Pixel tests missing C%d"%ChipIndex
                 GradingComments.append("Pixel tests missing C%d"%ChipIndex)
 
-            if not i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DefectsGradingComplete']:
+            try:
+                if not i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['DefectsGradingComplete']:
+                    Incomplete = True
+                    GradingComments.append("Pixel tests incomplete C%d"%ChipIndex)
+                    print "Pixel tests incomplete C%d"%ChipIndex
+            except:
                 Incomplete = True
-                GradingComments.append("Pixel tests incomplete C%d"%ChipIndex)
+                print "Pixel tests incomplete C%d" % ChipIndex
 
             PixelDefectsGrades.append(PixelDefectsGrade)
             ChipIndex += 1
@@ -101,6 +107,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             IVRecalculated = float(self.ParentObject.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Recalculated']['Value'])
         except:
             IVRecalculated = -1
+            print "INCOMPLETE: NO IV!"
             Incomplete = True
 
         if IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_C']):
