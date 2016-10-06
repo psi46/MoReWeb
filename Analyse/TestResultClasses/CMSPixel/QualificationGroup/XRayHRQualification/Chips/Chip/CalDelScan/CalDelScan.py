@@ -15,12 +15,16 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
 
         histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'CalDelScan').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        histogramName2 = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate2', 'CalDelScan').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
 
         self.Canvas.Clear()
         
         if 'CalDelScan' in self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']:
             rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['CalDelScan']
-            self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+            try:
+                self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+            except:
+                self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName2).Clone(self.GetUniqueID())
 
             if self.ResultData['Plot']['ROOTObject']:
                 ROOT.gStyle.SetOptStat(0)

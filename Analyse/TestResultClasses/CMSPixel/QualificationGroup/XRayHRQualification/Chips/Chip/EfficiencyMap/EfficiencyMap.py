@@ -16,8 +16,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo = self.ParentObject.Attributes['ChipNo']
 
         rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]
-        histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'EfficiencyMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-
+        try:
+            histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'EfficiencyMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+            self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+        except: 
+            histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate2', 'EfficiencyMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+            self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
         self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
 
         if self.ResultData['Plot']['ROOTObject']:
