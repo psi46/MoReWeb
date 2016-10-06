@@ -63,10 +63,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ChipNo=self.ParentObject.Attributes['ChipNo']
 
         histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'NoiseBackgroundMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
+        histogramName2 = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate2', 'NoiseBackgroundMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
         rootFileKey = 'HRSCurves_{Rate}'.format(Rate = self.Attributes['Rate'])
+
         if rootFileKey in self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']:
             rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles'][rootFileKey]
-            self.ResultData['Plot']['ROOTObject_bg'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+            try:
+                self.ResultData['Plot']['ROOTObject_bg'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
+            except:
+                self.ResultData['Plot']['ROOTObject_bg'] = HistoGetter.get_histo(rootFileHandle, histogramName2).Clone(self.GetUniqueID())
             if self.ResultData['Plot']['ROOTObject_bg']:
                 # calculate real hitrate
                 TimeConstant = float(self.TestResultEnvironmentObject.XRayHRQualificationConfiguration['TimeConstant'])
