@@ -4,6 +4,13 @@ Info
 see the full changelog at:
 http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
 
+##### version 1.1.0
+
+L1 HR tests: supports analysis of workaround tests of: XPixelAlive, HRScurves, CaldelScan
+new test: OnShellQuickTest for modules mounted on half shell, including table of modules on detector
+add scripts/decode.py to decode the raw events printed out py pXar logfiles
+add scripts/merge_rootfiles.py to combine several pXar rootfiles into one single file
+
 ##### version 1.0.4
 
 fix for filling DAC parameters created with recent pxar version into global DB
