@@ -1012,8 +1012,12 @@ class GeneralTestResult(object):
         MyObjectTestDate = ''
         VersionInfo = ''
         if RecursionLevel == 0 and TestResultObject.Attributes['TestDate']:
-            MyObjectTestDate = 'Test Date: ' + datetime.datetime.fromtimestamp(
-                float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%M") + '<br><span style="font-size:10.5pt;" title="' + self.TestResultEnvironmentObject.MoReWebVersion + '">Analysis date: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + '</span>'
+            try:
+                MyObjectTestDate = 'Test Date: ' + datetime.datetime.fromtimestamp(
+                    float(TestResultObject.Attributes['TestDate'])).strftime("%Y-%m-%d %H:%M") + '<br><span style="font-size:10.5pt;" title="' + self.TestResultEnvironmentObject.MoReWebVersion + '">Analysis date: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + '</span>'
+            except:
+                print "\x1b[31mERROR: can't read test date from TestResultObject:", TestResultObject, "\x1b[0m"
+                MyObjectTestDate = 'Test Date: unknown'
             VersionInfo = self.TestResultEnvironmentObject.MoReWebVersion + " on branch " + self.TestResultEnvironmentObject.MoReWebBranch
 
         MainTestResultAdditionalClasses = ''
