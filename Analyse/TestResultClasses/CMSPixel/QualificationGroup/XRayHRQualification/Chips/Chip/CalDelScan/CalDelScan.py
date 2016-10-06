@@ -20,11 +20,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Canvas.Clear()
         
         if 'CalDelScan' in self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']:
+            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['CalDelScan']
             try:
-                rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['CalDelScan']
                 self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
             except:
-                rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['CalDelScan']
                 self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName2).Clone(self.GetUniqueID())
 
             if self.ResultData['Plot']['ROOTObject']:

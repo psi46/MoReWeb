@@ -25,13 +25,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def PopulateResultData(self):
         NumberOfLowEfficiencyPixels = 0;
         ChipNo = self.ParentObject.Attributes['ChipNo']
+        rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]
         try: 
             histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate', 'BackgroundMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]
             self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
         except:     
             histogramName = self.ParentObject.ParentObject.ParentObject.ParentObject.HistoDict.get('HighRate2', 'BackgroundMap').format(ChipNo=self.ParentObject.Attributes['ChipNo'])
-            rootFileHandle = self.ParentObject.ParentObject.ParentObject.Attributes['ROOTFiles']['HREfficiency_{Rate}'.format(Rate=self.Attributes['Rate'])]
             self.ResultData['Plot']['ROOTObject'] = HistoGetter.get_histo(rootFileHandle, histogramName).Clone(self.GetUniqueID())
     
 
