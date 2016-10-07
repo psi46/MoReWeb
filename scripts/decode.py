@@ -18,11 +18,17 @@ parser.add_argument('-i','--input',dest='input',metavar='PATH',
 parser.add_argument('-t', '--token-chain-length', dest = 'tokenchainlength', default = 4,
                     help='tokenchainlength')
 
+parser.add_argument('-e', '--event-dump', dest = 'eventdump', default = '',
+                    help='event dump output from pxar')
+
 args = parser.parse_args()
 lines = []
 
-with open(args.input) as inputFile:
-    lines = inputFile.readlines()
+if len(args.eventdump.strip()) > 1:
+    lines = args.eventdump.split('\n')
+else:
+    with open(args.input) as inputFile:
+        lines = inputFile.readlines()
 
 tokenChainLength = int(args.tokenchainlength)
 
