@@ -1,8 +1,12 @@
 Info
 =======
 
-see the full changelog at:
-http://cmspixel.phys.ethz.ch/MoRe-Web/MoReWeb.html
+##### version 1.1.0
+
+L1 HR tests: supports analysis of workaround tests of: XPixelAlive, HRScurves, CaldelScan
+new test: OnShellQuickTest for modules mounted on half shell, including table of modules on detector
+add scripts/decode.py to decode the raw events printed out py pXar logfiles
+add scripts/merge_rootfiles.py to combine several pXar rootfiles into one single file
 
 ##### version 1.0.4
 
@@ -20,11 +24,9 @@ few changes for reception tests
 
 Same grading as in 0.7.3 version, but some small bugs fixed and some changes for global DB
 
-
 ##### version 0.7.3
 
 New bump bonding cut for standard pxar bump bonding test (BB) which can more reliably detect missing bumps if there are >90 per ROC.
-
 
 ##### version 0.7.2
 
@@ -38,7 +40,7 @@ Requirements
     Python 2.6 (2.7 recommended)
     ROOT 5.34.19+ or ROOT 6
     recent Web browser (min Firefox 4, Chrome 18, Safari 3, Opera 9, IE 10)
-
+    optional: MySQLdb python module
 
 MoReWeb
 =======
