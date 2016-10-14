@@ -339,7 +339,7 @@ class TestResult(GeneralTestResult):
             })
         except:
             Row['Grade'] = 'C'
-            Row['Comments'] = 'incomplete test'
+            Row['Comments'] = Row['Comments'] + '/ incomplete test' if ('Comments' in Row and len(Row['Comments'].strip()) > 0) else 'incomplete test'
 
         print 'fill row end'
 

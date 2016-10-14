@@ -56,7 +56,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if os.path.isfile(dbLeakageCurrentFileName):
             with open(dbLeakageCurrentFileName, 'r') as dbLeakageCurrentFile:
                 dbLeakageCurrentLines = [x for x in dbLeakageCurrentFile.readlines() if not x.strip().startswith('#')]
-            dbLeakageCurrentTuples = [[float(y) for y in x.strip().replace('\t', ' ').split(' ') if len(y) > 0] for x in dbLeakageCurrentLines]
+            dbLeakageCurrentTuples = [[float(y) for y in x.strip().replace('\t', ' ').split(' ')[0:2] if len(y) > 0] for x in dbLeakageCurrentLines]
             for dbLeakageCurrentTuple in dbLeakageCurrentTuples:
                 if abs(dbLeakageCurrentTuple[0]) > 147.0:
                     self.ResultData['KeyValueDictPairs']['I150Database']['Value'] = '%1.2f'%(abs(dbLeakageCurrentTuple[1])*1.0e6)

@@ -350,13 +350,16 @@ class ModuleResultOverview:
                         try:
                             RowDict = matchingRows[0]
                             ModuleLink = RowDict['ModuleID']
+                            ModuleTooltip = ''
+                            if 'Comments' in RowDict:
+                                ModuleTooltip = RowDict['Comments']
                             if 'Grade' in RowDict:
                                 if RowDict['Grade'] == 'A':
-                                    ModuleLink = "<div style='background-color:#aaffaa'>" + ModuleLink + "</div>"
+                                    ModuleLink = "<div style='background-color:#aaffaa' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
                                 elif RowDict['Grade'] == 'B':
-                                    ModuleLink = "<div style='background-color:#eeff99'>" + ModuleLink + "</div>"
+                                    ModuleLink = "<div style='background-color:#eeff99' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
                                 elif RowDict['Grade'] == 'C':
-                                    ModuleLink = "<div style='background-color:#ff8888'>" + ModuleLink + "</div>"
+                                    ModuleLink = "<div style='background-color:#ff8888' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
 
                             moduleLinksRow.append(ModuleLink)
 
