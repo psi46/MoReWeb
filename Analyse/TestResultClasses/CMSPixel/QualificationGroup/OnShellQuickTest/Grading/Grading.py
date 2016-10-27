@@ -115,6 +115,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         elif IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_B']):
             IVGrade = 2
 
+        if IVRecalculated < 0.05:
+            IVGrade = 3
+            print "WARNING: NO HV! => graded C"
+
         # Final Grade
         # translate grade from number to A/B/C
         GradeMapping = {1:'A', 2:'B', 3:'C'}
