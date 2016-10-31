@@ -202,10 +202,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if MeanEfficiency < 0:
                 Grades['EfficiencyGrade'] = -1
             else:
-                if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
-                    Grades['EfficiencyGrade'] = 2
-                if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
-                    Grades['EfficiencyGrade'] = 3
+                if not self.isPROC or RateIndex == 1:
+                    if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_A_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
+                        Grades['EfficiencyGrade'] = 2
+                    if MeanEfficiency < self.TestResultEnvironmentObject.GradingParameters['XRayHighRateEfficiency_max_allowed_loweff_B_Rate{RateIndex}'.format(RateIndex=RateIndex)]:
+                        Grades['EfficiencyGrade'] = 3
 
             if 'EfficiencyGrade' not in OmitGradesInFinalGrading and 'EfficiencyGrade_{Rate}'.format(Rate=Rate) not in OmitGradesInFinalGrading:
                 ROCGrades.append(Grades['EfficiencyGrade'])
@@ -244,10 +245,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             # double columns with many defects
             BadDoubleColumns = self.ParentObject.ResultData['SubTestResults']['DoubleColumnGrading'].ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value']
 
+            # temporarily disable DC grading for edge DCs for PROC
+            if self.isPROC:
+                BadDoubleColumns = set([x for x in BadDoubleColumns if x != 0 and x != 25])
+
             # double columns with bad efficiency
-            BadDoubleColumnsEfficiency = self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']
-            for DoubleColumnDefect in BadDoubleColumnsEfficiency:
-                BadDoubleColumns.add((DoubleColumnDefect['Chip'], DoubleColumnDefect['DoubleColumn']))
+            if not self.isPROC:
+                BadDoubleColumnsEfficiency = self.ParentObject.ResultData['SubTestResults']['DoubleColumnEfficiencyDistribution'].ResultData['HiddenData']['BadDoubleColumns']
+                for DoubleColumnDefect in BadDoubleColumnsEfficiency:
+                    BadDoubleColumns.add((DoubleColumnDefect['Chip'], DoubleColumnDefect['DoubleColumn']))
 
             NBadDoubleColumns = len(BadDoubleColumns)
             self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'] = NBadDoubleColumns
@@ -358,6 +364,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         NumberValues['NumberOfNonUniformColumns'] = 0
         if ColumnReadoutUniformityROOTObject:
             for Column in range(self.nCols):
+                if self.isPROC and (Column == 0 or Column == 51):
+                    continue
                 ColumnHitRatio = ColumnReadoutUniformityROOTObject.GetBinContent(Column+1)
                 if (ColumnHitRatio < self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_low'] 
                     or ColumnHitRatio > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_factor_dcol_uniformity_high']):
@@ -391,12 +399,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             Noise = float(NoiseTestResultObject.ResultData['KeyValueDictPairs']['mu']['Value'])
             self.ResultData['HiddenData']['Noise_{Rate}'.format(Rate=Rate)] = Noise
 
-            if Grades['NoiseGrade'] < 2 and Noise > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']:
-                Grades['NoiseGrade'] = 2
+            if not self.isPROC:
+                if Grades['NoiseGrade'] < 2 and Noise > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_B']:
+                    Grades['NoiseGrade'] = 2
 
-            if Grades['NoiseGrade'] < 3 and Noise > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
-                Grades['NoiseGrade'] = 3
-                print "Grade noise to C: %f"%Noise
+                if Grades['NoiseGrade'] < 3 and Noise > self.TestResultEnvironmentObject.GradingParameters['XRayHighRate_SCurve_Noise_Threshold_C']:
+                    Grades['NoiseGrade'] = 3
+                    print "Grade noise to C: %f"%Noise
+            else:
+                print "PROC600: mean noise grading temporarily disabled"
 
             #NoisyPixels = int(NoiseTestResultObject.ResultData['HiddenData']['NumberOfNoisyPixels']['Value'])
             #NoiseDefectsList.append(NoisyPixels)
@@ -423,11 +434,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         ### Total Pixel Defects Grading ###
         try:
-            if len(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves']) > 0:
-                NoiseRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves'])
-                NoisePixelsList = self.ParentObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=NoiseRateGrading)].ResultData['HiddenData']['ListOfNoisyPixels']['Value']
+            if not self.isPROC:
+                if len(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves']) > 0:
+                    NoiseRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRSCurves'])
+                    NoisePixelsList = self.ParentObject.ResultData['SubTestResults']['SCurveWidths_{Rate}'.format(Rate=NoiseRateGrading)].ResultData['HiddenData']['ListOfNoisyPixels']['Value']
+                else:
+                    raise Exception("NO NOISE TEST FOUND!")
             else:
-                raise Exception("NO NOISE TEST FOUND!")
+                NoiseRateGrading = -1
+                NoisePixelsList = set()
 
             if len(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData']) > 0:
                 BumpBondingRateGrading = max(self.ParentObject.ParentObject.ParentObject.Attributes['Rates']['HRData'])
@@ -458,7 +473,13 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             sys.stdout.flush()
 
 
-        TotalPixelDefectsList = BumpBondingDefectPixelsList | NoisePixelsList | HotPixelsList | InefficientPixelList
+        if self.isPROC:
+            HotPixelsList = set([x for x in HotPixelsList if x[1] != 0 and x[1]!= 51 and x[2]!=79])
+            InefficientPixelList = set([x for x in InefficientPixelList if x[1] != 0 and x[1]!= 51 and x[2]!=79])
+            BumpBondingDefectPixelsList = set([x for x in BumpBondingDefectPixelsList if x[1] != 0 and x[1]!= 51 and x[2]!=79])
+            TotalPixelDefectsList = BumpBondingDefectPixelsList | HotPixelsList | InefficientPixelList
+        else:
+            TotalPixelDefectsList = BumpBondingDefectPixelsList | NoisePixelsList | HotPixelsList | InefficientPixelList
 
         if self.ResultData['HiddenData']['MissingTests'] < 1:
             TotalPixelDefects = len(TotalPixelDefectsList)

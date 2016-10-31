@@ -272,6 +272,13 @@ class TestResult(GeneralTestResult):
         self.Attributes['SCurvePaths'] = {}
         self.Attributes['Ntrig'] = {}
 
+        HREfficiencyPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_HREfficiency_*')
+        if len(HREfficiencyPaths) > 0:
+            self.ReadModuleVersion(HREfficiencyPaths[0])
+
+        if self.isPROC:
+            self.Attributes['InterpolatedEfficiencyRates'] = [150, 300]
+
         try:
             self.AnalyzeHRQualificationFolder()
         except Exception as inst:

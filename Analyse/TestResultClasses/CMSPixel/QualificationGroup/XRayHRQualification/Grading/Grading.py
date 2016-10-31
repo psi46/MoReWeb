@@ -47,6 +47,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ROCsWithUniformityProblems = 0
         MeanEfficiency50List = []
         MeanEfficiency120List = []
+        MeanEfficiency150List = []
+        MeanEfficiency300List = []
         MeanNoise = -1.0
 
         HotPixelsList = set()
@@ -111,8 +113,12 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 TotalDefectPixelsList = TotalDefectPixelsList | TotalDefectPixelsListROC
 
                 # mean efficiency
-                MeanEfficiency50List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency50']['Value']))
-                MeanEfficiency120List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency120']['Value']))
+                if self.isPROC:
+                    MeanEfficiency150List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency150']['Value']))
+                    MeanEfficiency300List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency300']['Value']))
+                else:
+                    MeanEfficiency50List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency50']['Value']))
+                    MeanEfficiency120List.append(float(i['TestResultObject'].ResultData['SubTestResults']['EfficiencyInterpolation'].ResultData['HiddenData']['InterpolatedEfficiency120']['Value']))
 
                 # column uniformity
                 NonUniformColumnsROC = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['NumberOfNonUniformColumns']['Value'])
