@@ -349,11 +349,12 @@ class GeneralTestResult(object):
         comment = ''
         comment_short = ''
         for filename in comment_files:
-            comment += '{filename}:\n'.format(filename=filename.split('/')[-1])
-            with file(filename) as f:
-                s = f.read()
-            comment += s + '\n\n'
-            comment_short += s + ' '
+            if '.txt~' not in filename:
+                comment += '{filename}:\n'.format(filename=filename.split('/')[-1])
+                with file(filename) as f:
+                    s = f.read()
+                comment += s + '\n\n'
+                comment_short += s + ' '
         # if self.ResultData:
         # if not 'KeyVaueDictPairs' in self.ResultData:
         # self.ResultData['KeyValueDictPairs'] = {}
@@ -414,7 +415,10 @@ class GeneralTestResult(object):
             print " => not found."
         return Defects
 
-    def ReadModuleVersion(self):
+    def ReadModuleVersion(self, basePath=None):
+        if not basePath:
+            basePath = self.RawTestSessionDataPath
+
         if self.verbose:
             print 'Read configParameters'
         self.check_Test_Software()
@@ -426,7 +430,7 @@ class GeneralTestResult(object):
         if config_format == 'dat':
             lines = []
             for filename in fileNames:
-                fileName = '%s/%s' % (self.RawTestSessionDataPath, filename)
+                fileName = '%s/%s' % (basePath, filename)
                 try:
                     f = open(fileName)
                     lines.extend(f.readlines())
@@ -446,7 +450,7 @@ class GeneralTestResult(object):
         elif config_format == 'cfg':
             config = BetterConfigParser()
             for filename in fileNames:
-                fileName = '%s/%s' % (self.RawTestSessionDataPath, filename)
+                fileName = '%s/%s' % (basePath, filename)
                 config.read(fileName)
             try:
                 version = config.get('ROC', 'type')
