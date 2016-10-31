@@ -60,8 +60,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for DoubleColumn in range(0, 26):
 
             # inefficienct pixels: >1% per double column => C
-            NEfficiencyDefectsPerDoubleColumn = len([x for x in self.ResultData['HiddenData']['HighRateInefficientPixelList'] if x[0] == ChipNo and int(x[1]/2) == DoubleColumn])
-            if NEfficiencyDefectsPerDoubleColumn > MaximumNumberAllowedBadPixels:
-                self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'].add((ChipNo, DoubleColumn))
+            if not self.isPROC:
+                NEfficiencyDefectsPerDoubleColumn = len([x for x in self.ResultData['HiddenData']['HighRateInefficientPixelList'] if x[0] == ChipNo and int(x[1]/2) == DoubleColumn])
+                if NEfficiencyDefectsPerDoubleColumn > MaximumNumberAllowedBadPixels:
+                    self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'].add((ChipNo, DoubleColumn))
 
         self.ResultData['KeyValueDictPairs']['NBadDoubleColumns']['Value'] = len(self.ResultData['KeyValueDictPairs']['BadDoubleColumns']['Value'])
