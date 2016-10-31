@@ -8,7 +8,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.Name = 'CMSPixel_QualificationGroup_XRayHRQualification_Chips_Chip_EfficiencyInterpolation_TestResult'
         self.NameSingle = 'EfficiencyInterpolation'
         self.Attributes['TestedObjectType'] = 'CMSPixel_QualificationGroup_XRayHRQualification_ROC'
+
         self.FitFunction = "[0]-[1]*x^3"
+        if self.isPROC:
+            self.FitFunction = "[0]-[1]*x-[2]*x**2"
+
         self.ResultData['KeyValueDictPairs'] = {}
         for Rate in self.ParentObject.ParentObject.ParentObject.Attributes['InterpolatedEfficiencyRates']:
             self.ResultData['KeyValueDictPairs']['InterpolatedEfficiency{Rate}'.format(Rate=Rate)] = {
@@ -30,6 +34,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         }
         self.ResultData['KeyList'].append('BadDoubleColumns')
         self.HiddenDataInterpolationRates = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+        if self.isPROC:
+            self.HiddenDataInterpolationRates = [150, 175, 200, 225, 250, 275, 300]
+
         for InterpolationRate in self.HiddenDataInterpolationRates:
             self.ResultData['HiddenData']['InterpolatedEfficiency%d'%int(InterpolationRate)] = {
                 'Label': 'Interpolated Efficiency at %s Mhz/cm2'%int(InterpolationRate),
@@ -98,8 +105,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         DoubleColumnMeanEfficiency = ROOT.TMath.Mean(len(PixelEfficiencyList), PixelEfficiencyList)
                         DoubleColumnRate = ROOT.TMath.Mean(len(PixelRateList), PixelRateList)
                         # correct measured hit rate by efficiency, in %
-                        DoubleColumnRateList.append(DoubleColumnRate / DoubleColumnMeanEfficiency)
-                        DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
+
+                        DoubleColumnRateCorrected = DoubleColumnRate / DoubleColumnMeanEfficiency
+                        if int(Rate) < 300 or DoubleColumnMeanEfficiency > 0.9 or not self.isPROC:
+                            DoubleColumnRateList.append(DoubleColumnRateCorrected)
+                            DoubleColumnEfficiencyList.append(DoubleColumnMeanEfficiency * 100)
                     except:
                         pass
                 else:
@@ -117,15 +127,32 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             if self.ResultData['Plot']['ROOTObject']:
                 ROOT.gStyle.SetOptStat(0)
 
-                cubicFit = ROOT.TF1("fitfunction", self.FitFunction, 40, 150)
+                fitFunctionRangeLow = 40 if not self.isPROC else 100
+                fitFunctionRangeHigh = 150 if not self.isPROC else 350
+                cubicFit = ROOT.TF1("fitfunction", self.FitFunction, fitFunctionRangeLow, fitFunctionRangeHigh)
+
                 cubicFit.SetParameter(0, 100)
                 cubicFit.SetParLimits(0, 0, 101)
                 cubicFit.SetParameter(1, 5e-7)
                 cubicFit.SetParLimits(1, 0, 0.01)
 
-                PlotMinEfficiency = min(80, min(DoubleColumnEfficiencyList)*0.95) if len(DoubleColumnEfficiencyList) > 0 else 80
+                if self.isPROC:
+                    cubicFit.SetParameter(0, 99)
+                    cubicFit.SetParLimits(0, 0, 101)
+                    cubicFit.SetParameter(1, -1.5e-3)
+                    cubicFit.SetParLimits(1, -1, 1)
+                    cubicFit.SetParameter(2, 7e-6)
+                    cubicFit.SetParLimits(2, -1, 1)
+
+
+                if self.isPROC:
+                    PlotMinEfficiency = min(97.5, min(DoubleColumnEfficiencyList)*0.98) if len(DoubleColumnEfficiencyList) > 0 else 97.5
+                else:
+                    PlotMinEfficiency = min(80, min(DoubleColumnEfficiencyList)*0.95) if len(DoubleColumnEfficiencyList) > 0 else 80
                 RateMaxRange = max(300, max(DoubleColumnRateList)*1.05) if len(DoubleColumnRateList) > 0 else 300
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(PlotMinEfficiency, 105.)
+                if self.isPROC:
+                    self.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(PlotMinEfficiency, 100.5)
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetRangeUser(0, RateMaxRange)
                 self.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("Hitrate [MHz/cm2]")
                 self.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle("Efficiency [%]")
