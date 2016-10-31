@@ -1,6 +1,10 @@
 Info
 =======
 
+##### version 1.1.1
+
+HR tests: modified grading for L1 modules
+
 ##### version 1.1.0
 
 L1 HR tests: supports analysis of workaround tests of: XPixelAlive, HRScurves, CaldelScan
