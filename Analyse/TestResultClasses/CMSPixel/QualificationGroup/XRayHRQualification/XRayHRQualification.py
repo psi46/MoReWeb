@@ -449,6 +449,11 @@ class TestResult(GeneralTestResult):
 
 
         PixelAlivePaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_PixelAlive_*')
+        PixelAlivePaths.sort()
+        print "\x1b[33m"
+        print PixelAlivePaths
+        print "\x1b[0m"
+
         for Path in PixelAlivePaths:
             ROOTFiles = glob.glob(Path+'/*.root')
             self.Attributes['ROOTFiles']['PixelAlive'] = ROOT.TFile.Open(ROOTFiles[0])
@@ -483,7 +488,7 @@ class TestResult(GeneralTestResult):
                 else:
                     print "X-ray PixelAlive: either no or multiple .log files found! error statistics are not available. Please name the .log file the same as the .root file to avoid ambiguousness if more than 1 logfiles are present in the folder."
 
-        
+            break
 
         CalDelScanPaths = glob.glob(self.RawTestSessionDataPath+'/0[0-9][0-9]_CalDel*_*')
         for Path in CalDelScanPaths:
