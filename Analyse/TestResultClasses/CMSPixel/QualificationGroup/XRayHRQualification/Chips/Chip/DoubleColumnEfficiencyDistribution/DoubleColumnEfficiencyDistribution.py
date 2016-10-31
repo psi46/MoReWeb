@@ -82,17 +82,27 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
                 try:
                     if len(DoubleColumnRateList) > 0:
-                        cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 5, 150)
-                        cubicFit.SetParameter(0, 100.0)
-                        cubicFit.SetParLimits(0, 0.0, 110.0)
-                        cubicFit.SetParameter(1, 5.0e-7)
-                        cubicFit.SetParLimits(1, 0, 1.0e-5)
+                        if self.isPROC:
+                            cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x-[2]*x**2", 100, 350)
+                            cubicFit.SetParameter(0, 99)
+                            cubicFit.SetParLimits(0, 0, 101)
+                            cubicFit.SetParameter(1, -1.5e-3)
+                            cubicFit.SetParLimits(1, -1, 1)
+                            cubicFit.SetParameter(2, 7e-6)
+                            cubicFit.SetParLimits(2, -1, 1)
+
+                        else:
+                            cubicFit = ROOT.TF1("fitfunction", "[0]-[1]*x^3", 5, 150)
+                            cubicFit.SetParameter(0, 100.0)
+                            cubicFit.SetParLimits(0, 0.0, 110.0)
+                            cubicFit.SetParameter(1, 5.0e-7)
+                            cubicFit.SetParLimits(1, 0, 1.0e-5)
 
                         EfficiencyGraph = ROOT.TGraph(len(DoubleColumnRateList), DoubleColumnRateList, DoubleColumnEfficiencyList)
                         EfficiencyGraph.Fit(cubicFit, 'QRB')
                         InterpolatedEfficiency = cubicFit.Eval(InterpolationRate * 1.0e6 * ScalingFactor)
 
-                        if InterpolationRate < 121:
+                        if InterpolationRate < 121 or (self.isPROC and InterpolationRate < 151):
                             if DoubleColumn in [0,25]:
                                 if InterpolatedEfficiency*0.01 < MinDCEfficiencyEdge:
                                     print "        Edge DC with bad efficiency found!"
