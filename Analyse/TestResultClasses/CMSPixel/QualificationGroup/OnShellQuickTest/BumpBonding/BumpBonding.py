@@ -11,6 +11,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
     def PopulateResultData(self):
         ROOT.gStyle.SetOptStat(0)
+        SpecialBumpBondingTestName = ''
 
         # initialize module map
         self.ModuleMap = ModuleMap(Name=self.GetUniqueID(), nChips=self.ParentObject.Attributes['NumberOfChips'], StartChip=self.ParentObject.Attributes['StartChip'])
@@ -19,16 +20,29 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for i in self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults']:
             ChipTestResultObject = self.ParentObject.ResultData['SubTestResults']['Chips'].ResultData['SubTestResults'][i]
             histo = ChipTestResultObject.ResultData['SubTestResults']['BumpBonding'].ResultData['Plot']['ROOTObject']
+            try:
+                histoBB2 = ChipTestResultObject.ResultData['SubTestResults']['BB2Map'].ResultData['Plot']['ROOTObject']
+                if histoBB2:
+                    SpecialBumpBondingTestName = 'BB2'
+            except:
+                histoBB2 = None
 
             if not histo:
                 print 'cannot get BumpBondingProblems histo for chip ',ChipTestResultObject.Attributes['ChipNo']
                 continue
 
             chipNo = ChipTestResultObject.Attributes['ChipNo']
-            for col in range(self.nCols):
-                for row in range(self.nRows):
-                    result = histo.GetBinContent(col + 1, row + 1)
-                    self.ModuleMap.UpdatePlot(chipNo, col, row, result)
+            if histoBB2:
+                for col in range(self.nCols):
+                    for row in range(self.nRows):
+                        result = histo.GetBinContent(col + 1, row + 1)
+                        if result == 2:
+                            self.ModuleMap.UpdatePlot(chipNo, col, row, 1)
+            else:
+                for col in range(self.nCols):
+                    for row in range(self.nRows):
+                        result = histo.GetBinContent(col + 1, row + 1)
+                        self.ModuleMap.UpdatePlot(chipNo, col, row, result)
 
         # draw module map
         if self.ModuleMap:
@@ -37,7 +51,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # save canvas
         self.ResultData['Plot']['Format'] = 'png'
-        self.Title = 'Bump Bonding Defects'
+        self.Title = 'Bump Bonding Defects ' + SpecialBumpBondingTestName
         self.SaveCanvas()
 
     def UpdatePlot(self, chipNo, col, row, value):

@@ -34,6 +34,21 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         'Order': 120,
                     }
                 },
+                {'Key':'BB2Scan',
+                    'DisplayOptions':{
+                        'Order':6,
+                    }
+                },
+                {'Key':'BareBBWidth',
+                 'DisplayOptions':{
+                    'Order':6,
+                    }
+                 },
+                {'Key':'BB2Map',
+                 'DisplayOptions':{
+                    'Order':6,
+                    }
+                 },
                 {'Key':'Grading',
                     'DisplayOptions':{
                         'Order': 1000,
