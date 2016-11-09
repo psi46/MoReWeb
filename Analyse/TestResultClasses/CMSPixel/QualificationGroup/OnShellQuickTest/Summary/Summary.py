@@ -21,6 +21,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '-',
                 'Label':'Electrical Grade'
             },
+            'ElectricalGradeNoBB': {
+                'Value': '-',
+                'Label':'Electrical Grade (no BB)'
+            },
             'IVGrade': {
                 'Value': '-',
                 'Label':'IV Grade'
@@ -53,12 +57,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         Grade = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Grade']['Value']
         ElectricalGrade = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ElectricalGrade']['Value']
+        ElectricalGradeNoBB = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ElectricalGradeNoBB']['Value']
         IVGrade = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['IVGrade']['Value']
         ManualGrade = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['ManualGrade']['Value'] if 'ManualGrade' in self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'] else '-'
 
         self.ResultData['KeyValueDictPairs']['Module']['Value'] = self.ParentObject.Attributes['ModuleID']
         self.ResultData['KeyValueDictPairs']['Grade']['Value'] = Grade
         self.ResultData['KeyValueDictPairs']['ElectricalGrade']['Value'] = ElectricalGrade
+        self.ResultData['KeyValueDictPairs']['ElectricalGradeNoBB']['Value'] = ElectricalGradeNoBB
         self.ResultData['KeyValueDictPairs']['IVGrade']['Value'] = IVGrade
         self.ResultData['KeyValueDictPairs']['ManualGrade']['Value'] = ManualGrade
 

@@ -232,6 +232,18 @@ class ModuleResultOverview:
                         print 'existing Keys: ',RowTuple.keys()
                         raise e
 
+                # bump bonding
+                try:
+                    KeyValueDictPairsFileName = self.TestResultEnvironmentObject.GlobalOverviewPath + '/' + \
+                                                RowTuple[
+                                                    'RelativeModuleFinalResultsPath'] + '/' + QualificationGroupSubfolder + '/ModuleOnShellQuickTest_p17_1/Grading/KeyValueDictPairs.json'
+                    with open(KeyValueDictPairsFileName) as data_file:
+                        KeyValueDictPairs = json.load(data_file)
+                    RowDict['ElectricalGradeNoBB'] = KeyValueDictPairs['ElectricalGradeNoBB']['Value']
+
+                except:
+                    pass
+
 
                 if GlobalOverviewList:
                     Link = os.path.relpath(
@@ -358,6 +370,8 @@ class ModuleResultOverview:
                                     ModuleLink = "<div style='background-color:#aaffaa' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
                                 elif RowDict['Grade'] == 'B':
                                     ModuleLink = "<div style='background-color:#eeff99' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
+                                elif 'ElectricalGradeNoBB' in RowDict and RowDict['ElectricalGradeNoBB'] != 'C':
+                                    ModuleLink = "<div style='background-color:#ee9911' title='%s'>" % ModuleTooltip + ModuleLink + "</div>"
                                 elif RowDict['Grade'] == 'C':
                                     ModuleLink = "<div style='background-color:#ff8888' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
 
@@ -388,7 +402,7 @@ class ModuleResultOverview:
 
             TableData['BODY'].append(Row)
 
-        TableDataObject = {'List': TableData, 'Map': {'BODY': mapModules, 'HEADER': [['','-4','-3','-2','-1','+1','+2','+3','+4']]}}
+        TableDataObject = {'List': TableData, 'Map': {'BODY': mapModules, 'HEADER': [['','-4','-3','-2','-1','+1','+2','+3','+4']] if len(mapModules) > 0 else [[]]}}
         return TableDataObject
 
     def GenerateOverviewHTML(self):

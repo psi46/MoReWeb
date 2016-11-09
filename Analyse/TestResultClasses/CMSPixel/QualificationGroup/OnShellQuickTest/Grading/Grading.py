@@ -25,6 +25,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '-',
                 'Label':'Electrical Grade'
             },
+            'ElectricalGradeNoBB': {
+                'Value': '-',
+                'Label':'Electrical Grade (no BB)'
+            },
             'IVGrade': {
                 'Value': '-',
                 'Label':'IV Grade'
@@ -59,7 +63,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             },
         }
 
-        self.ResultData['KeyList'] = ['Module', 'Grade', 'ManualGrade', 'ElectricalGrade', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback']
+        self.ResultData['KeyList'] = ['Module', 'Grade', 'ManualGrade', 'ElectricalGrade', 'ElectricalGradeNoBB', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback']
 
     def OpenFileHandle(self):
 
@@ -69,6 +73,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         NumDeadPixels = []
         NumDefects = []
         PixelDefectsGrades = []
+        PixelDefectsGradesNoBB = []
         Incomplete = False
         GradingComments = []
 
@@ -76,6 +81,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         for i in chipResults:
             try:
                 PixelDefectsGrade = int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['PixelDefectsGrade']['Value'])
+                PixelDefectsGradeNoBB = int(
+                    i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs'][
+                        'PixelDefectsGradeNoBB']['Value'])
+
                 NumBumpBondingProblems.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefectiveBumps']))
                 NumDeadPixels.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDeadPixels']))
                 NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']))
@@ -94,9 +103,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 print "Pixel tests incomplete C%d" % ChipIndex
 
             PixelDefectsGrades.append(PixelDefectsGrade)
+            PixelDefectsGradesNoBB.append(PixelDefectsGradeNoBB)
             ChipIndex += 1
 
         ElectricalGrade = max(PixelDefectsGrades)
+        ElectricalGradeNoBB = max(PixelDefectsGradesNoBB)
 
         if 'IanaProblem' in self.ParentObject.ResultData['SubTestResults']['Logfile'].ResultData['HiddenData'] and self.ParentObject.ResultData['SubTestResults']['Logfile'].ResultData['HiddenData']['IanaProblem']:
             ElectricalGrade = 3
@@ -156,6 +167,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['Module']['Value'] = self.ParentObject.Attributes['ModuleID']
         self.ResultData['KeyValueDictPairs']['Grade']['Value'] = Grade
         self.ResultData['KeyValueDictPairs']['ElectricalGrade']['Value'] = GradeMapping[ElectricalGrade] if ElectricalGrade in GradeMapping else 'None'
+        self.ResultData['KeyValueDictPairs']['ElectricalGradeNoBB']['Value'] = GradeMapping[ElectricalGradeNoBB] if ElectricalGradeNoBB in GradeMapping else 'None'
         self.ResultData['KeyValueDictPairs']['IVGrade']['Value'] = GradeMapping[IVGrade] if IVGrade in GradeMapping else 'None'
         self.ResultData['KeyValueDictPairs']['DefectiveBumps']['Value'] = sum(NumBumpBondingProblems)
         self.ResultData['KeyValueDictPairs']['DefectiveBumpsMax']['Value'] = max(NumBumpBondingProblems)

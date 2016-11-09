@@ -79,6 +79,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         # check if some data is missing and make unique list of total pixel defects
         self.ResultData['HiddenData']['DefectsGradingComplete'] = True
         self.ResultData['HiddenData']['TotalList'] = set([])
+        self.ResultData['HiddenData']['TotalListNoBB'] = set([])
         for IndividualDefectsList in [
             self.ResultData['HiddenData']['DeadPixelList'],
             self.ResultData['HiddenData']['DeadBumpList'],
@@ -87,6 +88,7 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 self.ResultData['HiddenData']['TotalList'] = self.ResultData['HiddenData']['TotalList'] | IndividualDefectsList
             else:
                 self.ResultData['HiddenData']['DefectsGradingComplete'] = False
+
 
         # subtract dead pixels explicitly from individual defects which do not exclude them implicitly
         if self.ResultData['HiddenData']['DeadPixelList'] is not None:
@@ -106,11 +108,20 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         else:
             pixelDefectsGrade = 3
 
+        totalDefectsNoBB = len(self.ResultData['HiddenData']['DeadPixelList'])
+        if totalDefectsNoBB < PixelDefectsGradeALimit:
+            pixelDefectsGradeNoBB = 1
+        elif totalDefectsNoBB < PixelDefectsGradeBLimit:
+            pixelDefectsGradeNoBB = 2
+        else:
+            pixelDefectsGradeNoBB = 3
+
         GradeMapping = {1:'A', 2:'B', 3:'C'}
         Grade = 'None'
 
         if not self.ResultData['HiddenData']['DefectsGradingComplete']:
             pixelDefectsGrade = 3
+            pixelDefectsGradeNoBB = 3
 
         try:
             Grade = GradeMapping[pixelDefectsGrade]
@@ -130,6 +141,10 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             'PixelDefectsGrade':{
                 'Value': '%d'%pixelDefectsGrade,
                 'Label': 'Pixel Defects Grade ROC'
+            },
+            'PixelDefectsGradeNoBB':{
+                'Value': '%d'%pixelDefectsGradeNoBB,
+                'Label': 'Pixel Defects Grade ROC no BB'
             },
         }
         self.ResultData['KeyList'] = ['PixelDefectsGrade']
