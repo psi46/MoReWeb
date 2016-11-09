@@ -89,6 +89,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 NumDeadPixels.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDeadPixels']))
                 NumDefects.append(int(i['TestResultObject'].ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['NDefects']))
             except:
+                PixelDefectsGrade = 3
+                PixelDefectsGradeNoBB = 3
                 Incomplete = True
                 print "Pixel tests missing C%d"%ChipIndex
                 GradingComments.append("Pixel tests missing C%d"%ChipIndex)

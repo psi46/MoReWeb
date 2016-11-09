@@ -370,10 +370,12 @@ class ModuleResultOverview:
                                     ModuleLink = "<div style='background-color:#aaffaa' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
                                 elif RowDict['Grade'] == 'B':
                                     ModuleLink = "<div style='background-color:#eeff99' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
-                                elif 'ElectricalGradeNoBB' in RowDict and RowDict['ElectricalGradeNoBB'] != 'C':
+                                elif 'ElectricalGradeNoBB' in RowDict and RowDict['ElectricalGradeNoBB'] in ['A', 'B']:
                                     ModuleLink = "<div style='background-color:#ffcc44' title='%s'>" % ModuleTooltip + ModuleLink + "</div>"
                                 elif RowDict['Grade'] == 'C':
                                     ModuleLink = "<div style='background-color:#ff8888' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
+                                else:
+                                    ModuleLink = "<div style='background-color:#ff0000;color:#ffffff' title='%s'>" % ModuleTooltip + ModuleLink + "</div>"
 
                             moduleLinksRow.append(ModuleLink)
 
