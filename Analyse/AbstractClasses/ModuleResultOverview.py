@@ -371,7 +371,7 @@ class ModuleResultOverview:
                                 elif RowDict['Grade'] == 'B':
                                     ModuleLink = "<div style='background-color:#eeff99' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
                                 elif 'ElectricalGradeNoBB' in RowDict and RowDict['ElectricalGradeNoBB'] != 'C':
-                                    ModuleLink = "<div style='background-color:#ee9911' title='%s'>" % ModuleTooltip + ModuleLink + "</div>"
+                                    ModuleLink = "<div style='background-color:#ffcc44' title='%s'>" % ModuleTooltip + ModuleLink + "</div>"
                                 elif RowDict['Grade'] == 'C':
                                     ModuleLink = "<div style='background-color:#ff8888' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
 
