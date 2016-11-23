@@ -102,7 +102,12 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
             {
                 'Parameter': 'par1ia',
                 'Xmin': 0,
-                'Xmax': 1
+                'Xmax': 10
+            },
+            {
+                'Parameter': 'par2ia',
+                'Xmin': 0,
+                'Xmax': 0.1
             },
         ]
 
