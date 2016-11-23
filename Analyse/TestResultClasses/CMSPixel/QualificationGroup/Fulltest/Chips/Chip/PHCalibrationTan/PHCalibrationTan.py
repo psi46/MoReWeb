@@ -62,8 +62,8 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                             if (ChipNo, col, row) not in DeadPixelList:
                                 self.ResultData['Plot']['ROOTObject'].Fill(par1)
 
-                                # parameter 1 defects
-                                if par1 > par1Max or par1 < par1Min:
+                                # parameter 1 defects - disabled for PROC600
+                                if not self.isPROC and (par1 > par1Max or par1 < par1Min):
                                     if (ChipNo, col, row) not in ThresholdDefectsList and (ChipNo, col, row) not in DeadPixelsList:
                                         self.Par1DefectsList.add((ChipNo, col, row))
 

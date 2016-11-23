@@ -25,6 +25,8 @@ class TestResultEnvironment:
         'tthrTol':10,
         'gainMin':1.,
         'gainMax': 4.5,
+        'L1_gainMin': 1.,
+        'L1_gainMax': 4.5,
         'par1Min':0.,
         'par1Max':2.,
         'noiseB':200,
