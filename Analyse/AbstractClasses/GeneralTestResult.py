@@ -635,7 +635,12 @@ class GeneralTestResult(object):
             TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerStyle(Parameters['MarkerStyle'])
             TestResultObject.ResultData['Plot']['ROOTObject'].SetMarkerSize(0.5)
             TestResultObject.ResultData['Plot']['ROOTObject'].SetTitle("")
-            TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(Ymin, Ymax)
+
+            if 'Ymax' in Parameters and 'Ymin' in Parameters:
+                TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(Parameters['Ymin'], Parameters['Ymax'])
+            else:
+                TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetRangeUser(Ymin, Ymax)
+
             TestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().SetTitle("ROC No.")
             TestResultObject.ResultData['Plot']['ROOTObject'].GetYaxis().SetTitle(Parameters['YaxisTitle'])
             TestResultObject.ResultData['Plot']['ROOTObject'].GetXaxis().CenterTitle()
