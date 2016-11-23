@@ -59,8 +59,15 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                         try:
                             NumberOfPixelDefectsROC = int(self.GetJSONValue([RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips', 'Chip%d'%Chip, 'BumpBondingDefects_150', 'KeyValueDictPairs.json', 'NumberOfDefectivePixels', 'Value']))
                         except:
-                            self.ProblematicModulesList.append(ModuleID)
-                            NumberOfPixelDefectsROC = 0
+                            try:
+                                NumberOfPixelDefectsROC = int(self.GetJSONValue(
+                                    [RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'], 'Chips',
+                                     'Chip%d' % Chip, 'BumpBondingDefects_300', 'KeyValueDictPairs.json',
+                                     'NumberOfDefectivePixels', 'Value']))
+                            except:
+                                self.ProblematicModulesList.append(ModuleID)
+                                NumberOfPixelDefectsROC = 0
+
                         NumberOfPixelDefects.append(NumberOfPixelDefectsROC)
                     HistogramXray.SetBinContent(binX, sum(NumberOfPixelDefects))
 
