@@ -363,19 +363,25 @@ class ModuleResultOverview:
                             RowDict = matchingRows[0]
                             ModuleLink = RowDict['ModuleID']
                             ModuleTooltip = ''
+                            ModuleStyle = ''
                             if 'Comments' in RowDict:
                                 ModuleTooltip = RowDict['Comments']
+                                if ModuleTooltip and len(ModuleTooltip.strip()) > 0:
+                                    ModuleStyle = ModuleStyle + 'border-width: 0px 0px 0px 6px;border-style: solid;border-color: #fe9;padding: 0px 0px 0px 2px;'
+
                             if 'Grade' in RowDict:
                                 if RowDict['Grade'] == 'A':
-                                    ModuleLink = "<div style='background-color:#aaffaa' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
+                                    ModuleStyle = ModuleStyle + 'background-color:#aaffaa;'
                                 elif RowDict['Grade'] == 'B':
-                                    ModuleLink = "<div style='background-color:#eeff99' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
+                                    ModuleStyle = ModuleStyle + 'background-color:#eeff99;'
                                 elif 'ElectricalGradeNoBB' in RowDict and RowDict['ElectricalGradeNoBB'] in ['A', 'B']:
-                                    ModuleLink = "<div style='background-color:#ffcc44' title='%s'>" % ModuleTooltip + ModuleLink + "</div>"
+                                    ModuleStyle = ModuleStyle + 'background-color:#ffcc44;'
                                 elif RowDict['Grade'] == 'C':
-                                    ModuleLink = "<div style='background-color:#ff8888' title='%s'>"%ModuleTooltip + ModuleLink + "</div>"
+                                    ModuleStyle = ModuleStyle + 'background-color:#ff8888;'
                                 else:
-                                    ModuleLink = "<div style='background-color:#ff0000;color:#ffffff' title='%s'>" % ModuleTooltip + ModuleLink + "</div>"
+                                    ModuleStyle = ModuleStyle + 'background-color:#ff0000;color:#ffffff;'
+
+                            ModuleLink = "<div style='%s' title='%s'>" % (ModuleStyle, ModuleTooltip) + ModuleLink + "</div>"
 
                             moduleLinksRow.append(ModuleLink)
 
