@@ -8,8 +8,8 @@ from AbstractClasses.ModuleMap import ModuleMap
 class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProductionOverview):
 
     def CustomInit(self):
-    	self.Name='CMSPixel_ProductionOverview_BBCorners'
-    	self.NameSingle='BBCorners'
+        self.Name='CMSPixel_ProductionOverview_BBCorners'
+        self.NameSingle='BBCorners'
         self.Title = 'Pixel Defects (Bump+Dead)'
         self.DisplayOptions = {
             'Width': 5,
@@ -135,19 +135,17 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                     # initialize module map
                     self.DefectsMap = ModuleMap(Name=self.GetUniqueID(), nChips=self.nROCs, StartChip=0)
 
-                    # add dead pixels
+                    # add threshold defects pixels
                     for iRoc in range(self.nROCs):
-                        Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],"Chips", "Chip%d"%iRoc, "PixelMap", 'PixelMap.root'])
+                        Path = '/'.join([self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'], RowTuple['FulltestSubfolder'],"Chips", "Chip%d"%iRoc, "VcalThresholdTrimmedMap", 'VcalThresholdTrimmedMap.root'])
                         RootFiles = glob.glob(Path)
-                        PixelMapROOTObject = self.GetHistFromROOTFile(RootFiles, "PixelMap")
+                        PixelMapROOTObject = self.GetHistFromROOTFile(RootFiles, "VcalThresholdTrimmedMap")
 
                         for x in range(PixelMapROOTObject.GetNbinsX()):
                             for y in range(PixelMapROOTObject.GetNbinsY()):
                                 BinContent = PixelMapROOTObject.GetBinContent(1 + x, 1 + y)
-                                if BinContent < 1:
-                                    self.DefectsMap.UpdatePlot(iRoc, x, y, 0.123)
-                                    countDeadTotal += 1
-                                    countDeadROC[iRoc] += 1
+                                if BinContent < 25 or BinContent > 45:
+                                    self.DefectsMap.UpdatePlot(iRoc, x, y, 0.5)
 
                     # add bump defects pixels
                     for iRoc in range(self.nROCs):
@@ -162,6 +160,23 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
                                     self.DefectsMap.UpdatePlot(iRoc, x, y, 1)
                                     countBBTotal += 1
                                     countBBROC[iRoc] += 1
+
+                    # add dead pixels
+                    for iRoc in range(self.nROCs):
+                        Path = '/'.join(
+                            [self.GlobalOverviewPath, RowTuple['RelativeModuleFinalResultsPath'],
+                             RowTuple['FulltestSubfolder'], "Chips", "Chip%d" % iRoc, "PixelMap",
+                             'PixelMap.root'])
+                        RootFiles = glob.glob(Path)
+                        PixelMapROOTObject = self.GetHistFromROOTFile(RootFiles, "PixelMap")
+
+                        for x in range(PixelMapROOTObject.GetNbinsX()):
+                            for y in range(PixelMapROOTObject.GetNbinsY()):
+                                BinContent = PixelMapROOTObject.GetBinContent(1 + x, 1 + y)
+                                if BinContent < 1:
+                                    self.DefectsMap.UpdatePlot(iRoc, x, y, 0.123)
+                                    countDeadTotal += 1
+                                    countDeadROC[iRoc] += 1
 
                     # combine maps, 0.12 means blue
                     self.DefectsMap.Map2D.GetZaxis().SetRangeUser(0.0, 1.0)
@@ -218,7 +233,7 @@ class ProductionOverview(AbstractClasses.GeneralProductionOverview.GeneralProduc
 
         RowLimit = 500
         HTMLInfo = ""
-        HTMLInfo += "<b>colors:</b> red = missing bump, blue = dead pixel<br>"
+        HTMLInfo += "<b>colors:</b> red = missing bump, blue = dead pixel, green = trimmed threshold<br>"
         #HTMLInfo += "<b>definitions:</b> corners are pixels with col less or equal than " + "%d"%self.marginX + " pix and row less or equal than " + "%d"%self.marginY + " pix away from edge. Borders include pixels with col less or equal than " + "%d"%self.marginX + " pix or row less or equal than " + "%d"%self.marginY + " pix away from edge, thus include corners.<br>"
         HTMLInfo += "<b>test:</b> " + self.Attributes['Test'] + "<br>"
         HTMLInfo += "<b>grades:</b> %s<br>"%(', '.join(self.IncludeGrades))
