@@ -1,5 +1,7 @@
 import AbstractClasses
 import ROOT
+import os
+
 class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
     def CustomInit(self):
         self.Name='CMSPixel_QualificationGroup_Grading_Chips_TestResult'
@@ -127,24 +129,36 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
 
         # IV grading
         IVGrade = 1
-        try:
-            IVRecalculated = float(self.ParentObject.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Recalculated']['Value'])
-        except:
-            IVRecalculated = -1
-            print "INCOMPLETE: NO IV!"
-            Incomplete = True
 
-        if IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_C']):
-            IVGrade = 3
-            GradingComments.append("HIGH LEAKAGE CURRENT!")
-        elif IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_B']):
-            IVGrade = 2
-            GradingComments.append("little high leakage current")
+        # check if leakage current file exists
+        LeakageCurrentFileName = self.RawTestSessionDataPath + '/../logfiles/IV.log'
+        LeakageCurrentLines = []
+        if os.path.isfile(LeakageCurrentFileName):
+            with open(LeakageCurrentFileName, 'r') as LeakageCurrentFile:
+                LeakageCurrentLines = [x for x in LeakageCurrentFile.readlines() if not x.strip().startswith('#')]
+        if len(LeakageCurrentLines) > 0:
 
-        if IVRecalculated < 0.05:
-            IVGrade = 3
-            GradingComments.append("NO HV BIAS!")
-            print "WARNING: NO HV! => graded C"
+            try:
+                IVRecalculated = float(self.ParentObject.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Recalculated']['Value'])
+            except:
+                IVRecalculated = -1
+                print "INCOMPLETE: NO IV!"
+                Incomplete = True
+
+            if IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_C']):
+                IVGrade = 3
+                GradingComments.append("HIGH LEAKAGE CURRENT!")
+            elif IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_B']):
+                IVGrade = 2
+                GradingComments.append("little high leakage current")
+
+            if IVRecalculated < 0.05:
+                IVGrade = 3
+                GradingComments.append("NO HV BIAS!")
+                print "WARNING: NO HV! => graded C"
+        else:
+            print "WARNING: NO IV logfile found => ignored!!!!!"
+
 
         # Final Grade
         # translate grade from number to A/B/C
