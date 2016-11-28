@@ -57,6 +57,17 @@ class TestResult(GeneralTestResult):
                 },
             },
             {
+                'Key': 'LeakageCurrent',
+                'DisplayOptions': {
+                    'Order': 305,
+                    'Width': 1,
+                    'Show': True,
+                },
+                'InitialAttributes': {
+                    'ModuleVersion': self.Attributes['ModuleVersion'],
+                },
+            },
+            {
                 'Key': 'Grading',
                 'DisplayOptions': {
                     'Order': 100,

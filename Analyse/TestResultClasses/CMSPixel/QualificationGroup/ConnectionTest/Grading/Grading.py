@@ -124,10 +124,32 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
             GradingComments.append("programROC test failed")
             ElectricalGrade = 3
 
+
+        # IV grading
+        IVGrade = 1
+        try:
+            IVRecalculated = float(self.ParentObject.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Recalculated']['Value'])
+        except:
+            IVRecalculated = -1
+            print "INCOMPLETE: NO IV!"
+            Incomplete = True
+
+        if IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_C']):
+            IVGrade = 3
+            GradingComments.append("HIGH LEAKAGE CURRENT!")
+        elif IVRecalculated >= float(self.TestResultEnvironmentObject.GradingParameters['OnShellQuickTest_LeakageCurrent_B']):
+            IVGrade = 2
+            GradingComments.append("little high leakage current")
+
+        if IVRecalculated < 0.05:
+            IVGrade = 3
+            GradingComments.append("NO HV BIAS!")
+            print "WARNING: NO HV! => graded C"
+
         # Final Grade
         # translate grade from number to A/B/C
         GradeMapping = {1:'A', 2:'B', 3:'C'}
-        ModuleGrade = ElectricalGrade
+        ModuleGrade = max(ElectricalGrade, IVGrade)
 
         # Grade C if incomplete
         if Incomplete:
