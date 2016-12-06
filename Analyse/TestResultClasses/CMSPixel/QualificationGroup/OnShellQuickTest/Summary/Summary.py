@@ -45,13 +45,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '',
                 'Label':'Total Pixel defects'
             },
+            'nErrors': {
+                'Value': '',
+                'Label':'# errors'
+            },
             'Comment': {
                 'Value': '',
                 'Label':'Comment'
             },
         }
 
-        self.ResultData['KeyList'] = ['Module', 'Grade', 'ElectricalGrade', 'ManualGrade', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'Comment']
+        self.ResultData['KeyList'] = ['Module', 'Grade', 'ElectricalGrade', 'ManualGrade', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'nErrors', 'Comment']
 
     def OpenFileHandle(self):
 
@@ -71,6 +75,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         self.ResultData['KeyValueDictPairs']['DefectiveBumps']['Value'] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DefectiveBumps']['Value']
         self.ResultData['KeyValueDictPairs']['DeadPixels']['Value'] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DeadPixels']['Value']
         self.ResultData['KeyValueDictPairs']['Defects']['Value'] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Defects']['Value']
+
+        self.ResultData['KeyValueDictPairs']['nErrors']['Value'] = \
+            self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['nErrors']['Value']
 
         if 'Incomplete' in self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']:
             self.ResultData['KeyValueDictPairs']['Incomplete'] = self.ParentObject.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Incomplete']

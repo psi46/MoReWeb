@@ -20,14 +20,15 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 }
             },
         ]
-        self.ResultData['KeyValueDictPairs'] = {'DTB_FW': {'Value': '', 'Label': 'DTB FW'}, 'pXar': {'Value': '', 'Label': 'pXar version'}}
-        self.ResultData['KeyList'] = []
+        self.ResultData['KeyValueDictPairs'] = {'DTB_FW': {'Value': '', 'Label': 'DTB FW'}, 'pXar': {'Value': '', 'Label': 'pXar version'}, 'nErrors': {'Value': '-', 'Label': '#errors'}}
+        self.ResultData['KeyList'] = ['DTB_FW', 'pXar', 'nErrors']
 
         self.ResultData['HiddenData']['IanaProblem'] = False
 
     def PopulateResultData(self):
 
         LogfileName = self.ParentObject.logfilePath
+        NErrors = 0
         if LogfileName:
             if os.path.isfile(LogfileName):
                 DTBSectionFound = False
@@ -65,4 +66,9 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                         if FWFound and pXarFound and IanaLossFound:
                             break
 
+
+                        if 'ERROR:' in Line:
+                            NErrors += 1
+
+        self.ResultData['KeyValueDictPairs']['nErrors']['Value'] = NErrors
 

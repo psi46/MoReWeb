@@ -269,6 +269,18 @@ class TestResult(GeneralTestResult):
         except:
             pass
 
+        try:
+            nErrors = int(self.ResultData['SubTestResults']['Logfile'].ResultData['KeyValueDictPairs']['nErrors']['Value'])
+            if nErrors > 9:
+                nErrorsComment = "#errors = %d"%nErrors
+                if len(Comment) < 1:
+                    Comment = nErrorsComment
+                else:
+                    Comment += "; " + nErrorsComment
+        except:
+            pass
+
+
         # fill DB row
         Row = {
             'ModuleID': self.Attributes['ModuleID'],

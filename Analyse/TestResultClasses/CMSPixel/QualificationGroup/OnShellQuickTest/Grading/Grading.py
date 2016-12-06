@@ -57,13 +57,17 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
                 'Value': '',
                 'Label':'Total Pixel defects'
             },
+            'nErrors': {
+                'Value': '-',
+                'Label':'# errors'
+            },
             'Comment': {
                 'Value': '',
                 'Label':'Comment'
             },
         }
 
-        self.ResultData['KeyList'] = ['Module', 'Grade', 'ManualGrade', 'ElectricalGrade', 'ElectricalGradeNoBB', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback']
+        self.ResultData['KeyList'] = ['Module', 'Grade', 'ManualGrade', 'ElectricalGrade', 'ElectricalGradeNoBB', 'IVGrade', 'DeadPixels', 'DefectiveBumps', 'DefectiveBumpsMax', 'DeadPixelsMax', 'Readback', 'nErrors']
 
     def OpenFileHandle(self):
 
@@ -131,6 +135,14 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         if IVRecalculated < 0.05:
             IVGrade = 3
             print "WARNING: NO HV! => graded C"
+
+        try:
+            nErrors = int(self.ParentObject.ResultData['SubTestResults']['Logfile'].ResultData['KeyValueDictPairs']['nErrors']['Value'])
+            self.ResultData['KeyValueDictPairs']['nErrors']['Value'] = nErrors
+            if nErrors > 9:
+                GradingComments.append("%d read-out errors!"%nErrors)
+        except:
+            print "WARNING: can't determine number of errors from logfile!"
 
         # Final Grade
         # translate grade from number to A/B/C
