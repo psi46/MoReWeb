@@ -217,7 +217,7 @@ class TestResult(GeneralTestResult):
             'InputTarFile': os.environ.get('TARFILE', None),
             'MacroVersion': os.environ.get('MACROVERSION', None),
 
-            'initialCurrent': None,
+            'initialCurrent': -1,
 
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],

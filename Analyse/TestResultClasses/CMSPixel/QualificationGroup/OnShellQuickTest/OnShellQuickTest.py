@@ -323,7 +323,7 @@ class TestResult(GeneralTestResult):
             'InputTarFile': os.environ.get('TARFILE', None),
             'MacroVersion': os.environ.get('MACROVERSION', None),
 
-            'initialCurrent': None,
+            'initialCurrent': -1,
 
             'TestCenter': self.Attributes['TestCenter'],
             'Hostname': self.Attributes['Hostname'],
@@ -331,10 +331,11 @@ class TestResult(GeneralTestResult):
             'Comments': Comment,
         }
 
+        initialCurrentValue = self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Initial']['Value']
+
         try:
             Row.update({
                 'PixelDefects': "%d" % self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['Defects']['Value'],
-                'initialCurrent': "%1.2f" % -1,
                 'nDeadPixels': "%d" % self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DeadPixels']['Value'],
                 'nBumpDefects': "%d" % self.ResultData['SubTestResults']['Grading'].ResultData['KeyValueDictPairs']['DefectiveBumps']['Value'],
                 'CurrentAtVoltage150V': self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150']['Value'],
@@ -347,7 +348,7 @@ class TestResult(GeneralTestResult):
                 'ROCsLessThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'], #self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsLessThanOnePercent'
                 'ROCsMoreThanOnePercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanOnePercent'],
                 'ROCsMoreThanFourPercent': self.ResultData['SubTestResults']['Grading'].ResultData['HiddenData']['ROCsMoreThanFourPercent'],
-                'initialCurrent': self.ResultData['SubTestResults']['LeakageCurrent'].ResultData['KeyValueDictPairs']['I150Initial']['Value'],
+                'initialCurrent': initialCurrentValue,
             })
         except:
             Row['Grade'] = 'C'
