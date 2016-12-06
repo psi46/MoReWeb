@@ -106,6 +106,21 @@ if not os.path.isfile('Configuration/ProductionOverview.cfg'):
         print " => failed! try to create 'Configuration/ProductionOverview.cfg' manually and run MoReWeb again!"
         exit()
 
+if not os.path.isfile('Configuration/GradingParameters.cfg'):
+    print "info: The config file 'Configuration/GradingParameters.cfg' was not found, it will be automatically created with default settings!"
+    try:
+        shutil.copy('Configuration/GradingParameters.cfg.default', 'Configuration/GradingParameters.cfg')
+        print " => done!"
+    except:
+        print " => failed! try to create 'Configuration/ProductionOverview.cfg' manually and run MoReWeb again!"
+        exit()
+
+# default grading parameters
+Configuration.read([
+    'Configuration/GradingParameters.cfg.default',
+    ])
+
+# additional grading parameters and system settings
 Configuration.read([
     'Configuration/GradingParameters.cfg',
     'Configuration/SystemConfiguration.cfg',
