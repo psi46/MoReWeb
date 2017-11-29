@@ -481,9 +481,10 @@ class TestResult(GeneralTestResult):
             print "\x1b[31mSingleTest not supported for global DB\x1b[0m"
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
-                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
-                    'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',
-                    Row)
+                if self.TestResultEnvironmentObject.Configuration['ShowOnlyLatestTestResults']:
+                    self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
+                        'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',
+                        Row)
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
                     '''INSERT INTO ModuleTestResults
                     (

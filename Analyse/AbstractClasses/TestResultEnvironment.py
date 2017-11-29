@@ -162,6 +162,10 @@ class TestResultEnvironment:
             }
             self.Configuration['GzipSVG'] = int(Configuration.get('SystemConfiguration', 'GzipSVG'))
             self.Configuration['DefaultImageFormat'] = Configuration.get('SystemConfiguration', 'DefaultImageFormat')
+            try:
+                self.Configuration['ShowOnlyLatestTestResults'] = int(Configuration.get('SystemConfiguration', 'ShowOnlyLatestTestResults'))
+            except:
+                self.Configuration['ShowOnlyLatestTestResults'] = 1
             self.Configuration['RequiredTestTypesForComplete'] = Configuration.get('ProductionOverview', 'RequiredTestTypesForComplete')
             try:
                 self.Configuration['IgnoreInSelectionList'] = Configuration.get('ProductionOverview', 'IgnoreInSelectionList')

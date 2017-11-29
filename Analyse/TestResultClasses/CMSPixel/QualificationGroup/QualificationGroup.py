@@ -888,8 +888,11 @@ class TestResult(AbstractClasses.GeneralTestResult.GeneralTestResult):
         ModuleResultOverviewObject = AbstractClasses.ModuleResultOverview.ModuleResultOverview(
             self.TestResultEnvironmentObject)
         ModuleResultOverviewObject.FinalResultsStoragePath = self.FinalResultsStoragePath
-        self.ResultData['Table'] = ModuleResultOverviewObject.TableData(self.Attributes['ModuleID'],
-                                                                        self.Attributes['TestDate'],
-                                                                        GlobalOverviewList=False)['List']
+        self.ResultData['Table'] = ModuleResultOverviewObject.TableData(
+                ModuleID=self.Attributes['ModuleID'],
+                TestDate=None,
+                GlobalOverviewList=False,
+                QualificationType=self.Attributes['QualificationType']
+            )['List']
     def PostWriteToDatabase(self):
         self.PopulateResultData()

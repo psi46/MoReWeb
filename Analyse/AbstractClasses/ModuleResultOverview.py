@@ -10,7 +10,7 @@ class ModuleResultOverview:
         self.TestResultEnvironmentObject = TestResultEnvironmentObject
         self.GlobalOverviewPath = self.TestResultEnvironmentObject.GlobalOverviewPath
 
-    def TableData(self, ModuleID = None, TestDate = None, GlobalOverviewList = True):
+    def TableData(self, ModuleID = None, TestDate = None, GlobalOverviewList = True, QualificationType = None):
         HtmlParser = self.TestResultEnvironmentObject.HtmlParser
 
         if self.TestResultEnvironmentObject.Configuration['Database']['UseGlobal']:
@@ -37,14 +37,18 @@ class ModuleResultOverview:
                 AdditionalWhere += ' AND ModuleID=:ModuleID '
             if TestDate:
                 AdditionalWhere += ' AND TestDate=:TestDate '
+            if QualificationType:
+                AdditionalWhere += ' AND QualificationType=:QualificationType '
+
             self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
                 'SELECT * FROM ModuleTestResults '+
                 'WHERE 1=1 '+
-                AdditionalWhere+
+                AdditionalWhere+' '
                 'ORDER BY ' + SortClause,
                 {
-                    'ModuleID':ModuleID,
-                    'TestDate':TestDate
+                    'ModuleID': ModuleID,
+                    'TestDate': TestDate,
+                    'QualificationType': QualificationType,
                 }
             )
             Rows = self.TestResultEnvironmentObject.LocalDBConnectionCursor.fetchall()
@@ -196,16 +200,21 @@ class ModuleResultOverview:
         FinalModuleRowsDict = {}
         ModuleIDList = []
 
+        # if old results are shown, display new results at the top
+        if not GlobalOverviewList and not self.TestResultEnvironmentObject.Configuration['ShowOnlyLatestTestResults']:
+            Rows.sort(key=lambda x: x['TestDate'], reverse=True)
+
         for RowTuple in Rows:
             Identificator = RowTuple['ModuleID']
             if not GlobalOverviewList:
                 Identificator+='_%s'%RowTuple['TestType']
+                if not self.TestResultEnvironmentObject.Configuration['ShowOnlyLatestTestResults']:
+                    Identificator+='_%s'%RowTuple['TestDate']
                 if RowTuple['TestType'] == 'TemperatureCycle':
                     continue
             else:
                 Identificator+='_%s'%RowTuple['QualificationType']
 #            Identificator+='_%s'%RowTuple['TestDate']
-#            print Identificator
             if not FinalModuleRowsDict.has_key(Identificator):
                 FinalModuleRowsDict[Identificator] = {}
                 ModuleIDList.append(Identificator)
@@ -220,7 +229,7 @@ class ModuleResultOverview:
                         if Key.startswith('KeyValueDictPairs/'):
                             try:
                                 KeyValueDictPairsFileName = self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/KeyValueDictPairs.json'
-                                with open(KeyValueDictPairsFileName) as data_file:    
+                                with open(KeyValueDictPairsFileName) as data_file:
                                     KeyValueDictPairs = json.load(data_file)
                                 RowDict[Key] = KeyValueDictPairs[Key.split('/')[1]]['Value']
                             except:
@@ -246,14 +255,23 @@ class ModuleResultOverview:
 
 
                 if GlobalOverviewList:
+                    # this qualification might be split to different folders. (When updating the overview page of the
+                    # qualification, all other subtest, e.g. test for diferent temperatures) are linked on this)
+                    # make sure now in the list of modules, the latest such qualification pages is linked
+                    allSubtests = [RowTuple2 for RowTuple2 in Rows if (
+                        RowTuple2['ModuleID'] == RowTuple['ModuleID'] and
+                        RowTuple2['QualificationType'] == RowTuple['QualificationType']
+                                                                       )]
+                    allSubtests.sort(key=lambda x: x[1], reverse=True)
+                    QualificationGroupSubfolder = allSubtests[0]['FulltestSubfolder'] + '/../'
                     Link = os.path.relpath(
-                        self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+RowTuple['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/'+ResultHTMLFileName,
+                        self.TestResultEnvironmentObject.GlobalOverviewPath+'/'+allSubtests[0]['RelativeModuleFinalResultsPath']+'/'+QualificationGroupSubfolder+'/'+ResultHTMLFileName,
                         self.TestResultEnvironmentObject.GlobalOverviewPath
                         )
                 else:
-                    CurrentBasePath = self.GlobalOverviewPath + '/' +RowTuple['FulltestSubfolder']
-                    # change directory one level up since we are in QualificationGroup folder and FulltestSubfolder is relative to ModuleFinalResultsPath...
-                    Link = '../'+RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
+                    # since this overview page can also contains links to results from different folders, also take
+                    # RelativeModuleFinalResultsPath into account
+                    Link = '../../../../' + RowTuple['RelativeModuleFinalResultsPath'] + '/' + RowTuple['FulltestSubfolder'] + '/' + ResultHTMLFileName
 
                 #Link the module ID
 
@@ -265,6 +283,17 @@ class ModuleResultOverview:
                         }
                     )
 
+                # if old results are shown, mark them as old
+                if not GlobalOverviewList and not self.TestResultEnvironmentObject.Configuration['ShowOnlyLatestTestResults']:
+                    allSubtests = [RowTuple2 for RowTuple2 in Rows if (
+                        RowTuple2['ModuleID']==RowTuple['ModuleID'] and
+                        RowTuple2['QualificationType'] == RowTuple['QualificationType'] and
+                        RowTuple2['TestType'] == RowTuple['TestType'])]
+
+                    allSubtests.sort(key=lambda x: x[1], reverse=True)
+                    if len(allSubtests) > 0:
+                        if RowTuple['TestDate'] != allSubtests[0]['TestDate']:
+                            RowDict['ModuleID'] = 'old result: ' + RowDict['ModuleID']
 
                 # Parse the date
                 try:
@@ -292,7 +321,10 @@ class ModuleResultOverview:
 
             else:
                 #TestType
-                FinalModuleRowsDict[Identificator]['TestType'] += ' & %s'%RowTuple['TestType']
+                testTypes = [x.strip() for x in FinalModuleRowsDict[Identificator]['TestType'].split('&')]
+                testTypes.append(RowTuple['TestType'])
+                FinalModuleRowsDict[Identificator]['TestType'] = ' & '.join(list(set(testTypes)))
+
                 if (FinalModuleRowsDict[Identificator]['Grade'] < RowTuple['Grade']):
                     FinalModuleRowsDict[Identificator]['Grade'] = RowTuple['Grade']
                 MaxCompareList = ['PixelDefects','Noise','Trimming','PHCalibration']
@@ -321,17 +353,24 @@ class ModuleResultOverview:
 
                 if RowTuple['Temperature'] and FinalModuleRowsDict[Identificator].has_key('Temperature'):
                    if FinalModuleRowsDict[Identificator]['Temperature']:
-                       FinalModuleRowsDict[Identificator]['Temperature'] += " / %s"%RowTuple['Temperature']
+                       temperaturesList = [x.strip() for x in FinalModuleRowsDict[Identificator]['Temperature'].split('/')]
+                       temperaturesList.append(RowTuple['Temperature'])
+                       FinalModuleRowsDict[Identificator]['Temperature'] = " / ".join(list(set(temperaturesList)))
                    else:
                        FinalModuleRowsDict[Identificator]['Temperature'] = "%s" % RowTuple['Temperature']
                 if RowTuple['initialCurrent'] and FinalModuleRowsDict[Identificator].has_key('initialCurrent'):
                    if FinalModuleRowsDict[Identificator]['initialCurrent']:
-                       FinalModuleRowsDict[Identificator]['initialCurrent'] = "%s / %s"%(str(FinalModuleRowsDict[Identificator]['initialCurrent']), RowTuple['initialCurrent'])
+                       currentsList = [x.strip() for x in str(FinalModuleRowsDict[Identificator]['initialCurrent']).split('/')]
+                       currentsList.append(str(RowTuple['initialCurrent']))
+                       FinalModuleRowsDict[Identificator]['initialCurrent'] = " / ".join(list(set(currentsList)))
                    else:
                        FinalModuleRowsDict[Identificator]['initialCurrent'] = "%s" % RowTuple['initialCurrent']
                 if RowTuple['Comments'] and FinalModuleRowsDict[Identificator].has_key('Comments'):
                    if FinalModuleRowsDict[Identificator]['Comments']:
-                       FinalModuleRowsDict[Identificator]['Comments'] += " / %s"%RowTuple['Comments']
+                       commentsList = [x.strip() for x in FinalModuleRowsDict[Identificator]['Comments'].split('/')]
+                       commentsList.append(RowTuple['Comments'])
+                       FinalModuleRowsDict[Identificator]['Comments'] = " / ".join(list(set(commentsList)))
+
                    else:
                        FinalModuleRowsDict[Identificator]['Comments'] = "%s"%RowTuple['Comments']
                 if RowTuple['nCycles'] and FinalModuleRowsDict[Identificator].has_key('nCycles'):

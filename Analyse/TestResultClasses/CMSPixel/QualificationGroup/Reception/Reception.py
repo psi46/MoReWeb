@@ -438,9 +438,10 @@ class TestResult(GeneralTestResult):
 
         else:
             with self.TestResultEnvironmentObject.LocalDBConnection:
-                self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
-                    'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',
-                    Row)
+                if self.TestResultEnvironmentObject.Configuration['ShowOnlyLatestTestResults']:
+                    self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
+                        'DELETE FROM ModuleTestResults WHERE ModuleID = :ModuleID AND TestType=:TestType AND QualificationType=:QualificationType AND TestDate <= :TestDate',
+                        Row)
                 self.TestResultEnvironmentObject.LocalDBConnectionCursor.execute(
                     '''INSERT INTO ModuleTestResults
                     (
