@@ -353,21 +353,21 @@ class ModuleResultOverview:
 
                 if RowTuple['Temperature'] and FinalModuleRowsDict[Identificator].has_key('Temperature'):
                    if FinalModuleRowsDict[Identificator]['Temperature']:
-                       temperaturesList = [x.strip() for x in FinalModuleRowsDict[Identificator]['Temperature'].split('/')]
+                       temperaturesList = [x.strip() for x in FinalModuleRowsDict[Identificator]['Temperature'].split(' / ')]
                        temperaturesList.append(RowTuple['Temperature'])
                        FinalModuleRowsDict[Identificator]['Temperature'] = " / ".join(list(set(temperaturesList)))
                    else:
                        FinalModuleRowsDict[Identificator]['Temperature'] = "%s" % RowTuple['Temperature']
                 if RowTuple['initialCurrent'] and FinalModuleRowsDict[Identificator].has_key('initialCurrent'):
                    if FinalModuleRowsDict[Identificator]['initialCurrent']:
-                       currentsList = [x.strip() for x in str(FinalModuleRowsDict[Identificator]['initialCurrent']).split('/')]
+                       currentsList = [x.strip() for x in str(FinalModuleRowsDict[Identificator]['initialCurrent']).split(' / ')]
                        currentsList.append(str(RowTuple['initialCurrent']))
                        FinalModuleRowsDict[Identificator]['initialCurrent'] = " / ".join(list(set(currentsList)))
                    else:
                        FinalModuleRowsDict[Identificator]['initialCurrent'] = "%s" % RowTuple['initialCurrent']
                 if RowTuple['Comments'] and FinalModuleRowsDict[Identificator].has_key('Comments'):
                    if FinalModuleRowsDict[Identificator]['Comments']:
-                       commentsList = [x.strip() for x in FinalModuleRowsDict[Identificator]['Comments'].split('/')]
+                       commentsList = [x.strip() for x in FinalModuleRowsDict[Identificator]['Comments'].split(' / ')]
                        commentsList.append(RowTuple['Comments'])
                        FinalModuleRowsDict[Identificator]['Comments'] = " / ".join(list(set(commentsList)))
 
